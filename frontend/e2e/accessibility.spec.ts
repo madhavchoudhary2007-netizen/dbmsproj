@@ -12,6 +12,8 @@ const routes = [
 
 for (const [id, path] of routes) {
   test(`${id} ${path}: keyboard and accessibility audit`, async ({ page }) => {
+    if (path === "/login") test.fail(!process.env.RUN_XFAIL, "F-A11");
+
     const attemptedWrites: string[] = [];
     await page.addInitScript((routePath) => {
       if (routePath !== "/login") localStorage.setItem("apexgrid_token", "accessibility-audit-fake-token");

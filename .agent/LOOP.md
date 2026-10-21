@@ -13,7 +13,7 @@ score: NOT_RUN
 - Existing Playwright config and 16-route smoke test require stronger authenticated journey coverage. Login keyboard audit and responsive run are open from prior work.
 
 ## Findings
-- None assessed in this loop yet. Historical risks remain in CURRENT_STATE.md and NEXT_STATE.md.
+- F-A11, area D, P1: `/login` copyright text has 3.88:1 contrast against `#0b0e12` (axe serious at `frontend/app/globals.css:1073`; browser E2E-R02). Required: >=4.5:1 foreground color with regression check. Opened after T-035 corrected the audit fixture; desktop browser audit was 15 passed, 1 failed.
 
 ## Blocked
 - None confirmed for the isolated database baseline. Browser and quality gates remain open.
