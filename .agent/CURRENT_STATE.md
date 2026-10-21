@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-21T12:50:26Z
-git_head: f2d7054
+updated_at: 2026-10-21T12:50:55Z
+git_head: 7fdd20f
 branch: master
 architect_sha256: e7722a81b4f2c708f019b3468c0a9630411ea6df88eb85aa37a7aff6ffc523a9
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -26,6 +26,7 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 | Backend/API and schema | W2 | IN_REVIEW | n/a | 57 pass/0 skip; acceptance fixture blocked |
 | DBMS teacher views | W1/W2 | IN_REVIEW | partial needs test | historical manual checks; new E2E pending |
 | Evaluation harness | W3 | PLANNED | n/a | `E2E_CMD=none`; no score |
+| `ViewState<T>` boundary | W2 | VERIFIED | five variants typed | typecheck, T-004 |
 
 ## Known invariants
 - `0 <= session.total_laps <= 72`; session state/timestamp transitions enforced in SQL (`backend/migrations/001_initial.sql`).
@@ -42,4 +43,4 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 - T-001 accepted at `7fefa04`; T-010 accepted at `f2d7054` after offline motion lint passed. The old build gate hit a Turbopack port restriction.
 - Updated kit lint baseline: motion 0, banned 0, spacing 1 (real off-scale CSS plus border-width false positives). Workspace write check passed.
 - `localStorage` bearer token and local JWT fallback require a deployment-context decision before auth transport changes.
-- Worker queue is in `NEXT_STATE.md`; T-001 and T-010 are accepted.
+- Worker queue is in `NEXT_STATE.md`; T-001, T-010 and T-004 are accepted.

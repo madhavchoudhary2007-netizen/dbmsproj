@@ -1,5 +1,5 @@
 # NEXT_STATE
-updated_at: 2026-10-21T12:50:26Z
+updated_at: 2026-10-21T12:50:55Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; no worker dispatched; <=3 target files and <=150 changed lines per task)
@@ -13,11 +13,6 @@ loop_iteration: 1 of 5
 - target_files: playwright.config.ts, e2e/routes.spec.ts
 - contract: register E2E-R01..R16
 - verify: npx --yes playwright test --list
-### T-004 — G04 typed five-state boundary
-- worker: W2 | priority: P1
-- target_files: frontend/lib/data-state.ts
-- contract: typed five states with retry and retained data
-- verify: npm --prefix frontend run typecheck
 ### T-005 — G04 shared partial-state rendering
 - worker: W1 | priority: P1 | after: T-004
 - target_files: frontend/components/ui.tsx
@@ -112,3 +107,4 @@ loop_iteration: 1 of 5
 ## Done this iteration (pruned on compaction)
 - T-001 ✓ 7fefa04
 - T-010 ✓ f2d7054
+- T-004 ✓ 7fdd20f
