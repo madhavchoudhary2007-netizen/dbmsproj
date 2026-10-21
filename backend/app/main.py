@@ -16,7 +16,7 @@ from uuid import UUID, uuid4
 
 import bcrypt
 from bson import ObjectId
-from fastapi import Depends, FastAPI, HTTPException, Query, WebSocket, WebSocketDisconnect
+from fastapi import Depends, FastAPI, HTTPException, Query, Request, Response, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -31,6 +31,7 @@ from psycopg_pool import PoolClosed, PoolTimeout
 from psycopg.rows import dict_row, tuple_row
 
 from .config import APP_ENV, AUTO_DEMO_RACE, CORS_ORIGINS, JWT_ALGORITHM, JWT_MINUTES, JWT_SECRET, MONGODB_DATABASE, MONGODB_URL
+from .auth_cookie import create_csrf_token, set_auth_cookies
 from .database import close_pool, connection, fetch_all, fetch_one, open_pool, pool
 
 logging.basicConfig(level=logging.INFO)
@@ -153,11 +154,12 @@ def require_db():
         raise HTTPException(503, "PostgreSQL is unavailable")
 
 
-def current_user(credentials: HTTPAuthorizationCredentials | None = Depends(bearer)):
-    if not credentials:
+def current_user(request: Request, credentials: HTTPAuthorizationCredentials | None = Depends(bearer)):
+    token = credentials.credentials if credentials else request.cookies.get("apexgrid_session")
+    if not token:
         raise HTTPException(401, "Authentication required", headers={"WWW-Authenticate": "Bearer"})
     try:
-        claims = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        claims = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         user_id = claims.get("sub")
         if not user_id:
             raise ValueError()
@@ -505,7 +507,7 @@ def update_membership(membership_id: UUID, body: MembershipPatch, user=Depends(r
 
 
 @app.post("/api/auth/login")
-def login(body: Login):
+def login(body: Login, response: Response):
     try:
         user = fetch_one("SELECT id,email,password_hash,full_name,role FROM users WHERE lower(email)=lower(%s)", (body.email,))
     except Exception:
@@ -517,7 +519,14 @@ def login(body: Login):
     if not valid_password:
         raise HTTPException(401, "Invalid email or password")
     expiry = datetime.now(timezone.utc) + timedelta(minutes=JWT_MINUTES)
-    token = jwt.encode({"sub": str(user["id"]), "role": user["role"], "exp": expiry}, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    session_id = secrets.token_urlsafe(32)
+    token = jwt.encode(
+        {"sub": str(user["id"]), "role": user["role"], "exp": expiry, "jti": session_id},
+        JWT_SECRET,
+        algorithm=JWT_ALGORITHM,
+    )
+    csrf_token = create_csrf_token(session_id, JWT_SECRET)
+    set_auth_cookies(response, token, csrf_token, secure=APP_ENV != "local")
     return {"access_token": token, "token_type": "bearer", "user": jsonable({k: user[k] for k in ("id", "email", "full_name", "role")})}
 
 
