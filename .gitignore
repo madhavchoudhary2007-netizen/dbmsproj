@@ -13,3 +13,6 @@ agents-kit.zip
 .agent/results/*.raw.*
 .agent/eval/*.json
 .DS_Store
+
+frontend/test-results/
+frontend/playwright-report/
