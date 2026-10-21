@@ -254,10 +254,10 @@ a {
 .footer {
   padding: 16px 38px;
   border-top: 1px solid var(--line);
-  color: #56616c;
+  color: var(--muted);
   display: flex;
   justify-content: space-between;
-  font-size: 8px;
+  font-size: 12px;
   letter-spacing: 1.1px;
 }
 .page-head {

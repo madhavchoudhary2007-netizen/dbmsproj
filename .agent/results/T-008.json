@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "task_id": "T-008",
+  "status": "PASSED",
+  "files_modified": [
+    {
+      "path": "frontend/e2e/responsive.spec.ts",
+      "lines_added": 70,
+      "lines_removed": 0
+    }
+  ],
+  "diff_summary": "Added audits for all 16 routes at six viewport widths, checking horizontal overflow, visible pointer-actionable and keyboard-reachable controls, fake auth, mocked GETs, and blocked mutations.",
+  "verification": {
+    "command": "npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/responsive.spec.ts",
+    "exit_code": 0,
+    "tests_passed": 0,
+    "tests_failed": 0,
+    "duration_ms": 310
+  },
+  "unresolved_blockers": [
+    "Browser execution is deferred to the orchestrator per packet."
+  ]
+}

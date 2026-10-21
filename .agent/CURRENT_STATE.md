@@ -37,6 +37,7 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 - 2026-10-21: configuration, `.gitignore`, `.agent/ARCHITECT.md`, and state files only; 0 product-source lines.
 
 ## Open risks
+- T-031 accepted: footer contrast now uses existing muted token and 12px text. Taste check: one accent remains, no new focal/card/bloat defect; browser axe rerun pending.
 - T-030 accepted: shared StateMessage now announces loading/empty politely and errors assertively. Taste check: no visual focal/palette/card change; existing ui.tsx >300-line bloat remains T-023.
 - T-029 accepted: keyboard audit now checks document.activeElement rather than counting `:focus` matches; browser rerun pending after UI fixes.
 - T-007 orchestrator desktop browser check failed 16/16 after offline acceptance. Real findings: footer #56616c on #0b0e12 has 3.05 contrast; `.state` notices lack status semantics. Test defect: `:focus` locator counted two elements on login. T-029/T-030/T-031 queued; do not claim axe gate passed.
