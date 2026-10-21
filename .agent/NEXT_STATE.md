@@ -1,5 +1,5 @@
 # NEXT_STATE
-updated_at: 2026-10-21T12:42:00Z
+updated_at: 2026-10-21T12:50:26Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; no worker dispatched; <=3 target files and <=150 changed lines per task)
@@ -43,11 +43,6 @@ loop_iteration: 1 of 5
 - target_files: frontend/app/globals.css
 - contract: touched controls >=44x44px without breaking dense tables
 - verify: npm --prefix frontend run build
-### T-010 — G09 reduced motion
-- worker: W1 | priority: P1 | pilot FAILED: build port denied
-- target_files: frontend/app/globals.css
-- contract: honor prefers-reduced-motion on spinners/transitions
-- verify: bash scripts/eval/lint-motion.sh
 ### T-011 — G14 stale requests and recovery
 - worker: W2 | priority: P1
 - target_files: frontend/lib/api.ts
@@ -116,3 +111,4 @@ loop_iteration: 1 of 5
 
 ## Done this iteration (pruned on compaction)
 - T-001 ✓ 7fefa04
+- T-010 ✓ f2d7054

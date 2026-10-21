@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-21T12:42:00Z
-git_head: 7fefa04
+updated_at: 2026-10-21T12:50:26Z
+git_head: f2d7054
 branch: master
 architect_sha256: e7722a81b4f2c708f019b3468c0a9630411ea6df88eb85aa37a7aff6ffc523a9
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -39,7 +39,7 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 - No aggregate score or completion claim; acceptance, E2E and axe hard gates remain unresolved.
 - Acceptance requires round 3 of "ApexGrid World Series", which has no events: missing seed data, not a code defect. Existing demo archives were not altered by checks.
 - Production frontend image omits source and lint config; typecheck and lint run on the host only. Host Python 3.14 / Node 26 differ from Dockerfile Python 3.12 / Node 22.
-- T-001 accepted at `7fefa04`; T-010 prior in-scope CSS diff remains unaccepted pending offline verification. Old build gate hit a Turbopack port restriction.
+- T-001 accepted at `7fefa04`; T-010 accepted at `f2d7054` after offline motion lint passed. The old build gate hit a Turbopack port restriction.
 - Updated kit lint baseline: motion 0, banned 0, spacing 1 (real off-scale CSS plus border-width false positives). Workspace write check passed.
 - `localStorage` bearer token and local JWT fallback require a deployment-context decision before auth transport changes.
-- Worker queue is in `NEXT_STATE.md`; T-001 is accepted.
+- Worker queue is in `NEXT_STATE.md`; T-001 and T-010 are accepted.
