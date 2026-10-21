@@ -31,7 +31,7 @@ One orchestrator, three isolated workers. The Taste Agent is an orchestrator mod
 
 ## Hard rules
 
-1. No product source (`src/ app/ lib/ server/`, scaffold commands included) until `.agent/ARCHITECT.md` carries `STATUS: LOCKED` (check: `bash scripts/agent/verify-lock.sh`).
+1. No product source (the directories in `PRODUCT_DIRS`, `.agent/commands.env`; scaffold commands included) until `.agent/ARCHITECT.md` carries `STATUS: LOCKED` (check: `bash scripts/agent/verify-lock.sh`).
 2. Workers receive only their packet and return only the JSON envelope. They never commit.
 3. The orchestrator re-runs every worker's verify command itself (`bash scripts/agent/accept.sh T-nnn`).
 4. Present a deliverable only at aggregate score ≥ 95 with all hard gates passing. At most 5 repair iterations, then escalate honestly. Never relax a threshold, delete a test or mark a check passed to exit.

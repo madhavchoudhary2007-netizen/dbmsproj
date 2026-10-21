@@ -61,5 +61,6 @@ else
   echo "No architecture yet: read .agent/protocol/architect.md"
 fi
 bash scripts/agent/budget.sh || fail "size budget exceeded"
-test -z "$(git status --porcelain -- src app lib server 2>/dev/null)" || echo "WARN: uncommitted product changes; reconcile before dispatching"
+[ -f .agent/commands.env ] && . .agent/commands.env
+test -z "$(git status --porcelain -- ${PRODUCT_DIRS:-src app lib server} 2>/dev/null)" || echo "WARN: uncommitted product changes; reconcile before dispatching"
 echo "boot OK"

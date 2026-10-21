@@ -34,7 +34,7 @@ Never print more than 100 lines of a file; use rg -n and sed -n 'A,Bp'.
 ## Verify (exit 0 required for PASSED)
 pnpm exec vitest run tests/state/use-rename-project.spec.ts
 ## Output
-Exactly one JSON object matching the envelope schema below. Nothing else.
+Exactly one JSON object matching the envelope schema below. Nothing else. Do not copy the schema's `$schema` line into the result (it is tolerated, not needed).
 (paste the contents of .agent/envelope.schema.json here)
 ~~~
 
@@ -75,3 +75,10 @@ npx --yes @ast-grep/cli run --lang tsx --pattern 'export function useRenameProje
 rg -n "^export (interface|type) Project\b" -A 12 src/types/project.ts                                         # one type only
 rg -n "^export " src/lib/api.ts                                                                               # exports without bodies
 ```
+
+## Sandbox, network and failed results
+
+- Workers run with the orchestrator session's sandbox; a worker file cannot widen it (Codex docs: `sandbox_mode` in an agent file is ignored). Start the session with write access to the workspace (Codex: workspace-write). A read-only session makes every worker fail before it edits anything.
+- Worker sandboxes usually have no network. Write verify commands that run offline (tests, lint, typecheck, build, greps). A check that needs the network is run by the orchestrator in `accept.sh`'s rerun or by hand, and named as such in the packet.
+- Verify commands must not start servers on fixed ports or depend on a dev server; workers run side by side and ports collide.
+- When a result is FAILED: read `git diff` for its target files. If the diff is in scope and the failure was only the envelope format or a network-only check, fix the cause, re-run `accept.sh` and do not re-dispatch. Otherwise `git checkout -- <target files>` and re-dispatch once. Never leave a failed task's diff uncommitted and unreferenced: record it in CURRENT_STATE.

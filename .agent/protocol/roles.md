@@ -73,6 +73,8 @@ Prose can be ignored; settings files are read by the harness.
 
 `boot.sh` checks the worker TOMLs and, if `~/.codex/config.toml` exists, the `[agents]` cap. Packets still begin "Ignore AGENTS.md except this packet".
 
+Run Codex with write access to the workspace (workspace-write). Subagents inherit the parent session's sandbox and approvals, and Codex ignores `sandbox_mode`, `approval_policy` and `mcp_servers` in an agent file. Scope is enforced by `accept.sh`'s boundary check, not by the sandbox.
+
 ## Antigravity and Gemini CLI (instructions only)
 
 Antigravity documents no file setting for subagent count, subagent model or thinking level, and no custom subagents. So this is a rule, not a binding: the orchestrator runs on Gemini 3.8 Flash with high thinking; run at most 2 subagents at once, each Gemini 3.8 Flash with low thinking, picking those in the UI where offered. Verify in the UI at session start and report any mismatch. Gemini CLI: pass `-m "$WORKER_MODEL"`; its thinking level has no flag in this kit, set it in its config if your version supports it.

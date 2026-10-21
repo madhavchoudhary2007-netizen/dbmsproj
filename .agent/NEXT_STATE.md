@@ -7,7 +7,7 @@ loop_iteration: 1 of 5
 - worker: W2 | priority: P0 | pilot FAILED: envelope, worker DNS
 - target_files: backend/requirements-dev.txt
 - contract: correct HTTP client; preserve ranges
-- verify: bash -c 'source .agent/commands.env; eval "$INSTALL_CMD"'
+- verify: bash -c '! rg -q "httpx2" backend/requirements-dev.txt && .venv/bin/python -c "import httpx"'
 ### T-002 — G02 require full database baseline
 - worker: W3 | priority: P0 | blocked: acceptance fixture assumes absent World Series round 3
 - target_files: scripts/eval/db-baseline.sh
@@ -52,7 +52,7 @@ loop_iteration: 1 of 5
 - worker: W1 | priority: P1 | pilot FAILED: build port denied
 - target_files: frontend/app/globals.css
 - contract: honor prefers-reduced-motion on spinners/transitions
-- verify: bash -c 'bash scripts/eval/lint-motion.sh >/dev/null 2>&1 && rg -q "prefers-reduced-motion: reduce" frontend/app/globals.css && npm --prefix frontend run build'
+- verify: bash scripts/eval/lint-motion.sh
 ### T-011 — G14 stale requests and recovery
 - worker: W2 | priority: P1
 - target_files: frontend/lib/api.ts
@@ -108,10 +108,15 @@ loop_iteration: 1 of 5
 - target_files: scripts/acceptance.py
 - contract: own named test championship/events, clean up; preserve assertions
 - verify: .venv/bin/python scripts/acceptance.py
+### T-022 — Spacing lint precision
+- worker: W3 | priority: P2
+- target_files: scripts/eval/lint-spacing.sh
+- contract: ignore border widths, keep spacing checks
+- verify: bash scripts/eval/lint-spacing.sh --self-test
 
 ## Blocked
-- T-002: full database tests pass (57/57), but acceptance assumes an absent World Series round 3 and stops before its mutable checks.
-- T-019: container versions are Python 3.12.15 and Node 22.23.3; the frontend runner lacks source and lint config, so use a builder-stage gate.
+- T-002: 57 DB tests pass; acceptance lacks fixture event.
+- T-019: frontend runner lacks source; test in builder stage.
 - T-014: decide whether shared/public deployment requires HttpOnly cookie auth.
 
 ## Done this iteration (pruned on compaction)

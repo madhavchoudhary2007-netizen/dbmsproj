@@ -2,7 +2,7 @@
 
 Read when: starting a project or feature with no locked architecture, or when the user's instruction contradicts a locked one. Phase C is in `lenses.md`.
 
-**Rule:** no product source (`src/ app/ lib/ server/`, including scaffold commands) until `.agent/ARCHITECT.md` carries `STATUS: LOCKED`.
+**Rule:** no product source (the directories in `PRODUCT_DIRS` in `.agent/commands.env`, including scaffold commands) until `.agent/ARCHITECT.md` carries `STATUS: LOCKED`.
 
 ## Phase A: discovery
 

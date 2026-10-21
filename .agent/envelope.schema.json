@@ -2,38 +2,102 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
-  "required": ["task_id", "status", "files_modified", "diff_summary", "verification", "unresolved_blockers"],
+  "required": [
+    "task_id",
+    "status",
+    "files_modified",
+    "diff_summary",
+    "verification",
+    "unresolved_blockers"
+  ],
   "properties": {
-    "task_id": { "type": "string", "pattern": "^T-[0-9]{3,}$" },
-    "status": { "enum": ["PASSED", "FAILED"] },
+    "task_id": {
+      "type": "string",
+      "pattern": "^T-[0-9]{3,}$"
+    },
+    "status": {
+      "enum": [
+        "PASSED",
+        "FAILED"
+      ]
+    },
     "files_modified": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["path", "lines_added", "lines_removed"],
+        "required": [
+          "path",
+          "lines_added",
+          "lines_removed"
+        ],
         "properties": {
-          "path": { "type": "string" },
-          "lines_added": { "type": "integer", "minimum": 0 },
-          "lines_removed": { "type": "integer", "minimum": 0 }
+          "path": {
+            "type": "string"
+          },
+          "lines_added": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "lines_removed": {
+            "type": "integer",
+            "minimum": 0
+          }
         }
       }
     },
-    "diff_summary": { "type": "string", "maxLength": 400 },
+    "diff_summary": {
+      "type": "string",
+      "maxLength": 400
+    },
     "verification": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["command", "exit_code", "tests_passed", "tests_failed", "duration_ms"],
+      "required": [
+        "command",
+        "exit_code",
+        "tests_passed",
+        "tests_failed",
+        "duration_ms"
+      ],
       "properties": {
-        "command": { "type": "string" },
-        "exit_code": { "type": "integer" },
-        "tests_passed": { "type": "integer", "minimum": 0 },
-        "tests_failed": { "type": "integer", "minimum": 0 },
-        "duration_ms": { "type": "integer", "minimum": 0 },
-        "typecheck_errors": { "type": "integer", "minimum": 0 },
-        "lint_warnings": { "type": "integer", "minimum": 0 }
+        "command": {
+          "type": "string"
+        },
+        "exit_code": {
+          "type": "integer"
+        },
+        "tests_passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tests_failed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "typecheck_errors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "lint_warnings": {
+          "type": "integer",
+          "minimum": 0
+        }
       }
     },
-    "unresolved_blockers": { "type": "array", "items": { "type": "string", "maxLength": 200 } }
+    "unresolved_blockers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 200
+      }
+    },
+    "$schema": {
+      "type": "string"
+    }
   }
 }
