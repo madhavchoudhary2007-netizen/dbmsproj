@@ -37,6 +37,7 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 - 2026-10-21: configuration, `.gitignore`, `.agent/ARCHITECT.md`, and state files only; 0 product-source lines.
 
 ## Open risks
+- 2026-10-21 queue preparation: installed frontend devDependencies `@playwright/test` ^1.64.1 for route/state/accessibility/responsive E2E and `@axe-core/playwright` ^4.14.0 for accessibility assertions using `npm --prefix frontend install --save-dev @playwright/test @axe-core/playwright`; Chromium install requested with `npm --prefix frontend exec -- playwright install chromium`. No other dependency added.
 - No aggregate score or completion claim; acceptance, E2E and axe hard gates remain unresolved.
 - Acceptance requires round 3 of "ApexGrid World Series", which has no events: missing seed data, not a code defect. Existing demo archives were not altered by checks.
 - Production frontend image omits source and lint config; typecheck and lint run on the host only. Host Python 3.14 / Node 26 differ from Dockerfile Python 3.12 / Node 22.

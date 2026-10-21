@@ -10,9 +10,9 @@ loop_iteration: 1 of 5
 - verify: bash scripts/eval/db-baseline.sh
 ### T-003 — G03 establish route E2E harness
 - worker: W3 | priority: P1
-- target_files: playwright.config.ts, e2e/routes.spec.ts
+- target_files: frontend/playwright.config.ts, frontend/e2e/routes.spec.ts
 - contract: register E2E-R01..R16
-- verify: npx --yes playwright test --list
+- verify: npm --prefix frontend exec -- playwright test --list
 ### T-005 — G04 shared partial-state rendering
 - worker: W1 | priority: P1 | after: T-004
 - target_files: frontend/components/ui.tsx
@@ -20,19 +20,19 @@ loop_iteration: 1 of 5
 - verify: npm --prefix frontend run typecheck
 ### T-006 — G04 screen-state fixtures
 - worker: W3 | priority: P1 | after: T-003
-- target_files: e2e/states.spec.ts
+- target_files: frontend/e2e/states.spec.ts
 - contract: cover applicable five states for all 16 routes; fail on missing state
-- verify: npx --yes playwright test e2e/states.spec.ts
+- verify: npm --prefix frontend exec -- playwright test --list frontend/e2e/states.spec.ts
 ### T-007 — G05 keyboard and screen-reader audit
 - worker: W3 | priority: P1 | after: T-003
-- target_files: e2e/accessibility.spec.ts
+- target_files: frontend/e2e/accessibility.spec.ts
 - contract: tab/focus/labels/status checks on all routes
-- verify: npx --yes playwright test e2e/accessibility.spec.ts
+- verify: npm --prefix frontend exec -- playwright test --list frontend/e2e/accessibility.spec.ts
 ### T-008 — G06 viewport matrix
 - worker: W3 | priority: P1 | after: T-003
-- target_files: e2e/responsive.spec.ts
+- target_files: frontend/e2e/responsive.spec.ts
 - contract: six viewport widths, no overflow or lost action
-- verify: npx --yes playwright test e2e/responsive.spec.ts
+- verify: npm --prefix frontend exec -- playwright test --list frontend/e2e/responsive.spec.ts
 ### T-009 — G07 touch targets
 - worker: W1 | priority: P1 | after: T-008
 - target_files: frontend/app/globals.css
