@@ -1,12 +1,12 @@
 # NEXT_STATE
-updated_at: 2026-10-21T18:48:00Z
+updated_at: 2026-10-21T19:02:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; no worker dispatched; <=3 target files and <=150 changed lines per task)
-### T-047 — Exclude injected dev-toolbar control from touch audit
-- worker: W3 | priority: P1 | after: T-009
+### T-048 — Extend touch audit to all product screens
+- worker: W3 | priority: P1 | origin: G07 | after: T-047
 - target_files: frontend/e2e/touch-targets.spec.ts
-- contract: exclude Next.js dev indicator only; keep all product controls and 44px assertion; focused browser passes
+- contract: inspect all 15 nonredirect routes at 375px with strict product-control geometry; report any new defects
 - verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/touch-targets.spec.ts
 ### T-012 — G15 deterministic timing boundaries
 - worker: W3 | priority: P1
@@ -56,6 +56,7 @@ loop_iteration: 1 of 5
 - T-014: ADR-001 authorizes cookie/CSRF migration; split into atomic frontend, backend and test tasks before dispatch.
 
 ## Done this iteration (pruned on compaction)
+- T-047 ✓ 139e92f; dev-toolbar false positive excluded; full browser suite 645/645
 - T-009 ✓ 8da6ff7; shared controls >=44px in enabled mobile browser check and production build
 - T-046 ✓ fe207ca; RUN_XFAIL=1 reproduced 51 undersized targets across four routes
 - T-045 ✓ 33f09ff; PyJWT replacement and 8 focused checks, backend audit green, isolated DB 65/0/0 + live acceptance

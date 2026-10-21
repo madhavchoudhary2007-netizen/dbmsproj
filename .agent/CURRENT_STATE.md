@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-21T18:48:00Z
-git_head: 8da6ff7
+updated_at: 2026-10-21T19:02:00Z
+git_head: 139e92f
 branch: perfection-loop
 architect_sha256: 4cd5bc0272d02c031ca5ea833f1f07b200444efa866448f4549a5f68dab7ca73
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -48,6 +48,7 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 - T-045 replaced python-jose with PyJWT 2.15.1, preserving HS256 decoding and auth behavior. Focused 8/8 pass; pip-audit reports no known backend runtime vulnerabilities. Marker removed; isolated DB suite 65 passed/0 failed/0 skipped and live acceptance passed.
 - T-046 reproduced G07 at 375px: 51 undersized targets over dashboard/live/dbms/login, collapsing to shared nav links, menu/close/sign-out/refresh buttons, two selects, and login fields/button. RUN_XFAIL=1 mobile-375 fails as expected.
 - T-009 fixed those shared controls; RUN_XFAIL=1 touch audit and build pass. After marker removal, full browser run: 644 pass/1 fail from injected Next.js Dev Tools button. T-047 narrows only that external control; product target assertion stays strict.
+- T-047 excluded the injected dev-toolbar button; full Playwright matrix passed 645/645 across five projects. G07 audit still samples four routes; expand to all screens before closing.
 - T-008 responsive desktop audit was interrupted after R01 timed out at 30s and R02 began; full matrix remains unverified. T-036 queued to bound per-width cases.
 - Latest safe quality checks: frontend typecheck 0, lint 0, build 0; in-memory simulation pytest 2 pass/0 skip (35 deselected); motion/banned lint 0, spacing lint 1.
 - T-006 blocked after two W3 failures: generic five-state fixture overasserted states without route-specific applicability; failed draft at `.agent/results/T-006.raw.failed.spec.ts`. T-026..028 depend on it.
