@@ -81,6 +81,91 @@ export async function api<T = any>(
   if (response.status === 204) return undefined as T;
   return response.json();
 }
+
+export type ApiReadOptions = Omit<RequestInit, "signal" | "method"> & {
+  signal?: AbortSignal | AbortController | null;
+  method?: "GET" | "HEAD";
+  retries?: number;
+  retryDelayMs?: number;
+  maxRetryDelayMs?: number;
+};
+
+const MAX_READ_RETRIES = 5;
+const MAX_READ_DELAY_MS = 10_000;
+
+function getAbortSignal(signal?: AbortSignal | AbortController | null): AbortSignal | undefined {
+  if (!signal) return undefined;
+  return "signal" in signal ? signal.signal : signal;
+}
+
+function isAbortError(error: unknown): boolean {
+  return error instanceof Error && error.name === "AbortError";
+}
+
+function isRetryableReadError(error: unknown): boolean {
+  if (error instanceof TypeError) return true;
+  if (!(error instanceof Error)) return false;
+  const status = error.message.match(/^(\d{3})(?:\s|:|$)/)?.[1];
+  return status !== undefined && Number(status) >= 500 && Number(status) < 600;
+}
+
+function abortableDelay(ms: number, signal?: AbortSignal): Promise<void> {
+  if (signal?.aborted) return Promise.reject(new DOMException("The operation was aborted", "AbortError"));
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      signal?.removeEventListener("abort", onAbort);
+      resolve();
+    }, ms);
+    const onAbort = () => {
+      clearTimeout(timer);
+      signal?.removeEventListener("abort", onAbort);
+      reject(new DOMException("The operation was aborted", "AbortError"));
+    };
+    signal?.addEventListener("abort", onAbort, { once: true });
+  });
+}
+
+/** Opt-in GET/HEAD read with bounded retries for transient network and server errors. */
+export async function apiRead<T = any>(path: string, options: ApiReadOptions = {}): Promise<T> {
+  const {
+    signal: signalInput,
+    method = "GET",
+    retries = 2,
+    retryDelayMs = 250,
+    maxRetryDelayMs = 2_000,
+    ...requestOptions
+  } = options;
+  if (method !== "GET" && method !== "HEAD") {
+    throw new TypeError("apiRead only supports GET and HEAD requests");
+  }
+  if (requestOptions.body != null) {
+    throw new TypeError("apiRead does not support request bodies");
+  }
+  const signal = getAbortSignal(signalInput);
+  const retryCount = Number.isFinite(retries)
+    ? Math.min(MAX_READ_RETRIES, Math.max(0, Math.floor(retries)))
+    : 0;
+  const initialDelay = Number.isFinite(retryDelayMs)
+    ? Math.min(MAX_READ_DELAY_MS, Math.max(0, retryDelayMs))
+    : 250;
+  const delayCap = Number.isFinite(maxRetryDelayMs)
+    ? Math.min(MAX_READ_DELAY_MS, Math.max(0, maxRetryDelayMs))
+    : 2_000;
+
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await api<T>(path, { ...requestOptions, method, signal });
+    } catch (error) {
+      if (
+        signal?.aborted || isAbortError(error) || attempt >= retryCount ||
+        !isRetryableReadError(error)
+      ) throw error;
+      const delay = Math.min(delayCap, initialDelay * 2 ** attempt);
+      await abortableDelay(delay, signal);
+    }
+  }
+}
+
 export const list = (path: string, params?: Record<string, string>) => {
   const q = new URLSearchParams({ limit: "200", offset: "0", ...params });
   return api<Row[]>(`${path}${path.includes("?") ? "&" : "?"}${q}`);

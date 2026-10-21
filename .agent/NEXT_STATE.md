@@ -28,10 +28,10 @@ loop_iteration: 1 of 5
 - target_files: frontend/app/globals.css
 - contract: touched controls >=44x44px without breaking dense tables
 - verify: npm --prefix frontend run build
-### T-011 — G14 stale requests and recovery
-- worker: W2 | priority: P1
+### T-025 — Repair opt-in HEAD response handling
+- worker: W2 | priority: P1 | after: T-011
 - target_files: frontend/lib/api.ts
-- contract: cancellation/retry primitive; no wire-contract change
+- contract: make apiRead HEAD resolve without JSON parsing, or restrict helper to GET; preserve existing api behavior and wire fields
 - verify: npm --prefix frontend run typecheck
 ### T-012 — G15 deterministic timing boundaries
 - worker: W3 | priority: P1
@@ -101,7 +101,8 @@ loop_iteration: 1 of 5
 - T-014: decide whether shared/public deployment requires HttpOnly cookie auth.
 
 ## Done this iteration (pruned on compaction)
-- T-003 ✓ 7afd3e8 (80 cases discovered; desktop browser 16/16 pass)
+- T-011 ✓ 8d26347 (follow-up T-025 required before use)
+- T-003 ✓ 5584461 (80 cases discovered; desktop browser 16/16 pass)
 - T-005 ✓ 889de7b
 - T-001 ✓ 7fefa04
 - T-010 ✓ f2d7054
