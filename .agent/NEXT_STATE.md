@@ -8,11 +8,6 @@ loop_iteration: 1 of 5
 - target_files: scripts/eval/db-baseline.sh
 - contract: reject skipped DB tests; run acceptance
 - verify: bash scripts/eval/db-baseline.sh
-### T-003 — G03 establish route E2E harness
-- worker: W3 | priority: P1
-- target_files: frontend/playwright.config.ts, frontend/e2e/routes.spec.ts
-- contract: register E2E-R01..R16
-- verify: npm --prefix frontend exec -- playwright test --list
 ### T-006 — G04 screen-state fixtures
 - worker: W3 | priority: P1 | after: T-003
 - target_files: frontend/e2e/states.spec.ts
@@ -106,7 +101,8 @@ loop_iteration: 1 of 5
 - T-014: decide whether shared/public deployment requires HttpOnly cookie auth.
 
 ## Done this iteration (pruned on compaction)
-- T-005 ✓ ab7b5c7
+- T-003 ✓ 7afd3e8 (80 cases discovered; desktop browser 16/16 pass)
+- T-005 ✓ 889de7b
 - T-001 ✓ 7fefa04
 - T-010 ✓ f2d7054
 - T-004 ✓ 7fdd20f
