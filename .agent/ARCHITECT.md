@@ -1,7 +1,7 @@
 <!-- LOCK:BEGIN -->
 > STATUS: LOCKED
-> SHA256: e7722a81b4f2c708f019b3468c0a9630411ea6df88eb85aa37a7aff6ffc523a9
-> LOCKED_AT: 2026-10-21T12:15:10Z
+> SHA256: 4cd5bc0272d02c031ca5ea833f1f07b200444efa866448f4549a5f68dab7ca73
+> LOCKED_AT: 2026-10-21T13:35:31Z
 > LOCKED_BY: orchestrator
 <!-- LOCK:END -->
 # ApexGrid architecture — existing system, improvement in place
@@ -75,11 +75,11 @@ Enterprise SaaS / Analytics: **5** matching signals (tables, dashboards, filters
 
 ### A.5 Non-goals
 
-No rewrite of working race flows, schema, SQL rules, public API routes or persisted IDs. No new service split, third-party telemetry provider, fixture reset, new championship product, or visual redesign. No production deployment in this phase.
+No wholesale rewrite of working race flows, SQL rules, public API routes or persisted IDs. ADR-001 permits a reasoned font/type-scale change, a coordinated cookie/CSRF auth migration, additive schema migrations tested only on a disposable stack without dropping or rewriting existing data, and API contract changes only when required by a finding or change proposal and documented in a separate ADR each. These are permissions, not implemented changes. No new service split, third-party telemetry provider, fixture reset, new championship product, or visual redesign. No production deployment in this phase.
 
 ### A.6 Assumptions and unknowns
 
-**Required assumption:** keep ApexGrid and its existing PostgreSQL schema and API contracts; improve it in place. Treat historical local-demo records as valuable and do not erase them. Browser E2E is not configured; planned IDs above are a task backlog. Local Compose is the acceptance environment; Docker was unavailable during this baseline. Architecture-changing unknowns: whether shared/public deployment is intended, whether authentication must move away from browser localStorage, and whether the evaluator requires actual browser automation or only a teacher demonstration. Use the reversible local-demo path until answered.
+**Required assumption:** keep ApexGrid and improve it in place, preserving its existing PostgreSQL schema and API contracts until an individually justified change is implemented. ADR-001 authorizes the specific font, cookie/CSRF auth, additive schema, and finding-backed API paths in A.5; it does not enact them. Treat historical local-demo records as valuable and do not erase them. Browser E2E is not configured; planned IDs above are a task backlog. Local Compose is the acceptance environment; Docker was unavailable during this baseline. Remaining unknowns: whether shared/public deployment is intended and whether the evaluator requires actual browser automation or only a teacher demonstration. Use the reversible local-demo path until answered.
 
 ## Phase B — system as built
 
@@ -123,7 +123,7 @@ type RaceArchive = { session: Session; results: unknown[]; incidents: unknown[];
 type DataState<T> = { kind: "empty" } | { kind: "loading"; previous?: T } | { kind: "populated"; data: T } | { kind: "error"; message: string; retry: () => void } | { kind: "partial"; data: T; message: string; retry: () => void };
 ```
 
-Pydantic inputs already in `backend/app/main.py`: `Login`, `Action`, `IncidentIn`, `Decision`, `ReservationIn`, `AutoReservationIn`, `Telemetry`, `ResultIn`, `DemoRaceCreate`, `SimulationControl`. SQL row ownership and invariants are in `backend/migrations/001_initial.sql`; full route fields remain in `docs/contracts.md`. Future W2 packets should replace untyped frontend `Row`/`any` boundaries incrementally without changing wire names.
+Pydantic inputs already in `backend/app/main.py`: `Login`, `Action`, `IncidentIn`, `Decision`, `ReservationIn`, `AutoReservationIn`, `Telemetry`, `ResultIn`, `DemoRaceCreate`, `SimulationControl`. SQL row ownership and invariants are in `backend/migrations/001_initial.sql`; full route fields remain in `docs/contracts.md`. Future W2 packets should replace untyped frontend `Row`/`any` boundaries incrementally while preserving wire names unless an ADR-001 finding/change proposal justifies a contract change and a separate ADR records it.
 
 PostgreSQL's 17 existing tables are `users`, `teams`, `drivers`, `team_memberships`, `championships`, `circuits`, `race_events`, `race_sessions`, `incident_reports`, `demo_races`, `demo_race_entries`, `penalties`, `penalty_points`, `session_results`, `driver_standings`, `pit_boxes`, and `pit_reservations`. MongoDB currently owns the `telemetry` collection. Neither store is being redesigned.
 
@@ -131,7 +131,7 @@ PostgreSQL's 17 existing tables are `users`, `teams`, `drivers`, `team_membershi
 
 | Flow | States and legal transitions | Persistence / guardrail |
 |---|---|---|
-| Login | anonymous -> authenticating -> authenticated or error; authenticated -> refreshing/me -> authenticated or anonymous; authenticated -> signed out | `auth/login`, `auth/me`; JWT role checked server-side; localStorage token is current risk |
+| Login | anonymous -> authenticating -> authenticated or error; authenticated -> refreshing/me -> authenticated or anonymous; authenticated -> signed out | `auth/login`, `auth/me`; JWT role checked server-side; localStorage token is current risk. ADR-001 authorizes future httpOnly, Secure, SameSite cookie + CSRF transport with matching backend/tests; current transport remains as built. |
 | Session | SCHEDULED -> ACTIVE or CANCELLED; ACTIVE <-> PAUSED; ACTIVE/PAUSED -> COMPLETED/CANCELLED/SCHEDULED(reset); COMPLETED/CANCELLED -> SCHEDULED(reset) where API permits | PostgreSQL trigger and timestamp checks; `POST /sessions/{id}/action`; lap 0..72 |
 | Simulation | absent -> running <-> paused -> stopped; stopped/reset -> running after clean start; generated completion -> archived + optionally new auto race | in-memory `simulations`, SQL session and Mongo telemetry; restore from stored packets on restart |
 | Pit reservation | requested -> locked/allocation -> RESERVED or conflict/no-box error; RESERVED -> COMPLETED/CANCELLED; terminal states cannot reopen | SQL row lock, exclusion/unique constraints; auto chooses earliest free event box/window; Mongo/WS reflect assigned driver |
@@ -186,8 +186,8 @@ Severity P0 blocks reproducible verification/security; P1 blocks a protocol gate
 | G07 touch targets | P1 | Audit clickable targets against >=44x44px, especially dense tables, sidebar and DBMS tabs. |
 | G08 spacing scale | P2 | `globals.css` has many literal dimensions; constrain future W1 changes to 4/8/12/16/24/32/48/64 tokens and audit existing exceptions. |
 | G09 reduced motion | P1 | Verify `prefers-reduced-motion` covers spinners, transitions and live changes; add browser assertion. |
-| G10 font choice | P2 | Arial/Helvetica and generic mono are the only current faces; choose and test a deliberate accessible type system without rebranding. |
-| G11 auth token storage | P1 | Bearer token in `localStorage` (`auth.tsx`/`api.ts`); evaluate HttpOnly cookie migration without changing existing API contract until decision. |
+| G10 font choice | P2 | Arial/Helvetica and generic mono are the only current faces; ADR-001 authorizes an accessible font family and type scale chosen from the archetype table with a written reason, without rebranding. |
+| G11 auth token storage | P1 | Bearer token remains in `localStorage` (`auth.tsx`/`api.ts`); ADR-001 authorizes migration to an httpOnly, Secure, SameSite cookie with CSRF protection, matching backend changes and tests. Any required API contract change needs its own finding/change proposal and ADR. |
 | G12 JWT secret | P1 | Backend fails closed outside local mode, but local demo secret/Compose fallback must be excluded from shared deployment and tested. |
 | G13 giant mixed modules | P1 | `special-pages.tsx` ~1720 lines, `main.py` ~2175, `globals.css` ~1416; W1/W2 boundaries and reviewability need small extractions. |
 | G14 request/stream race conditions | P1 | Different polling/WS paths use local guards; verify navigation cancellation, reconnect snapshot, duplicate ticks and Mongo partial failures. |
@@ -216,6 +216,8 @@ Five-state screen inventory (`Y` = evident static code path, `?` = needs test, `
 
 Pass 1 findings and amendments: goal lens assigned all route/API IDs and prerequisite owners; expert lens replaced generic Vitest commands with pytest and marked missing E2E; taste lens preserved existing identity while flagging crowded mixed files, literal spacing and unverified focal actions; technical lens added SQL/Mongo, timing and concurrency guardrails; edge lens added explicit boundary tests. Pass 2 checked each amendment against existing contracts and added the cross-store partial state and runtime mismatch. Pass 3 produced no further document amendment. The unresolved implementation gaps remain above and under Risks; none is described as passing.
 
+ADR-001 focused Phase C, pass 1 on A.5/A.6, B.3/B.4, G10/G11 and R03: goal lens retained all existing route/API deliverables and required a finding before any contract change; expert lens required cookie/CSRF backend tests and disposable-stack migration proof; taste lens required an archetype-based typography reason without rebranding; technical lens retained JWT roles, CSRF checks and non-destructive SQL invariants; edge lens identified login expiry/CSRF rejection, old-client compatibility and migration replay as future tests. These are implementation gaps, not completed checks. Pass 2 found zero further architecture amendments; no lens finding was rejected.
+
 | Lens 1 deliverables | Cold-start steps / prerequisite | Owner task | Test IDs |
 |---|---|---|---|
 | Core routes R01-R03, R08-R15 | install -> Compose/seed -> login -> selected page | T-001, T-002, T-003 | E2E-R01..R03,R08..R15; API-01..03,09 |
@@ -235,6 +237,6 @@ Lens 5 boundary matrix: 0/1/72/73 laps and sector three boundary (API-04); dupli
 
 - R01: Install and full DB acceptance are red/unverified until G01 and Docker availability are resolved; no completed product claim or score >=95 is possible now.
 - R02: `E2E_CMD=none` and planned route IDs cannot pass until W3 adds Playwright; historical “E2E passing” means prior manual/API checks, not current automated browser coverage.
-- R03: The exact security target for token storage/shared deployment needs a product decision before changing auth transport; current API and local demo must keep working.
+- R03: ADR-001 authorizes cookie/CSRF auth migration with matching backend changes and tests. Implementation and compatibility verification remain open; the current API and local demo must keep working until the migration is accepted.
 - R04: Large mixed UI/API files make the strict W1/W2 packet boundaries costly. Extract in small behavior-preserving steps with one focused verify each.
 - R05: Runtime and Compose availability differ from historical verification. Any result measured on host Python 3.14/Node 26 needs container parity before final evaluation.
