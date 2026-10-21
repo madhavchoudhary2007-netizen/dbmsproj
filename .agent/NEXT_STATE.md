@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-21T16:50:00Z
+updated_at: 2026-10-21T17:20:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; no worker dispatched; <=3 target files and <=150 changed lines per task)
-### T-042 — Align mobile viewport browser gate
-- worker: W3 | priority: P1 | origin: F-A14
-- target_files: frontend/playwright.config.ts, .github/workflows/ci.yml
-- contract: use Chromium for iPhone viewport project; CI installs only configured browser, retain mobile emulation and assertions
-- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/responsive.spec.ts
+### T-043 — Characterize authentication responses
+- worker: W3 | priority: P0 | origin: Phase 0 safety net
+- target_files: backend/tests/test_api.py
+- contract: pin login/me/token expiry/signature status and response shapes before JWT library migration
+- verify: .venv/bin/pytest -q backend/tests/test_api.py -k auth_characterization
 ### T-009 — G07 touch targets
 - worker: W1 | priority: P1 | after: T-008
 - target_files: frontend/app/globals.css
@@ -54,13 +54,14 @@ loop_iteration: 1 of 5
 - contract: compare host/container Node and Python; run container gates
 - verify: bash scripts/eval/runtime-parity.sh
 ## Blocked
-- Full responsive matrix passed 96/96 in desktop browser project; other Playwright projects remain unrun.
+- Browser matrix passed 640/640 across all five configured Chromium projects. Security audit and quality debt remain.
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
 - T-019: frontend runner lacks source; test in builder stage.
 - T-014: ADR-001 authorizes cookie/CSRF migration; split into atomic frontend, backend and test tasks before dispatch.
 
 ## Done this iteration (pruned on compaction)
+- T-042 ✓ 0d020d0; all browser E2E projects now pass 640/640
 - T-041 ✓ 7f59af7; root/login/mobile fixture fixed, 96/96 desktop-project responsive cases passed
 - T-040 ✓ d6e328e; desktop accessibility sweep 16/16
 - T-036 ✓ 6fb9ba0; bounded 96-case/project responsive matrix, fixture follow-up required

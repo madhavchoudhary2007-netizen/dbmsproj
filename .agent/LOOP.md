@@ -17,10 +17,13 @@ score: NOT_RUN
 - F-A11, area D, P1, closed by T-039: `/login` copyright text was 3.88:1 against `#0b0e12` (axe serious at `frontend/app/globals.css:1073`); `--muted` yields 6.44:1. `RUN_XFAIL=1` reproduced before and passed after; marker removed.
 - F-A12, area D, P1, closed by T-040: browser test waited for visible actionable control before Tab; desktop accessibility sweep passed 16/16 afterward.
 - F-A13, area D, P1, closed by T-041: responsive audit root redirect and login/mobile action fixtures corrected; desktop browser project passed 96/96 route-width cases.
-- F-A14, area D, P1, open: full browser gate failed 128 cases in the mobile-375 project because WebKit was missing; after installing it, the login 320px keyboard action still failed in WebKit while the same case passed in mobile-320 Chromium. The required matrix is viewport coverage, so T-042 will align the iPhone emulator to Chromium; WebKit testing can be a separately scoped cross-browser gate.
+- F-A14, area D, P1, closed by T-042: mobile-375 now uses Chromium with iPhone touch/viewport emulation. Its responsive matrix passed 96/96 and the full browser suite passed 640/640 across five projects.
+- F-E01, area E, P0, open: `python-jose` 3.5.0 has an unpatched critical [algorithm-confusion advisory](https://github.com/advisories/GHSA-3qf3-8w2g-rqmx); current API explicitly restricts HS256 in both decode paths, which narrows exposure, but the dependency audit remains red. Replace with a maintained JWT library after auth characterization tests, then rerun token/API/WS compatibility and `pip-audit`.
+- F-E02, area E, P2, open: `npm audit` reports 7 high and 2 moderate findings in the frontend dev-tool chain, through Tailwind 3 and `eslint-config-next`; suggested fixes are major dependency changes. Evaluate targeted safe upgrades before any major migration.
 
 ## Full-gates baseline (isolated stack, 2026-10-21)
 - 10 gates ran; 6 failed: ruff check (641), ruff format (7 files), mypy strict (311), frontend strict lint (45 explicit `any`), browser E2E (mobile-375 WebKit issue), supply-chain audit (3 findings in `python-jose`/`ecdsa`). DB-backed pytest+acceptance, frontend typecheck/build, and backend coverage passed. Browser E2E reported 512 passing cases before the missing-WebKit failures.
+- After T-042, the full browser gate passed 640/640 cases in 1.1 minutes; remaining red gate count is five. The frontend audit, run separately, found 7 high and 2 moderate issues; the combined gate stops at the backend audit failure.
 
 ## Blocked
 - None confirmed for the isolated database baseline. Browser and quality gates remain open.

@@ -8,6 +8,7 @@ node_modules/
 *.tsbuildinfo
 coverage/
 .coverage
+coverage.xml
 dist/
 build/
 agents-kit.zip
