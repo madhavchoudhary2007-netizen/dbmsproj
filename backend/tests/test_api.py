@@ -175,6 +175,127 @@ def test_auth_characterization_websocket_accepts_and_rejects_tokens(
     assert rejected.value.reason == "Invalid or expired token"
 
 
+def cookie_auth_login(client, monkeypatch):
+    import bcrypt
+    user = auth_characterization_user(bcrypt.hashpw(b"correct horse", bcrypt.gensalt()).decode())
+    auth_characterization_fetch(monkeypatch, user)
+    return auth_characterization_login(client, user, "correct horse")
+
+
+def cookie_auth_set_cookies(response):
+    from http.cookies import SimpleCookie
+    cookies = SimpleCookie()
+    for header in response.headers.get_list("set-cookie"):
+        cookies.load(header)
+    return cookies
+
+
+@pytest.mark.xfail(strict=True, reason="G11")
+def test_cookie_auth_login_sets_host_only_session_and_readable_csrf(
+    auth_characterization_client, monkeypatch
+):
+    response = cookie_auth_login(auth_characterization_client, monkeypatch)
+    assert response.status_code == 200
+    cookies = cookie_auth_set_cookies(response)
+    assert set(cookies) == {"apexgrid_session", "apexgrid_csrf"}
+    session, csrf = cookies["apexgrid_session"], cookies["apexgrid_csrf"]
+    assert session["httponly"] and session["samesite"].lower() == "lax"
+    assert session["path"] == "/" and not session["domain"]
+    assert csrf["samesite"].lower() == "lax" and not csrf["httponly"]
+    assert csrf["path"] == "/" and not csrf["domain"]
+
+
+@pytest.mark.xfail(strict=True, reason="G11")
+def test_cookie_auth_me_uses_session_without_bearer(auth_characterization_client, monkeypatch):
+    user = auth_characterization_user()
+    cookie_auth_login(auth_characterization_client, monkeypatch)
+    response = auth_characterization_client.get("/api/auth/me")
+    assert response.status_code == 200
+    assert response.json() == {key: user[key] for key in ("id", "email", "full_name", "role")}
+
+
+@pytest.mark.parametrize("csrf_value", [None, "wrong-token"], ids=["missing", "wrong"])
+@pytest.mark.xfail(strict=True, reason="G11")
+def test_cookie_auth_logout_rejects_missing_or_wrong_csrf(
+    auth_characterization_client, monkeypatch, csrf_value
+):
+    cookie_auth_login(auth_characterization_client, monkeypatch)
+    headers = {"Origin": "http://localhost:3000"}
+    if csrf_value is not None:
+        headers["X-CSRF-Token"] = csrf_value
+    response = auth_characterization_client.post("/api/auth/logout", headers=headers)
+    assert response.status_code == 403
+
+
+@pytest.mark.xfail(strict=True, reason="G11")
+def test_cookie_auth_logout_accepts_csrf_and_clears_both_cookies(
+    auth_characterization_client, monkeypatch
+):
+    cookie_auth_login(auth_characterization_client, monkeypatch)
+    csrf = auth_characterization_client.cookies.get("apexgrid_csrf", "")
+    response = auth_characterization_client.post(
+        "/api/auth/logout",
+        headers={"Origin": "http://localhost:3000", "X-CSRF-Token": csrf},
+    )
+    assert response.status_code in {200, 204}
+    headers = [value.lower() for value in response.headers.get_list("set-cookie")]
+    cleared = {name for name in ("apexgrid_session", "apexgrid_csrf")
+               if any(value.startswith(f"{name}=") and ("max-age=0" in value or "expires=" in value)
+                      for value in headers)}
+    assert cleared == {"apexgrid_session", "apexgrid_csrf"}
+
+
+@pytest.mark.xfail(strict=True, reason="G11")
+def test_cookie_auth_websocket_accepts_session_without_jwt_subprotocol(
+    auth_characterization_client, monkeypatch
+):
+    user = auth_characterization_user()
+    auth_characterization_fetch(monkeypatch, user)
+    cookie_auth_login(auth_characterization_client, monkeypatch)
+    session = auth_characterization_client.cookies.get("apexgrid_session", "")
+    path = f"/api/ws/sessions/{uuid4()}"
+    headers = {
+        "Cookie": f"apexgrid_session={session}",
+        "Origin": "http://localhost:3000",
+    }
+    with auth_characterization_client.websocket_connect(path, headers=headers) as ws:
+        assert ws.accepted_subprotocol is None
+
+
+@pytest.mark.xfail(strict=True, reason="G11")
+def test_cookie_auth_websocket_rejects_unapproved_origin(
+    auth_characterization_client, monkeypatch
+):
+    from starlette.websockets import WebSocketDisconnect
+    login = cookie_auth_login(auth_characterization_client, monkeypatch)
+    session = login.cookies.get("apexgrid_session", "missing-cookie")
+    legacy_token = session if session != "missing-cookie" else login.json()["access_token"]
+    path = f"/api/ws/sessions/{uuid4()}"
+    headers = {
+        "Origin": "https://unapproved.example",
+        "Cookie": f"apexgrid_session={session}",
+    }
+    with (
+        pytest.raises(WebSocketDisconnect),
+        auth_characterization_client.websocket_connect(
+            path, subprotocols=["apexgrid.jwt", legacy_token], headers=headers
+        ),
+    ):
+        pass
+
+
+@pytest.mark.xfail(strict=True, reason="G11")
+def test_cookie_auth_login_sets_secure_cookies_outside_local_mode(
+    auth_characterization_client, monkeypatch
+):
+    monkeypatch.setattr(main_module, "APP_ENV", "production")
+    response = cookie_auth_login(auth_characterization_client, monkeypatch)
+    assert response.status_code == 200
+    cookies = cookie_auth_set_cookies(response)
+    assert cookies["apexgrid_session"]["secure"]
+    assert cookies["apexgrid_csrf"]["secure"]
+
+
 def test_historical_archive_fills_missing_laps_without_replacing_recorded_data():
     session_id = uuid4()
     first_driver, second_driver = uuid4(), uuid4()
