@@ -44,30 +44,11 @@ pytest_status=$?
 set -e
 
 set +e
-DATABASE_URL="$DATABASE_URL" MONGODB_URL="$MONGODB_URL" \
-  "$TEST_PYTHON" - "$REPORT" "$pytest_status" <<'PY'
-import sys
-import xml.etree.ElementTree as ET
-
-path, pytest_status = sys.argv[1], int(sys.argv[2])
-try:
-    root = ET.parse(path).getroot()
-    suites = [root] if root.tag == "testsuite" else list(root.iter("testsuite"))
-    totals = {name: sum(int(suite.get(name, 0)) for suite in suites)
-              for name in ("tests", "failures", "errors", "skipped")}
-except (OSError, ET.ParseError, ValueError) as error:
-    print(f"FAIL: backend tests did not produce a readable report ({error})")
-    raise SystemExit(1)
-
-passed = totals["tests"] - totals["failures"] - totals["errors"] - totals["skipped"]
-failed = totals["failures"] + totals["errors"]
-print(f"Backend tests: {passed} passed, {failed} failed, {totals['skipped']} skipped")
-raise SystemExit(0 if pytest_status == 0 and failed == 0 and totals["skipped"] == 0 else 1)
-PY
+"$TEST_PYTHON" "$SCRIPT_DIR/junit_gate.py" "$REPORT" "$pytest_status"
 summary_status=$?
 set -e
 if [[ "$summary_status" -ne 0 ]]; then
-  printf 'FAIL: backend test gate failed (pytest exit %s; skips are rejected).\n' "$pytest_status" >&2
+  printf 'FAIL: backend test gate failed (pytest exit %s; real skips are rejected).\n' "$pytest_status" >&2
   exit 1
 fi
 
