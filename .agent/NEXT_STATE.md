@@ -8,11 +8,6 @@ loop_iteration: 1 of 5
 - target_files: scripts/eval/db-baseline.sh
 - contract: reject skipped DB tests; run acceptance
 - verify: bash scripts/eval/db-baseline.sh
-### T-033 — Keyboard reachability over several Tabs
-- worker: W3 | priority: P1 | origin: T-007 browser round 1
-- target_files: frontend/e2e/accessibility.spec.ts
-- contract: find an actionable visible focus-visible element within bounded Tab sequence; keep all other assertions
-- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/accessibility.spec.ts
 ### T-009 — G07 touch targets
 - worker: W1 | priority: P1 | after: T-008
 - target_files: frontend/app/globals.css
@@ -94,16 +89,10 @@ loop_iteration: 1 of 5
 - T-014: decide whether shared/public deployment requires HttpOnly cookie auth.
 
 ## Done this iteration (pruned on compaction)
-- T-032 ✓ remaining table/strategy status roles; browser rerun pending
-- T-008 ✓ offline discovery; browser matrix pending
-- T-031 ✓ footer uses muted token and 12px text; axe rerun pending
-- T-030 ✓ StateMessage loading/empty/error announcement roles
-- T-029 ✓ focus assertion now checks activeElement; browser rerun after UI fixes
-- T-007 ✓ cd4ab6e (offline discovery; desktop browser 0/16 due accessibility findings)
-- T-025 ✓ HEAD removed from opt-in helper
-- T-011 ✓ 3d0f6dc (follow-up T-025 required before use)
-- T-003 ✓ 5584461 (80 cases discovered; desktop browser 16/16 pass)
-- T-005 ✓ 889de7b
-- T-001 ✓ 7fefa04
-- T-010 ✓ f2d7054
-- T-004 ✓ 7fdd20f
+- T-033 ✓ bounded keyboard Tab focus audit; second browser rerun pending
+- T-032 ✓ remaining table/strategy status roles
+- T-008 ✓ offline responsive test; browser timeout needs triage
+- T-031 ✓ footer contrast
+- T-030 ✓ StateMessage roles
+- T-029 ✓ focus audit fix
+- Earlier accepted tasks are in git history (T-001/003/004/005/007/010/011/025).

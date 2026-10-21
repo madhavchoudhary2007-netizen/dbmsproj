@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-21T13:04:06Z
-git_head: 8d26347
+git_head: e3a52ed
 branch: master
 architect_sha256: e7722a81b4f2c708f019b3468c0a9630411ea6df88eb85aa37a7aff6ffc523a9
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -37,26 +37,13 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 - 2026-10-21: configuration, `.gitignore`, `.agent/ARCHITECT.md`, and state files only; 0 product-source lines.
 
 ## Open risks
-- T-032 accepted: DataTable empty and PitWall strategy/history notices now use status/alert semantics; typecheck passed. Taste: special-pages.tsx remains >300 lines, T-034 queued.
-- T-007 desktop browser repair round 1: 11 pass / 5 fail. Remaining issues are DataTable and PitWall `.state` notices without status roles, plus first-Tab focus test on login/DBMS. T-032/T-033 are second repair round; if audit still fails, stop condition D.
-- T-008 accepted as offline-discoverable responsive matrix (16 routes × six widths per test); browser run pending.
-- T-031 accepted: footer contrast now uses existing muted token and 12px text. Taste check: one accent remains, no new focal/card/bloat defect; browser axe rerun pending.
-- T-030 accepted: shared StateMessage now announces loading/empty politely and errors assertively. Taste check: no visual focal/palette/card change; existing ui.tsx >300-line bloat remains T-023.
-- T-029 accepted: keyboard audit now checks document.activeElement rather than counting `:focus` matches; browser rerun pending after UI fixes.
-- T-007 orchestrator desktop browser check failed 16/16 after offline acceptance. Real findings: footer #56616c on #0b0e12 has 3.05 contrast; `.state` notices lack status semantics. Test defect: `:focus` locator counted two elements on login. T-029/T-030/T-031 queued; do not claim axe gate passed.
-- T-007 accepted as an offline-discoverable accessibility audit; 16 route cases × five viewports. Orchestrator browser result pending. The test uses fake auth and aborts non-GET requests.
-- T-006 blocked after two W3 failures. Retry generated 100 discovered cases but reported missing states using generic assertions not applicable to every screen; no test source committed. Draft retained only at `.agent/results/T-006.raw.failed.spec.ts`.
-- T-006 first W3 result FAILED with no target diff: route wrappers hide implementation in `frontend/components/special-pages.tsx`, omitted from read list. `accept.sh` found 0 tests and exited 1. Retry packet widens read-only context; no assertion weakened.
-- T-025 accepted: apiRead is now GET-only, removing the HEAD empty-body path; typecheck passed. No caller uses it yet.
-- T-011 accepted at 3d0f6dc: opt-in cancellable GET/HEAD retry helper typechecks; code review found HEAD 200 wrongly attempts JSON parsing. T-025 is P1 and must land before any caller adopts the helper.
-- T-003 accepted at 5584461 after explicit-config retry: offline discovery found 80 cases (16 routes × 5 viewports), and orchestrator desktop Chromium smoke passed 16/16. Auth redirects are allowed by those smoke assertions; deeper authenticated state coverage remains queued.
-- T-003 first attempt reported PASSED, but its verify command discovered 16 tests without loading the five-project config; target files were removed and W3 will retry once with explicit `--config`, which must discover 80.
-- T-005 accepted at 889de7b: accessible partial-state notice added; typecheck passed. Taste check: existing ui.tsx exceeds 300 lines and the new component is not yet used by a screen; integration remains queued.
-- 2026-10-21 queue preparation: installed frontend devDependencies `@playwright/test` ^1.64.1 for route/state/accessibility/responsive E2E and `@axe-core/playwright` ^4.14.0 for accessibility assertions using `npm --prefix frontend install --save-dev @playwright/test @axe-core/playwright`; Chromium install requested with `npm --prefix frontend exec -- playwright install chromium`. No other dependency added.
-- No aggregate score or completion claim; acceptance, E2E and axe hard gates remain unresolved.
-- Acceptance requires round 3 of "ApexGrid World Series", which has no events: missing seed data, not a code defect. Existing demo archives were not altered by checks.
-- Production frontend image omits source and lint config; typecheck and lint run on the host only. Host Python 3.14 / Node 26 differ from Dockerfile Python 3.12 / Node 22.
-- T-001 accepted at `7fefa04`; T-010 accepted at `f2d7054` after offline motion lint passed. The old build gate hit a Turbopack port restriction.
-- Updated kit lint baseline: motion 0, banned 0, spacing 1 (real off-scale CSS plus border-width false positives). Workspace write check passed.
-- `localStorage` bearer token and local JWT fallback require a deployment-context decision before auth transport changes.
-- Worker queue is in `NEXT_STATE.md`; T-001, T-010 and T-004 are accepted.
+- T-006 blocked after two W3 failures: generic five-state fixture overasserted states without route-specific applicability; failed draft at `.agent/results/T-006.raw.failed.spec.ts`. T-026..028 depend on it.
+- T-002 acceptance fixture assumes nonexistent World Series round 3; DB data/schema untouched. Full DB-backed suite previously 57 pass/0 skip.
+- T-003 route smoke: 80 cases discovered, desktop Chromium 16/16 pass; auth redirects allowed, so deeper states remain unverified.
+- T-007 desktop accessibility: baseline 0/16, repair round 1 11/16. T-029/030/031 and T-032/033 accepted; second browser rerun pending. No axe gate claim.
+- T-008 responsive test discovered offline; browser run interrupted after initial 30s timeout. Test design likely needs per-width cases or explicit bounded timing.
+- T-005 partial notice exists but is not wired to screens. Taste bloat tasks T-023 (ui.tsx) and T-034 (special-pages.tsx) queued.
+- Added only `@playwright/test` ^1.64.1 and `@axe-core/playwright` ^4.14.0 as frontend devDependencies via npm; Chromium installed with `npm --prefix frontend exec -- playwright install chromium`.
+- Production frontend runner omits source/config; host typecheck/lint only. Host Python 3.14/Node 26 versus Docker Python 3.12/Node 22.
+- Spacing lint fails on off-scale CSS plus border-width false positives; motion/banned lint pass.
+- `localStorage` bearer token and JWT fallback require user deployment/auth decision before T-013/T-014. No aggregate score; E2E/axe/acceptance gates unresolved.

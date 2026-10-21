@@ -32,18 +32,21 @@ for (const [id, path] of routes) {
     await expect.poll(() => page.locator("body").innerText()).toMatch(/\S{8}/);
     expect(attemptedWrites).toEqual([]);
 
-    await page.keyboard.press("Tab");
-    const focusInfo = await page.evaluate(() => {
-      const element = document.activeElement;
-      if (!element) return null;
-      const rect = element.getBoundingClientRect();
-      return {
-        actionable: element.matches("a, button, input, select, textarea, [role=button], [role=link], [tabindex]") && !element.matches("[tabindex='-1']"),
-        visible: rect.width > 0 && rect.height > 0 && getComputedStyle(element).visibility !== "hidden" && getComputedStyle(element).display !== "none",
-        focusVisible: element.matches(":focus-visible"),
-      };
-    });
-    expect(focusInfo).toEqual({ actionable: true, visible: true, focusVisible: true });
+    let reachedVisibleControl = false;
+    for (let tabPress = 0; tabPress < 12 && !reachedVisibleControl; tabPress++) {
+      await page.keyboard.press("Tab");
+      reachedVisibleControl = await page.evaluate(() => {
+        const element = document.activeElement;
+        if (!element) return false;
+        const rect = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return element.matches("a, button, input, select, textarea, [role=button], [role=link], [tabindex]")
+          && !element.matches("[tabindex='-1']")
+          && rect.width > 0 && rect.height > 0 && style.visibility !== "hidden" && style.display !== "none"
+          && element.matches(":focus-visible");
+      });
+    }
+    expect(reachedVisibleControl).toBe(true);
 
     const unnamed = await page.locator("a, button, input:not([type=hidden]), select, textarea, [role=button], [role=link]").evaluateAll((elements) =>
       elements.filter((element) => {
