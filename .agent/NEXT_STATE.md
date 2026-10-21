@@ -1,13 +1,8 @@
 # NEXT_STATE
-updated_at: 2026-10-21T19:12:00Z
+updated_at: 2026-10-21T19:20:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; no worker dispatched; <=3 target files and <=150 changed lines per task)
-### T-049 — Fix search field touch height
-- worker: W1 | priority: P1 | origin: F-D08 | after: T-048
-- target_files: frontend/app/globals.css
-- contract: `.search` and `.search input` must each expose >=44px height on six filter-table routes; preserve toolbar layout
-- verify: npm --prefix frontend run build
 ### T-012 — G15 deterministic timing boundaries
 - worker: W3 | priority: P1
 - target_files: backend/tests/test_api.py
@@ -28,11 +23,6 @@ loop_iteration: 1 of 5
 - target_files: backend/app/main.py, backend/app/simulation_core.py
 - contract: behavior-preserving <=150-line extraction; no route/schema change
 - verify: .venv/bin/pytest -q backend/tests/test_api.py -k simulation
-### T-016 — G17 CI hard gates
-- worker: W3 | priority: P1 | after: T-001,T-002,T-003
-- target_files: .github/workflows/ci.yml, scripts/eval/full-gates.sh
-- contract: install/typecheck/lint/all tests/build/E2E; skip is failure
-- verify: bash -n scripts/eval/full-gates.sh
 ### T-017 — G08 spacing tokens
 - worker: W1 | priority: P2 | after: T-010
 - target_files: frontend/app/globals.css, frontend/tailwind.config.ts
@@ -49,13 +39,15 @@ loop_iteration: 1 of 5
 - contract: compare host/container Node and Python; run container gates
 - verify: bash scripts/eval/runtime-parity.sh
 ## Blocked
-- Browser matrix passed 640/640 across all five configured Chromium projects. Security audit and quality debt remain.
+- Browser matrix passed 715/715 across five Chromium projects; backend runtime audit clean. Frontend dev dependency audit and quality debt remain.
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
 - T-019: frontend runner lacks source; test in builder stage.
 - T-014: ADR-001 authorizes cookie/CSRF migration; split into atomic frontend, backend and test tasks before dispatch.
 
 ## Done this iteration (pruned on compaction)
+- T-049 ✓ 2baa5cd; search input touch size fixed, mobile all routes 15/15 and full browser 715/715
+- T-016 ✓ 8f47108; CI/full gates accepted, baseline 5 reds remain after browser/backend security fixes
 - T-048 ✓ 1d9c061; all-route touch audit found six filter inputs at 16.5px high
 - T-047 ✓ 139e92f; dev-toolbar false positive excluded; full browser suite 645/645
 - T-009 ✓ 8da6ff7; shared controls >=44px in enabled mobile browser check and production build

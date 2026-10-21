@@ -5,7 +5,6 @@ const routes = [
   "/championships", "/events", "/circuits", "/standings", "/teams",
   "/drivers", "/users", "/analytics", "/dbms",
 ] as const;
-const shortFilterRoutes = new Set(["/championships", "/events", "/circuits", "/teams", "/drivers", "/users"]);
 const controls = [
   "a[href]",
   "button:not([disabled])",
@@ -19,9 +18,6 @@ const controls = [
 
 for (const routePath of routes) {
   test(`G07 touch targets are at least 44×44px at 375px on ${routePath}`, async ({ page }) => {
-    if (shortFilterRoutes.has(routePath)) {
-      test.fail(!process.env.RUN_XFAIL, "G07 filter input is 16.5px high on this route");
-    }
     const writes: string[] = [];
     await page.setViewportSize({ width: 375, height: 812 });
     await page.addInitScript(() => {

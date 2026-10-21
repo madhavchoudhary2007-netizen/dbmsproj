@@ -1,62 +1,29 @@
 # CURRENT_STATE
-updated_at: 2026-10-21T19:12:00Z
-git_head: 1d9c061
+updated_at: 2026-10-21T19:20:00Z
+git_head: 2baa5cd
 branch: perfection-loop
 architect_sha256: 4cd5bc0272d02c031ca5ea833f1f07b200444efa866448f4549a5f68dab7ca73
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
-last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
+last_eval_score: NOT_RUN (quality gates and journey coverage remain open)
 
-## Verified setup and baseline
-- Existing ApexGrid product committed as `ccab46d`; kit committed as `79cae60`; architecture locked as `8bde3fe`; `verify-lock.sh` passed.
-- `boot.sh --probe` returned OK for `gpt-6-sol` and `gpt-6-luna`; final boot printed `boot OK`. The probe checked IDs, not the worker `high` effort binding.
-- `.agent/commands.env` now uses root-runnable npm frontend commands, venv pytest and `E2E_CMD=none`.
-- Initial install failed on `httpx2`; T-001 corrected it and passed offline `accept.sh` plus host pip dry-run. Typecheck, lint and build previously exited 0.
-- Isolated `apexgrid-test` stack and T-002 baseline passed: 57 backend tests, 0 skipped, then live acceptance passed through PostgreSQL, MongoDB, WebSocket, pits, standings, DBMS, and generated races. Acceptance now paginates the seeded event lookup.
-- Host venv Python 3.14.7 / Node 26.10.0; running backend Python 3.12.15 / frontend Node 22.23.3. The production frontend container serves `/live` (HTTP 200); its runner image omits source/config, so in-container typecheck/lint do not run as gates.
+## Verified setup and contracts
+- Boot and architecture lock pass. The branch is `perfection-loop`; isolated databases use only Compose project `apexgrid-test`, ports 15432/27018. Do not touch regular databases or secrets.
+- Existing PostgreSQL schema and API wire fields remain authoritative (`docs/contracts.md`). MongoDB owns telemetry; PostgreSQL owns official race records. ADR-001 permits additive migrations and finding-backed contract changes with separate ADRs.
+- Generated race lap cap 72; lap increments after sector three. SQL guards state transitions, pit overlap, results, and penalties.
+- Host venv Python 3.14/Node 26 versus backend container Python 3.12/frontend container Node 22; frontend runner image lacks source/config for in-container typecheck/lint.
 
-## Active contracts
-- Official PostgreSQL schema and API wire fields remain unchanged; `docs/contracts.md` is the existing cross-store contract. ADR-001 authorizes future additive disposable-stack migrations and finding-backed API changes with separate ADRs.
-- MongoDB telemetry uses shared UUID strings; server emits authenticated WebSocket session events; frontend reads API via `frontend/lib/api.ts`.
-- Generated race lap cap is 72; lap advances only after sector three. SQL controls pit overlap, immutable penalties and persisted standings.
+## Verified gates and components
+- Isolated backend suite: 65 passed, 0 failed, 0 skipped after PyJWT replacement; live acceptance passed PostgreSQL/MongoDB/WebSocket/pits/standings/DBMS/generated races. Backend runtime `pip-audit -r backend/requirements.txt`: no known vulnerabilities.
+- Browser suite: 715/715 passed across five Chromium projects after all-route 375px touch-target audit. Desktop axe/keyboard sweep 16/16. Typecheck and webpack production build pass.
+- Phase 0 CI/full-gates harness accepted in T-016. Remaining red quality gates: Ruff 639 violations, format 7 files, mypy strict 311 errors, frontend strict lint 45 explicit-any errors, frontend npm audit 7 high/2 moderate dev-tool findings. Backend coverage target and full route journeys remain unverified.
+- Existing 16 routes and DBMS views remain IN_REVIEW for five UI states and role journeys. `ViewState<T>` typed boundary is VERIFIED; shared partial notice is not wired to screens.
 
-## Component status
-| Component | Owner | Status | States | Verified by |
-|---|---|---|---|---|
-| Existing 16 routes | W1/W2 | IN_REVIEW | 5-state matrix incomplete | static survey; E2E pending |
-| Backend/API and schema | W2 | IN_REVIEW | n/a | 57 pass/0 skip; acceptance fixture blocked |
-| DBMS teacher views | W1/W2 | IN_REVIEW | partial needs test | historical manual checks; new E2E pending |
-| Evaluation harness | W3 | PLANNED | n/a | `E2E_CMD=none`; no score |
-| `ViewState<T>` boundary | W2 | VERIFIED | five variants typed | typecheck, T-004 |
+## Ratchet and open risks
+- Ruff baseline 641→639; mypy 311; strict lint 45. Quality metrics may only stay or improve. Spacing lint has off-scale CSS and border-width false positives; motion/banned lint pass.
+- T-006 twice failed: generic five-state fixtures overasserted empty/partial states without a route-specific applicability matrix. T-026..028 depend on it. T-014 cookie/CSRF migration (ADR-001) needs separate backend/frontend/test packets.
+- Frontend dev-tool advisories need a safe upgrade path; `npm audit fix --dry-run` offers only in-range `eslint-config-next` and selector-parser updates, and Tailwind 4 is major.
+- Runtime parity, permissions matrix, simulator invariants, role journeys, full evaluation score, and docs audit remain open. `NEXT_STATE.md` is the queue.
 
-## Known invariants
-- `0 <= session.total_laps <= 72`; session state/timestamp transitions enforced in SQL (`backend/migrations/001_initial.sql`).
-- One result per session/driver and one classified position; one active reservation per driver/session; overlapping box windows rejected.
-- PostgreSQL owns official records; MongoDB owns telemetry; cross-store failure must be visible as partial data, not hidden.
-
-## Orchestrator direct edits
-- 2026-10-21: configuration, `.gitignore`, `.agent/ARCHITECT.md`, and state files only; 0 product-source lines.
-- 2026-10-21: `frontend/package.json` build script, 1 line: switched to Next's webpack mode because Turbopack cannot bind its internal port here; normal `npm run build` now exits 0.
-- 2026-10-21: removed the F-E01 xfail marker and now-unused pytest import from the accepted security test (2 test lines); logged fix-protocol cleanup, no product-source lines.
-
-## Open risks
-- T-037 isolated Compose stack was accepted in commit `70fc6b5`; use `apexgrid-test` only for database checks and verify Docker access before starting it.
-- Phase 0 started on `perfection-loop`; Docker access currently denied by sandbox, to be retried with scoped escalation. `scripts/agent/run-loop.sh` has a pre-existing user edit that must be preserved.
-- T-035 fixed the `/login` audit fixture's authenticated redirect; desktop browser rerun reached all 16 routes and keyboard checks. New finding F-A11: `/login` copyright text contrast 3.88:1 (axe serious, required 4.5:1); T-038/T-039 queued.
-- F-A11 fixed by T-039; marker removed. T-040 desktop accessibility sweep passed 16/16. T-041 and T-042 made all five Chromium Playwright projects pass 640/640 cases. Full-gates baseline initially had 6 failed gates; browser gate is now green. Remaining reds: ruff, format, mypy, strict lint, dependency audit.
-- T-043 pinned auth login/me/JWT/WebSocket wire behavior: 7 focused tests pass, 0 skipped; Ruff violations fell from 641 to 639. F-E01 dependency replacement now has a behavior safety net.
-- T-044 added a strict xfail invariant for runtime requirements; normal run reports 1 xfail, `--runxfail` reproduces F-E01. PyJWT 2.15.1 is installed in the project venv for the replacement verify.
-- T-045 replaced python-jose with PyJWT 2.15.1, preserving HS256 decoding and auth behavior. Focused 8/8 pass; pip-audit reports no known backend runtime vulnerabilities. Marker removed; isolated DB suite 65 passed/0 failed/0 skipped and live acceptance passed.
-- T-046 reproduced G07 at 375px: 51 undersized targets over dashboard/live/dbms/login, collapsing to shared nav links, menu/close/sign-out/refresh buttons, two selects, and login fields/button. RUN_XFAIL=1 mobile-375 fails as expected.
-- T-009/T-047 fixed 51 shared touch targets and excluded only injected dev toolbar; full Playwright matrix passed 645/645. T-048 extended the audit to all 15 routes: 45 pass, 30 expected failures (six filter-table routes × five projects), each from `.search input` at 177.5×16.5px. T-049 queued.
-- T-008 responsive desktop audit was interrupted after R01 timed out at 30s and R02 began; full matrix remains unverified. T-036 queued to bound per-width cases.
-- Latest safe quality checks: frontend typecheck 0, lint 0, build 0; in-memory simulation pytest 2 pass/0 skip (35 deselected); motion/banned lint 0, spacing lint 1.
-- T-006 blocked after two W3 failures: generic five-state fixture overasserted states without route-specific applicability; failed draft at `.agent/results/T-006.raw.failed.spec.ts`. T-026..028 depend on it.
-- T-002 baseline passed on isolated stack; fixture event was beyond the first `/events` page, not absent from seed data.
-- T-003 route smoke: 80 cases discovered, desktop Chromium 16/16 pass; auth redirects allowed, so deeper states remain unverified.
-- T-007 desktop accessibility: baseline 0/16, repair round 1 11/16. T-029/030/031 and T-032/033 accepted; second browser rerun pending. No axe gate claim.
-- T-008 responsive test discovered offline; browser run interrupted after initial 30s timeout. Test design likely needs per-width cases or explicit bounded timing.
-- T-005 partial notice exists but is not wired to screens. Taste bloat tasks T-023 (ui.tsx) and T-034 (special-pages.tsx) queued.
-- Added only `@playwright/test` ^1.64.1 and `@axe-core/playwright` ^4.14.0 as frontend devDependencies via npm; Chromium installed with `npm --prefix frontend exec -- playwright install chromium`.
-- Production frontend runner omits source/config; host typecheck/lint only. Host Python 3.14/Node 26 versus Docker Python 3.12/Node 22.
-- Spacing lint fails on off-scale CSS plus border-width false positives; motion/banned lint pass.
-- ADR-001 authorizes font/type choice and cookie/CSRF token migration with backend tests; neither is implemented. JWT fallback and deployment target remain evaluation risks. No aggregate score; E2E/axe/acceptance gates unresolved.
+## Orchestrator direct edits and Taste review
+- Product source: one `frontend/package.json` build-script line switched Next build to webpack due Turbopack bind failure (logged at e854d9b). No other product-source edits.
+- Removed accepted strict xfail markers and unused pytest import from security/touch tests (6 test lines total), then reran full suites. T-009/T-049 CSS changes added no dependency, abstraction, palette, or new focal action; no new Taste defect in their diff. Existing large-file/spacing debt remains queued.
