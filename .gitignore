@@ -16,3 +16,5 @@ agents-kit.zip
 
 frontend/test-results/
 frontend/playwright-report/
+
+.agent/loop-runs.log

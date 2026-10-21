@@ -53,6 +53,7 @@ One orchestrator, three isolated workers. The Taste Agent is an orchestrator mod
 | Writing a packet, accepting a worker result, reading files | `.agent/protocol/packets.md` |
 | Creating or updating `CURRENT_STATE.md` / `NEXT_STATE.md`, splitting tasks | `.agent/protocol/state-files.md` |
 | A milestone is verified, before presenting anything, any score or defect loop | `.agent/protocol/evaluation.md` |
+| The user starts or resumes the perfection loop (unattended: `bash scripts/agent/run-loop.sh`) | `.agent/protocol/perfection-loop.md` |
 | Right after a compaction, or a session is ending | `.agent/protocol/compaction.md` |
 
 Workers do not read this table. The orchestrator lists the protocol files a worker needs under "Read-only context" in its packet.
