@@ -37,7 +37,8 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 - 2026-10-21: configuration, `.gitignore`, `.agent/ARCHITECT.md`, and state files only; 0 product-source lines.
 
 ## Open risks
-- T-011 accepted at 8d26347: opt-in cancellable GET/HEAD retry helper typechecks; code review found HEAD 200 wrongly attempts JSON parsing. T-025 is P1 and must land before any caller adopts the helper.
+- T-025 accepted: apiRead is now GET-only, removing the HEAD empty-body path; typecheck passed. No caller uses it yet.
+- T-011 accepted at 3d0f6dc: opt-in cancellable GET/HEAD retry helper typechecks; code review found HEAD 200 wrongly attempts JSON parsing. T-025 is P1 and must land before any caller adopts the helper.
 - T-003 accepted at 5584461 after explicit-config retry: offline discovery found 80 cases (16 routes × 5 viewports), and orchestrator desktop Chromium smoke passed 16/16. Auth redirects are allowed by those smoke assertions; deeper authenticated state coverage remains queued.
 - T-003 first attempt reported PASSED, but its verify command discovered 16 tests without loading the five-project config; target files were removed and W3 will retry once with explicit `--config`, which must discover 80.
 - T-005 accepted at 889de7b: accessible partial-state notice added; typecheck passed. Taste check: existing ui.tsx exceeds 300 lines and the new component is not yet used by a screen; integration remains queued.

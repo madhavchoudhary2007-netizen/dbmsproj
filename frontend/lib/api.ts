@@ -84,7 +84,7 @@ export async function api<T = any>(
 
 export type ApiReadOptions = Omit<RequestInit, "signal" | "method"> & {
   signal?: AbortSignal | AbortController | null;
-  method?: "GET" | "HEAD";
+  method?: "GET";
   retries?: number;
   retryDelayMs?: number;
   maxRetryDelayMs?: number;
@@ -125,7 +125,7 @@ function abortableDelay(ms: number, signal?: AbortSignal): Promise<void> {
   });
 }
 
-/** Opt-in GET/HEAD read with bounded retries for transient network and server errors. */
+/** Opt-in GET read with bounded retries for transient network and server errors. */
 export async function apiRead<T = any>(path: string, options: ApiReadOptions = {}): Promise<T> {
   const {
     signal: signalInput,
@@ -135,8 +135,8 @@ export async function apiRead<T = any>(path: string, options: ApiReadOptions = {
     maxRetryDelayMs = 2_000,
     ...requestOptions
   } = options;
-  if (method !== "GET" && method !== "HEAD") {
-    throw new TypeError("apiRead only supports GET and HEAD requests");
+  if (method !== "GET") {
+    throw new TypeError("apiRead only supports GET requests");
   }
   if (requestOptions.body != null) {
     throw new TypeError("apiRead does not support request bodies");

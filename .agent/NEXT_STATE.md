@@ -8,11 +8,26 @@ loop_iteration: 1 of 5
 - target_files: scripts/eval/db-baseline.sh
 - contract: reject skipped DB tests; run acceptance
 - verify: bash scripts/eval/db-baseline.sh
-### T-006 — G04 screen-state fixtures
+### T-006 — G04 screen-state fixtures, routes R03-R06
 - worker: W3 | priority: P1 | after: T-003
 - target_files: frontend/e2e/states.spec.ts
-- contract: cover applicable five states for all 16 routes; fail on missing state
-- verify: npm --prefix frontend exec -- playwright test --list frontend/e2e/states.spec.ts
+- contract: test applicable empty/loading/populated/error/partial states for R03-R06 with read-only API mocks; fail on missing state
+- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/states.spec.ts
+### T-026 — G04 screen-state fixtures, routes R07-R10
+- worker: W3 | priority: P1 | after: T-006
+- target_files: frontend/e2e/states-r07-r10.spec.ts
+- contract: same state matrix for R07-R10 with read-only API mocks
+- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/states-r07-r10.spec.ts
+### T-027 — G04 screen-state fixtures, routes R11-R14
+- worker: W3 | priority: P1 | after: T-026
+- target_files: frontend/e2e/states-r11-r14.spec.ts
+- contract: same state matrix for R11-R14 with read-only API mocks
+- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/states-r11-r14.spec.ts
+### T-028 — G04 screen-state fixtures, routes R01-R02,R15-R16
+- worker: W3 | priority: P1 | after: T-027
+- target_files: frontend/e2e/states-r01-r02-r15-r16.spec.ts
+- contract: applicable state matrix for landing/login/analytics/dbms, with read-only mocks
+- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/states-r01-r02-r15-r16.spec.ts
 ### T-007 — G05 keyboard and screen-reader audit
 - worker: W3 | priority: P1 | after: T-003
 - target_files: frontend/e2e/accessibility.spec.ts
@@ -28,11 +43,6 @@ loop_iteration: 1 of 5
 - target_files: frontend/app/globals.css
 - contract: touched controls >=44x44px without breaking dense tables
 - verify: npm --prefix frontend run build
-### T-025 — Repair opt-in HEAD response handling
-- worker: W2 | priority: P1 | after: T-011
-- target_files: frontend/lib/api.ts
-- contract: make apiRead HEAD resolve without JSON parsing, or restrict helper to GET; preserve existing api behavior and wire fields
-- verify: npm --prefix frontend run typecheck
 ### T-012 — G15 deterministic timing boundaries
 - worker: W3 | priority: P1
 - target_files: backend/tests/test_api.py
@@ -101,7 +111,8 @@ loop_iteration: 1 of 5
 - T-014: decide whether shared/public deployment requires HttpOnly cookie auth.
 
 ## Done this iteration (pruned on compaction)
-- T-011 ✓ 8d26347 (follow-up T-025 required before use)
+- T-025 ✓ HEAD removed from opt-in helper
+- T-011 ✓ 3d0f6dc (follow-up T-025 required before use)
 - T-003 ✓ 5584461 (80 cases discovered; desktop browser 16/16 pass)
 - T-005 ✓ 889de7b
 - T-001 ✓ 7fefa04
