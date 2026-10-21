@@ -37,6 +37,8 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 - 2026-10-21: configuration, `.gitignore`, `.agent/ARCHITECT.md`, and state files only; 0 product-source lines.
 
 ## Open risks
+- T-029 accepted: keyboard audit now checks document.activeElement rather than counting `:focus` matches; browser rerun pending after UI fixes.
+- T-007 orchestrator desktop browser check failed 16/16 after offline acceptance. Real findings: footer #56616c on #0b0e12 has 3.05 contrast; `.state` notices lack status semantics. Test defect: `:focus` locator counted two elements on login. T-029/T-030/T-031 queued; do not claim axe gate passed.
 - T-007 accepted as an offline-discoverable accessibility audit; 16 route cases × five viewports. Orchestrator browser result pending. The test uses fake auth and aborts non-GET requests.
 - T-006 blocked after two W3 failures. Retry generated 100 discovered cases but reported missing states using generic assertions not applicable to every screen; no test source committed. Draft retained only at `.agent/results/T-006.raw.failed.spec.ts`.
 - T-006 first W3 result FAILED with no target diff: route wrappers hide implementation in `frontend/components/special-pages.tsx`, omitted from read list. `accept.sh` found 0 tests and exited 1. Retry packet widens read-only context; no assertion weakened.

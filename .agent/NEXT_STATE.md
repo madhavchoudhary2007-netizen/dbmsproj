@@ -8,6 +8,16 @@ loop_iteration: 1 of 5
 - target_files: scripts/eval/db-baseline.sh
 - contract: reject skipped DB tests; run acceptance
 - verify: bash scripts/eval/db-baseline.sh
+### T-030 — Announce shared loading/empty/error states
+- worker: W1 | priority: P1 | origin: T-007 desktop run
+- target_files: frontend/components/ui.tsx
+- contract: add appropriate status/alert semantics to StateMessage without changing content or behavior
+- verify: npm --prefix frontend run typecheck
+### T-031 — Footer contrast and legibility
+- worker: W1 | priority: P1 | origin: T-007 desktop run
+- target_files: frontend/app/globals.css
+- contract: ensure footer text is WCAG AA contrast and readable at existing viewport widths; keep font family
+- verify: bash scripts/eval/lint-banned.sh
 ### T-008 — G06 viewport matrix
 - worker: W3 | priority: P1 | after: T-003
 - target_files: frontend/e2e/responsive.spec.ts
@@ -88,7 +98,8 @@ loop_iteration: 1 of 5
 - T-014: decide whether shared/public deployment requires HttpOnly cookie auth.
 
 ## Done this iteration (pruned on compaction)
-- T-007 ✓ offline discovery; desktop browser check pending
+- T-029 ✓ focus assertion now checks activeElement; browser rerun after UI fixes
+- T-007 ✓ cd4ab6e (offline discovery; desktop browser 0/16 due accessibility findings)
 - T-025 ✓ HEAD removed from opt-in helper
 - T-011 ✓ 3d0f6dc (follow-up T-025 required before use)
 - T-003 ✓ 5584461 (80 cases discovered; desktop browser 16/16 pass)

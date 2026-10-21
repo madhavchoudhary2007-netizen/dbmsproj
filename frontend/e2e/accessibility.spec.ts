@@ -33,13 +33,13 @@ for (const [id, path] of routes) {
     expect(attemptedWrites).toEqual([]);
 
     await page.keyboard.press("Tab");
-    const focused = page.locator(":focus");
-    await expect(focused).toHaveCount(1);
-    const focusInfo = await focused.evaluate((element) => {
+    const focusInfo = await page.evaluate(() => {
+      const element = document.activeElement;
+      if (!element) return null;
       const rect = element.getBoundingClientRect();
       return {
         actionable: element.matches("a, button, input, select, textarea, [role=button], [role=link], [tabindex]") && !element.matches("[tabindex='-1']"),
-        visible: rect.width > 0 && rect.height > 0 && getComputedStyle(element).visibility !== "hidden",
+        visible: rect.width > 0 && rect.height > 0 && getComputedStyle(element).visibility !== "hidden" && getComputedStyle(element).display !== "none",
         focusVisible: element.matches(":focus-visible"),
       };
     });
