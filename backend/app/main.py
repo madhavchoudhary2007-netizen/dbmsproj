@@ -20,7 +20,7 @@ from fastapi import Depends, FastAPI, HTTPException, Query, WebSocket, WebSocket
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import JWTError, jwt
+import jwt
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from pymongo import MongoClient, DESCENDING
 from pymongo.errors import PyMongoError
@@ -162,7 +162,7 @@ def current_user(credentials: HTTPAuthorizationCredentials | None = Depends(bear
         if not user_id:
             raise ValueError()
         user = fetch_one("SELECT id,email,full_name,role FROM users WHERE id=%s", (user_id,))
-    except (JWTError, ValueError):
+    except (jwt.exceptions.InvalidTokenError, ValueError):
         user = None
     if not user:
         raise HTTPException(401, "Invalid or expired token", headers={"WWW-Authenticate": "Bearer"})
