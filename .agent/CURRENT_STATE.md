@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-21T19:45:00Z
-git_head: 62a65f0
+updated_at: 2026-10-21T20:00:00Z
+git_head: e01ac86
 branch: perfection-loop
 architect_sha256: 8753bfed50769fe28099f5f400bf3f7a42223fc98bebddda0db16eb7d0ece31b
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -16,6 +16,7 @@ last_eval_score: NOT_RUN (quality gates and journey coverage remain open)
 - Isolated backend suite: 65 passed, 0 failed, 0 skipped after PyJWT replacement; live acceptance passed PostgreSQL/MongoDB/WebSocket/pits/standings/DBMS/generated races. Backend runtime `pip-audit -r backend/requirements.txt`: no known vulnerabilities.
 - Browser suite: 715/715 passed across five Chromium projects after all-route 375px touch-target audit. Desktop axe/keyboard sweep 16/16. Typecheck and webpack production build pass.
 - Phase 0 CI/full-gates harness accepted in T-016. Remaining red quality gates: Ruff 639 violations, format 7 files, mypy strict 311 errors, frontend strict lint 45 explicit-any errors, frontend npm audit 7 high/2 moderate dev-tool findings. Backend coverage target and full route journeys remain unverified.
+- `.agent/commands.env` now names the real Playwright E2E command and zero-warning frontend lint; CI already runs all gates through `full-gates.sh`.
 - Existing 16 routes and DBMS views remain IN_REVIEW for five UI states and role journeys. `ViewState<T>` typed boundary is VERIFIED; shared partial notice is not wired to screens.
 
 ## Ratchet and open risks
