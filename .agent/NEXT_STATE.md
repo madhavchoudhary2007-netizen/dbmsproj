@@ -1,13 +1,18 @@
 # NEXT_STATE
-updated_at: 2026-10-21T20:00:00Z
+updated_at: 2026-10-21T20:20:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; no worker dispatched; <=3 target files and <=150 changed lines per task)
-### T-050 — Reproduce cookie and CSRF auth contract
-- worker: W3 | priority: P1 | origin: G11/ADR-002
-- target_files: backend/tests/test_api.py
-- contract: strict xfail login cookie flags, cookie /me, CSRF/logout, and WS cookie/Origin cases without DB
-- verify: .venv/bin/pytest -q backend/tests/test_api.py -k cookie_auth
+### T-057 — Count expected xfails separately from skips
+- worker: W3 | priority: P1 | origin: F-F01/Phase 0
+- target_files: scripts/eval/db-baseline.sh, scripts/eval/junit_gate.py, scripts/eval/test_junit_gate.py
+- contract: actual skips fail, pytest.xfail markers are reported separately; synthetic XML tests plus isolated baseline
+- verify: .venv/bin/pytest -q scripts/eval/test_junit_gate.py
+### T-058 — Run deployment-secret gate in CI; fail unreachable audit in CI
+- worker: W3 | priority: P1 | origin: Phase 0
+- target_files: scripts/eval/full-gates.sh
+- contract: include jwt-secret.sh; CI may not silently skip dependency audit
+- verify: bash -n scripts/eval/full-gates.sh
 ### T-015 — G13 simulation boundary extraction
 - worker: W2 | priority: P1 | after: T-012
 - target_files: backend/app/main.py, backend/app/simulation_core.py
@@ -36,6 +41,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (pruned on compaction)
+- T-050 ✓ cf80374; 8 strict cookie/CSRF xfails reproduced, Ruff 639
 - T-013 ✓ 98fbd3e; secret gate 5/5, no output secret
 - T-012 ✓ d2d1c35; simulation 0/1 lap, fixed seed, stop cleanup; 6 focused tests, Ruff 639
 - T-049 ✓ 2baa5cd; search input touch size fixed, mobile all routes 15/15 and full browser 715/715

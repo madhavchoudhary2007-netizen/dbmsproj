@@ -12,6 +12,7 @@ score: NOT_RUN
 - T-043 added seven database-independent auth characterization tests; focused run passed 7/7 and Ruff count improved from 641 to 639.
 - T-044 pinned F-E01 with a strict xfail runtime-requirements check; `--runxfail` produced the expected failure while `python-jose` remains in requirements.
 - T-012 added deterministic simulation boundaries (0/1 lap, fixed clock/seed, stop cleanup): 6 focused tests pass; Ruff remains 639. T-013 deployment-secret subprocess gate passes 5/5 cases without printing secret values.
+- T-050 added eight strict cookie/CSRF reproducing tests; normal run 8 xfail, --runxfail 8 failed before implementation. Isolated-stack coverage baseline after T-050: 69 passed, 8 xfailed, 0 real skips; bootstrap 0%, config 88%, database 100%, main 72%, race_archive 97%, overall 72%.
 - Host pytest: 31 passed, 26 skipped; coverage overall 44.58% (777/1743 lines), app module percentages: bootstrap 0.0, config 88.2, database 50.0, main 43.6, race_archive 97.1. These numbers are not an isolated-stack baseline.
 - Docker and local sockets required scoped sandbox escalation; the isolated stack started and was seeded successfully.
 - Existing Playwright config and 16-route smoke test require stronger authenticated journey coverage. Login keyboard audit and responsive run are open from prior work.
@@ -25,6 +26,7 @@ score: NOT_RUN
 - F-E02, area E, P2, open: `npm audit` reports 7 high and 2 moderate findings in the frontend dev-tool chain, through Tailwind 3 and `eslint-config-next`; suggested fixes are major dependency changes. Evaluate targeted safe upgrades before any major migration.
 - F-D07, area D, P1, closed by T-009/T-047: 51 undersized shared mobile controls fixed; injected Next.js toolbar excluded from product audit.
 - F-D08, area D, P1, closed by T-049: `.search input` was 177.5×16.5px on six table routes at 375px; wrapper and input now 44px high. RUN_XFAIL=1 passed all 15 mobile routes; marker removed; full browser matrix passed 715/715 across five projects.
+- F-F01, area F, P1, open: pytest JUnit encodes eight deliberate strict G11 xfails as `skipped type=pytest.xfail`; `scripts/eval/db-baseline.sh` currently treats them as eight real skips and fails. T-057 will count xfails separately and continue to reject actual skips.
 
 ## Full-gates baseline (isolated stack, 2026-10-21)
 - 10 gates ran; 6 failed: ruff check (641), ruff format (7 files), mypy strict (311), frontend strict lint (45 explicit `any`), browser E2E (mobile-375 WebKit issue), supply-chain audit (3 findings in `python-jose`/`ecdsa`). DB-backed pytest+acceptance, frontend typecheck/build, and backend coverage passed. Browser E2E reported 512 passing cases before the missing-WebKit failures.
