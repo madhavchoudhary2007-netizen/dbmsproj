@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-21T18:40:00Z
-git_head: fb3da98
+git_head: 1c64bc1
 branch: perfection-loop
 architect_sha256: 8753bfed50769fe28099f5f400bf3f7a42223fc98bebddda0db16eb7d0ece31b
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -13,7 +13,7 @@ last_eval_score: NOT_RUN (quality gates and journey coverage remain open)
 - Host venv Python 3.14/Node 26 versus backend container Python 3.12/frontend container Node 22; frontend runner image lacks source/config for in-container typecheck/lint.
 
 ## Verified gates and components
-- Isolated backend suite: 65 passed, 0 failed, 0 skipped after PyJWT replacement; live acceptance passed PostgreSQL/MongoDB/WebSocket/pits/standings/DBMS/generated races. Backend runtime `pip-audit -r backend/requirements.txt`: no known vulnerabilities.
+- Isolated backend suite: 69 passed, 8 strict xfailed, 0 real skips; live acceptance passed PostgreSQL/MongoDB/WebSocket/pits/standings/DBMS/generated races. Backend runtime `pip-audit -r backend/requirements.txt`: no known vulnerabilities.
 - Browser suite: 715/715 passed across five Chromium projects after all-route 375px touch-target audit. Desktop axe/keyboard sweep 16/16. Typecheck and webpack production build pass.
 - Phase 0 CI/full-gates harness accepted in T-016. Remaining red quality gates: Ruff 639 violations, format 7 files, mypy strict 311 errors, frontend strict lint 45 explicit-any errors, frontend npm audit 7 high/2 moderate dev-tool findings. Backend coverage target and full route journeys remain unverified.
 - `.agent/commands.env` now names the real Playwright E2E command and zero-warning frontend lint; CI already runs all gates through `full-gates.sh`.
@@ -25,7 +25,7 @@ last_eval_score: NOT_RUN (quality gates and journey coverage remain open)
 - Frontend dev-tool advisories need a safe upgrade path; `npm audit fix --dry-run` offers only in-range `eslint-config-next` and selector-parser updates, and Tailwind 4 is major.
 - Runtime parity, permissions matrix, simulator invariants, role journeys, full evaluation score, and docs audit remain open. `NEXT_STATE.md` is the queue.
 - T-012 simulation boundaries passed 6 focused tests with Ruff steady at 639; T-013 deployment-secret gate passed 5 subprocess cases. ADR-002 plans browser cookie/CSRF migration; architecture relocked at 8753bfed after focused five-lens review, implementation unstarted.
-- T-050 accepted eight strict cookie/CSRF xfails; --runxfail reproduces all eight. Isolated coverage baseline: 69 pass/8 xfail/0 real skip, overall 72%, main 72%, database 100%, config 88%, race_archive 97%, bootstrap 0%. T-057 accepts JUnit xfails separately while rejecting real skips; disposable-stack rerun pending. T-058 includes deployment-secret regression and fails unreachable audits in CI.
+- Phase 0 complete; 16-route browser smoke, isolated database and live acceptance, characterization tests, quality metrics, CI gates and deployment-secret regression are in place. T-050's eight strict cookie/CSRF xfails reproduce with --runxfail; coverage overall 72%, main 72%, database 100%, config 88%, race_archive 97%, bootstrap 0%. T-057's JUnit gate passes the disposable-stack rerun; T-058 includes secret regression and CI audit reachability.
 
 ## Orchestrator direct edits and Taste review
 - Product source: one `frontend/package.json` build-script line switched Next build to webpack due Turbopack bind failure (logged at e854d9b). No other product-source edits.
