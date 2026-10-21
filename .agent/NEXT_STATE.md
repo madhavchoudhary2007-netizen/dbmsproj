@@ -1,8 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-21T16:20:00Z
+updated_at: 2026-10-21T16:50:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; no worker dispatched; <=3 target files and <=150 changed lines per task)
+### T-042 — Align mobile viewport browser gate
+- worker: W3 | priority: P1 | origin: F-A14
+- target_files: frontend/playwright.config.ts, .github/workflows/ci.yml
+- contract: use Chromium for iPhone viewport project; CI installs only configured browser, retain mobile emulation and assertions
+- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/responsive.spec.ts
 ### T-009 — G07 touch targets
 - worker: W1 | priority: P1 | after: T-008
 - target_files: frontend/app/globals.css

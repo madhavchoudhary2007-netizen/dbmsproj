@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-21T16:20:00Z
-git_head: 7f59af7
+updated_at: 2026-10-21T16:50:00Z
+git_head: 8f47108
 branch: perfection-loop
 architect_sha256: 4cd5bc0272d02c031ca5ea833f1f07b200444efa866448f4549a5f68dab7ca73
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -41,7 +41,7 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 - T-037 isolated Compose stack was accepted in commit `70fc6b5`; use `apexgrid-test` only for database checks and verify Docker access before starting it.
 - Phase 0 started on `perfection-loop`; Docker access currently denied by sandbox, to be retried with scoped escalation. `scripts/agent/run-loop.sh` has a pre-existing user edit that must be preserved.
 - T-035 fixed the `/login` audit fixture's authenticated redirect; desktop browser rerun reached all 16 routes and keyboard checks. New finding F-A11: `/login` copyright text contrast 3.88:1 (axe serious, required 4.5:1); T-038/T-039 queued.
-- F-A11 fixed by T-039; marker removed. T-040 desktop accessibility sweep passed 16/16. T-041 root/login/mobile action fixture repair made the desktop-project responsive matrix pass 96/96 across all 16 routes and six widths.
+- F-A11 fixed by T-039; marker removed. T-040 desktop accessibility sweep passed 16/16. T-041 desktop-project responsive matrix passed 96/96. Full-gates baseline: 10 gates ran, 6 failed (ruff, format, mypy, strict lint, browser WebKit project, dependency audit); isolated DB/acceptance, typecheck, build, coverage passed.
 - T-008 responsive desktop audit was interrupted after R01 timed out at 30s and R02 began; full matrix remains unverified. T-036 queued to bound per-width cases.
 - Latest safe quality checks: frontend typecheck 0, lint 0, build 0; in-memory simulation pytest 2 pass/0 skip (35 deselected); motion/banned lint 0, spacing lint 1.
 - T-006 blocked after two W3 failures: generic five-state fixture overasserted states without route-specific applicability; failed draft at `.agent/results/T-006.raw.failed.spec.ts`. T-026..028 depend on it.

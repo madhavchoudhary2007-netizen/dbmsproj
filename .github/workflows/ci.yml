@@ -41,7 +41,7 @@ jobs:
           .venv/bin/python -m pip install --upgrade pip
           .venv/bin/python -m pip install -r backend/requirements.txt -r backend/requirements-dev.txt
 
-      - name: Install Playwright Chromium
+      - name: Install Playwright browsers
         run: npm --prefix frontend exec -- playwright install --with-deps chromium
 
       - name: Run full quality gates

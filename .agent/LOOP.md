@@ -17,6 +17,10 @@ score: NOT_RUN
 - F-A11, area D, P1, closed by T-039: `/login` copyright text was 3.88:1 against `#0b0e12` (axe serious at `frontend/app/globals.css:1073`); `--muted` yields 6.44:1. `RUN_XFAIL=1` reproduced before and passed after; marker removed.
 - F-A12, area D, P1, closed by T-040: browser test waited for visible actionable control before Tab; desktop accessibility sweep passed 16/16 afterward.
 - F-A13, area D, P1, closed by T-041: responsive audit root redirect and login/mobile action fixtures corrected; desktop browser project passed 96/96 route-width cases.
+- F-A14, area D, P1, open: full browser gate failed 128 cases in the mobile-375 project because WebKit was missing; after installing it, the login 320px keyboard action still failed in WebKit while the same case passed in mobile-320 Chromium. The required matrix is viewport coverage, so T-042 will align the iPhone emulator to Chromium; WebKit testing can be a separately scoped cross-browser gate.
+
+## Full-gates baseline (isolated stack, 2026-10-21)
+- 10 gates ran; 6 failed: ruff check (641), ruff format (7 files), mypy strict (311), frontend strict lint (45 explicit `any`), browser E2E (mobile-375 WebKit issue), supply-chain audit (3 findings in `python-jose`/`ecdsa`). DB-backed pytest+acceptance, frontend typecheck/build, and backend coverage passed. Browser E2E reported 512 passing cases before the missing-WebKit failures.
 
 ## Blocked
 - None confirmed for the isolated database baseline. Browser and quality gates remain open.
