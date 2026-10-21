@@ -37,6 +37,7 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 - 2026-10-21: configuration, `.gitignore`, `.agent/ARCHITECT.md`, and state files only; 0 product-source lines.
 
 ## Open risks
+- T-008 accepted as offline-discoverable responsive matrix (16 routes × six widths per test); browser run pending.
 - T-031 accepted: footer contrast now uses existing muted token and 12px text. Taste check: one accent remains, no new focal/card/bloat defect; browser axe rerun pending.
 - T-030 accepted: shared StateMessage now announces loading/empty politely and errors assertively. Taste check: no visual focal/palette/card change; existing ui.tsx >300-line bloat remains T-023.
 - T-029 accepted: keyboard audit now checks document.activeElement rather than counting `:focus` matches; browser rerun pending after UI fixes.

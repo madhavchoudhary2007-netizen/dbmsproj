@@ -8,11 +8,6 @@ loop_iteration: 1 of 5
 - target_files: scripts/eval/db-baseline.sh
 - contract: reject skipped DB tests; run acceptance
 - verify: bash scripts/eval/db-baseline.sh
-### T-008 — G06 viewport matrix
-- worker: W3 | priority: P1 | after: T-003
-- target_files: frontend/e2e/responsive.spec.ts
-- contract: six viewport widths, no overflow or lost action
-- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/responsive.spec.ts
 ### T-009 — G07 touch targets
 - worker: W1 | priority: P1 | after: T-008
 - target_files: frontend/app/globals.css
@@ -88,6 +83,7 @@ loop_iteration: 1 of 5
 - T-014: decide whether shared/public deployment requires HttpOnly cookie auth.
 
 ## Done this iteration (pruned on compaction)
+- T-008 ✓ offline discovery; browser matrix pending
 - T-031 ✓ footer uses muted token and 12px text; axe rerun pending
 - T-030 ✓ StateMessage loading/empty/error announcement roles
 - T-029 ✓ focus assertion now checks activeElement; browser rerun after UI fixes
