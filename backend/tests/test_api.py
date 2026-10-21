@@ -6,7 +6,7 @@ import random
 import subprocess
 import sys
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 from uuid import uuid4
 
@@ -255,6 +255,39 @@ def test_session_lap_limits_and_simulation_never_exceeds_72():
     assert max(packet["lap"] for packet in emitted) == 72
     sector_three_laps = [packet["lap"] for packet in emitted if packet["sector"] == 3 and packet["lap_time_ms"]]
     assert sector_three_laps == list(range(1, 73))
+
+
+@pytest.mark.parametrize("total_laps", [0, 1])
+def test_simulation_accepts_zero_and_one_lap_boundaries(total_laps):
+    validate_session_laps("race_sessions", {"total_laps": total_laps})
+    sim = Simulation("lap-boundary", [{"id": "driver-1", "number": 7}], 2, total_laps=total_laps)
+    assert sim.total_laps == total_laps
+
+
+def test_simulation_packets_and_timing_repeat_for_fixed_clock_and_seed():
+    timestamp = datetime(2026, 10, 5, 10, 0, tzinfo=UTC)
+    outputs = []
+    for _ in range(2):
+        sim = Simulation("deterministic", [{"id": "driver-1", "number": 7}], 2)
+        outputs.append(advance_simulation_tick(sim, timestamp, random.Random(42)))  # noqa: S311
+    assert outputs[0] == outputs[1]
+
+
+def test_simulation_stop_clears_pending_pit_reservations(monkeypatch):
+    session_id = uuid4()
+    sim = Simulation(session_id, [], 2, status="running")
+    sim.pit_reservations_by_driver = {"driver-1": {"id": "reservation-1"}}
+    monkeypatch.setitem(simulations, str(session_id), sim)
+    monkeypatch.setattr(main_module, "mongo_ready", lambda: object())
+    monkeypatch.setattr(main_module, "cancel_automatic_pit_reservations", lambda *_: None)
+    try:
+        result = asyncio.run(main_module.control_simulation(
+            session_id, main_module.SimulationControl(action="stop"), user={"role": "ADMIN"}
+        ))
+        assert result["state"] == sim.status == "stopped"
+        assert sim.pit_reservations_by_driver == {}
+    finally:
+        simulations.pop(str(session_id), None)
 
 
 def test_reservation_requires_timezone_and_status_endpoint_exists():
