@@ -18,6 +18,11 @@ loop_iteration: 1 of 5
 - target_files: backend/app/main.py
 - contract: session cookie WS accepted with allowed Origin; disallowed Origin rejected for all WS; legacy subprotocol remains
 - verify: .venv/bin/pytest -q backend/tests/test_api.py --runxfail -k 'cookie_auth_websocket'
+### T-059 — Phase 1 A/C/E backend audit
+- worker: W3 | priority: P1 | origin: Phase 1
+- target_files: .agent/audit/phase1-ace.md
+- contract: evidence-based authorization, SQL, transaction, validation, rate-limit and WS findings
+- verify: test -s .agent/audit/phase1-ace.md
 ### T-015 — G13 simulation boundary extraction
 - worker: W2 | priority: P1 | after: T-012
 - target_files: backend/app/main.py, backend/app/simulation_core.py
