@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-21T17:20:00Z
-git_head: 0d020d0
+updated_at: 2026-10-21T18:05:00Z
+git_head: 8ee4cbb
 branch: perfection-loop
 architect_sha256: 4cd5bc0272d02c031ca5ea833f1f07b200444efa866448f4549a5f68dab7ca73
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -42,6 +42,7 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 - Phase 0 started on `perfection-loop`; Docker access currently denied by sandbox, to be retried with scoped escalation. `scripts/agent/run-loop.sh` has a pre-existing user edit that must be preserved.
 - T-035 fixed the `/login` audit fixture's authenticated redirect; desktop browser rerun reached all 16 routes and keyboard checks. New finding F-A11: `/login` copyright text contrast 3.88:1 (axe serious, required 4.5:1); T-038/T-039 queued.
 - F-A11 fixed by T-039; marker removed. T-040 desktop accessibility sweep passed 16/16. T-041 and T-042 made all five Chromium Playwright projects pass 640/640 cases. Full-gates baseline initially had 6 failed gates; browser gate is now green. Remaining reds: ruff, format, mypy, strict lint, dependency audit.
+- T-043 pinned auth login/me/JWT/WebSocket wire behavior: 7 focused tests pass, 0 skipped; Ruff violations fell from 641 to 639. F-E01 dependency replacement now has a behavior safety net.
 - T-008 responsive desktop audit was interrupted after R01 timed out at 30s and R02 began; full matrix remains unverified. T-036 queued to bound per-width cases.
 - Latest safe quality checks: frontend typecheck 0, lint 0, build 0; in-memory simulation pytest 2 pass/0 skip (35 deselected); motion/banned lint 0, spacing lint 1.
 - T-006 blocked after two W3 failures: generic five-state fixture overasserted states without route-specific applicability; failed draft at `.agent/results/T-006.raw.failed.spec.ts`. T-026..028 depend on it.
