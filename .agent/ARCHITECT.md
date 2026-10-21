@@ -1,7 +1,7 @@
 <!-- LOCK:BEGIN -->
 > STATUS: LOCKED
-> SHA256: 4cd5bc0272d02c031ca5ea833f1f07b200444efa866448f4549a5f68dab7ca73
-> LOCKED_AT: 2026-10-21T13:35:31Z
+> SHA256: 8753bfed50769fe28099f5f400bf3f7a42223fc98bebddda0db16eb7d0ece31b
+> LOCKED_AT: 2026-10-21T18:30:04Z
 > LOCKED_BY: orchestrator
 <!-- LOCK:END -->
 # ApexGrid architecture — existing system, improvement in place
@@ -112,6 +112,9 @@ type ApiError = { detail: string };
 type ListResult<T> = T[]; // ordinary CRUD lists; DBMS table/document browsers return their own paged metadata
 type LoginRequest = { email: string; password: string };
 type LoginReply = { access_token: string; token_type: "bearer"; user: { id: UUID; email: string; full_name: string; role: Role } };
+// Planned by ADR-002, not yet implemented: browser login returns {user}, sets
+// host-only HttpOnly SameSite=Lax session cookie and signed session-bound CSRF cookie;
+// writes send X-CSRF-Token, fetch includes credentials, WebSocket sends cookies.
 type Session = { id: UUID; event_id: UUID; session_type: "PRACTICE" | "QUALIFYING" | "RACE"; state: SessionState; total_laps: number; scheduled_at: UTC; started_at: UTC | null; ended_at: UTC | null };
 type SessionAction = { action: "start" | "pause" | "resume" | "finish" | "reset" };
 type DemoRaceCreate = { cars?: number }; // omitted 8..16 random; explicit 6..20
@@ -131,7 +134,7 @@ PostgreSQL's 17 existing tables are `users`, `teams`, `drivers`, `team_membershi
 
 | Flow | States and legal transitions | Persistence / guardrail |
 |---|---|---|
-| Login | anonymous -> authenticating -> authenticated or error; authenticated -> refreshing/me -> authenticated or anonymous; authenticated -> signed out | `auth/login`, `auth/me`; JWT role checked server-side; localStorage token is current risk. ADR-001 authorizes future httpOnly, Secure, SameSite cookie + CSRF transport with matching backend/tests; current transport remains as built. |
+| Login | anonymous -> authenticating -> authenticated or error; authenticated -> refreshing/me -> authenticated or anonymous; authenticated -> signed out | `auth/login`, `auth/me`; JWT role checked server-side; localStorage token is current risk. ADR-002 specifies the planned HttpOnly session cookie, signed CSRF cookie/header, credentialed fetch, explicit logout and cookie-authenticated WebSocket; implementation remains pending. |
 | Session | SCHEDULED -> ACTIVE or CANCELLED; ACTIVE <-> PAUSED; ACTIVE/PAUSED -> COMPLETED/CANCELLED/SCHEDULED(reset); COMPLETED/CANCELLED -> SCHEDULED(reset) where API permits | PostgreSQL trigger and timestamp checks; `POST /sessions/{id}/action`; lap 0..72 |
 | Simulation | absent -> running <-> paused -> stopped; stopped/reset -> running after clean start; generated completion -> archived + optionally new auto race | in-memory `simulations`, SQL session and Mongo telemetry; restore from stored packets on restart |
 | Pit reservation | requested -> locked/allocation -> RESERVED or conflict/no-box error; RESERVED -> COMPLETED/CANCELLED; terminal states cannot reopen | SQL row lock, exclusion/unique constraints; auto chooses earliest free event box/window; Mongo/WS reflect assigned driver |
@@ -187,7 +190,7 @@ Severity P0 blocks reproducible verification/security; P1 blocks a protocol gate
 | G08 spacing scale | P2 | `globals.css` has many literal dimensions; constrain future W1 changes to 4/8/12/16/24/32/48/64 tokens and audit existing exceptions. |
 | G09 reduced motion | P1 | Verify `prefers-reduced-motion` covers spinners, transitions and live changes; add browser assertion. |
 | G10 font choice | P2 | Arial/Helvetica and generic mono are the only current faces; ADR-001 authorizes an accessible font family and type scale chosen from the archetype table with a written reason, without rebranding. |
-| G11 auth token storage | P1 | Bearer token remains in `localStorage` (`auth.tsx`/`api.ts`); ADR-001 authorizes migration to an httpOnly, Secure, SameSite cookie with CSRF protection, matching backend changes and tests. Any required API contract change needs its own finding/change proposal and ADR. |
+| G11 auth token storage | P1 | Bearer token remains in `localStorage` (`auth.tsx`/`api.ts`); ADR-002 specifies the cookie/CSRF and login response change, with matching backend/frontend/WS/acceptance tests before closing this finding. |
 | G12 JWT secret | P1 | Backend fails closed outside local mode, but local demo secret/Compose fallback must be excluded from shared deployment and tested. |
 | G13 giant mixed modules | P1 | `special-pages.tsx` ~1720 lines, `main.py` ~2175, `globals.css` ~1416; W1/W2 boundaries and reviewability need small extractions. |
 | G14 request/stream race conditions | P1 | Different polling/WS paths use local guards; verify navigation cancellation, reconnect snapshot, duplicate ticks and Mongo partial failures. |
@@ -237,6 +240,10 @@ Lens 5 boundary matrix: 0/1/72/73 laps and sector three boundary (API-04); dupli
 
 - R01: Install and full DB acceptance are red/unverified until G01 and Docker availability are resolved; no completed product claim or score >=95 is possible now.
 - R02: `E2E_CMD=none` and planned route IDs cannot pass until W3 adds Playwright; historical “E2E passing” means prior manual/API checks, not current automated browser coverage.
-- R03: ADR-001 authorizes cookie/CSRF auth migration with matching backend changes and tests. Implementation and compatibility verification remain open; the current API and local demo must keep working until the migration is accepted.
+- R03: ADR-002 specifies cookie/CSRF auth transport, credentialed CORS, local HTTP exception, and legacy bearer compatibility. Implementation and proof remain open; the current API and local demo must keep working until the migration is accepted.
 - R04: Large mixed UI/API files make the strict W1/W2 packet boundaries costly. Extract in small behavior-preserving steps with one focused verify each.
 - R05: Runtime and Compose availability differ from historical verification. Any result measured on host Python 3.14/Node 26 needs container parity before final evaluation.
+
+## ADR-002 focused Phase C: auth transport
+
+Pass 1 checked the affected A.2 login/live and API-01/07 paths. Lens 1 traced anonymous login -> cookies -> reload `/me` -> protected write -> live WebSocket -> logout; owners T-050 (backend reproducer), T-051/T-052 (backend runtime), T-053 (frontend API/provider), T-054 (WebSocket client), T-055 (browser and acceptance fixtures). Lens 2 requires explicit cookie flags, login shape, CSRF rejection, Origin rejection, refresh, logout, and isolated acceptance commands; these are pending tests, not claimed passing. Lens 3 found no new dependency or abstraction; the existing JWT and standard-library HMAC suffice. Lens 4 required session-bound signed CSRF, constant-time comparisons, credentialed allow-listed CORS, and WebSocket Origin checks; ADR-002 records each. Lens 5 added expired/invalid JWT, missing/mismatched/planted CSRF, old bearer client compatibility, local HTTP cookie behavior, and logout/reload boundaries to T-050/T-055. Pass 2 found zero further architecture amendments; implementation and checks remain in the queue.
