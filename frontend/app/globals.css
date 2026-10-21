@@ -1070,7 +1070,7 @@ tbody tr:hover {
 }
 .login-copyright {
   font-size: 8px;
-  color: #66717c;
+  color: var(--muted);
   letter-spacing: 1px;
   margin-top: auto;
   padding-top: 45px;
