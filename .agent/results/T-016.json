@@ -1,0 +1,11 @@
+{
+  "task_id": "T-016",
+  "status": "PASSED",
+  "files_modified": [
+    {"path": ".github/workflows/ci.yml", "lines_added": 59, "lines_removed": 0},
+    {"path": "scripts/eval/full-gates.sh", "lines_added": 79, "lines_removed": 0}
+  ],
+  "diff_summary": "Added CI and full quality gates. Cleanup removes only this runner's gate logs, and browser E2E loads the configured Playwright projects explicitly.",
+  "verification": {"command": "bash -n scripts/eval/full-gates.sh && test -s .github/workflows/ci.yml", "exit_code": 0, "tests_passed": 2, "tests_failed": 0, "duration_ms": 100},
+  "unresolved_blockers": ["Known red ruff, strict mypy, and frontend lint baselines were not run in this verification; their gates remain enabled."]
+}

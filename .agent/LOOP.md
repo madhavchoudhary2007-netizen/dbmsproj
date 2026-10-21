@@ -16,7 +16,7 @@ score: NOT_RUN
 ## Findings
 - F-A11, area D, P1, closed by T-039: `/login` copyright text was 3.88:1 against `#0b0e12` (axe serious at `frontend/app/globals.css:1073`); `--muted` yields 6.44:1. `RUN_XFAIL=1` reproduced before and passed after; marker removed.
 - F-A12, area D, P1, closed by T-040: browser test waited for visible actionable control before Tab; desktop accessibility sweep passed 16/16 afterward.
-- F-A13, area D, P1, open: responsive audit first run found root redirect racing its trial click and `/login` form action excluded from its selector (`frontend/e2e/responsive.spec.ts:60-63`). Interrupted after 8 failures, 4 passed, 1 interrupted, 83 not run. T-041 must fix route fixtures and preserve all layout/action assertions.
+- F-A13, area D, P1, closed by T-041: responsive audit root redirect and login/mobile action fixtures corrected; desktop browser project passed 96/96 route-width cases.
 
 ## Blocked
 - None confirmed for the isolated database baseline. Browser and quality gates remain open.
