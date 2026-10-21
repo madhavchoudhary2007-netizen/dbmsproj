@@ -1,18 +1,8 @@
 # NEXT_STATE
-updated_at: 2026-10-21T14:00:00Z
+updated_at: 2026-10-21T14:40:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; no worker dispatched; <=3 target files and <=150 changed lines per task)
-### T-037 — Phase 0 disposable test stack
-- worker: W3 | priority: P0 | origin: perfection-loop Phase 0
-- target_files: scripts/eval/test-stack.sh, scripts/eval/test-stack.compose.yaml
-- contract: isolated apexgrid-test volumes and ports, health/seed up, guarded down -v
-- verify: bash -n scripts/eval/test-stack.sh && docker compose -p apexgrid-test -f scripts/eval/test-stack.compose.yaml config --quiet
-### T-002 — G02 require full database baseline
-- worker: W3 | priority: P0 | blocked: acceptance fixture assumes absent World Series round 3
-- target_files: scripts/eval/db-baseline.sh, scripts/acceptance.py
-- contract: reject skipped DB tests on isolated stack; run acceptance with paginated fixture lookup
-- verify: bash -n scripts/eval/db-baseline.sh && .venv/bin/python -m py_compile scripts/acceptance.py
 ### T-035 — Login keyboard reachability
 - worker: W3 | priority: P1 | origin: accessibility round 2
 - target_files: frontend/e2e/accessibility.spec.ts
@@ -72,11 +62,12 @@ loop_iteration: 1 of 5
 - Stop condition D: T-007 desktop accessibility audit still fails on /login after two repair rounds (15 pass, 1 fail). No further worker dispatch this turn.
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
-- T-002: 57 DB tests pass; acceptance lacks fixture event.
 - T-019: frontend runner lacks source; test in builder stage.
 - T-014: ADR-001 authorizes cookie/CSRF migration; split into atomic frontend, backend and test tasks before dispatch.
 
 ## Done this iteration (pruned on compaction)
+- T-002 ✓ c6921bd; isolated stack 57 pass/0 skip and live acceptance passed
+- T-037 ✓ 70fc6b5; isolated Compose stack accepted
 - T-033 ✓ bounded keyboard Tab focus audit; second browser rerun pending
 - T-032 ✓ remaining table/strategy status roles
 - T-008 ✓ offline responsive test; browser timeout needs triage

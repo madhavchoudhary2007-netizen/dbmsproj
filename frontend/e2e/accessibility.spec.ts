@@ -13,7 +13,9 @@ const routes = [
 for (const [id, path] of routes) {
   test(`${id} ${path}: keyboard and accessibility audit`, async ({ page }) => {
     const attemptedWrites: string[] = [];
-    await page.addInitScript(() => localStorage.setItem("apexgrid_token", "accessibility-audit-fake-token"));
+    await page.addInitScript((routePath) => {
+      if (routePath !== "/login") localStorage.setItem("apexgrid_token", "accessibility-audit-fake-token");
+    }, path);
     await page.route("**/api/**", async (route) => {
       const request = route.request();
       if (request.method() !== "GET") {
