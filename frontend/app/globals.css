@@ -331,7 +331,7 @@ a {
   margin-left: auto;
 }
 .search {
-  height: 32px;
+  height: 44px;
   width: min(340px, 50vw);
   display: flex;
   align-items: center;
@@ -345,6 +345,8 @@ a {
   border-color: #667dff;
 }
 .search input {
+  height: 44px;
+  min-height: 44px;
   background: none;
   border: 0;
   outline: none;
