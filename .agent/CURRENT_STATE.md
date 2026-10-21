@@ -1,7 +1,7 @@
 # CURRENT_STATE
-updated_at: 2026-10-21T13:35:47Z
-git_head: 0f0dd4a
-branch: master
+updated_at: 2026-10-21T14:20:00Z
+git_head: 70fc6b5
+branch: perfection-loop
 architect_sha256: 4cd5bc0272d02c031ca5ea833f1f07b200444efa866448f4549a5f68dab7ca73
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
 last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
@@ -37,6 +37,8 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 - 2026-10-21: configuration, `.gitignore`, `.agent/ARCHITECT.md`, and state files only; 0 product-source lines.
 
 ## Open risks
+- T-037 isolated Compose stack was accepted in commit `70fc6b5`; use `apexgrid-test` only for database checks and verify Docker access before starting it.
+- Phase 0 started on `perfection-loop`; Docker access currently denied by sandbox, to be retried with scoped escalation. `scripts/agent/run-loop.sh` has a pre-existing user edit that must be preserved.
 - STOP D (2026-10-21): T-007 desktop accessibility audit still fails only on `/login` keyboard reachability after two repair rounds: 15 pass, 1 fail. Assertion at `frontend/e2e/accessibility.spec.ts:49` retained. T-035 queued, no further workers dispatched.
 - T-008 responsive desktop audit was interrupted after R01 timed out at 30s and R02 began; full matrix remains unverified. T-036 queued to bound per-width cases.
 - Latest safe quality checks: frontend typecheck 0, lint 0, build 0; in-memory simulation pytest 2 pass/0 skip (35 deselected); motion/banned lint 0, spacing lint 1.
