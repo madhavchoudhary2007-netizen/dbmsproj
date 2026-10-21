@@ -37,6 +37,9 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 - 2026-10-21: configuration, `.gitignore`, `.agent/ARCHITECT.md`, and state files only; 0 product-source lines.
 
 ## Open risks
+- T-007 accepted as an offline-discoverable accessibility audit; 16 route cases × five viewports. Orchestrator browser result pending. The test uses fake auth and aborts non-GET requests.
+- T-006 blocked after two W3 failures. Retry generated 100 discovered cases but reported missing states using generic assertions not applicable to every screen; no test source committed. Draft retained only at `.agent/results/T-006.raw.failed.spec.ts`.
+- T-006 first W3 result FAILED with no target diff: route wrappers hide implementation in `frontend/components/special-pages.tsx`, omitted from read list. `accept.sh` found 0 tests and exited 1. Retry packet widens read-only context; no assertion weakened.
 - T-025 accepted: apiRead is now GET-only, removing the HEAD empty-body path; typecheck passed. No caller uses it yet.
 - T-011 accepted at 3d0f6dc: opt-in cancellable GET/HEAD retry helper typechecks; code review found HEAD 200 wrongly attempts JSON parsing. T-025 is P1 and must land before any caller adopts the helper.
 - T-003 accepted at 5584461 after explicit-config retry: offline discovery found 80 cases (16 routes × 5 viewports), and orchestrator desktop Chromium smoke passed 16/16. Auth redirects are allowed by those smoke assertions; deeper authenticated state coverage remains queued.

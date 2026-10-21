@@ -8,31 +8,6 @@ loop_iteration: 1 of 5
 - target_files: scripts/eval/db-baseline.sh
 - contract: reject skipped DB tests; run acceptance
 - verify: bash scripts/eval/db-baseline.sh
-### T-006 — G04 screen-state fixtures, routes R03-R06
-- worker: W3 | priority: P1 | after: T-003
-- target_files: frontend/e2e/states.spec.ts
-- contract: test applicable empty/loading/populated/error/partial states for R03-R06 with read-only API mocks; fail on missing state
-- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/states.spec.ts
-### T-026 — G04 screen-state fixtures, routes R07-R10
-- worker: W3 | priority: P1 | after: T-006
-- target_files: frontend/e2e/states-r07-r10.spec.ts
-- contract: same state matrix for R07-R10 with read-only API mocks
-- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/states-r07-r10.spec.ts
-### T-027 — G04 screen-state fixtures, routes R11-R14
-- worker: W3 | priority: P1 | after: T-026
-- target_files: frontend/e2e/states-r11-r14.spec.ts
-- contract: same state matrix for R11-R14 with read-only API mocks
-- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/states-r11-r14.spec.ts
-### T-028 — G04 screen-state fixtures, routes R01-R02,R15-R16
-- worker: W3 | priority: P1 | after: T-027
-- target_files: frontend/e2e/states-r01-r02-r15-r16.spec.ts
-- contract: applicable state matrix for landing/login/analytics/dbms, with read-only mocks
-- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/states-r01-r02-r15-r16.spec.ts
-### T-007 — G05 keyboard and screen-reader audit
-- worker: W3 | priority: P1 | after: T-003
-- target_files: frontend/e2e/accessibility.spec.ts
-- contract: tab/focus/labels/status checks on all routes
-- verify: npm --prefix frontend exec -- playwright test --list frontend/e2e/accessibility.spec.ts
 ### T-008 — G06 viewport matrix
 - worker: W3 | priority: P1 | after: T-003
 - target_files: frontend/e2e/responsive.spec.ts
@@ -106,11 +81,14 @@ loop_iteration: 1 of 5
 - verify: npm --prefix frontend run typecheck
 
 ## Blocked
+- T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
+- T-026/T-027/T-028: depend on blocked T-006 state matrix.
 - T-002: 57 DB tests pass; acceptance lacks fixture event.
 - T-019: frontend runner lacks source; test in builder stage.
 - T-014: decide whether shared/public deployment requires HttpOnly cookie auth.
 
 ## Done this iteration (pruned on compaction)
+- T-007 ✓ offline discovery; desktop browser check pending
 - T-025 ✓ HEAD removed from opt-in helper
 - T-011 ✓ 3d0f6dc (follow-up T-025 required before use)
 - T-003 ✓ 5584461 (80 cases discovered; desktop browser 16/16 pass)
