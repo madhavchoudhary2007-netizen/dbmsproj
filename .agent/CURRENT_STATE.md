@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-21T18:12:00Z
-git_head: 5a80981
+updated_at: 2026-10-21T18:18:00Z
+git_head: 33f09ff
 branch: perfection-loop
 architect_sha256: 4cd5bc0272d02c031ca5ea833f1f07b200444efa866448f4549a5f68dab7ca73
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -36,6 +36,7 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 ## Orchestrator direct edits
 - 2026-10-21: configuration, `.gitignore`, `.agent/ARCHITECT.md`, and state files only; 0 product-source lines.
 - 2026-10-21: `frontend/package.json` build script, 1 line: switched to Next's webpack mode because Turbopack cannot bind its internal port here; normal `npm run build` now exits 0.
+- 2026-10-21: removed the F-E01 xfail marker and now-unused pytest import from the accepted security test (2 test lines); logged fix-protocol cleanup, no product-source lines.
 
 ## Open risks
 - T-037 isolated Compose stack was accepted in commit `70fc6b5`; use `apexgrid-test` only for database checks and verify Docker access before starting it.
@@ -44,6 +45,7 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 - F-A11 fixed by T-039; marker removed. T-040 desktop accessibility sweep passed 16/16. T-041 and T-042 made all five Chromium Playwright projects pass 640/640 cases. Full-gates baseline initially had 6 failed gates; browser gate is now green. Remaining reds: ruff, format, mypy, strict lint, dependency audit.
 - T-043 pinned auth login/me/JWT/WebSocket wire behavior: 7 focused tests pass, 0 skipped; Ruff violations fell from 641 to 639. F-E01 dependency replacement now has a behavior safety net.
 - T-044 added a strict xfail invariant for runtime requirements; normal run reports 1 xfail, `--runxfail` reproduces F-E01. PyJWT 2.15.1 is installed in the project venv for the replacement verify.
+- T-045 replaced python-jose with PyJWT 2.15.1, preserving HS256 decoding and auth behavior. Focused 8/8 pass; pip-audit reports no known backend runtime vulnerabilities. Marker removed; isolated DB suite 65 passed/0 failed/0 skipped and live acceptance passed.
 - T-008 responsive desktop audit was interrupted after R01 timed out at 30s and R02 began; full matrix remains unverified. T-036 queued to bound per-width cases.
 - Latest safe quality checks: frontend typecheck 0, lint 0, build 0; in-memory simulation pytest 2 pass/0 skip (35 deselected); motion/banned lint 0, spacing lint 1.
 - T-006 blocked after two W3 failures: generic five-state fixture overasserted states without route-specific applicability; failed draft at `.agent/results/T-006.raw.failed.spec.ts`. T-026..028 depend on it.

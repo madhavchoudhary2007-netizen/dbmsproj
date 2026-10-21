@@ -20,7 +20,7 @@ score: NOT_RUN
 - F-A12, area D, P1, closed by T-040: browser test waited for visible actionable control before Tab; desktop accessibility sweep passed 16/16 afterward.
 - F-A13, area D, P1, closed by T-041: responsive audit root redirect and login/mobile action fixtures corrected; desktop browser project passed 96/96 route-width cases.
 - F-A14, area D, P1, closed by T-042: mobile-375 now uses Chromium with iPhone touch/viewport emulation. Its responsive matrix passed 96/96 and the full browser suite passed 640/640 across five projects.
-- F-E01, area E, P0, open: `python-jose` 3.5.0 has an unpatched critical [algorithm-confusion advisory](https://github.com/advisories/GHSA-3qf3-8w2g-rqmx); current API explicitly restricts HS256 in both decode paths, which narrows exposure, but the dependency audit remains red. Replace with a maintained JWT library after auth characterization tests, then rerun token/API/WS compatibility and `pip-audit`.
+- F-E01, area E, P0, closed by T-045: replaced `python-jose` 3.5.0 (unpatched critical [algorithm-confusion advisory](https://github.com/advisories/GHSA-3qf3-8w2g-rqmx)) with PyJWT 2.15.1. HS256 is explicitly allowed in both decode paths. Seven auth characterization checks and the security invariant pass; backend `pip-audit` reports no known vulnerabilities; isolated suite 65/0/0 and live acceptance pass.
 - F-E02, area E, P2, open: `npm audit` reports 7 high and 2 moderate findings in the frontend dev-tool chain, through Tailwind 3 and `eslint-config-next`; suggested fixes are major dependency changes. Evaluate targeted safe upgrades before any major migration.
 
 ## Full-gates baseline (isolated stack, 2026-10-21)

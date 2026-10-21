@@ -3,12 +3,10 @@
 import re
 from pathlib import Path
 
-import pytest
 from packaging.requirements import Requirement
 from packaging.utils import canonicalize_name
 
 
-@pytest.mark.xfail(strict=True, reason="F-E01")
 def test_runtime_dependencies_exclude_python_jose():
     requirements_path = Path(__file__).resolve().parents[1] / "requirements.txt"
     requirements = requirements_path.read_text(encoding="utf-8")
