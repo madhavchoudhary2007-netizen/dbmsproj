@@ -1,0 +1,10 @@
+# Merge into ~/.codex/config.toml (documented location). Keep values equal to .agent/models.env (codex profile).
+model = "gpt-6-sol"
+model_reasoning_effort = "medium"
+model_auto_compact_token_limit = 400000   # keep equal to CONTEXT_WINDOW in .agent/models.env
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 2   # legacy alias: max_threads
+default_subagent_model = "gpt-6-luna"
+default_subagent_reasoning_effort = "high"

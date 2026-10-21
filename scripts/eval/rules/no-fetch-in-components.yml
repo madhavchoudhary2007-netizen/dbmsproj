@@ -1,0 +1,6 @@
+id: no-fetch-in-components
+language: tsx
+severity: error
+message: Components must not call fetch; use a hook from src/state.
+rule:
+  pattern: fetch($$$ARGS)
