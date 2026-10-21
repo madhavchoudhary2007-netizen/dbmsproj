@@ -40,6 +40,8 @@ run_gate() {
   fi
 }
 
+run_gate 'deployment JWT secret regression' \
+  bash "$SCRIPT_DIR/jwt-secret.sh"
 run_gate 'backend ruff check and format' \
   "$PYTHON" -m ruff check backend/app backend/tests
 run_gate 'backend ruff format' \
@@ -70,7 +72,12 @@ if command -v curl >/dev/null 2>&1 \
     _ "$PYTHON"
 else
   GATES=$((GATES + 1))
-  printf 'SKIP: supply-chain audit (package registries are unreachable)\n'
+  if [[ "${CI:-}" == "true" ]]; then
+    FAILURES=$((FAILURES + 1))
+    printf 'FAIL: supply-chain audit (package registries are unreachable in CI)\n'
+  else
+    printf 'SKIP: supply-chain audit (package registries are unreachable)\n'
+  fi
 fi
 
 printf 'Gates: %s run, %s failed.\n' "$GATES" "$FAILURES"
