@@ -1,0 +1,67 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-apexgrid}
+      POSTGRES_USER: ${POSTGRES_USER:-apexgrid}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-apexgrid}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-apexgrid} -d ${POSTGRES_DB:-apexgrid}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    ports:
+      - "127.0.0.1:27017:27017"
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-apexgrid}:${POSTGRES_PASSWORD:-apexgrid}@postgres:5432/${POSTGRES_DB:-apexgrid}
+      MONGODB_URL: mongodb://mongo:27017
+      JWT_SECRET: ${JWT_SECRET:-dev-change-me}
+      APP_ENV: ${APP_ENV:-local}
+      AUTO_DEMO_RACE: ${AUTO_DEMO_RACE:-1}
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-1}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+    command: ["sh", "-c", "python -m app.bootstrap && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
+  mongo_data:

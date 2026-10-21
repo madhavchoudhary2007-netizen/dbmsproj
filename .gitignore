@@ -1,0 +1,15 @@
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+node_modules/
+.next/
+*.tsbuildinfo
+coverage/
+dist/
+build/
+agents-kit.zip
+.agent/results/*.raw.*
+.agent/eval/*.json
+.DS_Store

@@ -1,0 +1,11 @@
+# Next Steps
+
+Open http://localhost:3000/live as admin to follow each driver's sectors and saved laps, see live incident and pit records, or create a generated race (up to 72 laps). Open http://localhost:3000/dbms for the grouped one-click teacher demo views: race archives, all 17 actual PostgreSQL base tables, EER, schema, indexes, query plans, locks, database operations, MongoDB collection counts and indexes, filtered paged telemetry documents with raw JSON inspection, and cross-store results. View links use the URL hash and support browser Back/Forward. Read-only views refresh automatically. Open http://localhost:3000/pit-wall to see automatic stop decisions, box allocations, and completed stop history. This local `.env` has `AUTO_DEMO_RACE=0`, so a race starts when an admin or steward creates one; two completed races remain archived and none is active.
+
+The latest DBMS Operations verification is deployed and complete. The configured backend suite passed **57 tests**; frontend lint, typecheck, and production build passed. All four services are healthy. At `/dbms#operations`, the UI rejected an invalid driver number through `drivers_number_check` (SQLSTATE `23514`). The rollback demo showed connection counts **1 before, 2 during, 1 after**, with **0 committed effects**. Pit locking showed a **4.48 ms** wait and rejected an overlapping reservation (SQLSTATE `23P01`). Standings were recalculated for championship `30224bf7-0226-4dd0-965e-94ab0feca260`; driver/pit/result/standings counts remained **27/41/17/17** and the standings checksum was unchanged.
+
+The local `.env` has `SEED_DEMO_DATA=0` and `AUTO_DEMO_RACE=0`; no race is live. The newest completed generated race (session `87049420-8e98-4fd6-95a0-cc8de6340d74`) has 8 drivers, exactly 60 laps per driver (480 total), 8 official results, 3 incidents, 19 completed automatic pit stops, and 2,784 MongoDB samples. The earlier completed archive has 9 drivers, 495 laps, 22 completed pit stops, 3 incidents, and 2,916 samples. Both retain their pit strategy and lap records; admins or stewards can create another live race from the UI.
+
+Optional future work:
+- Resolve development-toolchain audit findings before shared deployment.
+- Configure deployment credentials, networks and real telemetry integration when requested.
