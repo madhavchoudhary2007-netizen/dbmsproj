@@ -39,7 +39,7 @@ test("G07 visible touch targets are at least 44×44px at 375px", async ({ page }
       const style = getComputedStyle(element);
       const rect = element.getBoundingClientRect();
       if (style.display === "none" || style.visibility === "hidden" || rect.width === 0 || rect.height === 0) return [];
-      if (element.matches("[data-next-mark]") || element.closest("nextjs-portal")) return [];
+      if (element.matches("[data-next-mark], [data-nextjs-dev-tools-button='true']") || element.closest("nextjs-portal")) return [];
       if (element.matches("a[href]") && element.closest("p")) return [];
       if (rect.width >= 44 && rect.height >= 44) return [];
       const inputLabel = element instanceof HTMLInputElement ? element.labels?.[0]?.textContent : "";
