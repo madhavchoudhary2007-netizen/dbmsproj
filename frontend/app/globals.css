@@ -144,7 +144,10 @@ a {
   color: #a3acb5;
   font-size: 12px;
   border-left: 2px solid transparent;
-  transition: 0.14s;
+  transition:
+    background-color 0.14s ease,
+    color 0.14s ease,
+    border-color 0.14s ease;
 }
 .nav-item:hover {
   background: #151a20;
@@ -287,7 +290,10 @@ a {
   font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
-  transition: 0.14s;
+  transition:
+    background-color 0.14s ease,
+    color 0.14s ease,
+    border-color 0.14s ease;
 }
 .button.primary {
   background: var(--acid);
@@ -1095,7 +1101,7 @@ tbody tr:hover {
 @media (max-width: 700px) {
   .sidebar {
     transform: translateX(-100%);
-    transition: transform 0.2s;
+    transition: transform 0.2s ease;
     width: 270px;
   }
   .sidebar.show {
@@ -1263,6 +1269,21 @@ tbody tr:hover {
   .membership-history .panel-heading {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .spin {
+    animation: none !important;
   }
 }
 .telemetry-charts {
