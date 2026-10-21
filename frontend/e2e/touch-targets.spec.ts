@@ -1,6 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-const routes = ["/dashboard", "/live", "/dbms", "/login"] as const;
+const routes = [
+  "/login", "/dashboard", "/live", "/sessions", "/stewards", "/pit-wall",
+  "/championships", "/events", "/circuits", "/standings", "/teams",
+  "/drivers", "/users", "/analytics", "/dbms",
+] as const;
+const shortFilterRoutes = new Set(["/championships", "/events", "/circuits", "/teams", "/drivers", "/users"]);
 const controls = [
   "a[href]",
   "button:not([disabled])",
@@ -12,26 +17,28 @@ const controls = [
   "[tabindex]:not([tabindex='-1']):not([aria-disabled=true])",
 ].join(", ");
 
-test("G07 visible touch targets are at least 44×44px at 375px", async ({ page }) => {
-  const undersized: Array<{ route: string; label: string; html: string; width: number; height: number }> = [];
-  const writes: string[] = [];
-  await page.setViewportSize({ width: 375, height: 812 });
-  await page.addInitScript(() => {
-    if (location.pathname === "/login") localStorage.removeItem("apexgrid_token");
-    else localStorage.setItem("apexgrid_token", "responsive-audit-token");
-  });
-  await page.route("**/api/**", async (request) => {
-    if (request.request().method() !== "GET") {
-      writes.push(`${request.request().method()} ${new URL(request.request().url()).pathname}`);
-      await request.abort();
-      return;
+for (const routePath of routes) {
+  test(`G07 touch targets are at least 44×44px at 375px on ${routePath}`, async ({ page }) => {
+    if (shortFilterRoutes.has(routePath)) {
+      test.fail(!process.env.RUN_XFAIL, "G07 filter input is 16.5px high on this route");
     }
-    const body = new URL(request.request().url()).pathname === "/api/auth/me"
-      ? { id: 999, email: "responsive@example.test", full_name: "Responsive Audit", role: "admin" }
-      : {};
-    await request.fulfill({ json: body });
-  });
-  for (const routePath of routes) {
+    const writes: string[] = [];
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.addInitScript(() => {
+      if (location.pathname === "/login") localStorage.removeItem("apexgrid_token");
+      else localStorage.setItem("apexgrid_token", "responsive-audit-token");
+    });
+    await page.route("**/api/**", async (request) => {
+      if (request.request().method() !== "GET") {
+        writes.push(`${request.request().method()} ${new URL(request.request().url()).pathname}`);
+        await request.abort();
+        return;
+      }
+      const body = new URL(request.request().url()).pathname === "/api/auth/me"
+        ? { id: 999, email: "responsive@example.test", full_name: "Responsive Audit", role: "admin" }
+        : {};
+      await request.fulfill({ json: body });
+    });
     await page.goto(routePath, { waitUntil: "domcontentloaded" });
     await expect(page).toHaveURL((url) => new URL(url).pathname === routePath);
     await expect.poll(() => page.locator("body").innerText()).toMatch(/\S/);
@@ -49,11 +56,11 @@ test("G07 visible touch targets are at least 44×44px at 375px", async ({ page }
         height: Math.round(rect.height * 10) / 10,
       }];
     }));
-    undersized.push(...small.map((item) => ({ route: routePath, ...item })));
-  }
-  expect(writes, "the audit must not submit mutations").toEqual([]);
-  expect(
-    undersized.length,
-    `G07 undersized controls (route, label, HTML, width, height): ${JSON.stringify(undersized)}`,
-  ).toBe(0);
-});
+    const undersized = small.map((item) => ({ route: routePath, ...item }));
+    expect(writes, "the audit must not submit mutations").toEqual([]);
+    expect(
+      undersized.length,
+      `G07 undersized controls (route, label, HTML, width, height): ${JSON.stringify(undersized)}`,
+    ).toBe(0);
+  });
+}
