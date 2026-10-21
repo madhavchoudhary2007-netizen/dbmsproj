@@ -47,3 +47,5 @@ Integration tests must use PostgreSQL, not SQLite.
 ## Reconsider only if
 
 The product requirements remove the DBMS demonstrations.
+
+Perfection loop authorizations: `.agent/adr/ADR-001-perfection-loop-authorizations.md` (agent-architecture ADR namespace).

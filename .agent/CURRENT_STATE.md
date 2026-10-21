@@ -1,8 +1,8 @@
 # CURRENT_STATE
-updated_at: 2026-10-21T13:04:06Z
-git_head: e3a52ed
+updated_at: 2026-10-21T13:35:47Z
+git_head: 0f0dd4a
 branch: master
-architect_sha256: e7722a81b4f2c708f019b3468c0a9630411ea6df88eb85aa37a7aff6ffc523a9
+architect_sha256: 4cd5bc0272d02c031ca5ea833f1f07b200444efa866448f4549a5f68dab7ca73
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
 last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 
@@ -15,7 +15,7 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 - Host venv Python 3.14.7 / Node 26.10.0; running backend Python 3.12.15 / frontend Node 22.23.3. The production frontend container serves `/live` (HTTP 200); its runner image omits source/config, so in-container typecheck/lint do not run as gates.
 
 ## Active contracts
-- Official PostgreSQL schema and API wire fields remain unchanged; `docs/contracts.md` is the existing cross-store contract.
+- Official PostgreSQL schema and API wire fields remain unchanged; `docs/contracts.md` is the existing cross-store contract. ADR-001 authorizes future additive disposable-stack migrations and finding-backed API changes with separate ADRs.
 - MongoDB telemetry uses shared UUID strings; server emits authenticated WebSocket session events; frontend reads API via `frontend/lib/api.ts`.
 - Generated race lap cap is 72; lap advances only after sector three. SQL controls pit overlap, immutable penalties and persisted standings.
 
@@ -49,4 +49,4 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 - Added only `@playwright/test` ^1.64.1 and `@axe-core/playwright` ^4.14.0 as frontend devDependencies via npm; Chromium installed with `npm --prefix frontend exec -- playwright install chromium`.
 - Production frontend runner omits source/config; host typecheck/lint only. Host Python 3.14/Node 26 versus Docker Python 3.12/Node 22.
 - Spacing lint fails on off-scale CSS plus border-width false positives; motion/banned lint pass.
-- `localStorage` bearer token and JWT fallback require user deployment/auth decision before T-013/T-014. No aggregate score; E2E/axe/acceptance gates unresolved.
+- ADR-001 authorizes font/type choice and cookie/CSRF token migration with backend tests; neither is implemented. JWT fallback and deployment target remain evaluation risks. No aggregate score; E2E/axe/acceptance gates unresolved.

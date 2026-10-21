@@ -1,5 +1,5 @@
 # NEXT_STATE
-updated_at: 2026-10-21T13:04:06Z
+updated_at: 2026-10-21T13:35:47Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; no worker dispatched; <=3 target files and <=150 changed lines per task)
@@ -33,10 +33,10 @@ loop_iteration: 1 of 5
 - target_files: scripts/eval/jwt-secret.sh
 - contract: reject weak/missing JWT secret outside local mode; print no secret
 - verify: bash scripts/eval/jwt-secret.sh
-### T-014 — G11 token storage decision
-- worker: W2 | priority: P1 | blocked: shared-deployment/auth decision
+### T-014 — G11 token storage migration
+- worker: W2 | priority: P1 | authorized: ADR-001; split implementation before dispatch
 - target_files: frontend/components/auth.tsx, frontend/lib/api.ts
-- contract: transport migration plan preserving server roles; no markup edits
+- contract: plan cookie/CSRF migration with matching backend/tests; preserve server roles; no code change in this reconciliation
 - verify: npm --prefix frontend run typecheck
 ### T-015 — G13 simulation boundary extraction
 - worker: W2 | priority: P1 | after: T-012
@@ -63,41 +63,13 @@ loop_iteration: 1 of 5
 - target_files: scripts/eval/runtime-parity.sh
 - contract: compare host/container Node and Python; run container gates
 - verify: bash scripts/eval/runtime-parity.sh
-### T-020 — G18 docs truth gate
-- worker: W3 | priority: P2
-- target_files: scripts/eval/docs-truth.sh
-- contract: flag automated-E2E claims without configured tests
-- verify: bash scripts/eval/docs-truth.sh
-### T-021 — Acceptance self-owned fixtures
-- worker: W3 | priority: P2
-- target_files: scripts/acceptance.py
-- contract: own named test championship/events, clean up; preserve assertions
-- verify: .venv/bin/python scripts/acceptance.py
-### T-022 — Spacing lint precision
-- worker: W3 | priority: P2
-- target_files: scripts/eval/lint-spacing.sh
-- contract: ignore border widths, keep spacing checks
-- verify: bash scripts/eval/lint-spacing.sh --self-test
-
-### T-023 — TASTE-1 reduce UI module bloat
-- worker: W1 | priority: P2 | after: T-005
-- target_files: frontend/components/ui.tsx, frontend/components/data-table.tsx
-- contract: extract cohesive table presentation so ui.tsx is <=300 lines; preserve exports and behavior
-- verify: npm --prefix frontend run typecheck
-
-### T-034 — TASTE-2 reduce special-pages module bloat
-- worker: W1 | priority: P2 | after: T-032
-- target_files: frontend/components/special-pages.tsx, frontend/components/pit-wall.tsx
-- contract: extract cohesive PitWall presentation within 150 changed lines and preserve behavior; continue staged extraction until <=300 lines
-- verify: npm --prefix frontend run typecheck
-
 ## Blocked
 - Stop condition D: T-007 desktop accessibility audit still fails on /login after two repair rounds (15 pass, 1 fail). No further worker dispatch this turn.
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
 - T-002: 57 DB tests pass; acceptance lacks fixture event.
 - T-019: frontend runner lacks source; test in builder stage.
-- T-014: decide whether shared/public deployment requires HttpOnly cookie auth.
+- T-014: ADR-001 authorizes cookie/CSRF migration; split into atomic frontend, backend and test tasks before dispatch.
 
 ## Done this iteration (pruned on compaction)
 - T-033 ✓ bounded keyboard Tab focus audit; second browser rerun pending
