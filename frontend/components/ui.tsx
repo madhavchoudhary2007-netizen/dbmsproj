@@ -68,13 +68,13 @@ export function StateMessage({
 }) {
   if (loading)
     return (
-      <div className="state">
+      <div className="state" role="status" aria-live="polite">
         <LoaderCircle className="spin" /> Loading from API…
       </div>
     );
   if (error)
     return (
-      <div className="state error">
+      <div className="state error" role="alert" aria-live="assertive">
         <AlertCircle />
         <div>
           <strong>Request failed</strong>
@@ -87,7 +87,7 @@ export function StateMessage({
         </div>
       </div>
     );
-  if (empty) return <div className="state">{empty}</div>;
+  if (empty) return <div className="state" role="status" aria-live="polite">{empty}</div>;
   return null;
 }
 export function PartialStateNotice({
