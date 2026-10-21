@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-21T18:18:00Z
-git_head: 33f09ff
+updated_at: 2026-10-21T18:33:00Z
+git_head: fe207ca
 branch: perfection-loop
 architect_sha256: 4cd5bc0272d02c031ca5ea833f1f07b200444efa866448f4549a5f68dab7ca73
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -46,6 +46,7 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 - T-043 pinned auth login/me/JWT/WebSocket wire behavior: 7 focused tests pass, 0 skipped; Ruff violations fell from 641 to 639. F-E01 dependency replacement now has a behavior safety net.
 - T-044 added a strict xfail invariant for runtime requirements; normal run reports 1 xfail, `--runxfail` reproduces F-E01. PyJWT 2.15.1 is installed in the project venv for the replacement verify.
 - T-045 replaced python-jose with PyJWT 2.15.1, preserving HS256 decoding and auth behavior. Focused 8/8 pass; pip-audit reports no known backend runtime vulnerabilities. Marker removed; isolated DB suite 65 passed/0 failed/0 skipped and live acceptance passed.
+- T-046 reproduced G07 at 375px: 51 undersized targets over dashboard/live/dbms/login, collapsing to shared nav links, menu/close/sign-out/refresh buttons, two selects, and login fields/button. RUN_XFAIL=1 mobile-375 fails as expected.
 - T-008 responsive desktop audit was interrupted after R01 timed out at 30s and R02 began; full matrix remains unverified. T-036 queued to bound per-width cases.
 - Latest safe quality checks: frontend typecheck 0, lint 0, build 0; in-memory simulation pytest 2 pass/0 skip (35 deselected); motion/banned lint 0, spacing lint 1.
 - T-006 blocked after two W3 failures: generic five-state fixture overasserted states without route-specific applicability; failed draft at `.agent/results/T-006.raw.failed.spec.ts`. T-026..028 depend on it.
