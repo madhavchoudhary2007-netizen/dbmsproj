@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-21T18:33:00Z
+updated_at: 2026-10-21T18:48:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; no worker dispatched; <=3 target files and <=150 changed lines per task)
-### T-009 — G07 touch targets
-- worker: W1 | priority: P1 | after: T-046
-- target_files: frontend/app/globals.css
-- contract: make the 51 measured mobile controls >=44x44px via shared selectors; preserve readable nav and dense tables
-- verify: npm --prefix frontend run build
+### T-047 — Exclude injected dev-toolbar control from touch audit
+- worker: W3 | priority: P1 | after: T-009
+- target_files: frontend/e2e/touch-targets.spec.ts
+- contract: exclude Next.js dev indicator only; keep all product controls and 44px assertion; focused browser passes
+- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/touch-targets.spec.ts
 ### T-012 — G15 deterministic timing boundaries
 - worker: W3 | priority: P1
 - target_files: backend/tests/test_api.py
@@ -56,6 +56,7 @@ loop_iteration: 1 of 5
 - T-014: ADR-001 authorizes cookie/CSRF migration; split into atomic frontend, backend and test tasks before dispatch.
 
 ## Done this iteration (pruned on compaction)
+- T-009 ✓ 8da6ff7; shared controls >=44px in enabled mobile browser check and production build
 - T-046 ✓ fe207ca; RUN_XFAIL=1 reproduced 51 undersized targets across four routes
 - T-045 ✓ 33f09ff; PyJWT replacement and 8 focused checks, backend audit green, isolated DB 65/0/0 + live acceptance
 - T-044 ✓ 5a80981; security invariant xfails normally and fails with --runxfail

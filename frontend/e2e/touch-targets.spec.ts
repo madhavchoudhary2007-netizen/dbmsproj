@@ -13,7 +13,6 @@ const controls = [
 ].join(", ");
 
 test("G07 visible touch targets are at least 44×44px at 375px", async ({ page }) => {
-  test.fail(!process.env.RUN_XFAIL, "G07 currently includes undersized visible controls");
   const undersized: Array<{ route: string; label: string; html: string; width: number; height: number }> = [];
   const writes: string[] = [];
   await page.setViewportSize({ width: 375, height: 812 });
