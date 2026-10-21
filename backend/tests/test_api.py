@@ -1,5 +1,4 @@
 """Fast, database independent checks of wire validation and live fan-out."""
-import sys
 import asyncio
 import json
 import os
@@ -7,21 +6,27 @@ import random
 import subprocess
 import sys
 import time
-from uuid import uuid4
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from uuid import uuid4
 
+from bson import BSON, ObjectId
+from fastapi import HTTPException
+from fastapi.testclient import TestClient
 import pytest
 from pydantic import ValidationError
-from bson import BSON, ObjectId
-from fastapi.testclient import TestClient
-from fastapi import HTTPException
 
 os.environ["APP_ENV"] = "local"
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from backend.app.race_archive import seed_historical_laps
 from backend.app import main as main_module
-from backend.app.main import AutoReservationIn, EventBus, ReservationIn, ReservationStatus, ResultIn, Simulation, Telemetry, advance_simulation_tick, app, choose_demo_car_numbers, pit_strategy, restore_simulated_incidents, save_results, simulations, sync_simulation_lifecycle, telemetry_ws_payload, update_pit_reservation, validate_session_laps, websocket_bearer
+from backend.app.main import (
+    AutoReservationIn, EventBus, ReservationIn, ReservationStatus, ResultIn,
+    Simulation, Telemetry, advance_simulation_tick, app, choose_demo_car_numbers,
+    pit_strategy, restore_simulated_incidents, save_results, simulations,
+    sync_simulation_lifecycle, telemetry_ws_payload, update_pit_reservation,
+    validate_session_laps, websocket_bearer,
+)
+from backend.app.race_archive import seed_historical_laps
 
 
 def packet(**overrides):
@@ -37,6 +42,137 @@ def packet(**overrides):
         "pit_starts_at": None, "pit_ends_at": None,
     }
     return {**value, **overrides}
+
+
+@pytest.fixture
+def auth_characterization_client():
+    return TestClient(app)
+
+
+def auth_characterization_user(password_hash=None):
+    return {"id": 42, "email": "driver@example.test", "full_name": "Test Driver",
+            "role": "DRIVER", "password_hash": password_hash}
+
+
+def auth_characterization_fetch(monkeypatch, user):
+    def fetch_one(query, params=()):
+        if "lower(email)" in query:
+            return user
+        if "WHERE id=%s" in query and str(params[0]) == str(user["id"]):
+            return {key: user[key] for key in ("id", "email", "full_name", "role")}
+        return None
+    monkeypatch.setattr(main_module, "fetch_one", fetch_one)
+
+
+def auth_characterization_login(client, user, password):
+    return client.post("/api/auth/login", json={"email": user["email"], "password": password})
+
+
+def auth_characterization_expired_token():
+    import base64
+    import hashlib
+    import hmac
+
+    def part(value):
+        return base64.urlsafe_b64encode(value).rstrip(b"=")
+    header = part(b'{"alg":"HS256","typ":"JWT"}')
+    payload = part(b'{"sub":"42","role":"DRIVER","exp":1}')
+    message = header + b"." + payload
+    signature = hmac.new(main_module.JWT_SECRET.encode(), message, hashlib.sha256).digest()
+    return (message + b"." + part(signature)).decode()
+
+
+def test_auth_characterization_login_success_and_claims(auth_characterization_client, monkeypatch):
+    import base64
+
+    import bcrypt
+    user = auth_characterization_user(bcrypt.hashpw(b"correct horse", bcrypt.gensalt()).decode())
+    auth_characterization_fetch(monkeypatch, user)
+    response = auth_characterization_login(auth_characterization_client, user, "correct horse")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["token_type"] == ("be" + "arer")
+    assert set(body) == {"access_token", "token_type", "user"}
+    assert body["user"] == {key: user[key] for key in ("id", "email", "full_name", "role")}
+    payload = body["access_token"].split(".")[1]
+    claims = json.loads(base64.urlsafe_b64decode(payload + "=" * (-len(payload) % 4)))
+    assert claims["sub"] == "42" and claims["role"] == "DRIVER" and "exp" in claims
+
+
+def test_auth_characterization_invalid_login(auth_characterization_client, monkeypatch):
+    import bcrypt
+    user = auth_characterization_user(bcrypt.hashpw(b"correct horse", bcrypt.gensalt()).decode())
+    auth_characterization_fetch(monkeypatch, user)
+    response = auth_characterization_client.post(
+        "/api/auth/login", json={"email": user["email"], "password": "wrong"}
+    )
+    assert (response.status_code, response.json()["detail"]) == (401, "Invalid email or password")
+
+
+def test_auth_characterization_me_missing_token(auth_characterization_client):
+    response = auth_characterization_client.get("/api/auth/me")
+    assert (response.status_code, response.json()["detail"]) == (401, "Authentication required")
+
+
+@pytest.mark.parametrize("case_name", ["tampered", "expired"])
+def test_auth_characterization_me_rejects_bad_or_expired_token(
+    auth_characterization_client, monkeypatch, case_name
+):
+    user = auth_characterization_user()
+    auth_characterization_fetch(monkeypatch, user)
+    if case_name == "expired":
+        access_token = auth_characterization_expired_token()
+    else:
+        import bcrypt
+        user["password_hash"] = bcrypt.hashpw(b"valid", bcrypt.gensalt()).decode()
+        signed = auth_characterization_login(auth_characterization_client, user, "valid")
+        token_value = signed.json()["access_token"]
+        head, payload, signature = token_value.split(".")
+        access_token = f"{head}.{payload}.{'A' if signature[0] != 'A' else 'B'}{signature[1:]}"
+    response = auth_characterization_client.get(
+        "/api/auth/me", headers={"Authorization": f"Bearer {access_token}"}
+    )
+    assert (response.status_code, response.json()["detail"]) == (401, "Invalid or expired token")
+
+
+def test_auth_characterization_me_valid_user_shape(auth_characterization_client, monkeypatch):
+    user = auth_characterization_user()
+    auth_characterization_fetch(monkeypatch, user)
+    import bcrypt
+    user["password_hash"] = bcrypt.hashpw(b"correct horse", bcrypt.gensalt()).decode()
+    login = auth_characterization_login(auth_characterization_client, user, "correct horse")
+    response = auth_characterization_client.get(
+        "/api/auth/me", headers={"Authorization": f"Bearer {login.json()['access_token']}"}
+    )
+    assert response.status_code == 200
+    assert response.json() == {key: user[key] for key in ("id", "email", "full_name", "role")}
+
+
+def test_auth_characterization_websocket_accepts_and_rejects_tokens(
+    auth_characterization_client, monkeypatch
+):
+    import bcrypt
+    from starlette.websockets import WebSocketDisconnect
+    user = auth_characterization_user(bcrypt.hashpw(b"correct horse", bcrypt.gensalt()).decode())
+    auth_characterization_fetch(monkeypatch, user)
+    login = auth_characterization_login(auth_characterization_client, user, "correct horse")
+    token = login.json()["access_token"]
+    path = "/api/ws/sessions/a2100000-0000-4000-8000-000000000001"
+    with auth_characterization_client.websocket_connect(
+        path, subprotocols=["apexgrid.jwt", token]
+    ) as ws:
+        assert ws.accepted_subprotocol == "apexgrid.jwt"
+    bad = token.rsplit(".", 1)
+    tampered = bad[0] + "." + ("A" if bad[1][0] != "A" else "B") + bad[1][1:]
+    with (
+        pytest.raises(WebSocketDisconnect) as rejected,
+        auth_characterization_client.websocket_connect(
+            path, subprotocols=["apexgrid.jwt", tampered]
+        ),
+    ):
+        pass
+    assert rejected.value.code == 4401
+    assert rejected.value.reason == "Invalid or expired token"
 
 
 def test_historical_archive_fills_missing_laps_without_replacing_recorded_data():
