@@ -1,8 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-21T13:35:47Z
+updated_at: 2026-10-21T14:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; no worker dispatched; <=3 target files and <=150 changed lines per task)
+### T-037 — Phase 0 disposable test stack
+- worker: W3 | priority: P0 | origin: perfection-loop Phase 0
+- target_files: scripts/eval/test-stack.sh, scripts/eval/test-stack.compose.yaml
+- contract: isolated apexgrid-test volumes and ports, health/seed up, guarded down -v
+- verify: bash -n scripts/eval/test-stack.sh && docker compose -p apexgrid-test -f scripts/eval/test-stack.compose.yaml config --quiet
 ### T-002 — G02 require full database baseline
 - worker: W3 | priority: P0 | blocked: acceptance fixture assumes absent World Series round 3
 - target_files: scripts/eval/db-baseline.sh

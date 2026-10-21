@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: apexgrid
+      POSTGRES_USER: apexgrid
+      POSTGRES_PASSWORD: apexgrid
+    volumes:
+      - test_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U apexgrid -d apexgrid"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    ports:
+      - "127.0.0.1:15432:5432"
+
+  mongo:
+    image: mongo:7
+    volumes:
+      - test_mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    ports:
+      - "127.0.0.1:27018:27017"
+
+volumes:
+  test_postgres_data:
+    name: apexgrid-test-postgres-data
+  test_mongo_data:
+    name: apexgrid-test-mongo-data

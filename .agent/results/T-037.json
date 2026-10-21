@@ -1,0 +1,19 @@
+{
+  "task_id": "T-037",
+  "status": "PASSED",
+  "files_modified": [
+    {"path": "scripts/eval/test-stack.sh", "lines_added": 73, "lines_removed": 0},
+    {"path": "scripts/eval/test-stack.compose.yaml", "lines_added": 34, "lines_removed": 0}
+  ],
+  "diff_summary": "Added an isolated Compose stack with separate named PostgreSQL and MongoDB volumes on ports 15432 and 27018. The up command waits for health, checks for the repository .venv Python, and runs the seeded bootstrap; env prints test URLs and down guards the project name.",
+  "verification": {
+    "command": "bash -n scripts/eval/test-stack.sh && docker compose -p apexgrid-test -f scripts/eval/test-stack.compose.yaml config --quiet",
+    "exit_code": 0,
+    "tests_passed": 1,
+    "tests_failed": 0,
+    "duration_ms": 376,
+    "typecheck_errors": 0,
+    "lint_warnings": 0
+  },
+  "unresolved_blockers": []
+}
