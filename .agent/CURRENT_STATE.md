@@ -1,16 +1,16 @@
 # CURRENT_STATE
-updated_at: 2026-10-21T12:36:52Z
-git_head: 86495a1
+updated_at: 2026-10-21T12:42:00Z
+git_head: 7fefa04
 branch: master
 architect_sha256: e7722a81b4f2c708f019b3468c0a9630411ea6df88eb85aa37a7aff6ffc523a9
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
-last_eval_score: NOT_RUN (install, full DB tests and browser E2E hard gates unresolved)
+last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 
 ## Verified setup and baseline
 - Existing ApexGrid product committed as `ccab46d`; kit committed as `79cae60`; architecture locked as `8bde3fe`; `verify-lock.sh` passed.
 - `boot.sh --probe` returned OK for `gpt-6-sol` and `gpt-6-luna`; final boot printed `boot OK`. The probe checked IDs, not the worker `high` effort binding.
 - `.agent/commands.env` now uses root-runnable npm frontend commands, venv pytest and `E2E_CMD=none`.
-- Install exit 1: impossible `httpx2>=0.28,<1` in `backend/requirements-dev.txt`. Typecheck exit 0; lint exit 0; build exit 0.
+- Initial install failed on `httpx2`; T-001 corrected it and passed offline `accept.sh` plus host pip dry-run. Typecheck, lint and build previously exited 0.
 - With Docker running, the database-backed suite exited 0: 57 passed, 0 skipped. Acceptance exited 1 before creating a session: it assumes ApexGrid World Series round 3, but that championship has zero events in the current database. Pre/post counts and driver eligibility digest matched.
 - Host venv Python 3.14.7 / Node 26.10.0; running backend Python 3.12.15 / frontend Node 22.23.3. The production frontend container serves `/live` (HTTP 200); its runner image omits source/config, so in-container typecheck/lint do not run as gates.
 
@@ -36,10 +36,10 @@ last_eval_score: NOT_RUN (install, full DB tests and browser E2E hard gates unre
 - 2026-10-21: configuration, `.gitignore`, `.agent/ARCHITECT.md`, and state files only; 0 product-source lines.
 
 ## Open risks
-- No aggregate score or completion claim; install, full integration, E2E and axe hard gates remain unresolved.
+- No aggregate score or completion claim; acceptance, E2E and axe hard gates remain unresolved.
 - Acceptance requires round 3 of "ApexGrid World Series", which has no events: missing seed data, not a code defect. Existing demo archives were not altered by checks.
 - Production frontend image omits source and lint config; typecheck and lint run on the host only. Host Python 3.14 / Node 26 differ from Dockerfile Python 3.12 / Node 22.
-- Pilot T-001 and T-010 each ran twice with `gpt-6-luna`/high and remain FAILED; no task accepted or product commit. T-001 retry envelope had extra `$schema` and worker pip DNS failed; host pip dry-run passed. T-010 build could not bind a Turbopack port on worker or orchestrator rerun. In-scope product edits remain uncommitted.
+- T-001 accepted at `7fefa04`; T-010 prior in-scope CSS diff remains unaccepted pending offline verification. Old build gate hit a Turbopack port restriction.
 - Updated kit lint baseline: motion 0, banned 0, spacing 1 (real off-scale CSS plus border-width false positives). Workspace write check passed.
 - `localStorage` bearer token and local JWT fallback require a deployment-context decision before auth transport changes.
-- Worker queue is in `NEXT_STATE.md`; no workers dispatched or accepted.
+- Worker queue is in `NEXT_STATE.md`; T-001 is accepted.

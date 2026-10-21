@@ -1,13 +1,8 @@
 # NEXT_STATE
-updated_at: 2026-10-21T12:36:52Z
+updated_at: 2026-10-21T12:42:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; no worker dispatched; <=3 target files and <=150 changed lines per task)
-### T-001 — G01 repair dev install requirement
-- worker: W2 | priority: P0 | pilot FAILED: envelope, worker DNS
-- target_files: backend/requirements-dev.txt
-- contract: correct HTTP client; preserve ranges
-- verify: bash -c '! rg -q "httpx2" backend/requirements-dev.txt && .venv/bin/python -c "import httpx"'
 ### T-002 — G02 require full database baseline
 - worker: W3 | priority: P0 | blocked: acceptance fixture assumes absent World Series round 3
 - target_files: scripts/eval/db-baseline.sh
@@ -120,4 +115,4 @@ loop_iteration: 1 of 5
 - T-014: decide whether shared/public deployment requires HttpOnly cookie auth.
 
 ## Done this iteration (pruned on compaction)
-- none
+- T-001 ✓ 7fefa04
