@@ -44,8 +44,9 @@ for (const [id, route] of routes) {
 
       await page.setViewportSize({ width, height: width < 500 ? 812 : 1000 });
       await page.goto(route, { waitUntil: "domcontentloaded" });
-      await expect(page, `${id} ${route} at ${width}px must remain on the requested route`)
-        .toHaveURL((url) => new URL(url).pathname === route);
+      const expectedRoute = route === "/" ? "/dashboard" : route;
+      await expect(page, `${id} ${route} at ${width}px must reach ${expectedRoute}`)
+        .toHaveURL((url) => new URL(url).pathname === expectedRoute);
       await expect.poll(() => page.locator("body").innerText(), {
         message: `${id} ${route} at ${width}px must render content`,
       }).toMatch(/\S/);
@@ -56,10 +57,20 @@ for (const [id, route] of routes) {
       expect(extent.document, `${id} ${route} at ${width}px must not overflow horizontally`)
         .toBeLessThanOrEqual(extent.viewport + 1);
 
-      const action = page.locator(
-        "nav a:visible, nav button:visible, .mobile-menu:visible, main a:visible, main button:visible, header a:visible, header button:visible",
-      ).first();
+      const mobileMenu = page.locator(".mobile-menu");
+      let action;
+      if (route === "/login") {
+        action = page.locator("form button.login-submit");
+      } else if (width <= 700) {
+        action = mobileMenu;
+        await expect(action, `${id} ${route} at ${width}px mobile menu must become visible`).toBeVisible();
+      } else {
+        action = page.locator(
+          "nav a:visible, nav button:visible, main a:visible, main button:visible, header a:visible, header button:visible",
+        ).first();
+      }
       await expect(action, `${id} ${route} at ${width}px needs a visible navigation/action`).toBeVisible();
+      await expect(action, `${id} ${route} at ${width}px action must be in the viewport`).toBeInViewport();
       await action.click({ trial: true });
       let keyboardReached = false;
       for (let tab = 0; tab < 50; tab++) {

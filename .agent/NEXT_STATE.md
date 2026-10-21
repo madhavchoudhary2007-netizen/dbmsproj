@@ -1,17 +1,12 @@
 # NEXT_STATE
-updated_at: 2026-10-21T15:30:00Z
+updated_at: 2026-10-21T16:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; no worker dispatched; <=3 target files and <=150 changed lines per task)
-### T-040 — Stabilize keyboard audit readiness
-- worker: W3 | priority: P1 | origin: F-A12
-- target_files: frontend/e2e/accessibility.spec.ts
-- contract: wait for hydrated visible action before Tab loop; preserve visible focus and axe assertions
-- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/accessibility.spec.ts
-### T-036 — Responsive audit timeout
-- worker: W3 | priority: P1 | origin: T-008 browser run
+### T-041 — Responsive root/login fixture
+- worker: W3 | priority: P1 | origin: F-A13
 - target_files: frontend/e2e/responsive.spec.ts
-- contract: split six widths into bounded cases without weakening overflow/action assertions; keep read-only traffic
+- contract: follow root redirect, select login form control, preserve overflow, trial click, Tab, no-write assertions
 - verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/responsive.spec.ts
 ### T-009 — G07 touch targets
 - worker: W1 | priority: P1 | after: T-008
@@ -59,13 +54,15 @@ loop_iteration: 1 of 5
 - contract: compare host/container Node and Python; run container gates
 - verify: bash scripts/eval/runtime-parity.sh
 ## Blocked
-- F-A12: full desktop accessibility sweep intermittently fails focus check on different routes before hydration settles; individual reruns pass.
+- F-A13: responsive audit root redirect races trial click; login's form button is outside nav/main selector. Fix fixture before full matrix.
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
 - T-019: frontend runner lacks source; test in builder stage.
 - T-014: ADR-001 authorizes cookie/CSRF migration; split into atomic frontend, backend and test tasks before dispatch.
 
 ## Done this iteration (pruned on compaction)
+- T-040 ✓ d6e328e; desktop accessibility sweep 16/16
+- T-036 ✓ 6fb9ba0; bounded 96-case/project responsive matrix, fixture follow-up required
 - T-038 ✓ 4ee604b; contrast regression confirmed with RUN_XFAIL=1
 - T-039 ✓ c52d74e; login contrast 6.44:1, build and login axe pass
 - T-035 ✓ 45bab00; login keyboard assertion passes; axe contrast finding remains
