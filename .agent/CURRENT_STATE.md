@@ -35,11 +35,13 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 
 ## Orchestrator direct edits
 - 2026-10-21: configuration, `.gitignore`, `.agent/ARCHITECT.md`, and state files only; 0 product-source lines.
+- 2026-10-21: `frontend/package.json` build script, 1 line: switched to Next's webpack mode because Turbopack cannot bind its internal port here; normal `npm run build` now exits 0.
 
 ## Open risks
 - T-037 isolated Compose stack was accepted in commit `70fc6b5`; use `apexgrid-test` only for database checks and verify Docker access before starting it.
 - Phase 0 started on `perfection-loop`; Docker access currently denied by sandbox, to be retried with scoped escalation. `scripts/agent/run-loop.sh` has a pre-existing user edit that must be preserved.
 - T-035 fixed the `/login` audit fixture's authenticated redirect; desktop browser rerun reached all 16 routes and keyboard checks. New finding F-A11: `/login` copyright text contrast 3.88:1 (axe serious, required 4.5:1); T-038/T-039 queued.
+- T-038 reproduced F-A11 with `RUN_XFAIL=1`. W1 T-039 changed the color but reported FAILED solely because Turbopack build could not bind a port; webpack-mode build exits 0, pending acceptance.
 - T-008 responsive desktop audit was interrupted after R01 timed out at 30s and R02 began; full matrix remains unverified. T-036 queued to bound per-width cases.
 - Latest safe quality checks: frontend typecheck 0, lint 0, build 0; in-memory simulation pytest 2 pass/0 skip (35 deselected); motion/banned lint 0, spacing lint 1.
 - T-006 blocked after two W3 failures: generic five-state fixture overasserted states without route-specific applicability; failed draft at `.agent/results/T-006.raw.failed.spec.ts`. T-026..028 depend on it.
