@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-21T18:05:00Z
+updated_at: 2026-10-21T18:12:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; no worker dispatched; <=3 target files and <=150 changed lines per task)
-### T-044 — Reproduce vulnerable JWT dependency finding
-- worker: W3 | priority: P0 | origin: F-E01
-- target_files: backend/tests/test_security_dependencies.py
-- contract: strict xfail invariant that deploy requirements exclude unpatched python-jose; verify --runxfail fails before fix
-- verify: .venv/bin/pytest -q backend/tests/test_security_dependencies.py
+### T-045 — Replace python-jose with PyJWT
+- worker: W2 | priority: P0 | origin: F-E01 | after: T-043,T-044
+- target_files: backend/app/main.py, backend/requirements.txt
+- contract: use PyJWT >=2.15,<3 for HS256 encode/decode; preserve login/me/WS wire shape; remove python-jose runtime requirement
+- verify: .venv/bin/pytest -q backend/tests/test_api.py -k auth_characterization
 ### T-009 — G07 touch targets
 - worker: W1 | priority: P1 | after: T-008
 - target_files: frontend/app/globals.css
@@ -61,6 +61,7 @@ loop_iteration: 1 of 5
 - T-014: ADR-001 authorizes cookie/CSRF migration; split into atomic frontend, backend and test tasks before dispatch.
 
 ## Done this iteration (pruned on compaction)
+- T-044 ✓ 5a80981; security invariant xfails normally and fails with --runxfail
 - T-043 ✓ 8ee4cbb; 7 auth characterization tests, Ruff ratchet 641→639
 - T-042 ✓ 0d020d0; all browser E2E projects now pass 640/640
 - T-041 ✓ 7f59af7; root/login/mobile fixture fixed, 96/96 desktop-project responsive cases passed
