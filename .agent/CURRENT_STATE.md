@@ -1,8 +1,8 @@
 # CURRENT_STATE
-updated_at: 2026-10-21T19:25:00Z
-git_head: 6ffba9d
+updated_at: 2026-10-21T19:45:00Z
+git_head: 62a65f0
 branch: perfection-loop
-architect_sha256: 4cd5bc0272d02c031ca5ea833f1f07b200444efa866448f4549a5f68dab7ca73
+architect_sha256: 8753bfed50769fe28099f5f400bf3f7a42223fc98bebddda0db16eb7d0ece31b
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
 last_eval_score: NOT_RUN (quality gates and journey coverage remain open)
 
@@ -23,6 +23,7 @@ last_eval_score: NOT_RUN (quality gates and journey coverage remain open)
 - T-006 twice failed: generic five-state fixtures overasserted empty/partial states without a route-specific applicability matrix. T-026..028 depend on it. T-014 cookie/CSRF migration (ADR-001) needs separate backend/frontend/test packets.
 - Frontend dev-tool advisories need a safe upgrade path; `npm audit fix --dry-run` offers only in-range `eslint-config-next` and selector-parser updates, and Tailwind 4 is major.
 - Runtime parity, permissions matrix, simulator invariants, role journeys, full evaluation score, and docs audit remain open. `NEXT_STATE.md` is the queue.
+- T-012 simulation boundaries passed 6 focused tests with Ruff steady at 639; T-013 deployment-secret gate passed 5 subprocess cases. ADR-002 plans browser cookie/CSRF migration; architecture relocked at 8753bfed after focused five-lens review, implementation unstarted.
 
 ## Orchestrator direct edits and Taste review
 - Product source: one `frontend/package.json` build-script line switched Next build to webpack due Turbopack bind failure (logged at e854d9b). No other product-source edits.

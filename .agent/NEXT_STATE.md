@@ -1,23 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-21T19:25:00Z
+updated_at: 2026-10-21T19:45:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; no worker dispatched; <=3 target files and <=150 changed lines per task)
-### T-012 — G15 deterministic timing boundaries
-- worker: W3 | priority: P1
+### T-050 — Reproduce cookie and CSRF auth contract
+- worker: W3 | priority: P1 | origin: G11/ADR-002
 - target_files: backend/tests/test_api.py
-- contract: fixed clock/seed tests for 0/1/72/73 laps, restart, sector progression
-- verify: .venv/bin/pytest -q backend/tests/test_api.py -k simulation
-### T-013 — G12 deployment secret guard
-- worker: W3 | priority: P1
-- target_files: scripts/eval/jwt-secret.sh
-- contract: reject weak/missing JWT secret outside local mode; print no secret
-- verify: bash scripts/eval/jwt-secret.sh
-### T-014 — G11 token storage migration
-- worker: W2 | priority: P1 | authorized: ADR-001; split implementation before dispatch
-- target_files: frontend/components/auth.tsx, frontend/lib/api.ts
-- contract: plan cookie/CSRF migration with matching backend/tests; preserve server roles; no code change in this reconciliation
-- verify: npm --prefix frontend run typecheck
+- contract: strict xfail login cookie flags, cookie /me, CSRF/logout, and WS cookie/Origin cases without DB
+- verify: .venv/bin/pytest -q backend/tests/test_api.py -k cookie_auth
 ### T-015 — G13 simulation boundary extraction
 - worker: W2 | priority: P1 | after: T-012
 - target_files: backend/app/main.py, backend/app/simulation_core.py
@@ -43,9 +33,11 @@ loop_iteration: 1 of 5
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
 - T-019: frontend runner lacks source; test in builder stage.
-- T-014: ADR-001 authorizes cookie/CSRF migration; split into atomic frontend, backend and test tasks before dispatch.
+- T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (pruned on compaction)
+- T-013 ✓ 98fbd3e; secret gate 5/5, no output secret
+- T-012 ✓ d2d1c35; simulation 0/1 lap, fixed seed, stop cleanup; 6 focused tests, Ruff 639
 - T-049 ✓ 2baa5cd; search input touch size fixed, mobile all routes 15/15 and full browser 715/715
 - T-016 ✓ 8f47108; CI/full gates accepted, baseline 5 reds remain after browser/backend security fixes
 - T-048 ✓ 1d9c061; all-route touch audit found six filter inputs at 16.5px high
