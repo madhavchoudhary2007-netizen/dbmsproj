@@ -22,33 +22,39 @@ const routes = [
 const viewports = [320, 375, 768, 1024, 1440, 5120] as const;
 
 for (const [id, route] of routes) {
-  test(`${id} ${route} stays usable at every responsive viewport`, async ({ page }) => {
-    const mutations: string[] = [];
-    await page.addInitScript(() => localStorage.setItem("apexgrid_token", "responsive-audit-token"));
-    await page.route("**/api/**", async (request) => {
-      const method = request.request().method();
-      const pathname = new URL(request.request().url()).pathname;
-      if (method === "GET") {
-        const body = pathname === "/api/auth/me"
-          ? { id: 999, email: "responsive@example.test", full_name: "Responsive Audit", role: "admin" }
-          : {};
-        await request.fulfill({ json: body });
-        return;
-      }
-      mutations.push(`${method} ${pathname}`);
-      await request.abort();
-    });
+  for (const width of viewports) {
+    test(`${id} ${route} stays usable at ${width}px`, async ({ page }) => {
+      const mutations: string[] = [];
+      await page.addInitScript((routePath) => {
+        if (routePath !== "/login") localStorage.setItem("apexgrid_token", "responsive-audit-token");
+      }, route);
+      await page.route("**/api/**", async (request) => {
+        const method = request.request().method();
+        const pathname = new URL(request.request().url()).pathname;
+        if (method === "GET") {
+          const body = pathname === "/api/auth/me"
+            ? { id: 999, email: "responsive@example.test", full_name: "Responsive Audit", role: "admin" }
+            : {};
+          await request.fulfill({ json: body });
+          return;
+        }
+        mutations.push(`${method} ${pathname}`);
+        await request.abort();
+      });
 
-    for (const width of viewports) {
       await page.setViewportSize({ width, height: width < 500 ? 812 : 1000 });
       await page.goto(route, { waitUntil: "domcontentloaded" });
-      await expect(page).toHaveURL((url) => new URL(url).pathname === route);
-      await expect.poll(() => page.locator("body").innerText()).toMatch(/\S/);
+      await expect(page, `${id} ${route} at ${width}px must remain on the requested route`)
+        .toHaveURL((url) => new URL(url).pathname === route);
+      await expect.poll(() => page.locator("body").innerText(), {
+        message: `${id} ${route} at ${width}px must render content`,
+      }).toMatch(/\S/);
       const extent = await page.evaluate(() => ({
         document: document.documentElement.scrollWidth,
         viewport: document.documentElement.clientWidth,
       }));
-      expect(extent.document).toBeLessThanOrEqual(extent.viewport + 1);
+      expect(extent.document, `${id} ${route} at ${width}px must not overflow horizontally`)
+        .toBeLessThanOrEqual(extent.viewport + 1);
 
       const action = page.locator(
         "nav a:visible, nav button:visible, .mobile-menu:visible, main a:visible, main button:visible, header a:visible, header button:visible",
@@ -64,7 +70,7 @@ for (const [id, route] of routes) {
         }
       }
       expect(keyboardReached, `${id} ${route} at ${width}px action must be keyboard reachable`).toBe(true);
-      expect(mutations, `${id} ${route} must not send mutations`).toEqual([]);
-    }
-  });
+      expect(mutations, `${id} ${route} at ${width}px must not send mutations`).toEqual([]);
+    });
+  }
 }
