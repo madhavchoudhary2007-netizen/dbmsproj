@@ -37,6 +37,8 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 - 2026-10-21: configuration, `.gitignore`, `.agent/ARCHITECT.md`, and state files only; 0 product-source lines.
 
 ## Open risks
+- T-032 accepted: DataTable empty and PitWall strategy/history notices now use status/alert semantics; typecheck passed. Taste: special-pages.tsx remains >300 lines, T-034 queued.
+- T-007 desktop browser repair round 1: 11 pass / 5 fail. Remaining issues are DataTable and PitWall `.state` notices without status roles, plus first-Tab focus test on login/DBMS. T-032/T-033 are second repair round; if audit still fails, stop condition D.
 - T-008 accepted as offline-discoverable responsive matrix (16 routes × six widths per test); browser run pending.
 - T-031 accepted: footer contrast now uses existing muted token and 12px text. Taste check: one accent remains, no new focal/card/bloat defect; browser axe rerun pending.
 - T-030 accepted: shared StateMessage now announces loading/empty politely and errors assertively. Taste check: no visual focal/palette/card change; existing ui.tsx >300-line bloat remains T-023.

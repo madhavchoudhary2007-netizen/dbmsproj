@@ -8,6 +8,11 @@ loop_iteration: 1 of 5
 - target_files: scripts/eval/db-baseline.sh
 - contract: reject skipped DB tests; run acceptance
 - verify: bash scripts/eval/db-baseline.sh
+### T-033 — Keyboard reachability over several Tabs
+- worker: W3 | priority: P1 | origin: T-007 browser round 1
+- target_files: frontend/e2e/accessibility.spec.ts
+- contract: find an actionable visible focus-visible element within bounded Tab sequence; keep all other assertions
+- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/accessibility.spec.ts
 ### T-009 — G07 touch targets
 - worker: W1 | priority: P1 | after: T-008
 - target_files: frontend/app/globals.css
@@ -75,6 +80,12 @@ loop_iteration: 1 of 5
 - contract: extract cohesive table presentation so ui.tsx is <=300 lines; preserve exports and behavior
 - verify: npm --prefix frontend run typecheck
 
+### T-034 — TASTE-2 reduce special-pages module bloat
+- worker: W1 | priority: P2 | after: T-032
+- target_files: frontend/components/special-pages.tsx, frontend/components/pit-wall.tsx
+- contract: extract cohesive PitWall presentation within 150 changed lines and preserve behavior; continue staged extraction until <=300 lines
+- verify: npm --prefix frontend run typecheck
+
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -83,6 +94,7 @@ loop_iteration: 1 of 5
 - T-014: decide whether shared/public deployment requires HttpOnly cookie auth.
 
 ## Done this iteration (pruned on compaction)
+- T-032 ✓ remaining table/strategy status roles; browser rerun pending
 - T-008 ✓ offline discovery; browser matrix pending
 - T-031 ✓ footer uses muted token and 12px text; axe rerun pending
 - T-030 ✓ StateMessage loading/empty/error announcement roles

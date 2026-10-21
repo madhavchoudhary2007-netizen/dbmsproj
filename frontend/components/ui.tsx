@@ -125,7 +125,7 @@ export function DataTable({
   onSelect?: (row: Row) => void;
 }) {
   if (!rows.length)
-    return <div className="state">No records returned by the API.</div>;
+    return <div className="state" role="status">No records returned by the API.</div>;
   return (
     <div className="table-wrap">
       <table>
