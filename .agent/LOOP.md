@@ -13,7 +13,8 @@ score: NOT_RUN
 - Existing Playwright config and 16-route smoke test require stronger authenticated journey coverage. Login keyboard audit and responsive run are open from prior work.
 
 ## Findings
-- F-A11, area D, P1: `/login` copyright text has 3.88:1 contrast against `#0b0e12` (axe serious at `frontend/app/globals.css:1073`; browser E2E-R02). Required: >=4.5:1 foreground color with regression check. Opened after T-035 corrected the audit fixture; desktop browser audit was 15 passed, 1 failed.
+- F-A11, area D, P1, closed by T-039: `/login` copyright text was 3.88:1 against `#0b0e12` (axe serious at `frontend/app/globals.css:1073`); `--muted` yields 6.44:1. `RUN_XFAIL=1` reproduced before and passed after; marker removed.
+- F-A12, area D, P1, open: desktop accessibility sweep has intermittent focus failures on `/teams`, `/dbms`, and `/pit-wall` at `frontend/e2e/accessibility.spec.ts:51`. Isolated rerun of `/teams` and `/dbms` passed 2/2; likely audit readiness race. T-040 must wait for hydrated controls without weakening the Tab/focus assertion.
 
 ## Blocked
 - None confirmed for the isolated database baseline. Browser and quality gates remain open.

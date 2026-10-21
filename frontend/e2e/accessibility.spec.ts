@@ -12,8 +12,6 @@ const routes = [
 
 for (const [id, path] of routes) {
   test(`${id} ${path}: keyboard and accessibility audit`, async ({ page }) => {
-    if (path === "/login") test.fail(!process.env.RUN_XFAIL, "F-A11");
-
     const attemptedWrites: string[] = [];
     await page.addInitScript((routePath) => {
       if (routePath !== "/login") localStorage.setItem("apexgrid_token", "accessibility-audit-fake-token");
@@ -35,6 +33,11 @@ for (const [id, path] of routes) {
     await expect(page).toHaveURL((url) => new URL(url).pathname === path);
     await expect.poll(() => page.locator("body").innerText()).toMatch(/\S{8}/);
     expect(attemptedWrites).toEqual([]);
+
+    const actionableControl = page.locator(
+      "a[href]:visible, button:not([disabled]):visible, input:not([disabled]):not([type=hidden]):visible, select:not([disabled]):visible, textarea:not([disabled]):visible, [role=button]:not([aria-disabled=true]):visible, [role=link]:not([aria-disabled=true]):visible, [tabindex]:not([tabindex='-1']):not([aria-disabled=true]):visible",
+    ).first();
+    await expect(actionableControl).toBeVisible();
 
     let reachedVisibleControl = false;
     for (let tabPress = 0; tabPress < 12 && !reachedVisibleControl; tabPress++) {

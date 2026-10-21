@@ -1,18 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-21T15:00:00Z
+updated_at: 2026-10-21T15:30:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; no worker dispatched; <=3 target files and <=150 changed lines per task)
-### T-038 — Reproduce login contrast defect
-- worker: W3 | priority: P1 | origin: F-A11
+### T-040 — Stabilize keyboard audit readiness
+- worker: W3 | priority: P1 | origin: F-A12
 - target_files: frontend/e2e/accessibility.spec.ts
-- contract: add switchable strict expected failure for login axe contrast; preserve all assertions
+- contract: wait for hydrated visible action before Tab loop; preserve visible focus and axe assertions
 - verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/accessibility.spec.ts
-### T-039 — Fix login copyright contrast
-- worker: W1 | priority: P1 | after: T-038 | origin: F-A11
-- target_files: frontend/app/globals.css
-- contract: use accessible color token for login copyright text, contrast >=4.5:1
-- verify: npm --prefix frontend run build
 ### T-036 — Responsive audit timeout
 - worker: W3 | priority: P1 | origin: T-008 browser run
 - target_files: frontend/e2e/responsive.spec.ts
@@ -64,13 +59,15 @@ loop_iteration: 1 of 5
 - contract: compare host/container Node and Python; run container gates
 - verify: bash scripts/eval/runtime-parity.sh
 ## Blocked
-- F-A11: login keyboard fixture repaired; axe now exposes one serious contrast issue at `.login-copyright`.
+- F-A12: full desktop accessibility sweep intermittently fails focus check on different routes before hydration settles; individual reruns pass.
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
 - T-019: frontend runner lacks source; test in builder stage.
 - T-014: ADR-001 authorizes cookie/CSRF migration; split into atomic frontend, backend and test tasks before dispatch.
 
 ## Done this iteration (pruned on compaction)
+- T-038 ✓ 4ee604b; contrast regression confirmed with RUN_XFAIL=1
+- T-039 ✓ c52d74e; login contrast 6.44:1, build and login axe pass
 - T-035 ✓ 45bab00; login keyboard assertion passes; axe contrast finding remains
 - T-002 ✓ c6921bd; isolated stack 57 pass/0 skip and live acceptance passed
 - T-037 ✓ 70fc6b5; isolated Compose stack accepted
