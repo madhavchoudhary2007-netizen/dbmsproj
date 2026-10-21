@@ -1,5 +1,5 @@
 # NEXT_STATE
-updated_at: 2026-10-21T12:50:55Z
+updated_at: 2026-10-21T13:04:06Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; no worker dispatched; <=3 target files and <=150 changed lines per task)
@@ -13,11 +13,6 @@ loop_iteration: 1 of 5
 - target_files: frontend/playwright.config.ts, frontend/e2e/routes.spec.ts
 - contract: register E2E-R01..R16
 - verify: npm --prefix frontend exec -- playwright test --list
-### T-005 — G04 shared partial-state rendering
-- worker: W1 | priority: P1 | after: T-004
-- target_files: frontend/components/ui.tsx
-- contract: accessible partial notice retaining populated content
-- verify: npm --prefix frontend run typecheck
 ### T-006 — G04 screen-state fixtures
 - worker: W3 | priority: P1 | after: T-003
 - target_files: frontend/e2e/states.spec.ts
@@ -99,12 +94,19 @@ loop_iteration: 1 of 5
 - contract: ignore border widths, keep spacing checks
 - verify: bash scripts/eval/lint-spacing.sh --self-test
 
+### T-023 — TASTE-1 reduce UI module bloat
+- worker: W1 | priority: P2 | after: T-005
+- target_files: frontend/components/ui.tsx, frontend/components/data-table.tsx
+- contract: extract cohesive table presentation so ui.tsx is <=300 lines; preserve exports and behavior
+- verify: npm --prefix frontend run typecheck
+
 ## Blocked
 - T-002: 57 DB tests pass; acceptance lacks fixture event.
 - T-019: frontend runner lacks source; test in builder stage.
 - T-014: decide whether shared/public deployment requires HttpOnly cookie auth.
 
 ## Done this iteration (pruned on compaction)
+- T-005 ✓ ab7b5c7
 - T-001 ✓ 7fefa04
 - T-010 ✓ f2d7054
 - T-004 ✓ 7fdd20f

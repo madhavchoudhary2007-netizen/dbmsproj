@@ -90,6 +90,31 @@ export function StateMessage({
   if (empty) return <div className="state">{empty}</div>;
   return null;
 }
+export function PartialStateNotice({
+  shownCount,
+  totalCount,
+  filterLabel,
+  onClear,
+}: {
+  shownCount: number;
+  totalCount: number;
+  filterLabel: string;
+  onClear: () => void;
+}) {
+  return (
+    <div className="state" role="status" aria-live="polite">
+      <span>Showing {shownCount} of {totalCount} records</span>
+      <button
+        className="text-button"
+        onClick={onClear}
+        aria-label={`Clear filter: ${filterLabel}`}
+        style={{ minHeight: 44, paddingInline: 12 }}
+      >
+        Clear filter
+      </button>
+    </div>
+  );
+}
 export function DataTable({
   rows,
   columns,
