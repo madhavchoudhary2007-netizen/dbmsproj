@@ -136,7 +136,7 @@ a {
   margin-bottom: 8px;
 }
 .nav-item {
-  height: 36px;
+  height: 44px;
   display: flex;
   align-items: center;
   gap: 11px;
@@ -205,6 +205,8 @@ a {
   color: var(--muted);
   border: 0;
   padding: 6px;
+  min-width: 44px;
+  min-height: 44px;
 }
 .main-shell {
   margin-left: 246px;
@@ -286,7 +288,7 @@ a {
   gap: 8px;
   border: 1px solid transparent;
   padding: 10px 14px;
-  min-height: 36px;
+  min-height: 44px;
   font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
@@ -356,8 +358,8 @@ a {
   letter-spacing: 1px;
 }
 .icon-button {
-  height: 31px;
-  width: 32px;
+  height: 44px;
+  width: 44px;
   border: 1px solid #303841;
   display: grid;
   place-items: center;
@@ -621,7 +623,7 @@ tbody tr:hover {
 .inline-form input,
 .inline-form select,
 .login-form input {
-  height: 36px;
+  height: 44px;
   padding: 0 10px;
   background: #0a0e12;
   border: 1px solid #303941;
@@ -788,8 +790,8 @@ tbody tr:hover {
 .icon-button {
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
+  width: 44px;
+  height: 44px;
   border: 1px solid #37414b;
   background: #11161b;
   color: #d6dde3;
@@ -1051,12 +1053,12 @@ tbody tr:hover {
   margin-bottom: 17px;
 }
 .login-form input {
-  height: 42px;
+  height: 44px;
 }
 .login-submit {
   width: 100%;
   margin-top: 5px;
-  height: 42px;
+  height: 44px;
 }
 .login-submit svg {
   margin-left: auto;
@@ -1080,6 +1082,8 @@ tbody tr:hover {
   color: var(--muted);
   background: none;
   border: 0;
+  width: 44px;
+  height: 44px;
 }
 @media (max-width: 1000px) {
   .content {
@@ -1124,7 +1128,9 @@ tbody tr:hover {
     background: none;
     border: 0;
     color: #b9c2ca;
-    padding: 5px;
+    padding: 0;
+    width: 44px;
+    height: 44px;
   }
   .close-nav {
     display: block;
