@@ -8,6 +8,16 @@ loop_iteration: 1 of 5
 - target_files: scripts/eval/db-baseline.sh
 - contract: reject skipped DB tests; run acceptance
 - verify: bash scripts/eval/db-baseline.sh
+### T-035 — Login keyboard reachability
+- worker: W3 | priority: P1 | origin: accessibility round 2
+- target_files: frontend/e2e/accessibility.spec.ts
+- contract: diagnose why /login reaches no visible actionable focus in 12 Tabs; preserve keyboard and axe assertions
+- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/accessibility.spec.ts
+### T-036 — Responsive audit timeout
+- worker: W3 | priority: P1 | origin: T-008 browser run
+- target_files: frontend/e2e/responsive.spec.ts
+- contract: split six widths into bounded cases without weakening overflow/action assertions; keep read-only traffic
+- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --list frontend/e2e/responsive.spec.ts
 ### T-009 — G07 touch targets
 - worker: W1 | priority: P1 | after: T-008
 - target_files: frontend/app/globals.css
@@ -82,6 +92,7 @@ loop_iteration: 1 of 5
 - verify: npm --prefix frontend run typecheck
 
 ## Blocked
+- Stop condition D: T-007 desktop accessibility audit still fails on /login after two repair rounds (15 pass, 1 fail). No further worker dispatch this turn.
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
 - T-002: 57 DB tests pass; acceptance lacks fixture event.
@@ -92,7 +103,4 @@ loop_iteration: 1 of 5
 - T-033 ✓ bounded keyboard Tab focus audit; second browser rerun pending
 - T-032 ✓ remaining table/strategy status roles
 - T-008 ✓ offline responsive test; browser timeout needs triage
-- T-031 ✓ footer contrast
-- T-030 ✓ StateMessage roles
-- T-029 ✓ focus audit fix
 - Earlier accepted tasks are in git history (T-001/003/004/005/007/010/011/025).

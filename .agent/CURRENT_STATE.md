@@ -37,6 +37,9 @@ last_eval_score: NOT_RUN (acceptance and browser E2E hard gates unresolved)
 - 2026-10-21: configuration, `.gitignore`, `.agent/ARCHITECT.md`, and state files only; 0 product-source lines.
 
 ## Open risks
+- STOP D (2026-10-21): T-007 desktop accessibility audit still fails only on `/login` keyboard reachability after two repair rounds: 15 pass, 1 fail. Assertion at `frontend/e2e/accessibility.spec.ts:49` retained. T-035 queued, no further workers dispatched.
+- T-008 responsive desktop audit was interrupted after R01 timed out at 30s and R02 began; full matrix remains unverified. T-036 queued to bound per-width cases.
+- Latest safe quality checks: frontend typecheck 0, lint 0, build 0; in-memory simulation pytest 2 pass/0 skip (35 deselected); motion/banned lint 0, spacing lint 1.
 - T-006 blocked after two W3 failures: generic five-state fixture overasserted states without route-specific applicability; failed draft at `.agent/results/T-006.raw.failed.spec.ts`. T-026..028 depend on it.
 - T-002 acceptance fixture assumes nonexistent World Series round 3; DB data/schema untouched. Full DB-backed suite previously 57 pass/0 skip.
 - T-003 route smoke: 80 cases discovered, desktop Chromium 16/16 pass; auth redirects allowed, so deeper states remain unverified.
