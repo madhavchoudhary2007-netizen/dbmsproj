@@ -1,10 +1,10 @@
 # NEXT_STATE
-updated_at: 2026-10-21T12:16:50Z
-loop_iteration: 0 of 5
+updated_at: 2026-10-21T12:36:52Z
+loop_iteration: 1 of 5
 
 ## Queue (top-down; no worker dispatched; <=3 target files and <=150 changed lines per task)
 ### T-001 — G01 repair dev install requirement
-- worker: W2 | priority: P0
+- worker: W2 | priority: P0 | pilot FAILED: envelope, worker DNS
 - target_files: backend/requirements-dev.txt
 - contract: correct HTTP client; preserve ranges
 - verify: bash -c 'source .agent/commands.env; eval "$INSTALL_CMD"'
@@ -49,7 +49,7 @@ loop_iteration: 0 of 5
 - contract: touched controls >=44x44px without breaking dense tables
 - verify: npm --prefix frontend run build
 ### T-010 — G09 reduced motion
-- worker: W1 | priority: P1 | pilot-independent of T-009
+- worker: W1 | priority: P1 | pilot FAILED: build port denied
 - target_files: frontend/app/globals.css
 - contract: honor prefers-reduced-motion on spinners/transitions
 - verify: bash -c 'bash scripts/eval/lint-motion.sh >/dev/null 2>&1 && rg -q "prefers-reduced-motion: reduce" frontend/app/globals.css && npm --prefix frontend run build'
@@ -86,12 +86,12 @@ loop_iteration: 0 of 5
 ### T-017 — G08 spacing tokens
 - worker: W1 | priority: P2 | after: T-010
 - target_files: frontend/app/globals.css, frontend/tailwind.config.ts
-- contract: introduce 4/8/12/16/24/32/48/64 scale in <=150 lines
+- contract: add spacing scale in <=150 lines
 - verify: npm --prefix frontend run build
 ### T-018 — G10 typography
 - worker: W1 | priority: P2 | after: T-017
 - target_files: frontend/app/globals.css, frontend/tailwind.config.ts
-- contract: deliberate accessible sans/mono hierarchy; retain ApexGrid identity
+- contract: accessible sans/mono hierarchy
 - verify: npm --prefix frontend run build
 ### T-019 — G16 runtime parity
 - worker: W3 | priority: P2 | runtime versions verified; container source gates require builder stage

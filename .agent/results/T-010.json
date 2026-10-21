@@ -1,0 +1,22 @@
+{
+  "task_id": "T-010",
+  "status": "FAILED",
+  "files_modified": [
+    {
+      "path": "frontend/app/globals.css",
+      "lines_added": 24,
+      "lines_removed": 3
+    }
+  ],
+  "diff_summary": "Replaced shorthand transitions with named properties, kept the sidebar transform transition, and added reduced-motion rules that minimize transitions and disable spinner animation.",
+  "verification": {
+    "command": "bash -c 'bash scripts/eval/lint-motion.sh >/dev/null 2>&1 && rg -q \"prefers-reduced-motion: reduce\" frontend/app/globals.css && npm --prefix frontend run build'",
+    "exit_code": 1,
+    "tests_passed": 0,
+    "tests_failed": 1,
+    "duration_ms": 18200
+  },
+  "unresolved_blockers": [
+    "The motion guard and reduced-motion check passed, but the build failed when Turbopack could not bind to a port (Operation not permitted)."
+  ]
+}

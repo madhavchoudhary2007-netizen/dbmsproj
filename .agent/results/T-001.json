@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "task_id": "T-001",
+  "status": "FAILED",
+  "files_modified": [
+    {
+      "path": "backend/requirements-dev.txt",
+      "lines_added": 1,
+      "lines_removed": 1
+    }
+  ],
+  "diff_summary": "Confirmed test_api.py imports FastAPI TestClient and uses it in both listed ranges. Changed only httpx2>=0.28,<1 to httpx>=0.28,<1.",
+  "verification": {
+    "command": ".venv/bin/python -m pip install --dry-run -r backend/requirements.txt -r backend/requirements-dev.txt",
+    "exit_code": 1,
+    "tests_passed": 0,
+    "tests_failed": 0,
+    "duration_ms": 7840
+  },
+  "unresolved_blockers": [
+    "Dry-run could not resolve pypi.org because network DNS was unavailable; pip reported no matching distribution for httpx."
+  ]
+}

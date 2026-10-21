@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-21T12:16:50Z
-git_head: 8bde3fe
+updated_at: 2026-10-21T12:36:52Z
+git_head: 86495a1
 branch: master
 architect_sha256: e7722a81b4f2c708f019b3468c0a9630411ea6df88eb85aa37a7aff6ffc523a9
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -39,5 +39,6 @@ last_eval_score: NOT_RUN (install, full DB tests and browser E2E hard gates unre
 - No aggregate score or completion claim; install, full integration, E2E and axe hard gates remain unresolved.
 - Acceptance requires round 3 of "ApexGrid World Series", which has no events: missing seed data, not a code defect. Existing demo archives were not altered by checks.
 - Production frontend image omits source and lint config; typecheck and lint run on the host only. Host Python 3.14 / Node 26 differ from Dockerfile Python 3.12 / Node 22.
+- Pilot T-001 and T-010 each ran twice with `gpt-6-luna`/high and remain FAILED; no task accepted or product commit. T-001 retry envelope had extra `$schema` and worker pip DNS failed; host pip dry-run passed. T-010 build could not bind a Turbopack port on worker or orchestrator rerun. In-scope product edits remain uncommitted.
 - `localStorage` bearer token and local JWT fallback require a deployment-context decision before auth transport changes.
 - Worker queue is in `NEXT_STATE.md`; no workers dispatched or accepted.
