@@ -59,8 +59,17 @@ def main():
     assert health["services"] == {"postgres": "up", "mongodb": "up"}
     token = expect("/auth/login", body={"email": "admin@apexgrid.test", "password": "ApexGrid2026!"})["access_token"]
     championship = next(row for row in expect("/championships", token) if row["name"] == "ApexGrid World Series")
-    events = expect("/events", token)
-    event = next(row for row in events if row["round_number"] == 3 and row["championship_id"] == championship["id"])
+    offset = 0
+    event = None
+    while event is None:
+        events = expect(f"/events?limit=200&offset={offset}", token)
+        event = next((row for row in events
+                      if row["round_number"] == 3 and row["championship_id"] == championship["id"]), None)
+        if event is not None or len(events) < 200:
+            break
+        offset += 200
+    if event is None:
+        raise RuntimeError("Seeded ApexGrid World Series round 3 event was not found in /events")
     driver_rows = []
     offset = 0
     while True:

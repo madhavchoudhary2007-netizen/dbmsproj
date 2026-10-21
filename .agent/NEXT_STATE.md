@@ -10,9 +10,9 @@ loop_iteration: 1 of 5
 - verify: bash -n scripts/eval/test-stack.sh && docker compose -p apexgrid-test -f scripts/eval/test-stack.compose.yaml config --quiet
 ### T-002 — G02 require full database baseline
 - worker: W3 | priority: P0 | blocked: acceptance fixture assumes absent World Series round 3
-- target_files: scripts/eval/db-baseline.sh
-- contract: reject skipped DB tests; run acceptance
-- verify: bash scripts/eval/db-baseline.sh
+- target_files: scripts/eval/db-baseline.sh, scripts/acceptance.py
+- contract: reject skipped DB tests on isolated stack; run acceptance with paginated fixture lookup
+- verify: bash -n scripts/eval/db-baseline.sh && .venv/bin/python -m py_compile scripts/acceptance.py
 ### T-035 — Login keyboard reachability
 - worker: W3 | priority: P1 | origin: accessibility round 2
 - target_files: frontend/e2e/accessibility.spec.ts
