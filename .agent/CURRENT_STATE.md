@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-21T20:20:00Z
-git_head: cf80374
+updated_at: 2026-10-21T18:40:00Z
+git_head: fb3da98
 branch: perfection-loop
 architect_sha256: 8753bfed50769fe28099f5f400bf3f7a42223fc98bebddda0db16eb7d0ece31b
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -25,7 +25,7 @@ last_eval_score: NOT_RUN (quality gates and journey coverage remain open)
 - Frontend dev-tool advisories need a safe upgrade path; `npm audit fix --dry-run` offers only in-range `eslint-config-next` and selector-parser updates, and Tailwind 4 is major.
 - Runtime parity, permissions matrix, simulator invariants, role journeys, full evaluation score, and docs audit remain open. `NEXT_STATE.md` is the queue.
 - T-012 simulation boundaries passed 6 focused tests with Ruff steady at 639; T-013 deployment-secret gate passed 5 subprocess cases. ADR-002 plans browser cookie/CSRF migration; architecture relocked at 8753bfed after focused five-lens review, implementation unstarted.
-- T-050 accepted eight strict cookie/CSRF xfails; --runxfail reproduces all eight. Isolated coverage baseline: 69 pass/8 xfail/0 real skip, overall 72%, main 72%, database 100%, config 88%, race_archive 97%, bootstrap 0%. JUnit counts xfails as skipped; db-baseline gate needs to distinguish them before running.
+- T-050 accepted eight strict cookie/CSRF xfails; --runxfail reproduces all eight. Isolated coverage baseline: 69 pass/8 xfail/0 real skip, overall 72%, main 72%, database 100%, config 88%, race_archive 97%, bootstrap 0%. T-057 accepts JUnit xfails separately while rejecting real skips; disposable-stack rerun pending. T-058 includes deployment-secret regression and fails unreachable audits in CI.
 
 ## Orchestrator direct edits and Taste review
 - Product source: one `frontend/package.json` build-script line switched Next build to webpack due Turbopack bind failure (logged at e854d9b). No other product-source edits.

@@ -26,7 +26,7 @@ score: NOT_RUN
 - F-E02, area E, P2, open: `npm audit` reports 7 high and 2 moderate findings in the frontend dev-tool chain, through Tailwind 3 and `eslint-config-next`; suggested fixes are major dependency changes. Evaluate targeted safe upgrades before any major migration.
 - F-D07, area D, P1, closed by T-009/T-047: 51 undersized shared mobile controls fixed; injected Next.js toolbar excluded from product audit.
 - F-D08, area D, P1, closed by T-049: `.search input` was 177.5×16.5px on six table routes at 375px; wrapper and input now 44px high. RUN_XFAIL=1 passed all 15 mobile routes; marker removed; full browser matrix passed 715/715 across five projects.
-- F-F01, area F, P1, open: pytest JUnit encodes eight deliberate strict G11 xfails as `skipped type=pytest.xfail`; `scripts/eval/db-baseline.sh` currently treats them as eight real skips and fails. T-057 will count xfails separately and continue to reject actual skips.
+- F-F01, area F, P1, closed by T-057: pytest JUnit encodes deliberate strict G11 xfails as `skipped type=pytest.xfail`; the parser now reports them separately while rejecting real skips. Five synthetic checks pass; isolated-stack rerun pending.
 
 ## Full-gates baseline (isolated stack, 2026-10-21)
 - 10 gates ran; 6 failed: ruff check (641), ruff format (7 files), mypy strict (311), frontend strict lint (45 explicit `any`), browser E2E (mobile-375 WebKit issue), supply-chain audit (3 findings in `python-jose`/`ecdsa`). DB-backed pytest+acceptance, frontend typecheck/build, and backend coverage passed. Browser E2E reported 512 passing cases before the missing-WebKit failures.
