@@ -4,7 +4,6 @@ import hashlib
 import hmac
 import secrets
 
-
 SESSION_COOKIE = "apexgrid_session"
 CSRF_COOKIE = "apexgrid_csrf"
 
@@ -12,7 +11,7 @@ CSRF_COOKIE = "apexgrid_csrf"
 def create_csrf_token(session_id: str, secret: str) -> str:
     """Return a random nonce signed for one JWT session identifier."""
     nonce = secrets.token_urlsafe(32)
-    message = f"{session_id}.{nonce}".encode("utf-8")
+    message = f"{session_id}.{nonce}".encode()
     signature = hmac.new(secret.encode("utf-8"), message, hashlib.sha256).hexdigest()
     return f"{nonce}.{signature}"
 
@@ -25,7 +24,7 @@ def verify_csrf_token(value: str, session_id: str, secret: str) -> bool:
         return False
     if not nonce or not signature:
         return False
-    message = f"{session_id}.{nonce}".encode("utf-8")
+    message = f"{session_id}.{nonce}".encode()
     expected = hmac.new(secret.encode("utf-8"), message, hashlib.sha256).hexdigest()
     return hmac.compare_digest(signature, expected)
 

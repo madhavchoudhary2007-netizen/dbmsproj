@@ -161,7 +161,13 @@ def require_allowed_origin(request: Request):
         raise HTTPException(403, "Origin not allowed")
 
 
-def current_user(request: Request, credentials: HTTPAuthorizationCredentials | None = Depends(bearer)):
+bearer_dependency = Depends(bearer)
+
+
+def current_user(
+    request: Request,
+    credentials: HTTPAuthorizationCredentials | None = bearer_dependency,
+):
     bearer_token = credentials.credentials if credentials else None
     cookie_token = request.cookies.get("apexgrid_session")
     token = bearer_token or cookie_token
@@ -172,14 +178,22 @@ def current_user(request: Request, credentials: HTTPAuthorizationCredentials | N
         user_id = claims.get("sub")
         if not user_id:
             raise ValueError()
-        if not bearer_token and cookie_token and request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+        if (
+            not bearer_token
+            and cookie_token
+            and request.method in {"POST", "PUT", "PATCH", "DELETE"}
+        ):
             require_allowed_origin(request)
             csrf_cookie = request.cookies.get("apexgrid_csrf", "")
             csrf_header = request.headers.get("x-csrf-token", "")
             session_id = claims.get("jti", "")
-            if (not csrf_cookie or not csrf_header or not session_id
-                    or not hmac.compare_digest(csrf_cookie.encode("utf-8"), csrf_header.encode("utf-8"))
-                    or not verify_csrf_token(csrf_cookie, session_id, JWT_SECRET)):
+            if (
+                not csrf_cookie
+                or not csrf_header
+                or not session_id
+                or not hmac.compare_digest(csrf_cookie.encode(), csrf_header.encode())
+                or not verify_csrf_token(csrf_cookie, session_id, JWT_SECRET)
+            ):
                 raise HTTPException(403, "CSRF validation failed")
         user = fetch_one("SELECT id,email,full_name,role FROM users WHERE id=%s", (user_id,))
     except (jwt.exceptions.InvalidTokenError, ValueError):
@@ -528,11 +542,20 @@ def update_membership(membership_id: UUID, body: MembershipPatch, user=Depends(r
 def login(body: Login, response: Response, request: Request):
     require_allowed_origin(request)
     try:
-        user = fetch_one("SELECT id,email,password_hash,full_name,role FROM users WHERE lower(email)=lower(%s)", (body.email,))
+        user = fetch_one(
+            "SELECT id,email,password_hash,full_name,role "
+            "FROM users WHERE lower(email)=lower(%s)",
+            (body.email,),
+        )
     except Exception:
         raise HTTPException(503, "PostgreSQL is unavailable")
     try:
-        valid_password = bool(user and bcrypt.checkpw(body.password.encode("utf-8"), user["password_hash"].encode("utf-8")))
+        valid_password = bool(
+            user
+            and bcrypt.checkpw(
+                body.password.encode(), user["password_hash"].encode()
+            )
+        )
     except (ValueError, TypeError):
         valid_password = False
     if not valid_password:
@@ -540,13 +563,24 @@ def login(body: Login, response: Response, request: Request):
     expiry = datetime.now(timezone.utc) + timedelta(minutes=JWT_MINUTES)
     session_id = secrets.token_urlsafe(32)
     token = jwt.encode(
-        {"sub": str(user["id"]), "role": user["role"], "exp": expiry, "jti": session_id},
+        {
+            "sub": str(user["id"]),
+            "role": user["role"],
+            "exp": expiry,
+            "jti": session_id,
+        },
         JWT_SECRET,
         algorithm=JWT_ALGORITHM,
     )
     csrf_token = create_csrf_token(session_id, JWT_SECRET)
     set_auth_cookies(response, token, csrf_token, secure=APP_ENV != "local")
-    return {"access_token": token, "token_type": "bearer", "user": jsonable({k: user[k] for k in ("id", "email", "full_name", "role")})}
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": jsonable(
+            {key: user[key] for key in ("id", "email", "full_name", "role")}
+        ),
+    }
 
 
 @app.get("/api/auth/me")
@@ -1762,7 +1796,7 @@ async def session_ws(ws: WebSocket, session_id: UUID):
     if origin is not None and origin not in CORS_ORIGINS:
         await ws.close(code=4403, reason="Origin not allowed")
         return
-    protocols=ws.scope.get("subprotocols", [])
+    protocols = ws.scope.get("subprotocols", [])
     subprotocol_token = websocket_bearer(protocols)
     cookie_token = ws.cookies.get("apexgrid_session")
     token = subprotocol_token or cookie_token
@@ -1770,18 +1804,26 @@ async def session_ws(ws: WebSocket, session_id: UUID):
         await ws.close(code=4401, reason="Expected apexgrid.jwt subprotocol and bearer token")
         return
     try:
-        claims=jwt.decode(token,JWT_SECRET,algorithms=[JWT_ALGORITHM])
-        user=fetch_one("SELECT id FROM users WHERE id=%s",(claims.get("sub"),)) if claims.get("sub") else None
+        claims = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        user = (
+            fetch_one("SELECT id FROM users WHERE id=%s", (claims.get("sub"),))
+            if claims.get("sub")
+            else None
+        )
     except Exception:
-        user=None
+        user = None
     if not user:
         await ws.close(code=4401, reason="Invalid or expired token")
         return
-    await ws.accept(subprotocol="apexgrid.jwt" if subprotocol_token else None); q=bus.subscribe(session_id)
+    await ws.accept(subprotocol="apexgrid.jwt" if subprotocol_token else None)
+    q = bus.subscribe(session_id)
     try:
-        while True: await ws.send_json(await q.get())
-    except WebSocketDisconnect: pass
-    finally: bus.unsubscribe(session_id,q)
+        while True:
+            await ws.send_json(await q.get())
+    except WebSocketDisconnect:
+        pass
+    finally:
+        bus.unsubscribe(session_id, q)
 
 
 @app.get("/api/dashboard")
