@@ -201,7 +201,6 @@ def test_idle_websocket_loss_unsubscribes_without_bus_events(monkeypatch):
 
 
 @pytest.mark.parametrize("status", ["paused", "running"])
-@pytest.mark.xfail(strict=True, reason="F-STRUCT-01: simulation loop must stop after lease loss")
 def test_simulation_lease_loss(monkeypatch, status):
     from backend.app.runtime_lease import check_runtime_lease
 

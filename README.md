@@ -30,6 +30,8 @@ These are local demonstration credentials. Replace the seed and JWT secret befor
 
 PostgreSQL owns official entities and rules. MongoDB stores telemetry documents keyed by shared UUIDs. The WebSocket stream delivers normalized events to the live pit wall.
 
+Live simulation and WebSocket delivery run in one backend process per PostgreSQL database. The supplied Compose service starts one Uvicorn worker; a second backend process using the same database fails startup. If the runtime ownership connection is lost, HTTP returns 503, WebSockets close, and simulators stop. Restart the backend after PostgreSQL recovers. Do not increase the worker or replica count without shared simulation leadership and event delivery.
+
 ## Development checks
 
 Run `docker compose config` to check Compose. Backend migration and seed can also be run directly with:
