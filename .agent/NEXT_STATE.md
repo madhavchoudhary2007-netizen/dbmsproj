@@ -3,11 +3,16 @@ updated_at: 2026-10-22T12:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-072 — Phase 1 domain correctness audit
-- worker: W3 | priority: P1 | after: T-071
-- target_files: .agent/audit/phase1-domain.md
-- contract: evidence-based A-area findings on standings, classification, reservations, lifecycles, telemetry and simulator, excluding recorded G11/F-ACE01
-- verify: test -s .agent/audit/phase1-domain.md
+### T-073 — F-DOM-01 unclassified bonus reproducer
+- worker: W3 | priority: P1 | after: T-072
+- target_files: backend/tests/test_database.py
+- contract: strict xfail DB test proves pole/fastest-lap bonuses from unclassified result; --runxfail fails old SQL
+- verify: isolated test-stack focused pytest, normal xfail and --runxfail failure
+### T-074 — F-DOM-01 bonus scoring fix
+- worker: W2 | priority: P1 | after: T-073
+- target_files: backend/migrations/002_classified_bonus.sql, backend/app/bootstrap.py
+- contract: additive function replacement gates bonuses by classification; bootstrap applies numbered migrations safely
+- verify: focused T-073 --runxfail and isolated backend gate
 ### T-015 — G13 simulation boundary extraction
 - worker: W2 | priority: P1 | after: T-012
 - target_files: backend/app/main.py, backend/app/simulation_core.py
@@ -56,4 +61,5 @@ loop_iteration: 1 of 5
 - T-069 ✓ f2e6e56; four focused browser cookie/login/logout/CSRF cases pass
 - T-070 ✓ 417b922; removed unused token helper, typecheck passes
 - T-071 ✓ 348ec12; mobile navigation helper, six focused logout cases pass
+- T-072 ✓ fb806c0; five evidence-backed A-area findings
 - Earlier accepted tasks and evidence are in git history and LOOP.md.

@@ -20,12 +20,18 @@ score: NOT_RUN
 - T-067/T-068 removed bearer credentials from allowed-Origin browser login JSON while retaining no-Origin legacy API compatibility. Isolated backend gate exited 0: 82 passed, 0 failed/skipped/xfailed, plus live acceptance (2026-10-22). Logout/CSRF browser coverage remains open.
 - T-069 added desktop browser logout success and 503 retry/CSRF checks (4 focused cases passed); T-070 removed the inert token helper with typecheck passing. Full browser matrix: 736 passed, 4 new mobile logout cases failed because the test did not open the mobile navigation; T-071 fixture repair queued. G11 remains open.
 - T-071 opened the mobile navigation in both logout journeys without changing assertions. Acceptance reran all six focused desktop/mobile cases successfully (2026-10-22); full matrix remains to rerun.
+- Full 740-case browser matrix then exposed two tablet-768 fixture failures: the menu exists only at CSS max-width 700px. Orchestrator corrected one test helper line; rerun exited 0 with 740 passed across five projects (2026-10-22). G11 backend/browser/acceptance gates are now green; cookie transport finding closed.
 - Phase 0 closed after T-057/T-058: the isolated `db-baseline.sh` run passed 69 tests, separately reported 8 xfails and 0 real skips, and passed live acceptance; CI now runs all 11 full gates including deployment-secret regression and rejects unreachable registries. Browser smoke/responsive suite passed 715/715 across five projects and all 16 routes. Quality gates remain recorded red targets, not claimed passing.
 - Host pytest: 31 passed, 26 skipped; coverage overall 44.58% (777/1743 lines), app module percentages: bootstrap 0.0, config 88.2, database 50.0, main 43.6, race_archive 97.1. These numbers are not an isolated-stack baseline.
 - Docker and local sockets required scoped sandbox escalation; the isolated stack started and was seeded successfully.
 - Existing Playwright config and 16-route smoke test require stronger authenticated journey coverage. Login keyboard audit and responsive run are open from prior work.
 
 ## Findings
+- F-DOM-01, area A, P1, open: unclassified session results earn pole/fastest-lap points through unconditional terms in `recalculate_standings` (`backend/migrations/001_initial.sql:264`); T-073/T-074 test-first fix queued.
+- F-DOM-02, area A, P1, open: approved time/grid penalties are stored but do not affect official classification or starting order (`backend/app/main.py:707-745,800-801`); define enforcement rule and test before fix.
+- F-DOM-03, area A, P1, open: result upserts allow classified position gaps (`backend/app/main.py:727-744`); test and enforce at publication boundary.
+- F-DOM-04, area A, P2, open: telemetry insert/broadcast accepts duplicate and older packets (`backend/app/main.py:914-932`); test ordering/idempotency.
+- F-DOM-05, area A, P2, open: production simulator uses global random state without persisted seed (`backend/app/main.py:1451-1455,1661`); test restart/replay determinism.
 - F-ACE01, area C/E, P2, open: `/api/auth/login` does not throttle repeated invalid guesses (`backend/app/main.py:509-529`); the independent Phase 1 audit in `.agent/audit/phase1-ace.md` records evidence and the required per-account/per-source limit.
 - F-A11, area D, P1, closed by T-039: `/login` copyright text was 3.88:1 against `#0b0e12` (axe serious at `frontend/app/globals.css:1073`); `--muted` yields 6.44:1. `RUN_XFAIL=1` reproduced before and passed after; marker removed.
 - F-A12, area D, P1, closed by T-040: browser test waited for visible actionable control before Tab; desktop accessibility sweep passed 16/16 afterward.
