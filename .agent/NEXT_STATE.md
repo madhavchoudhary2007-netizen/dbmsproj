@@ -3,11 +3,6 @@ updated_at: 2026-10-22T12:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-074 — F-DOM-01 bonus scoring fix
-- worker: W2 | priority: P1 | after: T-073
-- target_files: backend/migrations/002_classified_bonus.sql, backend/app/bootstrap.py
-- contract: additive function replacement gates bonuses by classification; bootstrap applies numbered migrations safely
-- verify: focused T-073 --runxfail and isolated backend gate
 ### T-075 — F-DOM-03 classification gap reproducer
 - worker: W3 | priority: P1 | after: T-072
 - target_files: backend/tests/test_api.py
@@ -63,4 +58,5 @@ loop_iteration: 1 of 5
 - T-071 ✓ 348ec12; mobile navigation helper, six focused logout cases pass
 - T-072 ✓ fb806c0; five evidence-backed A-area findings
 - T-073 ✓ 5c2e9c4; strict DB xfail, --runxfail proves two unclassified bonus points
+- T-074 ✓ d6770a6; additive 002 scoring migration and ordered bootstrap; focused --runxfail passes
 - Earlier accepted tasks and evidence are in git history and LOOP.md.

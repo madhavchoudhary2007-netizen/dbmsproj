@@ -157,7 +157,6 @@ def test_standings_and_overlapping_pit_reservation(db):
         cur.execute("SELECT reserve_pit_box(%s,%s,%s,'2026-03-15 08:30+00','2026-03-15 09:30+00')", (box, session, team))
 
 
-@pytest.mark.xfail(strict=True, reason="F-DOM-01")
 def test_unclassified_bonus_points_do_not_count(db):
     _, cur = db
     now = datetime.now(timezone.utc)
