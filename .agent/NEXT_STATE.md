@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-22T18:31:37Z
+updated_at: 2026-10-22T18:34:37Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-135 — F-STRUCT-03 reopen PostgreSQL pool for each app lifespan
-- worker: W2 | priority: P1 | after: T-134
-- target_files: backend/app/database.py, backend/app/main.py
-- contract: second TestClient lifespan has a live pool; existing imports, DB error mapping, startup and shutdown remain correct
-- verify: T-134 --runxfail and T-131 seeded contract on apexgrid-test; Ruff <=583, mypy <=254
+### T-136 — Update lifespan unit fixture for current pool accessor
+- worker: W3 | priority: P1 | after: T-135
+- target_files: backend/tests/test_api.py
+- contract: mock `main.get_pool` rather than removed `main.pool`; preserve all startup/shutdown assertions
+- verify: focused lifespan unit and T-134 seeded regression on apexgrid-test; Ruff <=583
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-135 ✓ e99d7ab; pool reopens for sequential lifespans, focused seeded tests 2 passed, Ruff 583/mypy 254; full gate exposed stale test mock.
 - T-134 ✓ 2120ba9; two-lifespan strict xfail reproduced PoolClosed on second startup; Ruff 583.
 - T-133 ✓ 2692cff; live GET repository extraction, seeded contract 1 passed, Ruff 583, mypy 254; full isolated gate exposed F-STRUCT-03.
 - T-132 ✓ f1cc2b1; telemetry GET existence and Mongo query to typed repository, seeded contract 1 passed, Ruff 586, mypy 254; worker socket denied, orchestrator reran.

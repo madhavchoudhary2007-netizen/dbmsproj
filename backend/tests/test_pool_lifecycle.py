@@ -1,11 +1,9 @@
 """Expected-failure regression for the module-global PostgreSQL pool lifecycle."""
 
-import pytest
 from app.main import app
 from fastapi.testclient import TestClient
 
 
-@pytest.mark.xfail(strict=True, reason="F-STRUCT-03")
 def test_postgres_pool_reopens_across_sequential_lifespans():
     for lifespan_number in (1, 2):
         with TestClient(app) as client:
