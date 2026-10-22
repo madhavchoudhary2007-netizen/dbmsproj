@@ -51,7 +51,6 @@ async function openRaceArchive(page: Page, affected: boolean) {
 }
 
 test("F-DOM-02 historical sanctions mark the archive classification provisional", async ({ page }) => {
-  test.fail(!process.env.RUN_XFAIL);
   await openRaceArchive(page, true);
   await expect(page.getByText(/provisional classification|classification is provisional|provisional results/i)).toBeVisible();
   await expect(page.getByText(/historical time and grid penalties are recorded but not applied/i)).toBeVisible();

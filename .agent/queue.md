@@ -28,3 +28,7 @@
 - target_files: frontend/components/special-pages.tsx, frontend/components/pit-wall.tsx
 - contract: extract cohesive PitWall presentation within 150 changed lines and preserve behavior; continue staged extraction until <=300 lines
 - verify: npm --prefix frontend run typecheck
+
+### Phase 3 — ADR-003 full time/grid enforcement proposal
+- owner: orchestrator | priority: P2
+- contract: write a finding-backed CP defining race elapsed time, starting grid, inherited records, reranking and role journeys before new sanctions are enabled; no historical data rewrite.

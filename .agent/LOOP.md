@@ -1,6 +1,6 @@
 # Perfection loop
 branch: perfection-loop
-phase: 1 — correctness and security, in progress
+phase: 2 — structure, in progress
 cycle: 0 of 8
 score: NOT_RUN
 
@@ -37,6 +37,7 @@ score: NOT_RUN
 - T-085 added database-independent strict archive xfail: normal focused run 1 passed/1 xfailed; --runxfail fails on missing result provisional field (2026-10-22). T-086 owns repair.
 - T-086 added provisional archive result flags. The strict marker was retired; isolated backend gate passed 92 tests with zero failed/skipped/xfailed and live acceptance passed (2026-10-22). Archive UI explanation remains open.
 - T-087 added strict desktop/mobile archive screen xfails; normal focused run had two expected failures and two unaffected passes, and RUN_XFAIL=1 failed the affected journeys before repair (2026-10-22).
+- T-088 labelled provisional archive classifications with cause and next step. Marker retired; full browser matrix passed 775/775, frontend typecheck passed. Phase 1 A/C/E audits have no remaining P0/P1 after F-DOM-02 closure; Phase 2 begins. P2 F-DOM-04/05, F-ACE01, F-E02 and full penalty enforcement remain queued (2026-10-22).
 - Phase 0 closed after T-057/T-058: the isolated `db-baseline.sh` run passed 69 tests, separately reported 8 xfails and 0 real skips, and passed live acceptance; CI now runs all 11 full gates including deployment-secret regression and rejects unreachable registries. Browser smoke/responsive suite passed 715/715 across five projects and all 16 routes. Quality gates remain recorded red targets, not claimed passing.
 - Host pytest: 31 passed, 26 skipped; coverage overall 44.58% (777/1743 lines), app module percentages: bootstrap 0.0, config 88.2, database 50.0, main 43.6, race_archive 97.1. These numbers are not an isolated-stack baseline.
 - Docker and local sockets required scoped sandbox escalation; the isolated stack started and was seeded successfully.
@@ -44,7 +45,7 @@ score: NOT_RUN
 
 ## Findings
 - F-DOM-01, area A, P1, closed by T-073/T-074: unclassified session results earned pole/fastest-lap points through unconditional terms in `recalculate_standings` (`backend/migrations/001_initial.sql:264`); strict DB xfail proved 2 points, additive 002 migration gates both bonuses, full isolated backend and live acceptance pass.
-- F-DOM-02, area A, P1, open: approved time/grid penalties are stored but do not affect official classification or starting order (`backend/app/main.py:707-745,800-801`); define enforcement rule and test before fix.
+- F-DOM-02, area A, P1, closed by T-077..T-088: new unsupported time/grid sanctions return 422 without writes; steward controls explain the limit; historical result, standings and archive outputs are visibly provisional across backend and browser gates. Full enforcement remains required P2 Phase 3 work under ADR-003.
 - F-DOM-03, area A, P1, closed by T-075/T-076: result upserts allowed completed classified position gaps (`backend/app/main.py:727-744`); strict API xfail proved missing 422, final position set now validates within the write transaction; full isolated backend and live acceptance pass.
 - F-DOM-04, area A, P2, open: telemetry insert/broadcast accepts duplicate and older packets (`backend/app/main.py:914-932`); test ordering/idempotency.
 - F-DOM-05, area A, P2, open: production simulator uses global random state without persisted seed (`backend/app/main.py:1451-1455,1661`); test restart/replay determinism.

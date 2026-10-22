@@ -3,11 +3,6 @@ updated_at: 2026-10-22T12:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-088 — F-DOM-02 archive screen provisional label
-- worker: W1 | priority: P1 | after: T-087
-- target_files: frontend/components/race-database.tsx
-- contract: provisional classification label and explanation for affected archive; ordinary unaffected view
-- verify: RUN_XFAIL=1 PLAYWRIGHT_PORT=3188 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts frontend/e2e/archive-provisional.spec.ts --project=desktop-1440 --project=mobile-375
 ### T-015 — G13 simulation boundary extraction
 - worker: W2 | priority: P1 | after: T-012
 - target_files: backend/app/main.py, backend/app/simulation_core.py
@@ -36,5 +31,6 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (pruned on compaction)
+- T-088 ✓ 73de4fd; archive provisional label, full browser 775/775, typecheck pass.
 - T-001..T-086: accepted history and evidence in git/LOOP.md; latest T-086 648ddad archive API fix.
 - T-087 ✓ 710e0cf; strict desktop/mobile archive UI xfails reproduced; ordinary views pass.
