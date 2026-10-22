@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-22T20:36:10Z
+updated_at: 2026-10-22T20:40:50Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-149 — Move demo race list GET to APIRouter
-- worker: W2 | priority: P2 | after: T-148
-- target_files: backend/app/main.py, backend/app/demo_race_router.py
-- contract: move GET /api/demo-races to router while preserving pagination, auth, list order, response, and direct demo_race_row helper
-- verify: focused seeded demo race lifecycle test; Ruff <=558 and mypy <=248
+### T-150 — Characterize generated race persistence before splitting creation
+- worker: W3 | priority: P2 | after: T-149
+- target_files: backend/tests/test_api.py
+- contract: add a seeded contract asserting generated race creates linked championship/event/session, six unique driver/user/membership/entry records, four boxes, and scoped cleanup; no product change
+- verify: focused new seeded test; Ruff <=558
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-149 ✓ 4cae401; list GET moved to APIRouter. Worker socket denial and one Ruff regression corrected; seeded 1 passed, Ruff 558/mypy 248; full isolated backend 118/0/0 and live acceptance passed.
 - T-148 ✓ 2a76b13; demo race read SQL moved to typed repository; seeded 1 passed after mypy repair, Ruff 558/mypy 248; full isolated backend 118/0/0 and live acceptance passed.
 - T-147 ✓ 77e05b9; pit strategy GET moved to APIRouter and re-exported, focused 1 passed, Ruff 559/mypy 248; full isolated backend 118/0/0 and live acceptance passed.
 - T-146 ✓ 0385a6e; pit strategy SQL reads moved to typed repository; focused 1 passed, Ruff 561/mypy 248; full isolated backend 118/0/0 and live acceptance passed.

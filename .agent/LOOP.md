@@ -92,6 +92,7 @@ score: NOT_RUN
 - Existing Playwright config and 16-route smoke test require stronger authenticated journey coverage. Login keyboard audit and responsive run are open from prior work.
 
 ## Findings
+- T-149 moved demo race list GET into an APIRouter. Worker database socket denial required orchestrator seeded rerun; a new B008 was repaired before acceptance. Ruff stayed 558, mypy stayed 248; full isolated backend passed 118 with zero failed/skipped/xfailed and live acceptance passed. T-150 queued (2026-10-22).
 - T-148 extracted demo race detail and paged-ID SQL reads to a typed repository. Initial review caught one new mypy error (249); worker corrected it before acceptance (248). Ruff improved 559 to 558; seeded lifecycle passed, full disposable backend 118 passed with zero failures/skips/xfails, and live acceptance passed. T-149 queued (2026-10-22).
 - T-147 moved pit strategy GET into an APIRouter with a re-export for direct callers and late-bound runtime access. Ruff improved 561 to 559; mypy stayed 248. Full isolated backend passed 118 with zero failures/skips/xfails and live acceptance passed. T-148 queued (2026-10-22).
 - T-146 extracted pit strategy session, driver and reservation SQL into typed repository I/O with unchanged query/order and route behavior. Focused 1 passed; Ruff 561, mypy 248; disposable backend 118 passed, 0 failed/skipped/xfailed, and live acceptance passed. T-147 queued (2026-10-22).
