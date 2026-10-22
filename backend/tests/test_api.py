@@ -1104,7 +1104,9 @@ def test_demo_car_numbers_are_distinct_in_grid_even_with_prior_archives():
 @pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
 def test_dbms_workspace_table_browser_is_whitelisted_and_redacts_hashes(database_api_client):
     client = database_api_client
-    login = client.post("/api/auth/login", json={"email":"admin@apexgrid.test", "password":"ApexGrid2026!"})
+    login = client.post("/api/auth/login", json={
+        "email":"admin@apexgrid.test", "password":"ApexGrid2026!",
+    })
     headers = {"Authorization":"Bearer "+login.json()["access_token"]}
     overview = client.get("/api/dbms/overview", headers=headers)
     assert overview.status_code == 200 and overview.json()["postgres"] == "up"
@@ -1682,6 +1684,59 @@ def test_generated_demo_race_create_list_and_scoped_delete(database_api_client):
     assert mongo_ready().count_documents({"session_id":session_id}) == 0
     from backend.app.database import fetch_one
     assert fetch_one("SELECT 1 FROM pit_boxes WHERE event_id=%s", (event_id,)) is None
+
+
+@pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
+def test_generated_demo_race_persistence_contract(database_api_client):
+    client = database_api_client
+    login = client.post("/api/auth/login", json={"email":"admin@apexgrid.test", "password":"ApexGrid2026!"})
+    assert login.status_code == 200, login.text
+    headers = {"Authorization":"Bearer "+login.json()["access_token"]}
+    created = client.post("/api/demo-races", headers=headers, json={"cars":6})
+    assert created.status_code == 201, created.text
+    race = created.json()
+    session_id, event_id = race["session_id"], race["event_id"]
+    from backend.app.database import fetch_all, fetch_one
+    driver_ids, user_ids = [], []
+    try:
+        persisted = fetch_one("""SELECT e.championship_id, rs.session_type, rs.state,
+            (SELECT count(*) FROM demo_race_entries
+                WHERE session_id=d.session_id) AS entries,
+            (SELECT count(DISTINCT driver_id) FROM demo_race_entries
+                WHERE session_id=d.session_id) AS drivers,
+            (SELECT count(DISTINCT dr.user_id) FROM demo_race_entries de
+                JOIN drivers dr ON dr.id=de.driver_id
+                WHERE de.session_id=d.session_id) AS users,
+            (SELECT count(DISTINCT tm.id) FROM demo_race_entries de
+                JOIN team_memberships tm ON tm.driver_id=de.driver_id
+                WHERE de.session_id=d.session_id) AS memberships,
+            (SELECT count(*) FROM pit_boxes WHERE event_id=d.event_id) AS pit_boxes
+            FROM demo_races d JOIN race_events e ON e.id=d.event_id
+            JOIN race_sessions rs ON rs.id=d.session_id WHERE d.session_id=%s""", (session_id,))
+        assert persisted and persisted["championship_id"]
+        assert persisted["session_type"] == "RACE" and persisted["state"] == "ACTIVE"
+        counts = ("entries", "drivers", "users", "memberships", "pit_boxes")
+        assert [persisted[key] for key in counts] == [6, 6, 6, 6, 4]
+        generated = fetch_all("""SELECT de.driver_id, dr.user_id
+            FROM demo_race_entries de JOIN drivers dr ON dr.id=de.driver_id
+            WHERE de.session_id=%s""", (session_id,))
+        driver_ids = [row["driver_id"] for row in generated]
+        user_ids = [row["user_id"] for row in generated]
+        assert len(set(driver_ids)) == len(set(user_ids)) == 6
+    finally:
+        deleted = client.delete(f"/api/demo-races/{session_id}", headers=headers)
+        assert deleted.status_code == 204, deleted.text
+    remaining = fetch_one("""SELECT
+        (SELECT count(*) FROM demo_races WHERE session_id=%s) AS races,
+        (SELECT count(*) FROM demo_race_entries WHERE session_id=%s) AS entries,
+        (SELECT count(*) FROM race_sessions WHERE id=%s) AS sessions,
+        (SELECT count(*) FROM race_events WHERE id=%s) AS events,
+        (SELECT count(*) FROM pit_boxes WHERE event_id=%s) AS boxes,
+        (SELECT count(*) FROM drivers WHERE id=ANY(%s)) AS drivers,
+        (SELECT count(*) FROM users WHERE id=ANY(%s)) AS users,
+        (SELECT count(*) FROM team_memberships WHERE driver_id=ANY(%s)) AS memberships""",
+        (session_id, session_id, session_id, event_id, event_id, driver_ids, user_ids, driver_ids))
+    assert list(remaining.values()) == [0] * 8
 
 
 @pytest.mark.parametrize("blocked", [False, True])

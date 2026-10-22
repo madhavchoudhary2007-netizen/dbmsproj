@@ -1,0 +1,15 @@
+{
+  "task_id": "T-150",
+  "status": "PASSED",
+  "files_modified": [{"path": "backend/tests/test_api.py", "lines_added": 56, "lines_removed": 1}],
+  "diff_summary": "Pinned generated race database links and distinct account, driver, membership, entry and pit-box counts; verified scoped deletion. Worker database socket denial was resolved by orchestrator rerun.",
+  "verification": {
+    "command": "DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k generated_demo_race_persistence_contract",
+    "exit_code": 0,
+    "tests_passed": 1,
+    "tests_failed": 0,
+    "duration_ms": 818,
+    "lint_warnings": 558
+  },
+  "unresolved_blockers": []
+}
