@@ -1585,6 +1585,17 @@ async def _check_ws_runtime_lease(ws: WebSocket) -> bool:
     return True
 
 
+async def _wait_for_ws_event(
+    ws: WebSocket, queue: asyncio.Queue[Any]
+) -> dict[str, Any] | None:
+    while True:
+        try:
+            return await asyncio.wait_for(queue.get(), timeout=0.5)
+        except TimeoutError:
+            if not await _check_ws_runtime_lease(ws):
+                return None
+
+
 @app.websocket("/api/ws/sessions/{session_id}")
 async def session_ws(ws: WebSocket, session_id: UUID):
     if not await _check_ws_runtime_lease(ws):
@@ -1616,7 +1627,9 @@ async def session_ws(ws: WebSocket, session_id: UUID):
     q = bus.subscribe(session_id)
     try:
         while True:
-            event = await q.get()
+            event = await _wait_for_ws_event(ws, q)
+            if event is None:
+                return
             if not await _check_ws_runtime_lease(ws):
                 return
             await ws.send_json(event)
