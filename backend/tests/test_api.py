@@ -1361,6 +1361,56 @@ def test_crud_write_characterization(
 
 
 @pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
+def test_crud_delete_guard_characterization(database_api_client):
+    dependent_resources = {
+        "championships": """
+            SELECT c.id FROM championships c
+            WHERE EXISTS (SELECT 1 FROM race_events e WHERE e.championship_id=c.id)
+            LIMIT 1
+        """,
+        "circuits": """
+            SELECT c.id FROM circuits c
+            WHERE EXISTS (SELECT 1 FROM race_events e WHERE e.circuit_id=c.id)
+            LIMIT 1
+        """,
+        "events": """
+            SELECT e.id FROM race_events e
+            WHERE EXISTS (SELECT 1 FROM race_sessions s WHERE s.event_id=e.id)
+            LIMIT 1
+        """,
+    }
+    client = database_api_client
+    client.cookies.clear()
+    login = client.post("/api/auth/login", json={
+        "email": "admin@apexgrid.test", "password": "ApexGrid2026!",
+    })
+    assert login.status_code == 200, login.text
+    headers = {"Authorization": "Bearer " + login.json()["access_token"]}
+    client.cookies.clear()
+
+    for resource, query in dependent_resources.items():
+        rows = main_module.fetch_all(query)
+        assert rows, f"expected a seeded {resource} row with official dependents"
+        item_id = rows[0]["id"]
+        before = client.get(f"/api/{resource}/{item_id}", headers=headers)
+        assert before.status_code == 200, before.text
+
+        deleted = client.delete(f"/api/{resource}/{item_id}", headers=headers)
+        assert deleted.status_code == 409, deleted.text
+        assert deleted.json() == {"detail": "Resource is referenced by official records"}
+
+        after = client.get(f"/api/{resource}/{item_id}", headers=headers)
+        assert after.status_code == 200, after.text
+        assert after.json() == before.json()
+
+    missing_id = "00000000-0000-4000-8000-000000000000"
+    missing = client.delete(f"/api/events/{missing_id}", headers=headers)
+    assert missing.status_code == 404, missing.text
+    assert missing.json() == {"detail": "Event not found"}
+    client.cookies.clear()
+
+
+@pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
 def test_admin_lock_demo_observes_real_wait_and_exclusion_rejection(database_api_client):
     client=database_api_client
     login = client.post("/api/auth/login", json={"email":"admin@apexgrid.test", "password":"ApexGrid2026!"})
