@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-22T18:45:15Z
-git_head: e01de68
+updated_at: 2026-10-22T18:48:36Z
+git_head: 57b488b
 branch: perfection-loop
 architect_sha256: c9780b9cd1ffe91fcb0fbf369b4b136205eb5c1ffb82e8cf199e42cca18c69c5
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -27,6 +27,7 @@ last_eval_score: NOT_RUN (quality gates and role journeys remain open)
 - T-136 updated the legacy test mock without changing assertions; focused test and unmarked two-lifespan regression pass. Full isolated backend now passes 116, zero failures/skips/xfails, and live acceptance passes. F-STRUCT-03 closed. Phase 2 next: T-137 read-only telemetry/live router extraction.
 - T-137 moved telemetry/live GET handlers into a typed router; seeded read contract passed, OpenAPI paths remain, Ruff 582 and mypy 252. Full isolated backend passed 116 with zero fail/skip/xfail; live acceptance passed. Phase 2 next: characterize telemetry ingest write before extracting it.
 - T-138 seeded ingest characterization passed 1/1 on apexgrid-test with scoped Mongo cleanup, auth/role/active-state, accepted payload and GET visibility checks; Ruff 582. T-139 extracts ingest write I/O into repository; router move follows.
+- T-139 moved ingest SQL checks and Mongo insert to typed telemetry repository; seeded write contract passed, Ruff 582/mypy 252. T-140 moves the HTTP handler into the telemetry router, then full isolated backend/live gate.
 
 ## Orchestrator direct edits and Taste review
 - Product: one `frontend/package.json` build-script line switched Next build to webpack (e854d9b). No other product-source edits.
