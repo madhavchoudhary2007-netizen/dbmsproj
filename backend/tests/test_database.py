@@ -23,7 +23,9 @@ except ImportError:
         _connect = None
 
 URL = os.getenv("DATABASE_URL")
-pytestmark = pytest.mark.skipif(not URL or not _connect, reason="DATABASE_URL and psycopg are required")
+pytestmark = pytest.mark.skipif(
+    not URL or not _connect, reason="DATABASE_URL and psycopg are required"
+)
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT.parent))
 
@@ -38,20 +40,36 @@ def _auto_pit_fixture(cur):
     championship_id = cur.fetchone()[0]
     cur.execute("SELECT id FROM circuits WHERE name='Harbor Ring'")
     circuit_id = cur.fetchone()[0]
-    cur.execute("SELECT COALESCE(max(round_number),0)+1 FROM race_events WHERE championship_id=%s", (championship_id,))
+    cur.execute(
+        "SELECT COALESCE(max(round_number),0)+1 FROM race_events WHERE championship_id=%s",
+        (championship_id,),
+    )
     round_number = cur.fetchone()[0]
-    cur.execute("""INSERT INTO race_events(championship_id,circuit_id,round_number,name,start_date)
-        VALUES (%s,%s,%s,'Auto pit fixture',%s) RETURNING id""", (championship_id,circuit_id,round_number,now))
+    cur.execute(
+        """INSERT INTO race_events(championship_id,circuit_id,round_number,name,start_date)
+        VALUES (%s,%s,%s,'Auto pit fixture',%s) RETURNING id""",
+        (championship_id, circuit_id, round_number, now),
+    )
     event_id = cur.fetchone()[0]
-    cur.execute("""INSERT INTO race_sessions(event_id,session_type,state,scheduled_at,started_at,total_laps)
-        VALUES (%s,'RACE','ACTIVE',%s,%s,20) RETURNING id""", (event_id,now,now))
+    cur.execute(
+        """INSERT INTO race_sessions(event_id,session_type,state,scheduled_at,started_at,total_laps)
+        VALUES (%s,'RACE','ACTIVE',%s,%s,20) RETURNING id""",
+        (event_id, now, now),
+    )
     session_id = cur.fetchone()[0]
-    cur.execute("INSERT INTO pit_boxes(event_id,number) SELECT %s,n FROM generate_series(1,4) AS n", (event_id,))
+    cur.execute(
+        "INSERT INTO pit_boxes(event_id,number) SELECT %s,n FROM generate_series(1,4) AS n",
+        (event_id,),
+    )
     cur.execute("SELECT id FROM teams WHERE name='Apex Racing'")
     team_id = cur.fetchone()[0]
-    cur.execute("""SELECT d.id FROM drivers d JOIN team_memberships m ON m.driver_id=d.id
-        WHERE m.team_id=%s AND m.start_date<=%s::date AND (m.end_date IS NULL OR m.end_date>=%s::date)
-        ORDER BY d.number LIMIT 2""", (team_id,now,now))
+    cur.execute(
+        """SELECT d.id FROM drivers d JOIN team_memberships m ON m.driver_id=d.id
+        WHERE m.team_id=%s AND m.start_date<=%s::date
+          AND (m.end_date IS NULL OR m.end_date>=%s::date)
+        ORDER BY d.number LIMIT 2""",
+        (team_id, now, now),
+    )
     drivers = [row[0] for row in cur.fetchall()]
     return now,event_id,session_id,team_id,drivers
 
@@ -86,9 +104,15 @@ def test_seed_contract_and_indexes(db):
     assert cur.fetchone()[0] == 3
     cur.execute("SELECT count(*) FROM race_events")
     assert cur.fetchone()[0] >= 2
-    cur.execute("SELECT indexdef FROM pg_indexes WHERE schemaname=current_schema() AND indexname='idx_session_results_session_lap_time'")
+    cur.execute(
+        "SELECT indexdef FROM pg_indexes WHERE schemaname=current_schema() "
+        "AND indexname='idx_session_results_session_lap_time'"
+    )
     assert "(session_id, lap_time_ms)" in cur.fetchone()[0]
-    cur.execute("SELECT indexdef FROM pg_indexes WHERE schemaname=current_schema() AND indexname='idx_drivers_licence_hash'")
+    cur.execute(
+        "SELECT indexdef FROM pg_indexes WHERE schemaname=current_schema() "
+        "AND indexname='idx_drivers_licence_hash'"
+    )
     assert "USING hash" in cur.fetchone()[0]
 
 
@@ -98,16 +122,28 @@ def test_penalty_insert_accumulates_once_and_bans_at_threshold(db):
     driver_id = cur.fetchone()[0]
     cur.execute("SELECT id FROM race_sessions WHERE session_type='RACE' LIMIT 1")
     session_id = cur.fetchone()[0]
-    cur.execute("""INSERT INTO incident_reports(session_id,driver_id,lap,description,state)
-                    VALUES (%s,%s,3,'threshold test','APPROVED') RETURNING id""", (session_id, driver_id))
+    cur.execute(
+        """INSERT INTO incident_reports(session_id,driver_id,lap,description,state)
+                    VALUES (%s,%s,3,'threshold test','APPROVED') RETURNING id""",
+        (session_id, driver_id),
+    )
     incident_id = cur.fetchone()[0]
-    cur.execute("INSERT INTO penalties(incident_id,driver_id,points) VALUES (%s,%s,9)", (incident_id, driver_id))
+    cur.execute(
+        "INSERT INTO penalties(incident_id,driver_id,points) VALUES (%s,%s,9)",
+        (incident_id, driver_id),
+    )
     cur.execute("SELECT eligibility FROM drivers WHERE id=%s", (driver_id,))
     assert cur.fetchone()[0] == "ACTIVE"
-    cur.execute("""INSERT INTO incident_reports(session_id,driver_id,lap,description,state)
-                    VALUES (%s,%s,4,'threshold test two','APPROVED') RETURNING id""", (session_id, driver_id))
+    cur.execute(
+        """INSERT INTO incident_reports(session_id,driver_id,lap,description,state)
+                    VALUES (%s,%s,4,'threshold test two','APPROVED') RETURNING id""",
+        (session_id, driver_id),
+    )
     incident2 = cur.fetchone()[0]
-    cur.execute("INSERT INTO penalties(incident_id,driver_id,points) VALUES (%s,%s,3)", (incident2, driver_id))
+    cur.execute(
+        "INSERT INTO penalties(incident_id,driver_id,points) VALUES (%s,%s,3)",
+        (incident2, driver_id),
+    )
     cur.execute("SELECT eligibility FROM drivers WHERE id=%s", (driver_id,))
     assert cur.fetchone()[0] == "RACE_BANNED"
     cur.execute("SELECT points FROM penalty_points WHERE driver_id=%s AND season=2026", (driver_id,))
