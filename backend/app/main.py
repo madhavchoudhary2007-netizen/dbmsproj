@@ -1968,6 +1968,11 @@ def dbms_race(session_id: UUID, include_laps: bool = True, user=Depends(admin)):
       JOIN drivers d ON d.id=i.driver_id JOIN users u ON u.id=d.user_id
       WHERE i.session_id=%s ORDER BY i.lap,i.id""", (session_id,))
     penalties = fetch_all("SELECT p.* FROM penalties p JOIN incident_reports i ON i.id=p.incident_id WHERE i.session_id=%s", (session_id,))
+    provisional = session["state"] == "COMPLETED" and any(
+        (penalty.get("time_seconds") or 0) > 0 or (penalty.get("grid_places") or 0) > 0
+        for penalty in penalties)
+    for result in results:
+        result["provisional"] = provisional
     reservations = fetch_all(PIT_RESERVATION_SELECT + " WHERE r.session_id=%s ORDER BY r.starts_at", (session_id,))
     col = mongo_ready()
     match = {"session_id": str(session_id)}
