@@ -3,11 +3,11 @@ updated_at: 2026-10-22T12:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-086 — F-DOM-02 archive provisional API repair
-- worker: W2 | priority: P1 | after: T-085
-- target_files: backend/app/main.py
-- contract: archive results carry provisional boolean for completed race with historical positive time/grid sanction
-- verify: .venv/bin/pytest -q backend/tests/test_api.py -k archive_provisional --runxfail
+### T-087 — F-DOM-02 archive screen reproduction
+- worker: W3 | priority: P1 | after: T-086
+- target_files: frontend/e2e/archive-provisional.spec.ts
+- contract: strict desktop/mobile xfail for missing provisional archive explanation; unaffected ordinary view
+- verify: PLAYWRIGHT_PORT=3187 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts frontend/e2e/archive-provisional.spec.ts --project=desktop-1440 --project=mobile-375
 ### T-015 — G13 simulation boundary extraction
 - worker: W2 | priority: P1 | after: T-012
 - target_files: backend/app/main.py, backend/app/simulation_core.py
@@ -36,6 +36,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (pruned on compaction)
+- T-086 ✓ 648ddad; archive API provisional flag, focused --runxfail 2/2
 - T-085 ✓ 3baeac7; strict archive xfail reproduced missing provisional result field; unaffected case passed
 - T-084 ✓ 7ad491a; provisional session and standings labels, focused browser 8/8
 - T-057 ✓ 6a80027; JUnit gate allows xfails, rejects skips/failures/malformed reports; 5 synthetic checks

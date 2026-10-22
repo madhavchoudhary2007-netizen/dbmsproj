@@ -403,7 +403,6 @@ def archive_provisional_response(monkeypatch, penalties):
     return body
 
 
-@pytest.mark.xfail(strict=True, reason="F-DOM-02")
 def test_archive_provisional_historical_positive_sanction_results(monkeypatch):
     body = archive_provisional_response(monkeypatch, [{"time_seconds": 5, "grid_places": 0}])
     assert body["results"][0]["provisional"] is True
