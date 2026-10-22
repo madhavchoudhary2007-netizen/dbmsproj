@@ -8,6 +8,14 @@ const user = {
 };
 const apiPattern = "http://localhost:8000/api/**";
 
+async function openNavigationForMobile(page: import("@playwright/test").Page) {
+  if ((page.viewportSize()?.width ?? 1024) > 768) return;
+  const openNavigation = page.getByRole("button", { name: "Open navigation" });
+  if (await openNavigation.getAttribute("aria-expanded") !== "true") {
+    await openNavigation.click();
+  }
+}
+
 test("G11 cookie-only reload authenticates through /auth/me", async ({ page }) => {
   let meCookie: string | undefined;
   let meCalls = 0;
@@ -85,6 +93,7 @@ test("G11 logout sends session and CSRF cookies, then navigates to login", async
   await page.addInitScript(() => localStorage.removeItem("apexgrid_token"));
 
   await page.goto("/dashboard");
+  await openNavigationForMobile(page);
   await page.getByRole("button", { name: "Sign out" }).click();
 
   await expect(page).toHaveURL(/\/login$/);
@@ -124,11 +133,13 @@ test("G11 failed logout explains retry and a second attempt signs out", async ({
   });
 
   await page.goto("/dashboard");
+  await openNavigationForMobile(page);
   await page.getByRole("button", { name: "Sign out" }).click();
   await expect.poll(() => alertMessage).toContain("503 Service Unavailable: Service temporarily unavailable");
   expect(alertMessage).toContain("Please try again.");
   await expect(page).toHaveURL(/\/dashboard$/);
 
+  await openNavigationForMobile(page);
   await page.getByRole("button", { name: "Sign out" }).click();
   await expect(page).toHaveURL(/\/login$/);
   expect(logoutCalls).toBe(2);

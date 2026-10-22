@@ -8,6 +8,11 @@ loop_iteration: 1 of 5
 - target_files: frontend/e2e/auth-cookie.spec.ts
 - contract: open mobile navigation before Sign out in both logout journeys, preserving every assertion
 - verify: PLAYWRIGHT_PORT=32173 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts e2e/auth-cookie.spec.ts --grep 'G11 (logout|failed logout)' --project=mobile-320 --project=mobile-375 --project=desktop-1440
+### T-072 — Phase 1 domain correctness audit
+- worker: W3 | priority: P1 | after: T-071
+- target_files: .agent/audit/phase1-domain.md
+- contract: evidence-based A-area findings on standings, classification, reservations, lifecycles, telemetry and simulator, excluding recorded G11/F-ACE01
+- verify: test -s .agent/audit/phase1-domain.md
 ### T-015 — G13 simulation boundary extraction
 - worker: W2 | priority: P1 | after: T-012
 - target_files: backend/app/main.py, backend/app/simulation_core.py
