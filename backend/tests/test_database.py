@@ -5,6 +5,7 @@ Requires psycopg (v3) or psycopg2 and a PostgreSQL role allowed to create extens
 pgcrypto and btree_gist plus temporary schemas.
 """
 import os
+import sys
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -24,6 +25,7 @@ except ImportError:
 URL = os.getenv("DATABASE_URL")
 pytestmark = pytest.mark.skipif(not URL or not _connect, reason="DATABASE_URL and psycopg are required")
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT.parent))
 
 
 def _sqlstate(exc):
@@ -155,6 +157,40 @@ def test_standings_and_overlapping_pit_reservation(db):
     cur.execute("SELECT reserve_pit_box(%s,%s,%s,'2026-03-15 08:00+00','2026-03-15 09:00+00')", (box, session, team))
     with pytest.raises(Exception):
         cur.execute("SELECT reserve_pit_box(%s,%s,%s,'2026-03-15 08:30+00','2026-03-15 09:30+00')", (box, session, team))
+
+
+@pytest.mark.xfail(strict=True, reason="F-DOM-02")
+def test_historical_penalty_provisional(db, monkeypatch):
+    _, cur = db
+    cur.execute("SELECT id FROM championships WHERE name='ApexGrid World Series' AND season=2026")
+    championship_id = cur.fetchone()[0]
+    cur.execute("""SELECT e.round_number,s.id FROM race_events e JOIN race_sessions s ON s.event_id=e.id
+        WHERE e.championship_id=%s AND e.round_number IN (1,2) AND s.session_type='RACE'
+        ORDER BY e.round_number""", (championship_id,))
+    sessions = dict(cur.fetchall())
+    round1, round2 = sessions[1], sessions[2]
+    cur.execute("""SELECT count(*), min(p.time_seconds) FROM penalties p
+        JOIN incident_reports i ON i.id=p.incident_id WHERE i.session_id=%s""", (round1,))
+    assert cur.fetchone() == (1, 5)
+    cur.execute("""SELECT count(*) FROM penalties p JOIN incident_reports i ON i.id=p.incident_id
+        WHERE i.session_id=%s""", (round2,))
+    assert cur.fetchone()[0] == 0
+
+    from backend.app import main
+
+    def schema_fetch_all(query, params=()):
+        cur.execute(query, params)
+        columns = [column.name for column in cur.description]
+        return [dict(zip(columns, row)) for row in cur.fetchall()]
+
+    monkeypatch.setattr(main, "fetch_all", schema_fetch_all)
+    cur.execute("SELECT recalculate_standings(%s)", (championship_id,))
+    affected_results = main.results(round1)
+    unaffected_results = main.results(round2)
+    championship_standings = main.standings(championship_id)
+    assert affected_results and all(row["provisional"] is True for row in affected_results)
+    assert unaffected_results and all(row["provisional"] is False for row in unaffected_results)
+    assert championship_standings and all(row["provisional"] is True for row in championship_standings)
 
 
 def test_unclassified_bonus_points_do_not_count(db):
