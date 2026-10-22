@@ -10,7 +10,6 @@ import random
 import secrets
 import threading
 import time
-from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from typing import Any, Literal
 from uuid import UUID, uuid4
@@ -34,12 +33,11 @@ from psycopg.rows import dict_row, tuple_row
 from .config import APP_ENV, AUTO_DEMO_RACE, CORS_ORIGINS, JWT_ALGORITHM, JWT_MINUTES, JWT_SECRET, MONGODB_DATABASE, MONGODB_URL
 from .auth_cookie import create_csrf_token, set_auth_cookies, verify_csrf_token, clear_auth_cookies
 from .database import close_pool, connection, fetch_all, fetch_one, open_pool, pool
-from .simulation_core import calculate_sector_performance
+from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("apexgrid")
 bearer = HTTPBearer(auto_error=False)
-MAX_SESSION_LAPS = 72
 PIT_TIRE_STINT_LAPS = 18
 
 
@@ -1370,37 +1368,6 @@ class EventBus:
             else: loop.call_soon_threadsafe(self._enqueue,q,event)
 
 bus=EventBus()
-
-
-@dataclass
-class Simulation:
-    session_id: UUID
-    drivers: list[dict]
-    rate_hz: float
-    task: asyncio.Task | None = None
-    status: str = "stopped"
-    lap_by_driver: dict[str, int] = field(default_factory=dict)
-    sector_by_driver: dict[str, int] = field(default_factory=dict)
-    race_clock_ms: int = 0
-    next_sector_due_by_driver: dict[str, int] = field(default_factory=dict)
-    last_lap_by_driver: dict[str, int] = field(default_factory=dict)
-    elapsed_by_driver: dict[str, int] = field(default_factory=dict)
-    sector_splits_by_driver: dict[str, list[int]] = field(default_factory=dict)
-    tire_age_by_driver: dict[str, int] = field(default_factory=dict)
-    tire_wear_by_driver: dict[str, float] = field(default_factory=dict)
-    compound_by_driver: dict[str, str] = field(default_factory=dict)
-    pace_offsets_ms: dict[str, int] = field(default_factory=dict)
-    total_laps: int | None = None
-    auto_repeat: bool = False
-    runs_completed: int = 0
-    is_generated: bool = False
-    incident_laps_recorded: set[int] = field(default_factory=set)
-    pit_reservations_by_driver: dict[str, dict[str, Any]] = field(default_factory=dict)
-    pit_due_tire_age_by_driver: dict[str, int] = field(default_factory=dict)
-
-    def __post_init__(self):
-        if self.total_laps is not None:
-            self.total_laps = min(max(int(self.total_laps), 0), MAX_SESSION_LAPS)
 
 
 simulations: dict[str, Simulation] = {}
