@@ -5,7 +5,7 @@ from typing import Any
 import psycopg
 from psycopg import Connection
 
-from backend.app.config import DATABASE_URL
+from .config import DATABASE_URL
 
 _LOCK_CLASS_ID = 1_097_292_881
 _LOCK_OBJECT_ID = 1_097_292_884
