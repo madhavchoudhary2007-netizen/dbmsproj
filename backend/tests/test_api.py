@@ -1273,6 +1273,93 @@ def test_crud_read_characterization(database_api_client, resource, required_keys
     assert required_keys <= driver_detail.json().keys()
 
 
+@pytest.mark.skipif(
+    not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database"
+)
+@pytest.mark.parametrize(
+    ("resource", "create_fields", "patch_fields", "missing_detail"),
+    [
+        ("championships", {"season": 2097}, {"season": 2098}, "Championship not found"),
+        (
+            "circuits",
+            {"country": "Testland", "length_km": 3.217},
+            {"country": "Updatedland"},
+            "Circuit not found",
+        ),
+    ],
+)
+def test_crud_write_characterization(
+    database_api_client, resource, create_fields, patch_fields, missing_detail
+):
+    client = database_api_client
+    admin_login = client.post("/api/auth/login", json={
+        "email": "admin@apexgrid.test", "password": "ApexGrid2026!",
+    })
+    assert admin_login.status_code == 200, admin_login.text
+    admin_headers = {"Authorization": "Bearer " + admin_login.json()["access_token"]}
+    driver_login = client.post("/api/auth/login", json={
+        "email": "driver01@apexgrid.test", "password": "ApexGrid2026!",
+    })
+    assert driver_login.status_code == 200, driver_login.text
+    driver_headers = {"Authorization": "Bearer " + driver_login.json()["access_token"]}
+
+    name = f"crud-write-{uuid4().hex}"
+    create_payload = {"name": name, **create_fields}
+    patch_payload = {"name": name + "-updated", **patch_fields}
+    client.cookies.clear()
+    for method in ("post", "patch", "delete"):
+        path = (
+            f"/api/{resource}"
+            if method == "post"
+            else f"/api/{resource}/00000000-0000-4000-8000-000000000000"
+        )
+        payload = create_payload if method == "post" else patch_payload
+        anonymous = (
+            getattr(client, method)(path, json=payload)
+            if method != "delete"
+            else client.delete(path)
+        )
+        assert anonymous.status_code == 401
+        assert anonymous.json() == {"detail": "Authentication required"}
+        assert anonymous.headers["www-authenticate"] == "Bearer"
+        driver = (
+            getattr(client, method)(path, json=payload, headers=driver_headers)
+            if method != "delete"
+            else client.delete(path, headers=driver_headers)
+        )
+        assert driver.status_code == 403
+        assert driver.json() == {"detail": "Insufficient role"}
+
+    item_id = None
+    try:
+        created = client.post(f"/api/{resource}", json=create_payload, headers=admin_headers)
+        assert created.status_code == 201, created.text
+        assert created.json()["id"]
+        item_id = created.json()["id"]
+        assert {key: created.json()[key] for key in create_payload} == create_payload
+
+        updated = client.patch(
+            f"/api/{resource}/{item_id}", json=patch_payload, headers=admin_headers
+        )
+        assert updated.status_code == 200, updated.text
+        assert updated.json()["name"] == patch_payload["name"]
+        assert {key: updated.json()[key] for key in patch_fields} == patch_fields
+        detail = client.get(f"/api/{resource}/{item_id}", headers=admin_headers)
+        assert detail.status_code == 200, detail.text
+        assert detail.json()["name"] == patch_payload["name"]
+        assert {key: detail.json()[key] for key in patch_fields} == patch_fields
+
+        deleted = client.delete(f"/api/{resource}/{item_id}", headers=admin_headers)
+        assert deleted.status_code == 204
+        missing = client.get(f"/api/{resource}/{item_id}", headers=admin_headers)
+        assert missing.status_code == 404
+        assert missing.json() == {"detail": missing_detail}
+        item_id = None
+    finally:
+        if item_id is not None:
+            client.delete(f"/api/{resource}/{item_id}", headers=admin_headers)
+
+
 @pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
 def test_admin_lock_demo_observes_real_wait_and_exclusion_rejection(database_api_client):
     client=database_api_client

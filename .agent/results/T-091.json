@@ -1,0 +1,14 @@
+{
+  "task_id": "T-091",
+  "status": "PASSED",
+  "files_modified": [{"path": "backend/tests/test_api.py", "lines_added": 87, "lines_removed": 0}],
+  "diff_summary": "Pinned championship and circuit create, patch, delete, detail, and authorization response contracts on disposable PostgreSQL.",
+  "verification": {
+    "command": "DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_api.py -k crud_write_characterization",
+    "exit_code": 0,
+    "tests_passed": 2,
+    "tests_failed": 0,
+    "duration_ms": 1090
+  },
+  "unresolved_blockers": []
+}
