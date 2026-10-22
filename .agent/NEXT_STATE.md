@@ -3,11 +3,11 @@ updated_at: 2026-10-21T18:48:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-062 — Ruff ratchet in G11 runtime
-- worker: W2 | priority: P1 | after: T-053
-- target_files: backend/app/main.py, backend/app/auth_cookie.py
-- contract: reduce current Ruff count to at most the pre-G11 639 baseline by formatting only new auth/WS code; preserve behavior
-- verify: .venv/bin/pytest -q backend/tests/test_api.py -k 'cookie_auth or auth_characterization_websocket'
+### T-063 — G11 browser auth reproductions
+- worker: W3 | priority: P0 | after: T-053
+- target_files: frontend/e2e/auth-cookie.spec.ts
+- contract: strict expected-failure browser journeys for cookie-only startup and login without localStorage bearer token
+- verify: PLAYWRIGHT_PORT=32173 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts e2e/auth-cookie.spec.ts --project=desktop-1440
 ### T-059 — Phase 1 A/C/E backend audit
 - worker: W3 | priority: P1 | origin: Phase 1
 - target_files: .agent/audit/phase1-ace.md
@@ -50,4 +50,5 @@ loop_iteration: 1 of 5
 - T-052 ✓ 4353aaa; six CSRF/logout/Origin cases pass, isolated suite 78 passed/2 WS xfailed/0 skipped
 - T-053 ✓ 7b63377; WS cookie/Origin and legacy auth tests pass; all G11 markers retired, isolated suite 80 passed/0 skipped/0 xfailed
 - T-061 ✓ a47d81a; three test E501 signatures wrapped; runtime ratchet repair T-062 next
+- T-062 ✓ a3d3322; G11 runtime formatting reduced Ruff count to 633; focused 12 tests pass
 - Earlier accepted tasks and evidence are in git history and LOOP.md.

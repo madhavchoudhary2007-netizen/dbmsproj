@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-21T18:40:00Z
-git_head: a47d81a
+git_head: a3d3322
 branch: perfection-loop
 architect_sha256: 8753bfed50769fe28099f5f400bf3f7a42223fc98bebddda0db16eb7d0ece31b
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -20,7 +20,7 @@ last_eval_score: NOT_RUN (quality gates and journey coverage remain open)
 - Existing 16 routes and DBMS views remain IN_REVIEW for five UI states and role journeys. `ViewState<T>` typed boundary is VERIFIED; shared partial notice is not wired to screens.
 
 ## Ratchet and open risks
-- Ruff baseline 641→639 before T-052; current raw concise count 651 after T-052/T-060 (ratchet regression, repair queued). Mypy 311; strict lint 45. Spacing lint has off-scale CSS and border-width false positives; motion/banned lint pass.
+- Ruff baseline 641→639 before T-052; T-061/T-062 reduced current count to 633. Mypy 311; strict lint 45. Spacing lint has off-scale CSS and border-width false positives; motion/banned lint pass.
 - T-006 twice failed: generic five-state fixtures overasserted empty/partial states without a route-specific applicability matrix. T-026..028 depend on it. T-014 cookie/CSRF migration (ADR-001) needs separate backend/frontend/test packets.
 - Frontend dev-tool advisories need a safe upgrade path; `npm audit fix --dry-run` offers only in-range `eslint-config-next` and selector-parser updates, and Tailwind 4 is major.
 - Runtime parity, permissions matrix, simulator invariants, role journeys, full evaluation score, and docs audit remain open. `NEXT_STATE.md` is the queue.
