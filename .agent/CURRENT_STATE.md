@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-22T12:00:00Z
-git_head: fb806c0
+git_head: 5c2e9c4
 branch: perfection-loop
 architect_sha256: 8753bfed50769fe28099f5f400bf3f7a42223fc98bebddda0db16eb7d0ece31b
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -20,7 +20,7 @@ last_eval_score: NOT_RUN (quality gates and role journeys remain open)
 ## Ratchet and open risks
 - Ruff 641 baseline -> 633 current; mypy strict 311 baseline; frontend strict lint 45 explicit-any errors. Ruff format 7 files at baseline. Coverage overall 72% isolated baseline; domain/service 90% target, overall 80% target remain open. Frontend npm audit had 7 high/2 moderate dev-tool findings; safe upgrade path open.
 - F-ACE01 P2: login has no attempt throttling. T-006 twice failed: five-state fixtures need a route-specific applicability matrix before T-026..028. Role journeys, permissions matrix, simulator invariants, frontend visual states, docs, performance and evaluation score remain open in NEXT_STATE/queue.
-- Phase 1 A/C/E continues. T-072 found three P1 domain correctness defects (unclassified bonuses, ignored time penalties, position gaps) and two P2 telemetry/simulator defects. F-ACE01 throttling and frontend supply-chain findings remain open. T-073 test-first unclassified bonus case is next.
+- Phase 1 A/C/E continues. T-072 found three P1 domain correctness defects (unclassified bonuses, ignored time penalties, position gaps) and two P2 telemetry/simulator defects. F-ACE01 throttling and frontend supply-chain findings remain open. T-073 strict isolated DB regression xfails normally and --runxfail fails on actual 2 vs expected 0 points; T-074 additive migration fix is next.
 
 ## Orchestrator direct edits and Taste review
 - Product: one `frontend/package.json` build-script line switched Next build to webpack (e854d9b). No other product-source edits.
