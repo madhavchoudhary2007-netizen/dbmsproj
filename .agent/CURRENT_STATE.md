@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-22T18:48:36Z
-git_head: 57b488b
+updated_at: 2026-10-22T18:52:44Z
+git_head: 698dd2e
 branch: perfection-loop
 architect_sha256: c9780b9cd1ffe91fcb0fbf369b4b136205eb5c1ffb82e8cf199e42cca18c69c5
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -28,6 +28,7 @@ last_eval_score: NOT_RUN (quality gates and role journeys remain open)
 - T-137 moved telemetry/live GET handlers into a typed router; seeded read contract passed, OpenAPI paths remain, Ruff 582 and mypy 252. Full isolated backend passed 116 with zero fail/skip/xfail; live acceptance passed. Phase 2 next: characterize telemetry ingest write before extracting it.
 - T-138 seeded ingest characterization passed 1/1 on apexgrid-test with scoped Mongo cleanup, auth/role/active-state, accepted payload and GET visibility checks; Ruff 582. T-139 extracts ingest write I/O into repository; router move follows.
 - T-139 moved ingest SQL checks and Mongo insert to typed telemetry repository; seeded write contract passed, Ruff 582/mypy 252. T-140 moves the HTTP handler into the telemetry router, then full isolated backend/live gate.
+- T-140 moved POST ingest into telemetry router; focused seeded write/read contracts 2 passed, OpenAPI paths present, Ruff 573/mypy 248. Full backend gate stopped at collection: `backend/tests/test_api.py` imports Telemetry from main.py, which no longer re-exports it. T-141 updates the test import to schemas_telemetry; full gate and live acceptance then rerun.
 
 ## Orchestrator direct edits and Taste review
 - Product: one `frontend/package.json` build-script line switched Next build to webpack (e854d9b). No other product-source edits.
