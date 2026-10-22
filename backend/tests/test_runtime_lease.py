@@ -43,7 +43,6 @@ def test_runtime_lifespan_rejects_second_owner():
         held_lease.close()
 
 
-@pytest.mark.xfail(strict=True, reason="F-STRUCT-01")
 def test_runtime_lease_loss_fails_closed(monkeypatch):
     real_acquire = main_module.acquire_runtime_lease
     captured_leases = []
