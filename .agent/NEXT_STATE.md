@@ -3,11 +3,11 @@ updated_at: 2026-10-22T12:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-015 — G13 simulation boundary extraction
-- worker: W2 | priority: P1 | after: T-012
-- target_files: backend/app/main.py, backend/app/simulation_core.py
-- contract: behavior-preserving <=150-line extraction; no route/schema change
-- verify: .venv/bin/pytest -q backend/tests/test_api.py -k simulation
+### T-016 — Ruff test ratchet repair
+- worker: W3 | priority: P1 | after: T-015
+- target_files: backend/tests/test_api.py, backend/tests/test_database.py
+- contract: reduce backend Ruff violations from 645 to <=633 with no assertion change
+- verify: count=$(.venv/bin/ruff check backend/app backend/tests --output-format json | python3 -c 'import json,sys; print(len(json.load(sys.stdin)))'); test "$count" -le 633 && .venv/bin/pytest -q backend/tests/test_api.py -k 'archive_provisional or simulation'
 ### T-017 — G08 spacing tokens
 - worker: W1 | priority: P2 | after: T-010
 - target_files: frontend/app/globals.css, frontend/tailwind.config.ts
@@ -31,6 +31,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (pruned on compaction)
+- T-015 ✓ 432495a; extracted typed sector performance helper, six simulation tests pass.
 - T-088 ✓ 73de4fd; archive provisional label, full browser 775/775, typecheck pass.
 - T-001..T-086: accepted history and evidence in git/LOOP.md; latest T-086 648ddad archive API fix.
 - T-087 ✓ 710e0cf; strict desktop/mobile archive UI xfails reproduced; ordinary views pass.
