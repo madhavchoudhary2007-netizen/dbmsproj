@@ -42,6 +42,7 @@ from .crud_repository import (
     update_crud_row,
 )
 from .database import close_pool, connection, fetch_all, fetch_one, open_pool, pool
+from .pit_repository import PIT_RESERVATION_SELECT, list_pit_boxes, list_pit_reservations
 from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
 
 logging.basicConfig(level=logging.INFO)
@@ -329,13 +330,6 @@ class AutoReservationIn(BaseModel):
     session_id: UUID
     team_id: UUID
     driver_id: UUID | None = None
-
-
-PIT_RESERVATION_SELECT = """SELECT r.*,b.number AS box_number,t.name AS team_name,
-    d.full_name AS driver_name,dr.number AS driver_number
-    FROM pit_reservations r JOIN pit_boxes b ON b.id=r.pit_box_id
-    JOIN teams t ON t.id=r.team_id LEFT JOIN drivers dr ON dr.id=r.driver_id
-    LEFT JOIN users d ON d.id=dr.user_id"""
 
 
 def create_automatic_reservation(session_id: UUID | str, team_id: UUID | str,
@@ -791,18 +785,12 @@ def decide_incident(incident_id: UUID, body: Decision, user=Depends(roles("ADMIN
 
 @app.get("/api/pit-boxes")
 def pit_boxes(event_id: UUID, user=Depends(current_user)):
-    return jsonable(fetch_all("""SELECT b.*,r.id AS reservation_id,r.session_id,r.driver_id,r.allocation_source,
-        r.starts_at,r.ends_at,r.status,t.name AS team_name,du.full_name AS driver_name,d.number AS driver_number
-        FROM pit_boxes b
-        LEFT JOIN LATERAL (SELECT pr.* FROM pit_reservations pr WHERE pr.pit_box_id=b.id AND pr.status='RESERVED'
-          AND pr.ends_at>now() ORDER BY (pr.starts_at<=now()) DESC,pr.starts_at LIMIT 1) r ON TRUE
-        LEFT JOIN teams t ON t.id=r.team_id LEFT JOIN drivers d ON d.id=r.driver_id
-        LEFT JOIN users du ON du.id=d.user_id WHERE b.event_id=%s ORDER BY b.number""", (event_id,)))
+    return jsonable(list_pit_boxes(event_id))
 
 
 @app.get("/api/pit-reservations")
 def pit_reservations(session_id: UUID, user=Depends(current_user)):
-    return jsonable(fetch_all(PIT_RESERVATION_SELECT + " WHERE r.session_id=%s ORDER BY r.starts_at", (session_id,)))
+    return jsonable(list_pit_reservations(session_id))
 
 
 @app.post("/api/pit-reservations", status_code=201)
