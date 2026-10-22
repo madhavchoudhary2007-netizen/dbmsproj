@@ -1,4 +1,5 @@
 import asyncio
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -12,6 +13,23 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from backend.app import main as main_module
 from backend.app.main import app
 from backend.app.simulation_core import Simulation
+
+
+@pytest.mark.xfail(strict=True, reason="F-STRUCT-02")
+def test_uvicorn_import_contract():
+    backend_dir = Path(__file__).resolve().parents[1]
+    env = {"APP_ENV": "local", "PYTHONPATH": str(backend_dir)}
+    result = subprocess.run(
+        [sys.executable, "-c", "import app.main"],
+        cwd=backend_dir,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode:
+        assert "No module named 'backend'" in result.stderr
+    assert result.returncode == 0, result.stderr
 
 
 def test_runtime_lease_exclusive():
