@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-22T13:28:00Z
+updated_at: 2026-10-22T13:33:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-115 — Reproduce WebSocket handshake after lease loss
-- worker: W3 | priority: P1 | after: T-114
-- target_files: backend/tests/test_runtime_lease.py
-- contract: strict expected-failure test closes app lease and requires unauthenticated WebSocket handshake to close with runtime-loss code 1011 before auth logic
-- verify: DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_runtime_lease.py -k runtime_websocket_loss
+### T-116 — Reject WebSocket handshakes without runtime ownership
+- worker: W2 | priority: P1 | after: T-115
+- target_files: backend/app/main.py
+- contract: check app lifespan lease at WS entry before Origin/auth; close 1011 with restart guidance on ownership loss
+- verify: DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_runtime_lease.py -k runtime_websocket_loss --runxfail
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (pruned on compaction)
+- T-115 ✓ 5f5248a; strict WS xfail accepted; --runxfail gives 4401 rather than 1011, Ruff 600.
 - T-114 ✓ d2a9613; HTTP fail-closed --runxfail passed, Ruff 600, mypy 259; marker retired, full isolated backend 106 passed, zero skip/fail/xfail.
 - T-113 ✓ 86c4ecb; strict lease-loss HTTP xfail accepted; --runxfail sees health 200 after owner close, Ruff 602.
 - T-112 ✓ 8c273d6; two lease tests moved to standalone module, full isolated backend 105 passed, zero skip/fail/xfail; Ruff 602.
