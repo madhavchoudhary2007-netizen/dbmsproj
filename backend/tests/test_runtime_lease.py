@@ -15,7 +15,6 @@ from backend.app.main import app
 from backend.app.simulation_core import Simulation
 
 
-@pytest.mark.xfail(strict=True, reason="F-STRUCT-02")
 def test_uvicorn_import_contract():
     backend_dir = Path(__file__).resolve().parents[1]
     env = {"APP_ENV": "local", "PYTHONPATH": str(backend_dir)}
