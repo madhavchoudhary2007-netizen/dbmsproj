@@ -69,7 +69,11 @@ from .schemas_operations import Action, AutoReservationIn, Decision, IncidentIn,
 from .schemas_simulation import DemoRaceCreate, SimulationControl
 from .schemas_telemetry import Telemetry
 from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
-from .user_repository import get_user as get_user_record, list_users
+from .user_repository import (
+    create_user as create_user_record,
+    get_user as get_user_record,
+    list_users,
+)
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("apexgrid")
@@ -454,11 +458,7 @@ def get_user(user_id: UUID, user=Depends(roles("ADMIN"))):
 
 @app.post("/api/users", status_code=201)
 def create_user(body: UserCreate, user=Depends(roles("ADMIN"))):
-    password_hash=bcrypt.hashpw(body.password.encode("utf-8"),bcrypt.gensalt()).decode("utf-8")
-    with connection() as conn,conn.cursor(row_factory=dict_row) as cur:
-        cur.execute("INSERT INTO users(email,password_hash,full_name,role) VALUES (%s,%s,%s,%s) RETURNING id,email,full_name,role",(body.email.strip(),password_hash,body.full_name.strip(),body.role))
-        created=cur.fetchone()
-    return jsonable(created)
+    return jsonable(create_user_record(body))
 
 
 @app.patch("/api/users/{user_id}")
