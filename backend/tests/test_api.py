@@ -558,6 +558,46 @@ def test_results_reject_scheduled_sessions(monkeypatch):
     assert error.value.status_code == 409
 
 
+@pytest.mark.xfail(strict=True, reason="F-DOM-03")
+def test_completed_results_require_contiguous_classification(monkeypatch):
+    from contextlib import contextmanager
+    from fastapi import HTTPException
+
+    class Cursor:
+        def __init__(self, row): self.row = row
+        def __enter__(self): return self
+        def __exit__(self, *_): pass
+        def execute(self, *_): pass
+        def fetchall(self): return [self.row]
+
+    class Connection:
+        def __init__(self, row): self.row = row
+        def cursor(self, **_): return Cursor(self.row)
+
+    driver_id = uuid4()
+    persisted_row = {"driver_id": driver_id, "position": 2, "classified": True}
+
+    @contextmanager
+    def fake_connection():
+        yield Connection(persisted_row)
+
+    events = []
+    session_id = uuid4()
+    monkeypatch.setattr("backend.app.main.fetch_one", lambda *_: {"state": "COMPLETED", "generated": False})
+    monkeypatch.setattr("backend.app.main.connection", fake_connection)
+    monkeypatch.setattr("backend.app.main.publish", lambda *args: events.append(args))
+
+    with pytest.raises(HTTPException) as error:
+        save_results(
+            session_id,
+            [ResultIn(driver_id=driver_id, position=2)],
+            user={"id": "admin-1", "role": "ADMIN"},
+        )
+    assert error.value.status_code == 422
+    assert "contiguous" in str(error.value.detail).lower()
+    assert events == []
+
+
 @pytest.mark.parametrize("approve,penalty", [(False, None), (True, None)])
 def test_incident_decisions_always_return_current_driver_state(monkeypatch, approve, penalty):
     from contextlib import contextmanager
