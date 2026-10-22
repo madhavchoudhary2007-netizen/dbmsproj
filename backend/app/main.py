@@ -22,7 +22,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator, model_validator
 from pymongo import MongoClient, DESCENDING
 from pymongo.errors import PyMongoError
 from psycopg import IntegrityError, OperationalError
@@ -282,6 +282,16 @@ class Decision(BaseModel):
     points: int = Field(default=0, ge=0, le=12)
     time_seconds: int = Field(default=0, ge=0)
     grid_places: int = Field(default=0, ge=0)
+
+    @field_validator("time_seconds", "grid_places")
+    @classmethod
+    def reject_unsupported_sanctions(cls, value: int, info: ValidationInfo) -> int:
+        if value > 0:
+            raise ValueError(
+                f"Unsupported {info.field_name} sanction. Use penalty points and notes "
+                "until official timing and grid enforcement exists."
+            )
+        return value
 
 
 class ReservationIn(BaseModel):
