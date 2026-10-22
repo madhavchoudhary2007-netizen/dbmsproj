@@ -32,3 +32,20 @@
 ### Phase 3 — ADR-003 full time/grid enforcement proposal
 - owner: orchestrator | priority: P2
 - contract: write a finding-backed CP defining race elapsed time, starting grid, inherited records, reranking and role journeys before new sanctions are enabled; no historical data rewrite.
+
+### Deferred Phase 4 / cross-gate tasks from NEXT_STATE
+### T-017 — G08 spacing tokens
+- worker: W1 | priority: P2 | after: T-010
+- target_files: frontend/app/globals.css, frontend/tailwind.config.ts
+- contract: add spacing scale in <=150 lines
+- verify: npm --prefix frontend run build
+### T-018 — G10 typography
+- worker: W1 | priority: P2 | after: T-017
+- target_files: frontend/app/globals.css, frontend/tailwind.config.ts
+- contract: accessible sans/mono hierarchy
+- verify: npm --prefix frontend run build
+### T-019 — G16 runtime parity
+- worker: W3 | priority: P2 | runtime versions verified; container source gates require builder stage
+- target_files: scripts/eval/runtime-parity.sh
+- contract: compare host/container Node and Python; run container gates
+- verify: bash scripts/eval/runtime-parity.sh
