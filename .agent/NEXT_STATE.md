@@ -3,11 +3,11 @@ updated_at: 2026-10-22T12:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-087 — F-DOM-02 archive screen reproduction
-- worker: W3 | priority: P1 | after: T-086
-- target_files: frontend/e2e/archive-provisional.spec.ts
-- contract: strict desktop/mobile xfail for missing provisional archive explanation; unaffected ordinary view
-- verify: PLAYWRIGHT_PORT=3187 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts frontend/e2e/archive-provisional.spec.ts --project=desktop-1440 --project=mobile-375
+### T-088 — F-DOM-02 archive screen provisional label
+- worker: W1 | priority: P1 | after: T-087
+- target_files: frontend/components/race-database.tsx
+- contract: provisional classification label and explanation for affected archive; ordinary unaffected view
+- verify: RUN_XFAIL=1 PLAYWRIGHT_PORT=3188 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts frontend/e2e/archive-provisional.spec.ts --project=desktop-1440 --project=mobile-375
 ### T-015 — G13 simulation boundary extraction
 - worker: W2 | priority: P1 | after: T-012
 - target_files: backend/app/main.py, backend/app/simulation_core.py
@@ -36,39 +36,5 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (pruned on compaction)
-- T-086 ✓ 648ddad; archive API provisional flag, focused --runxfail 2/2
-- T-085 ✓ 3baeac7; strict archive xfail reproduced missing provisional result field; unaffected case passed
-- T-084 ✓ 7ad491a; provisional session and standings labels, focused browser 8/8
-- T-057 ✓ 6a80027; JUnit gate allows xfails, rejects skips/failures/malformed reports; 5 synthetic checks
-- T-058 ✓ fb3da98; CI runs deployment-secret gate and fails unreachable audit
-- T-050 ✓ cf80374; 8 strict cookie/CSRF xfails reproduced, Ruff 639
-- T-051 ✓ 9aa67ed; session/CSRF cookies and cookie /me, 3 --runxfail checks
-- T-060 ✓ 83f6dfb; three strict guard xfails reproduced with --runxfail
-- T-059 ✓ verification passed; audit found F-ACE01 P2 login throttling (audit committed with T-060)
-- T-052 ✓ 4353aaa; six CSRF/logout/Origin cases pass, isolated suite 78 passed/2 WS xfailed/0 skipped
-- T-053 ✓ 7b63377; WS cookie/Origin and legacy auth tests pass; all G11 markers retired, isolated suite 80 passed/0 skipped/0 xfailed
-- T-061 ✓ a47d81a; three test E501 signatures wrapped; runtime ratchet repair T-062 next
-- T-062 ✓ a3d3322; G11 runtime formatting reduced Ruff count to 633; focused 12 tests pass
-- T-063 ✓ d2e22b3; two browser cookie-auth defects reproduced with RUN_XFAIL=1
-- T-054 ✓ a11619b; focused cookie browser journeys and typecheck pass; broad browser suite exposed stale login fixtures
-- T-066 ✓ 724e732; fixtures migrated, full Playwright matrix 725 passed with exit 0
-- T-064 ✓ cc828eb and fixture correction 846c380; corrected test failed old client/passed new
-- T-055 ✓ f09d80f; cookie-only live WS; full Playwright matrix 730 passed with exit 0
-- T-067 ✓ a103d2f; browser login JSON token leak reproduced, no-Origin legacy login pinned
-- T-068 ✓ 417d0d2; browser JSON user-only; isolated backend 82 passed/0 skipped/0 xfailed and live acceptance pass
-- T-069 ✓ f2e6e56; four focused browser cookie/login/logout/CSRF cases pass
-- T-070 ✓ 417b922; removed unused token helper, typecheck passes
-- T-071 ✓ 348ec12; mobile navigation helper, six focused logout cases pass
-- T-072 ✓ fb806c0; five evidence-backed A-area findings
-- T-073 ✓ 5c2e9c4; strict DB xfail, --runxfail proves two unclassified bonus points
-- T-074 ✓ d6770a6; additive 002 scoring migration and ordered bootstrap; focused --runxfail passes
-- T-075 ✓ 6deb44f; strict completed-session gap xfail, --runxfail proves missing 422
-- T-076 ✓ 7eda6ec; contiguous final classification validation; full isolated backend 84/0/0 and live acceptance pass
-- T-077 ✓ 2dcf2d0; 2 strict unsupported-sanction xfails reproduced, 3 compatibility cases pass
-- T-078 ✓ 67af5a5; Decision rejects ineffective sanctions; isolated backend 89/0/0 and live acceptance pass
-- T-079 ✓ 7659c61; two strict browser xfails on enabled steward time/grid controls
-- T-080 ✓ 9aa3424; disabled controls and accessible guidance; full browser 745/745 passes
-- T-081 ✓ d08b315; strict isolated legacy-sanction xfail reaches missing provisional API field
-- T-082 ✓ 5d19f6c; provisional API metadata, focused isolated DB regression passes
-- T-083 ✓ 8a1cea6; four strict browser xfails plus four unaffected checks pass across desktop/mobile; RUN_XFAIL=1 reproduces missing labels
-- Earlier accepted tasks and evidence are in git history and LOOP.md.
+- T-001..T-086: accepted history and evidence in git/LOOP.md; latest T-086 648ddad archive API fix.
+- T-087 ✓ 710e0cf; strict desktop/mobile archive UI xfails reproduced; ordinary views pass.
