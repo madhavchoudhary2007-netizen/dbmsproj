@@ -60,7 +60,12 @@ from .crud_repository import (
     update_crud_row,
 )
 from .database import close_pool, connection, fetch_all, fetch_one, get_pool, open_pool
-from .demo_race_repository import get_demo_race_row, list_demo_race_ids
+from .demo_race_repository import (
+    DemoRaceSetupError,
+    create_demo_race_records,
+    get_demo_race_row,
+    list_demo_race_ids,
+)
 from .demo_race_router import create_demo_race_router
 from .pit_repository import PIT_RESERVATION_SELECT, load_pit_strategy_rows, load_pit_telemetry
 from .pit_router import create_pit_router
@@ -758,44 +763,10 @@ def _make_demo_race(cars: int | None = None, auto_repeat: bool = False):
     given = ["Amelia", "Rafael", "Maya", "Theo", "Nina", "Luca", "Aisha", "Felix", "Sofia", "Ethan", "Leila", "Oscar", "Priya", "Mateo", "Zara", "Jonah", "Ines", "Kai", "Elena", "Arjun"]
     family = ["Bennett", "Costa", "Shah", "Moreau", "Kim", "Novak", "Singh", "Fischer", "Alvarez", "Tanaka", "Dubois", "Reed", "Petrov", "Okafor", "Lindholm", "Santos", "Kaur", "Weber", "Nakamura", "Clarke"]
     names = [f"{a} {b}" for a, b in zip(random.sample(given, car_count), random.sample(family, car_count))]
-    generated = []
-    with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-        cur.execute("SELECT id FROM championships WHERE name='ApexGrid Live Demo' AND season=extract(year from current_date)::int")
-        championship = cur.fetchone()
-        if not championship:
-            cur.execute("INSERT INTO championships(name,season) VALUES ('ApexGrid Live Demo',extract(year from current_date)::int) RETURNING id")
-            championship = cur.fetchone()
-        cur.execute("SELECT id,name FROM circuits ORDER BY name")
-        circuits = cur.fetchall()
-        cur.execute("SELECT id,name FROM teams ORDER BY name")
-        teams = cur.fetchall()
-        if not circuits or not teams:
-            raise HTTPException(409, "Demo race requires at least one circuit and one team")
-        cur.execute("SELECT pg_advisory_xact_lock(hashtext('apexgrid-demo-race-create'))")
-        cur.execute("SELECT COALESCE(max(round_number),0)+1 AS round FROM race_events WHERE championship_id=%s", (championship["id"],))
-        round_number = cur.fetchone()["round"]
-        numbers = choose_demo_car_numbers(car_count)
-        circuit = random.choice(circuits)
-        event_name = f"{circuit['name']} Grand Prix — {random.choice(['Sprint Weekend', 'Night Race', 'Coastal Classic', 'Autumn Round'])}"
-        total_laps = random.randint(45, MAX_SESSION_LAPS)
-        cur.execute("INSERT INTO race_events(id,championship_id,circuit_id,round_number,name,start_date) VALUES (%s,%s,%s,%s,%s,%s)", (event_id, championship["id"], circuit["id"], round_number, event_name, now))
-        cur.execute("INSERT INTO race_sessions(id,event_id,session_type,state,scheduled_at,started_at,total_laps) VALUES (%s,%s,'RACE','ACTIVE',%s,%s,%s)", (session_id,event_id,now,now,total_laps))
-        cur.execute("INSERT INTO demo_races(session_id,event_id,auto_repeat) VALUES (%s,%s,%s)", (session_id,event_id,auto_repeat))
-        cur.execute("INSERT INTO pit_boxes(event_id,number) SELECT %s,n FROM generate_series(1,4) AS n ON CONFLICT(event_id,number) DO NOTHING", (event_id,))
-        for idx, full_name in enumerate(names):
-            number = numbers[idx]
-            user_id, driver_id = uuid4(), uuid4()
-            email = f"demo-{user_id.hex}@apexgrid.invalid"
-            secret = secrets.token_urlsafe(40)
-            password_hash = bcrypt.hashpw(secret.encode(), bcrypt.gensalt(rounds=10)).decode()
-            cur.execute("INSERT INTO users(id,email,password_hash,full_name,role) VALUES (%s,%s,%s,%s,'DRIVER')", (user_id,email,password_hash,full_name))
-            cur.execute("INSERT INTO drivers(id,user_id,licence_number,number) VALUES (%s,%s,%s,%s)", (driver_id,user_id,f"AGD-{driver_id.hex[:12].upper()}",number))
-            team = teams[idx % len(teams)]
-            cur.execute("INSERT INTO team_memberships(driver_id,team_id,start_date) VALUES (%s,%s,%s)", (driver_id,team["id"],now.date()))
-            offset = random.randint(-1200, 1600)
-            cur.execute("INSERT INTO demo_race_entries(session_id,driver_id,pace_offset_ms) VALUES (%s,%s,%s)", (session_id,driver_id,offset))
-            generated.append({"id":driver_id,"number":number,"pace_offset_ms":offset,
-                              "team_id":team["id"],"team_name":team["name"]})
+    try:
+        generated, total_laps = create_demo_race_records(session_id, event_id, now, names, auto_repeat)
+    except DemoRaceSetupError as exc:
+        raise HTTPException(409, str(exc)) from exc
     sim = Simulation(session_id, generated, 2.0, total_laps=total_laps)
     sim.auto_repeat = auto_repeat
     sim.is_generated = True
