@@ -46,14 +46,21 @@ test("G11 cookie-only live session opens WebSocket without JWT protocols", async
   await page.addInitScript(() => {
     const captureWindow = window as Window & { __wsCalls?: WebSocketCapture[] };
     const wsCalls: WebSocketCapture[] = [];
+    const NativeWebSocket = window.WebSocket;
     localStorage.removeItem("apexgrid_token");
     captureWindow.__wsCalls = wsCalls;
-    Object.defineProperty(window, "WebSocket", { configurable: true, value: class {
-      constructor(url: string, protocols?: string | string[]) {
-        wsCalls.push({ url, protocols });
-      }
-      close() {}
-    } });
+    const CapturingWebSocket = new Proxy(NativeWebSocket, {
+      construct(target, args) {
+        const [url, protocols] = args as [string | URL, string | string[] | undefined];
+        const urlString = String(url);
+        if (/^\/api\/ws\/sessions\/[^/]+$/.test(new URL(urlString, location.href).pathname)) {
+          wsCalls.push({ url: urlString, protocols });
+          return { close() {} };
+        }
+        return Reflect.construct(target, args);
+      },
+    });
+    Object.defineProperty(window, "WebSocket", { configurable: true, value: CapturingWebSocket });
   });
 
   await page.goto("/live");
