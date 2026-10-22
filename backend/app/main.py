@@ -59,7 +59,7 @@ from .crud_repository import (
     list_crud_rows,
     update_crud_row,
 )
-from .database import close_pool, connection, fetch_all, fetch_one, open_pool, pool
+from .database import close_pool, connection, fetch_all, fetch_one, get_pool, open_pool
 from .pit_repository import PIT_RESERVATION_SELECT
 from .pit_router import create_pit_router
 from .runtime_lease import acquire_runtime_lease, check_runtime_lease
@@ -109,7 +109,7 @@ async def lifespan(application: FastAPI):
         telemetry_collection.create_index([("session_id", 1), ("driver_id", 1), ("ts", -1)])
     except Exception:
         log.warning("MongoDB is not available at startup", exc_info=True)
-    if APP_ENV == "local" and not pool.closed and telemetry_collection is not None:
+    if APP_ENV == "local" and not get_pool().closed and telemetry_collection is not None:
         try:
             await resume_or_create_auto_demo_race(create_if_missing=AUTO_DEMO_RACE)
         except Exception:
@@ -213,7 +213,7 @@ async def database_unavailable_handler(_, exc):
 
 
 def require_db():
-    if pool.closed:
+    if get_pool().closed:
         raise HTTPException(503, "PostgreSQL is unavailable")
 
 

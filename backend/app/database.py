@@ -8,13 +8,30 @@ from psycopg_pool import ConnectionPool
 
 from .config import DATABASE_URL
 
-pool = ConnectionPool(
-    DATABASE_URL, min_size=1, max_size=10, kwargs={"row_factory": dict_row}, open=False
-)
 DatabaseRow = dict[str, Any]
 
 
+def _new_pool() -> ConnectionPool:
+    return ConnectionPool(
+        DATABASE_URL,
+        min_size=1,
+        max_size=10,
+        kwargs={"row_factory": dict_row},
+        open=False,
+    )
+
+
+pool = _new_pool()
+
+
+def get_pool() -> ConnectionPool:
+    return pool
+
+
 def open_pool() -> None:
+    global pool
+    if pool.closed:
+        pool = _new_pool()
     pool.open(wait=True)
 
 

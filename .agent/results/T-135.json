@@ -1,0 +1,19 @@
+{
+  "task_id": "T-135",
+  "status": "PASSED",
+  "files_modified": [
+    {"path": "backend/app/database.py", "lines_added": 20, "lines_removed": 3},
+    {"path": "backend/app/main.py", "lines_added": 3, "lines_removed": 3}
+  ],
+  "diff_summary": "Recreates the PostgreSQL pool after shutdown and makes main.py inspect the current pool through get_pool().",
+  "verification": {
+    "command": "DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q --runxfail backend/tests/test_pool_lifecycle.py backend/tests/test_telemetry_router_contract.py",
+    "exit_code": 0,
+    "tests_passed": 2,
+    "tests_failed": 0,
+    "duration_ms": 960,
+    "typecheck_errors": 254,
+    "lint_warnings": 583
+  },
+  "unresolved_blockers": []
+}
