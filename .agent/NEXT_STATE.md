@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-22T14:15:00Z
+updated_at: 2026-10-22T14:19:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-123 — Reproduce Uvicorn app.main import failure
-- worker: W3 | priority: P0 | origin: F-STRUCT-02
-- target_files: backend/tests/test_runtime_lease.py
-- contract: strict subprocess expected-failure test imports app.main from backend cwd without adding repo root to PYTHONPATH
-- verify: APP_ENV=local .venv/bin/pytest -q backend/tests/test_runtime_lease.py -k uvicorn_import_contract
+### T-124 — Fix backend-cwd runtime lease import
+- worker: W2 | priority: P0 | after: T-123
+- target_files: backend/app/runtime_lease.py
+- contract: package-relative config import works as app.main and backend.app.main, preserving lease behavior
+- verify: APP_ENV=local .venv/bin/pytest -q backend/tests/test_runtime_lease.py -k uvicorn_import_contract --runxfail
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (pruned on compaction)
+- T-123 ✓ 0930e54; strict backend-cwd import xfail accepted, --runxfail fails on missing backend package; Ruff 600.
 - T-122 ✓ 9e09f97; paused/running simulator guards pass, Ruff 600, mypy 259; marker retired, full isolated backend 111 passed. Live API startup failed import; F-STRUCT-02 queued.
 - T-121 ✓ dee5f57; two strict simulator xfails accepted; --runxfail proves paused hang and running DB read after lease loss, Ruff 600.
 - T-120 ✓ d5ebb3c; idle WS bounded check passed, Ruff 600, mypy 259; marker retired, full isolated backend 109 passed, zero skip/fail/xfail.

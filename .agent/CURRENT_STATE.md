@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-22T14:15:00Z
-git_head: 9e09f97
+updated_at: 2026-10-22T14:19:00Z
+git_head: 0930e54
 branch: perfection-loop
 architect_sha256: c9780b9cd1ffe91fcb0fbf369b4b136205eb5c1ffb82e8cf199e42cca18c69c5
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -20,7 +20,7 @@ last_eval_score: NOT_RUN (quality gates and role journeys remain open)
 ## Ratchet and open risks
 - Ruff 641 baseline -> 602 after T-104; mypy strict 311 baseline -> 259 after T-102; frontend strict lint 45 explicit-any errors. Ruff format 7 files at baseline. Coverage overall 72% isolated baseline; domain/service 90% target, overall 80% target remain open. Frontend npm audit had 7 high/2 moderate dev-tool findings; safe upgrade path open.
 - F-ACE01 P2: login has no attempt throttling. T-006 twice failed: five-state fixtures need a route-specific applicability matrix before T-026..028. Role journeys, permissions matrix, simulator invariants, frontend visual states, docs, performance and evaluation score remain open in NEXT_STATE/queue.
-- Phase 1 A/C/E P0/P1 findings closed after T-088. Phase 2 structure active: CRUD, analytics and pit read repositories; auth/operations/telemetry/competition/simulation schemas; analytics and pit read APIRouters. ADR-004 lease primitive, lifespan ownership, HTTP/WS and simulator guards accepted. T-122 focused --runxfail passed, Ruff 600, mypy 259; marker retired, full isolated backend 111 passed, zero skip/fail/xfail. Live db-baseline gate FAILED: Uvicorn `app.main` import raises ModuleNotFoundError from runtime_lease.py absolute `backend.app.config`; F-STRUCT-02 P0 and T-123 queued. ADR-003 full enforcement and P2 findings remain.
+- Phase 1 A/C/E P0/P1 findings closed after T-088. Phase 2 structure active: CRUD, analytics and pit read repositories; auth/operations/telemetry/competition/simulation schemas; analytics and pit read APIRouters. ADR-004 lease primitive, lifespan ownership, HTTP/WS and simulator guards accepted. T-122 focused --runxfail passed, Ruff 600, mypy 259; marker retired, full isolated backend 111 passed, zero skip/fail/xfail. Live db-baseline gate FAILED: Uvicorn `app.main` import raises ModuleNotFoundError from runtime_lease.py absolute `backend.app.config`; F-STRUCT-02 P0, strict T-123 reproducer accepted, T-124 import fix next. ADR-003 full enforcement and P2 findings remain.
 
 ## Orchestrator direct edits and Taste review
 - Product: one `frontend/package.json` build-script line switched Next build to webpack (e854d9b). No other product-source edits.
