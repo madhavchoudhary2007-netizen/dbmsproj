@@ -31,7 +31,7 @@ from psycopg.rows import dict_row, tuple_row
 
 from .config import APP_ENV, AUTO_DEMO_RACE, CORS_ORIGINS, JWT_ALGORITHM, JWT_MINUTES, JWT_SECRET, MONGODB_DATABASE, MONGODB_URL
 from .auth_cookie import create_csrf_token, set_auth_cookies, verify_csrf_token, clear_auth_cookies
-from .analytics_repository import get_dashboard_data, get_driver_analytics
+from .analytics_router import create_analytics_router
 from .crud_repository import (
     CrudDeleteError,
     create_crud_row,
@@ -1599,18 +1599,7 @@ async def session_ws(ws: WebSocket, session_id: UUID):
         bus.unsubscribe(session_id, q)
 
 
-@app.get("/api/dashboard")
-def dashboard(user=Depends(current_user)):
-    data = get_dashboard_data()
-    data["active_session"] = jsonable(data["active_session"])
-    return data
-
-
-@app.get("/api/analytics/drivers")
-def driver_analytics(championship_id: UUID|None=None, season: int|None=None, circuit_id: UUID|None=None, driver_id: UUID|None=None, team_id: UUID|None=None, limit: int=Query(50,ge=1,le=200), offset: int=Query(0,ge=0), user=Depends(current_user)):
-    return jsonable(get_driver_analytics(
-        championship_id, season, circuit_id, driver_id, team_id, limit, offset
-    ))
+app.include_router(create_analytics_router(current_user, jsonable))
 
 
 @app.get("/api/health")
