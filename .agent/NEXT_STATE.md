@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-22T20:44:23Z
+updated_at: 2026-10-22T20:48:51Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-151 — Extract generated-race SQL creation into repository
-- worker: W2 | priority: P2 | after: T-150
-- target_files: backend/app/main.py, backend/app/demo_race_repository.py
-- contract: move only the `_make_demo_race` PostgreSQL transaction to a typed repository function; preserve random draw order, active simulation setup, HTTP responses and all persisted links
-- verify: focused seeded lifecycle and persistence contracts; Ruff <=558, mypy <=248
+### T-152 — Move generated-race POST handler into APIRouter
+- worker: W2 | priority: P2 | after: T-151
+- target_files: backend/app/main.py, backend/app/demo_race_router.py
+- contract: move only POST /api/demo-races to existing router; preserve auth, 201 response, simulation launch, main direct-call export and route order
+- verify: focused seeded lifecycle/persistence plus OpenAPI inventory; Ruff <=558, mypy <=248
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-151 ✓ bf608f2; creation SQL transaction moved to typed repository; 2 seeded tests passed, Ruff 558/mypy 248; full backend 119/0/0 and live acceptance passed.
 - T-150 ✓ ed6bcaa; seeded persistence contract passed 1/1 on apexgrid-test after worker socket denial; Ruff 558.
 - T-149 ✓ 4cae401; list GET moved to APIRouter. Worker socket denial and one Ruff regression corrected; seeded 1 passed, Ruff 558/mypy 248; full isolated backend 118/0/0 and live acceptance passed.
 - T-148 ✓ 2a76b13; demo race read SQL moved to typed repository; seeded 1 passed after mypy repair, Ruff 558/mypy 248; full isolated backend 118/0/0 and live acceptance passed.
