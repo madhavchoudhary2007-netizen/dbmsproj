@@ -255,7 +255,9 @@ def cookie_auth_mock_user_update_db(monkeypatch):
     monkeypatch.setattr(main_module, "connection", lambda: nullcontext(connection))
 
 
-def test_cookie_auth_guard_rejects_protected_write_without_csrf(auth_characterization_client, monkeypatch):
+def test_cookie_auth_guard_rejects_protected_write_without_csrf(
+    auth_characterization_client, monkeypatch
+):
     cookie_auth_login(auth_characterization_client, monkeypatch, role="ADMIN")
     cookie_auth_mock_user_update_db(monkeypatch)
     response = auth_characterization_client.patch(
@@ -265,7 +267,9 @@ def test_cookie_auth_guard_rejects_protected_write_without_csrf(auth_characteriz
     assert response.status_code == 403
 
 
-def test_cookie_auth_guard_rejects_forged_signed_csrf_pair(auth_characterization_client, monkeypatch):
+def test_cookie_auth_guard_rejects_forged_signed_csrf_pair(
+    auth_characterization_client, monkeypatch
+):
     cookie_auth_login(auth_characterization_client, monkeypatch, role="ADMIN")
     cookie_auth_mock_user_update_db(monkeypatch)
     forged = "planted-nonce.invalid-signature"
@@ -278,7 +282,9 @@ def test_cookie_auth_guard_rejects_forged_signed_csrf_pair(auth_characterization
     assert response.status_code == 403
 
 
-def test_cookie_auth_guard_rejects_login_from_disallowed_origin(auth_characterization_client, monkeypatch):
+def test_cookie_auth_guard_rejects_login_from_disallowed_origin(
+    auth_characterization_client, monkeypatch
+):
     import bcrypt
 
     user = auth_characterization_user(bcrypt.hashpw(b"correct horse", bcrypt.gensalt()).decode())

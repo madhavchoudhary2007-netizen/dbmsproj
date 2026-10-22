@@ -13,6 +13,11 @@ loop_iteration: 1 of 5
 - target_files: backend/tests/test_api.py
 - contract: remove newly introduced E501 findings in G11 test helpers/cases without changing assertions or behavior
 - verify: .venv/bin/pytest -q backend/tests/test_api.py -k 'cookie_auth_guard or cookie_auth_logout'
+### T-062 — Ruff ratchet in G11 runtime
+- worker: W2 | priority: P1 | after: T-053
+- target_files: backend/app/main.py, backend/app/auth_cookie.py
+- contract: reduce current Ruff count to at most the pre-G11 639 baseline by formatting only new auth/WS code; preserve behavior
+- verify: .venv/bin/pytest -q backend/tests/test_api.py -k 'cookie_auth or auth_characterization_websocket'
 ### T-059 — Phase 1 A/C/E backend audit
 - worker: W3 | priority: P1 | origin: Phase 1
 - target_files: .agent/audit/phase1-ace.md
