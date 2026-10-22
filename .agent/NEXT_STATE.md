@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-22T20:42:14Z
+updated_at: 2026-10-22T20:44:23Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-150 — Characterize generated race persistence before splitting creation
-- worker: W3 | priority: P2 | after: T-149
-- target_files: backend/tests/test_api.py
-- contract: add a seeded contract asserting generated race creates linked championship/event/session, six unique driver/user/membership/entry records, four boxes, and scoped cleanup; no product change
-- verify: focused new seeded test; Ruff <=558
+### T-151 — Extract generated-race SQL creation into repository
+- worker: W2 | priority: P2 | after: T-150
+- target_files: backend/app/main.py, backend/app/demo_race_repository.py
+- contract: move only the `_make_demo_race` PostgreSQL transaction to a typed repository function; preserve random draw order, active simulation setup, HTTP responses and all persisted links
+- verify: focused seeded lifecycle and persistence contracts; Ruff <=558, mypy <=248
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-150 ✓ ed6bcaa; seeded persistence contract passed 1/1 on apexgrid-test after worker socket denial; Ruff 558.
 - T-149 ✓ 4cae401; list GET moved to APIRouter. Worker socket denial and one Ruff regression corrected; seeded 1 passed, Ruff 558/mypy 248; full isolated backend 118/0/0 and live acceptance passed.
 - T-148 ✓ 2a76b13; demo race read SQL moved to typed repository; seeded 1 passed after mypy repair, Ruff 558/mypy 248; full isolated backend 118/0/0 and live acceptance passed.
 - T-147 ✓ 77e05b9; pit strategy GET moved to APIRouter and re-exported, focused 1 passed, Ruff 559/mypy 248; full isolated backend 118/0/0 and live acceptance passed.
