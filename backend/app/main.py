@@ -9,7 +9,7 @@ import random
 import secrets
 import threading
 import time
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any, Literal
 from uuid import UUID, uuid4
 
@@ -20,7 +20,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from pymongo import MongoClient, DESCENDING
 from pymongo.errors import PyMongoError
 from psycopg import IntegrityError, OperationalError
@@ -45,7 +45,9 @@ from .pit_repository import PIT_RESERVATION_SELECT
 from .pit_router import create_pit_router
 from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
 from .schemas_auth import Login, UserCreate, UserPatch
+from .schemas_competition import MembershipIn, MembershipPatch, ResultIn
 from .schemas_operations import Action, AutoReservationIn, Decision, IncidentIn, ReservationIn
+from .schemas_simulation import DemoRaceCreate, SimulationControl
 from .schemas_telemetry import Telemetry
 
 logging.basicConfig(level=logging.INFO)
@@ -317,25 +319,12 @@ def team_memberships(team_id: UUID, user=Depends(current_user)):
     return jsonable(fetch_all("SELECT m.*,u.full_name AS driver_name,d.number,d.licence_number FROM team_memberships m JOIN drivers d ON d.id=m.driver_id LEFT JOIN users u ON u.id=d.user_id WHERE m.team_id=%s ORDER BY m.start_date DESC", (team_id,)))
 
 
-class MembershipIn(BaseModel):
-    driver_id: UUID
-    team_id: UUID
-    start_date: date
-    end_date: date | None = None
-
-
 @app.post("/api/team-memberships", status_code=201)
 def create_membership(body: MembershipIn, user=Depends(roles("ADMIN"))):
     with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
         cur.execute("INSERT INTO team_memberships(driver_id,team_id,start_date,end_date) VALUES (%s,%s,%s,%s) RETURNING *", (body.driver_id,body.team_id,body.start_date,body.end_date))
         row=cur.fetchone()
     return jsonable(row)
-
-
-class MembershipPatch(BaseModel):
-    team_id: UUID | None = None
-    start_date: date | None = None
-    end_date: date | None = None
 
 
 @app.patch("/api/team-memberships/{membership_id}")
@@ -527,15 +516,6 @@ def results(session_id: UUID, user=Depends(current_user)):
         AND m.start_date<=s.scheduled_at::date AND (m.end_date IS NULL OR m.end_date>=s.scheduled_at::date)
         ORDER BY m.start_date DESC LIMIT 1) membership ON true
       LEFT JOIN teams t ON t.id=membership.team_id WHERE r.session_id=%s ORDER BY r.position""", (session_id,)))
-
-
-class ResultIn(BaseModel):
-    driver_id: UUID
-    position: int = Field(ge=1)
-    lap_time_ms: int | None = Field(default=None, ge=0)
-    pole: bool = False
-    fastest_lap: bool = False
-    classified: bool = True
 
 
 @app.post("/api/sessions/{session_id}/results")
@@ -899,10 +879,6 @@ def pit_strategy(session_id: UUID, user=Depends(current_user)):
     return jsonable({"session_id": session_id, "session_state": session["state"],
         "source": "live_simulation" if is_live else "history", "strategy": strategy,
         "historical_summary": {"total_stops": total_stops, "by_driver": by_driver}})
-
-
-class DemoRaceCreate(BaseModel):
-    cars: int | None = Field(default=None, ge=6, le=20)
 
 
 def demo_race_row(session_id: UUID | str):
@@ -1474,12 +1450,6 @@ async def simulation_loop(sim: Simulation):
             log.exception("Telemetry simulator could not advance state")
             return
         await asyncio.sleep(1 / sim.rate_hz)
-
-
-class SimulationControl(BaseModel):
-    action: Literal["start", "pause", "resume", "stop", "reset"]
-    cars: int | None = Field(default=None, ge=1, le=20)
-    rate_hz: float | None = Field(default=None, ge=0.2, le=20)
 
 
 @app.post("/api/sessions/{session_id}/simulate")
