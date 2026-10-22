@@ -99,10 +99,6 @@ def test_runtime_websocket_loss(monkeypatch):
             lease.close()
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="F-STRUCT-01: an accepted WebSocket must stop delivering after lease loss",
-)
 def test_active_websocket_loss_closes_before_delivering_event(monkeypatch):
     from starlette.websockets import WebSocketDisconnect
 

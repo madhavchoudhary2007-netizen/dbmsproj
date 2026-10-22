@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-22T13:44:00Z
+updated_at: 2026-10-22T13:51:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-118 — Stop active WebSocket before send after lease loss
-- worker: W2 | priority: P1 | after: T-117
-- target_files: backend/app/main.py
-- contract: immediately before sending each queued event, check lifespan lease; on loss close 1011 with restart guidance, do not send event
-- verify: DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_runtime_lease.py -k active_websocket_loss --runxfail
+### T-119 — Reproduce idle WebSocket after lease loss
+- worker: W3 | priority: P1 | after: T-118
+- target_files: backend/tests/test_runtime_lease.py
+- contract: strict expected-failure test accepts authorized idle WS, closes owner lease and requires bounded automatic unsubscribe without any event
+- verify: DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_runtime_lease.py -k idle_websocket_loss
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (pruned on compaction)
+- T-118 ✓ 883edc5; active WS pre-send guard --runxfail passed, Ruff 600, mypy 259; marker retired, full isolated backend 108 passed, zero skip/fail/xfail.
 - T-117 ✓ 655b2a7; strict active WS xfail accepted; --runxfail delivers stale event, Ruff 600.
 - T-116 ✓ 56f437e; WS handshake guard --runxfail passed, Ruff 600, mypy 259; marker retired, full isolated backend 107 passed, zero skip/fail/xfail.
 - T-115 ✓ 5f5248a; strict WS xfail accepted; --runxfail gives 4401 rather than 1011, Ruff 600.
