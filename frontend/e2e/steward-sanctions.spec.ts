@@ -18,8 +18,6 @@ const incident = {
 };
 
 test("F-DOM-02 steward decision dialog disables unenforced sanctions", async ({ page }) => {
-  test.fail(!process.env.RUN_XFAIL);
-
   await page.route(apiPattern, async (route) => {
     const pathname = new URL(route.request().url()).pathname;
     if (pathname === "/api/auth/me") {
