@@ -1,12 +1,12 @@
 # NEXT_STATE
-updated_at: 2026-10-22T14:01:06Z
+updated_at: 2026-10-22T14:03:36Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-127 — Extract user create SQL to repository
-- worker: W2 | priority: P2 | after: T-126
+### T-128 — Extract user PATCH validation/write to repository
+- worker: W2 | priority: P2 | after: T-127
 - target_files: backend/app/main.py, backend/app/user_repository.py
-- contract: preserve /api/users POST status, shape, password hashing, transaction and roles; typed repository boundary
+- contract: preserve /api/users PATCH status, shape, null/empty validation, password hash and role; typed repository boundary
 - verify: focused seeded T-125 contract and existing user checks on apexgrid-test; Ruff <=600, mypy <=259
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-127 ✓ 1f2fe12; user creation hashing and INSERT moved to typed repository; seeded contract 2 passed, Ruff 599, mypy 259. Worker socket denied; orchestrator reran.
 - T-126 ✓ d2201f5; user list/detail SQL moved to typed repository; seeded contract 2 passed on apexgrid-test, Ruff 600, mypy 259. Worker socket denied; orchestrator reran after type repair.
 - T-125 ✓ e410407; seeded auth/user contract 2 passed on apexgrid-test, Ruff 600. Worker socket denied; orchestrator reran, corrected generated-ID fixture and cleanup definition before acceptance.
 - T-124 ✓ ffac0c8; backend-cwd import passes; marker retired; isolated backend 112 passed, zero skips/failures/xfails, live acceptance passed. F-STRUCT-01/02 closed.
