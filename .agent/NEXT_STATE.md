@@ -3,11 +3,6 @@ updated_at: 2026-10-22T12:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-079 — F-DOM-02 steward form reproducer
-- worker: W3 | priority: P1 | after: T-078
-- target_files: frontend/e2e/steward-sanctions.spec.ts
-- contract: strict browser xfail for enabled ineffective time/grid controls and missing explanation; points remain usable
-- verify: dynamic-port Playwright steward-sanctions focused matrix
 ### T-080 — F-DOM-02 steward form guidance
 - worker: W1 | priority: P1 | after: T-079
 - target_files: frontend/components/special-pages.tsx
@@ -68,4 +63,5 @@ loop_iteration: 1 of 5
 - T-076 ✓ 7eda6ec; contiguous final classification validation; full isolated backend 84/0/0 and live acceptance pass
 - T-077 ✓ 2dcf2d0; 2 strict unsupported-sanction xfails reproduced, 3 compatibility cases pass
 - T-078 ✓ 67af5a5; Decision rejects ineffective sanctions; isolated backend 89/0/0 and live acceptance pass
+- T-079 ✓ 7659c61; two strict browser xfails on enabled steward time/grid controls
 - Earlier accepted tasks and evidence are in git history and LOOP.md.
