@@ -52,7 +52,6 @@ async function expectProvisionalExplanation(page: Page, label: RegExp) {
 }
 
 test("F-DOM-02 completed race results explain historical provisional status", async ({ page }) => {
-  test.fail(!process.env.RUN_XFAIL);
   await mockData(page, true);
   await page.goto("/sessions");
   await page.getByRole("row").filter({ hasText: "Historical Grand Prix" }).click();
@@ -70,7 +69,6 @@ test("unaffected completed race results keep ordinary presentation", async ({ pa
 });
 
 test("F-DOM-02 championship standings explain historical provisional status", async ({ page }) => {
-  test.fail(!process.env.RUN_XFAIL);
   await mockData(page, true);
   await page.goto("/standings");
   await expectProvisionalExplanation(page, /provisional standings|standings are provisional|provisional classification/i);
