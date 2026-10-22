@@ -69,6 +69,7 @@ from .schemas_operations import Action, AutoReservationIn, Decision, IncidentIn,
 from .schemas_simulation import DemoRaceCreate, SimulationControl
 from .schemas_telemetry import Telemetry
 from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
+from .telemetry_repository import driver_exists, list_telemetry, session_exists
 from .user_router import create_user_router
 
 logging.basicConfig(level=logging.INFO)
@@ -715,13 +716,13 @@ def ingest(packet: Telemetry, user=Depends(roles("ADMIN", "STEWARD"))):
 
 @app.get("/api/telemetry")
 def telemetry(session_id: UUID, driver_id: UUID | None = None, limit: int=Query(50,ge=1,le=200), user=Depends(current_user)):
-    if not fetch_one("SELECT 1 FROM race_sessions WHERE id=%s", (session_id,)):
+    if not session_exists(session_id):
         raise HTTPException(404, "Session not found")
-    if driver_id and not fetch_one("SELECT 1 FROM drivers WHERE id=%s", (driver_id,)):
+    if driver_id and not driver_exists(driver_id):
         raise HTTPException(404, "Driver not found")
-    col=mongo_ready(); query={"session_id":str(session_id)}
-    if driver_id: query["driver_id"]=str(driver_id)
-    return [{**jsonable({k:v for k,v in d.items() if k!="_id"}),"id":str(d["_id"])} for d in col.find(query).sort("ts",DESCENDING).limit(limit)]
+    col=mongo_ready()
+    documents = list_telemetry(col, session_id, driver_id, limit)
+    return [{**jsonable({k:v for k,v in d.items() if k!="_id"}),"id":str(d["_id"])} for d in documents]
 
 
 @app.get("/api/sessions/{session_id}/live")
