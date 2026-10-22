@@ -20,17 +20,18 @@ for (const routePath of routes) {
   test(`G07 touch targets are at least 44×44px at 375px on ${routePath}`, async ({ page }) => {
     const writes: string[] = [];
     await page.setViewportSize({ width: 375, height: 812 });
-    await page.addInitScript(() => {
-      if (location.pathname === "/login") localStorage.removeItem("apexgrid_token");
-      else localStorage.setItem("apexgrid_token", "responsive-audit-token");
-    });
     await page.route("**/api/**", async (request) => {
       if (request.request().method() !== "GET") {
         writes.push(`${request.request().method()} ${new URL(request.request().url()).pathname}`);
         await request.abort();
         return;
       }
-      const body = new URL(request.request().url()).pathname === "/api/auth/me"
+      const pathname = new URL(request.request().url()).pathname;
+      if (pathname === "/api/auth/me" && routePath === "/login") {
+        await request.fulfill({ status: 401, json: { detail: "Authentication required" } });
+        return;
+      }
+      const body = pathname === "/api/auth/me"
         ? { id: 999, email: "responsive@example.test", full_name: "Responsive Audit", role: "admin" }
         : {};
       await request.fulfill({ json: body });

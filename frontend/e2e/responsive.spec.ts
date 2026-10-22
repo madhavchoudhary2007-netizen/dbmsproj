@@ -25,13 +25,14 @@ for (const [id, route] of routes) {
   for (const width of viewports) {
     test(`${id} ${route} stays usable at ${width}px`, async ({ page }) => {
       const mutations: string[] = [];
-      await page.addInitScript((routePath) => {
-        if (routePath !== "/login") localStorage.setItem("apexgrid_token", "responsive-audit-token");
-      }, route);
       await page.route("**/api/**", async (request) => {
         const method = request.request().method();
         const pathname = new URL(request.request().url()).pathname;
         if (method === "GET") {
+          if (pathname === "/api/auth/me" && route === "/login") {
+            await request.fulfill({ status: 401, json: { detail: "Authentication required" } });
+            return;
+          }
           const body = pathname === "/api/auth/me"
             ? { id: 999, email: "responsive@example.test", full_name: "Responsive Audit", role: "admin" }
             : {};

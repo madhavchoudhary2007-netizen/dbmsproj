@@ -13,9 +13,6 @@ const routes = [
 for (const [id, path] of routes) {
   test(`${id} ${path}: keyboard and accessibility audit`, async ({ page }) => {
     const attemptedWrites: string[] = [];
-    await page.addInitScript((routePath) => {
-      if (routePath !== "/login") localStorage.setItem("apexgrid_token", "accessibility-audit-fake-token");
-    }, path);
     await page.route("**/api/**", async (route) => {
       const request = route.request();
       if (request.method() !== "GET") {
@@ -23,7 +20,12 @@ for (const [id, path] of routes) {
         await route.abort();
         return;
       }
-      const body = new URL(request.url()).pathname === "/api/auth/me"
+      const pathname = new URL(request.url()).pathname;
+      if (pathname === "/api/auth/me" && path === "/login") {
+        await route.fulfill({ status: 401, contentType: "application/json", body: JSON.stringify({ detail: "Authentication required" }) });
+        return;
+      }
+      const body = pathname === "/api/auth/me"
         ? { id: 1, email: "audit@example.test", full_name: "Accessibility Audit", role: "admin" }
         : [];
       await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(body) });
