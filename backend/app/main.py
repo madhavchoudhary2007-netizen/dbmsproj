@@ -1758,8 +1758,14 @@ def publish(session_id, kind, data):
 
 @app.websocket("/api/ws/sessions/{session_id}")
 async def session_ws(ws: WebSocket, session_id: UUID):
+    origin = ws.headers.get("origin")
+    if origin is not None and origin not in CORS_ORIGINS:
+        await ws.close(code=4403, reason="Origin not allowed")
+        return
     protocols=ws.scope.get("subprotocols", [])
-    token=websocket_bearer(protocols)
+    subprotocol_token = websocket_bearer(protocols)
+    cookie_token = ws.cookies.get("apexgrid_session")
+    token = subprotocol_token or cookie_token
     if not token:
         await ws.close(code=4401, reason="Expected apexgrid.jwt subprotocol and bearer token")
         return
@@ -1771,7 +1777,7 @@ async def session_ws(ws: WebSocket, session_id: UUID):
     if not user:
         await ws.close(code=4401, reason="Invalid or expired token")
         return
-    await ws.accept(subprotocol="apexgrid.jwt"); q=bus.subscribe(session_id)
+    await ws.accept(subprotocol="apexgrid.jwt" if subprotocol_token else None); q=bus.subscribe(session_id)
     try:
         while True: await ws.send_json(await q.get())
     except WebSocketDisconnect: pass

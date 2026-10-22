@@ -8,6 +8,11 @@ loop_iteration: 1 of 5
 - target_files: backend/app/main.py
 - contract: session cookie WS accepted with allowed Origin; disallowed Origin rejected for all WS; legacy subprotocol remains
 - verify: .venv/bin/pytest -q backend/tests/test_api.py --runxfail -k 'cookie_auth_websocket'
+### T-061 — Ruff ratchet in G11 tests
+- worker: W3 | priority: P1 | after: T-060
+- target_files: backend/tests/test_api.py
+- contract: remove newly introduced E501 findings in G11 test helpers/cases without changing assertions or behavior
+- verify: .venv/bin/pytest -q backend/tests/test_api.py -k 'cookie_auth_guard or cookie_auth_logout'
 ### T-059 — Phase 1 A/C/E backend audit
 - worker: W3 | priority: P1 | origin: Phase 1
 - target_files: .agent/audit/phase1-ace.md
