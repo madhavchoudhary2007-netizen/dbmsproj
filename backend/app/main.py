@@ -5,7 +5,6 @@ from contextlib import asynccontextmanager
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
 import hmac
 import logging
-import re
 import random
 import secrets
 import threading
@@ -44,6 +43,7 @@ from .crud_repository import (
 from .database import close_pool, connection, fetch_all, fetch_one, open_pool, pool
 from .pit_repository import PIT_RESERVATION_SELECT, list_pit_boxes, list_pit_reservations
 from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
+from .schemas_auth import Login, UserCreate, UserPatch
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("apexgrid")
@@ -218,60 +218,6 @@ def roles(*allowed):
             raise HTTPException(403, "Insufficient role")
         return user
     return check
-
-
-class Login(BaseModel):
-    email: str
-    password: str = Field(min_length=1, max_length=128)
-
-    @field_validator("email")
-    @classmethod
-    def valid_email(cls, value):
-        if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", value):
-            raise ValueError("Enter a valid email address")
-        return value
-
-
-class UserCreate(BaseModel):
-    email: str
-    full_name: str = Field(min_length=1, max_length=200)
-    password: str = Field(min_length=8, max_length=72)
-    role: Literal["ADMIN", "STEWARD", "PRINCIPAL", "DRIVER"]
-
-    @field_validator("email")
-    @classmethod
-    def valid_email(cls, value):
-        if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", value):
-            raise ValueError("Enter a valid email address")
-        return value
-
-    @field_validator("password")
-    @classmethod
-    def bcrypt_length(cls, value):
-        if len(value.encode("utf-8")) > 72:
-            raise ValueError("Password must be at most 72 UTF-8 bytes")
-        return value
-
-
-class UserPatch(BaseModel):
-    email: str | None = None
-    full_name: str | None = Field(default=None, min_length=1, max_length=200)
-    password: str | None = Field(default=None, min_length=8, max_length=72)
-    role: Literal["ADMIN", "STEWARD", "PRINCIPAL", "DRIVER"] | None = None
-
-    @field_validator("email")
-    @classmethod
-    def valid_email(cls, value):
-        if value is not None and not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", value):
-            raise ValueError("Enter a valid email address")
-        return value
-
-    @field_validator("password")
-    @classmethod
-    def bcrypt_length(cls, value):
-        if value is not None and len(value.encode("utf-8")) > 72:
-            raise ValueError("Password must be at most 72 UTF-8 bytes")
-        return value
 
 
 class Action(BaseModel):
