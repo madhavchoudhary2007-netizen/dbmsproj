@@ -69,13 +69,7 @@ from .schemas_operations import Action, AutoReservationIn, Decision, IncidentIn,
 from .schemas_simulation import DemoRaceCreate, SimulationControl
 from .schemas_telemetry import Telemetry
 from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
-from .telemetry_repository import (
-    driver_exists,
-    get_live_session,
-    get_live_telemetry,
-    list_telemetry,
-    session_exists,
-)
+from .telemetry_router import create_telemetry_router
 from .user_router import create_user_router
 
 logging.basicConfig(level=logging.INFO)
@@ -720,25 +714,7 @@ def ingest(packet: Telemetry, user=Depends(roles("ADMIN", "STEWARD"))):
     return {"accepted":True,"packet":clean}
 
 
-@app.get("/api/telemetry")
-def telemetry(session_id: UUID, driver_id: UUID | None = None, limit: int=Query(50,ge=1,le=200), user=Depends(current_user)):
-    if not session_exists(session_id):
-        raise HTTPException(404, "Session not found")
-    if driver_id and not driver_exists(driver_id):
-        raise HTTPException(404, "Driver not found")
-    col=mongo_ready()
-    documents = list_telemetry(col, session_id, driver_id, limit)
-    return [{**jsonable({k:v for k,v in d.items() if k!="_id"}),"id":str(d["_id"])} for d in documents]
-
-
-@app.get("/api/sessions/{session_id}/live")
-def live(session_id: UUID, user=Depends(current_user)):
-    session = get_live_session(session_id)
-    if not session:
-        raise HTTPException(404, "Session not found")
-    col = mongo_ready()
-    latest, drivers = get_live_telemetry(col, session_id, session["scheduled_at"])
-    return {"session":jsonable(session),"drivers":jsonable(drivers),"packets":[{**jsonable({k:v for k,v in d.items() if k!="_id"}),"id":str(d["_id"])} for d in latest]}
+app.include_router(create_telemetry_router(current_user, jsonable, mongo_ready))
 
 
 @app.get("/api/sessions/{session_id}/pit-strategy")
