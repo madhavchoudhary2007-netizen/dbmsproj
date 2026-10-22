@@ -442,9 +442,18 @@ export function SessionPage() {
           )}
           {results.length > 0 && (
             <div className="results-table">
+              {results.some((result) => result.provisional === true) && (
+                <div className="notice">
+                  Historical time and grid penalties are recorded but not applied to official order or points. Review the penalties before treating results as final.
+                </div>
+              )}
               <div className="panel-heading">
                 <div>
-                  <div className="eyebrow">OFFICIAL RESULTS</div>
+                  <div className="eyebrow">
+                    {results.some((result) => result.provisional === true)
+                      ? "PROVISIONAL RESULTS"
+                      : "OFFICIAL RESULTS"}
+                  </div>
                   <h2>{results.length} classified entries</h2>
                 </div>
                 {canControl && (

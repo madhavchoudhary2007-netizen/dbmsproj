@@ -79,6 +79,11 @@ export default function Page() {
       </div>
       <StateMessage error={error} loading={loading} retry={() => void load()} />
       {message && <div className="notice">{message}</div>}
+      {rows.some((row) => row.provisional === true) && (
+        <div className="notice">
+          Provisional standings: historical time and grid penalties are recorded but not applied to official order or points. Review the penalties before treating standings as final.
+        </div>
+      )}
       {!loading && !error && (
         <DataTable
           rows={rows}
