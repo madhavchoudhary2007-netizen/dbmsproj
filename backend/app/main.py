@@ -1567,18 +1567,28 @@ def publish(session_id, kind, data):
     bus.send(session_id,{"type":kind,"ts":datetime.now(timezone.utc).isoformat().replace("+00:00","Z"),"session_id":str(session_id),"data":jsonable(data)})
 
 
+async def _check_ws_runtime_lease(ws: WebSocket) -> bool:
+    runtime_lease = getattr(ws.app.state, "runtime_lease", None)
+    if runtime_lease is None:
+        return True
+    try:
+        check_runtime_lease(runtime_lease)
+    except RuntimeError:
+        await ws.close(
+            code=1011,
+            reason=(
+                "Runtime ownership was lost; restart the backend "
+                "after PostgreSQL recovery."
+            ),
+        )
+        return False
+    return True
+
+
 @app.websocket("/api/ws/sessions/{session_id}")
 async def session_ws(ws: WebSocket, session_id: UUID):
-    runtime_lease = getattr(ws.app.state, "runtime_lease", None)
-    if runtime_lease is not None:
-        try:
-            check_runtime_lease(runtime_lease)
-        except RuntimeError:
-            await ws.close(
-                code=1011,
-                reason="Runtime ownership was lost; restart the backend after PostgreSQL recovery.",
-            )
-            return
+    if not await _check_ws_runtime_lease(ws):
+        return
     origin = ws.headers.get("origin")
     if origin is not None and origin not in CORS_ORIGINS:
         await ws.close(code=4403, reason="Origin not allowed")
@@ -1606,7 +1616,10 @@ async def session_ws(ws: WebSocket, session_id: UUID):
     q = bus.subscribe(session_id)
     try:
         while True:
-            await ws.send_json(await q.get())
+            event = await q.get()
+            if not await _check_ws_runtime_lease(ws):
+                return
+            await ws.send_json(event)
     except WebSocketDisconnect:
         pass
     finally:
