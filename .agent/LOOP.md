@@ -52,6 +52,7 @@ score: NOT_RUN
 - T-099 pinned seeded pit box/reservation reads, box order, response shapes, authentication and UUID validation. One scoped case passed on apexgrid-test; Ruff 605 (2026-10-22).
 - T-100 moved pit box/reservation read SQL and the shared select into pit_repository; scoped read and adjacent reservation checks: 3 passed. Ruff 603, mypy 261 (2026-10-22).
 - T-101 moved Login/UserCreate/UserPatch validation models into schemas_auth with main re-exports; eight focused auth and seeded admin checks passed. Ruff 603, mypy 261 (2026-10-22).
+- T-102 moved Action/IncidentIn/Decision/ReservationIn/AutoReservationIn to schemas_operations with main re-exports; nine focused cases passed. Ruff 603, mypy 259 (2026-10-22).
 - Phase 0 closed after T-057/T-058: the isolated `db-baseline.sh` run passed 69 tests, separately reported 8 xfails and 0 real skips, and passed live acceptance; CI now runs all 11 full gates including deployment-secret regression and rejects unreachable registries. Browser smoke/responsive suite passed 715/715 across five projects and all 16 routes. Quality gates remain recorded red targets, not claimed passing.
 - Host pytest: 31 passed, 26 skipped; coverage overall 44.58% (777/1743 lines), app module percentages: bootstrap 0.0, config 88.2, database 50.0, main 43.6, race_archive 97.1. These numbers are not an isolated-stack baseline.
 - Docker and local sockets required scoped sandbox escalation; the isolated stack started and was seeded successfully.
