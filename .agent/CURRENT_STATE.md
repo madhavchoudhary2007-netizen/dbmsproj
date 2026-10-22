@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-22T20:32:20Z
-git_head: 77e05b9
+updated_at: 2026-10-22T20:36:10Z
+git_head: 2a76b13
 branch: perfection-loop
 architect_sha256: c9780b9cd1ffe91fcb0fbf369b4b136205eb5c1ffb82e8cf199e42cca18c69c5
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -25,7 +25,7 @@ last_eval_score: NOT_RUN (quality gates and role journeys remain open)
 - T-137..T-141: telemetry GET/live/ingest reads and writes moved to typed repository/router with seeded characterization. T-141 updated stale test schema import. Full isolated backend now passes 117 tests, zero failures/skips/xfails; live acceptance passes login, simulator, MongoDB, WebSocket, pits, standings, DBMS and generated races. Ruff 573, mypy 248. Next Phase 2 task: characterize pit strategy before splitting its oversized handler.
 - T-142 pit-strategy seeded historical read contract passed 1/1 without fixture mutation, Ruff 573. T-143 extracts bounded Mongo pit telemetry read into pit_repository while preserving live/historical decisions.
 - T-143 moved bounded latest packets and stop-history aggregation to typed pit_repository; seeded historical and live unit tests passed 2/2, Ruff 573/mypy 248. Full isolated gate pending after next pit-strategy split.
-- T-144..T-147 split pit strategy policy, Mongo reads, SQL reads and GET handler into service/repository/router with preserved direct test import. After T-147: Ruff 559/mypy 248; full disposable backend 118 passed, zero failures/skips/xfails, live acceptance passed. Next T-148 extracts demo race read SQL.
+- T-144..T-147 split pit strategy policy, Mongo reads, SQL reads and GET handler into service/repository/router with preserved direct test import. T-148 moved demo race detail/list SQL reads into a typed repository; first review found a new mypy error, repaired before acceptance. Ruff 558/mypy 248; full disposable backend 118 passed, zero failures/skips/xfails, live acceptance passed. Next T-149 moves demo race read route to APIRouter.
 
 ## Orchestrator direct edits and Taste review
 - Product: one `frontend/package.json` build-script line switched Next build to webpack (e854d9b). No other product-source edits.
