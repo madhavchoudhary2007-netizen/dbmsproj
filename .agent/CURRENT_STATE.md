@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-22T18:29:20Z
-git_head: 2692cff
+updated_at: 2026-10-22T18:31:37Z
+git_head: 2120ba9
 branch: perfection-loop
 architect_sha256: c9780b9cd1ffe91fcb0fbf369b4b136205eb5c1ffb82e8cf199e42cca18c69c5
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -22,6 +22,7 @@ last_eval_score: NOT_RUN (quality gates and role journeys remain open)
 - F-ACE01 P2: login has no attempt throttling. T-006 twice failed: five-state fixtures need a route-specific applicability matrix before T-026..028. Role journeys, permissions matrix, simulator invariants, frontend visual states, docs, performance and evaluation score remain open in NEXT_STATE/queue.
 - Phase 1 A/C/E P0/P1 findings closed after T-088. Phase 2 structure active: CRUD, analytics, pit, user and telemetry GET repositories; auth/operations/telemetry/competition/simulation schemas; analytics, pit read and user APIRouters. ADR-004 lease primitive, lifespan ownership, HTTP/WS and simulator guards accepted. T-124 package-relative import accepted; strict T-123 marker retired. F-STRUCT-01/02 closed. T-125 auth/user contract and T-126..T-130 user extractions passed focused seeded checks on apexgrid-test; full isolated backend after T-130 passed 114, zero skip/fail/xfail, live acceptance passed. T-131/T-132 telemetry/live seeded read contract passed 1/1 with scoped Mongo cleanup. Ruff 586, mypy 254. ADR-003 full enforcement and P2 findings remain.
 - T-133 live GET reads moved to typed telemetry repository; seeded contract passed 1/1 on apexgrid-test, Ruff 583, mypy 254. Full isolated suite then found F-STRUCT-03: global psycopg pool cannot reopen for a later TestClient lifespan (114 passed, 1 failed); T-134 reproducer and W2 repair are next. Live acceptance did not run because the gate stopped.
+- T-134 strict two-lifespan regression accepted: ordinary seeded run 1 xfailed; --runxfail fails specifically on second lifespan PostgreSQL down/PoolClosed; Ruff 583. T-135 repairs database pool lifecycle, then marker retirement and full isolated gate are required.
 
 ## Orchestrator direct edits and Taste review
 - Product: one `frontend/package.json` build-script line switched Next build to webpack (e854d9b). No other product-source edits.
