@@ -742,6 +742,11 @@ def save_results(session_id: UUID, rows: list[ResultIn], user=Depends(roles("ADM
             cur.execute("INSERT INTO session_results(session_id,driver_id,position,lap_time_ms,pole,fastest_lap,classified) VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT(session_id,driver_id) DO UPDATE SET position=excluded.position,lap_time_ms=excluded.lap_time_ms,pole=excluded.pole,fastest_lap=excluded.fastest_lap,classified=excluded.classified", (session_id,r.driver_id,r.position,r.lap_time_ms,r.pole,r.fastest_lap,r.classified))
         cur.execute("SELECT r.*,u.full_name AS driver_name FROM session_results r JOIN drivers d ON d.id=r.driver_id JOIN users u ON u.id=d.user_id WHERE r.session_id=%s ORDER BY r.position", (session_id,))
         result = cur.fetchall()
+        if session["state"] == "COMPLETED":
+            classified_positions = [r["position"] for r in result if r["classified"]]
+            if (any(position is None for position in classified_positions)
+                    or sorted(classified_positions) != list(range(1, len(classified_positions) + 1))):
+                raise HTTPException(422, "Classified result positions must be contiguous starting at 1")
     publish(session_id, "timing.update", jsonable(result))
     return jsonable(result)
 
