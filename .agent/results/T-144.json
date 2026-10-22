@@ -1,0 +1,19 @@
+{
+  "task_id": "T-144",
+  "status": "PASSED",
+  "files_modified": [
+    {"path": "backend/app/main.py", "lines_added": 6, "lines_removed": 56},
+    {"path": "backend/app/pit_strategy_service.py", "lines_added": 76, "lines_removed": 0}
+  ],
+  "diff_summary": "Moved per-driver pit strategy policy into a pure service while retaining route I/O and the seeded/live response contracts.",
+  "verification": {
+    "command": "DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_pit_strategy_contract.py backend/tests/test_api.py -k 'seeded_pit_strategy_read_contract or pit_strategy_reports_pending_live_decision_and_historical_stops'",
+    "exit_code": 0,
+    "tests_passed": 2,
+    "tests_failed": 0,
+    "duration_ms": 840,
+    "typecheck_errors": 248,
+    "lint_warnings": 561
+  },
+  "unresolved_blockers": []
+}
