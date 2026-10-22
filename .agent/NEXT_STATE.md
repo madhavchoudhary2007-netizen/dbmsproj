@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-22T13:04:00Z
+updated_at: 2026-10-22T13:10:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-111 — Acquire runtime ownership for FastAPI lifespan
-- worker: W2 | priority: P1 | after: T-110
-- target_files: backend/app/main.py
-- contract: acquire dedicated lease before resource startup or simulator restore; second owner fails startup; release on clean shutdown
-- verify: DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_api.py -k 'runtime_lifespan or app_lifespan_starts' --runxfail
+### T-112 — Isolate runtime ownership tests from module-scoped API client
+- worker: W3 | priority: P1 | after: T-111
+- target_files: backend/tests/test_api.py, backend/tests/test_runtime_lease.py
+- contract: move both unmarked lease tests into a separate module after the API module fixture tears down; preserve all assertions and prove full isolated backend passes with zero skip/fail/xfail
+- verify: DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_runtime_lease.py
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (pruned on compaction)
+- T-111 ✓ ec2546b; focused --runxfail 2 passed; full suite 103 passed/2 fixture conflict failures, T-112 queued.
 - T-110 ✓ 7721eca; strict lifespan xfail accepted, --runxfail fails old startup with DID NOT RAISE; Ruff 602.
 - T-109 ✓ 6ca5226; scoped --runxfail passed on apexgrid-test, Ruff 602, mypy 259; marker retired and full backend 104 passed, zero skip/fail/xfail.
 - T-108 ✓ 43af11a; 1 strict xfail, 0 skip; --runxfail fails on missing lease module; Ruff 602.

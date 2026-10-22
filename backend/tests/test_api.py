@@ -1341,7 +1341,6 @@ def test_runtime_lease_exclusive():
             second.close()
 
 
-@pytest.mark.xfail(strict=True, reason="F-STRUCT-01")
 def test_runtime_lifespan_rejects_second_owner():
     from backend.app.runtime_lease import acquire_runtime_lease
 
