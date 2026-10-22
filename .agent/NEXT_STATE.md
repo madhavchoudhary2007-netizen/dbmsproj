@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-22T18:52:44Z
+updated_at: 2026-10-22T18:55:35Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-141 — Point telemetry validation test at schema module
-- worker: W3 | priority: P1 | after: T-140
-- target_files: backend/tests/test_api.py
-- contract: import Telemetry from schemas_telemetry rather than main; preserve validation assertions and all other imports
-- verify: focused telemetry validation and seeded ingest/read contracts on apexgrid-test; Ruff <=573
+### T-142 — Characterize pit-strategy read response
+- worker: W3 | priority: P2 | after: T-141
+- target_files: backend/tests/test_pit_strategy_contract.py
+- contract: pin seeded GET /api/sessions/{id}/pit-strategy auth, 404, response shape and historical/no-strategy status without fixture mutation
+- verify: focused seeded test on apexgrid-test; Ruff <=573
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-141 ✓ a8e25cf; Telemetry validation test imports schema module, focused 1 passed; full isolated backend 117/0/0 and live acceptance passed.
 - T-140 ✓ 698dd2e; POST ingest moved to router, focused 2 passed, Ruff 573/mypy 248; full collection exposed stale test import.
 - T-139 ✓ 57b488b; ingest write I/O moved to typed repository, seeded 1 passed, Ruff 582/mypy 252.
 - T-138 ✓ e01de68; seeded ingest write contract 1 passed, exact-ID cleanup, Ruff 582.
