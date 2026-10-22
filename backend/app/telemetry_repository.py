@@ -1,10 +1,11 @@
-from typing import Any
+from datetime import datetime
+from typing import Any, cast
 from uuid import UUID
 
 from pymongo import DESCENDING
 from pymongo.collection import Collection
 
-from .database import fetch_one
+from .database import fetch_all, fetch_one
 
 
 def session_exists(session_id: UUID) -> bool:
@@ -25,3 +26,46 @@ def list_telemetry(
     if driver_id is not None:
         query["driver_id"] = str(driver_id)
     return list(collection.find(query).sort("ts", DESCENDING).limit(limit))
+
+
+def get_live_session(session_id: UUID) -> dict[str, Any] | None:
+    return cast(
+        dict[str, Any] | None,
+        fetch_one("SELECT * FROM race_sessions WHERE id=%s", (session_id,)),
+    )
+
+
+def get_live_telemetry(
+    collection: Collection[dict[str, Any]],
+    session_id: UUID,
+    scheduled_at: datetime,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    latest = list(
+        collection.find({"session_id": str(session_id)})
+        .sort("ts", DESCENDING)
+        .limit(100)
+    )
+    latest.reverse()
+    driver_ids = {str(doc["driver_id"]) for doc in latest if doc.get("driver_id")}
+    driver_ids.update(
+        str(row["driver_id"])
+        for row in fetch_all(
+            "SELECT driver_id FROM demo_race_entries WHERE session_id=%s "
+            "UNION SELECT driver_id FROM session_results WHERE session_id=%s",
+            (session_id, session_id),
+        )
+    )
+    drivers = (
+        fetch_all(
+            """SELECT d.id,d.number,d.licence_number,u.full_name,t.name AS team_name
+            FROM drivers d LEFT JOIN users u ON u.id=d.user_id
+            LEFT JOIN LATERAL (SELECT team_id FROM team_memberships m WHERE m.driver_id=d.id
+              AND m.start_date<=%s::date AND (m.end_date IS NULL OR m.end_date>=%s::date)
+              ORDER BY m.start_date DESC LIMIT 1) membership ON true
+            LEFT JOIN teams t ON t.id=membership.team_id WHERE d.id=ANY(%s::uuid[]) ORDER BY d.number""",
+            (scheduled_at, scheduled_at, list(driver_ids)),
+        )
+        if driver_ids
+        else []
+    )
+    return latest, drivers

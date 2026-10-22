@@ -69,7 +69,13 @@ from .schemas_operations import Action, AutoReservationIn, Decision, IncidentIn,
 from .schemas_simulation import DemoRaceCreate, SimulationControl
 from .schemas_telemetry import Telemetry
 from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
-from .telemetry_repository import driver_exists, list_telemetry, session_exists
+from .telemetry_repository import (
+    driver_exists,
+    get_live_session,
+    get_live_telemetry,
+    list_telemetry,
+    session_exists,
+)
 from .user_router import create_user_router
 
 logging.basicConfig(level=logging.INFO)
@@ -727,22 +733,11 @@ def telemetry(session_id: UUID, driver_id: UUID | None = None, limit: int=Query(
 
 @app.get("/api/sessions/{session_id}/live")
 def live(session_id: UUID, user=Depends(current_user)):
-    session = fetch_one("SELECT * FROM race_sessions WHERE id=%s", (session_id,))
+    session = get_live_session(session_id)
     if not session:
         raise HTTPException(404, "Session not found")
-    col=mongo_ready(); latest=list(col.find({"session_id":str(session_id)}).sort("ts",DESCENDING).limit(100))
-    latest.reverse()
-    driver_ids = {str(doc["driver_id"]) for doc in latest if doc.get("driver_id")}
-    driver_ids.update(str(row["driver_id"]) for row in fetch_all(
-        "SELECT driver_id FROM demo_race_entries WHERE session_id=%s UNION SELECT driver_id FROM session_results WHERE session_id=%s",
-        (session_id, session_id)))
-    drivers = fetch_all("""SELECT d.id,d.number,d.licence_number,u.full_name,t.name AS team_name
-        FROM drivers d LEFT JOIN users u ON u.id=d.user_id
-        LEFT JOIN LATERAL (SELECT team_id FROM team_memberships m WHERE m.driver_id=d.id
-          AND m.start_date<=%s::date AND (m.end_date IS NULL OR m.end_date>=%s::date)
-          ORDER BY m.start_date DESC LIMIT 1) membership ON true
-        LEFT JOIN teams t ON t.id=membership.team_id WHERE d.id=ANY(%s::uuid[]) ORDER BY d.number""",
-        (session["scheduled_at"], session["scheduled_at"], list(driver_ids))) if driver_ids else []
+    col = mongo_ready()
+    latest, drivers = get_live_telemetry(col, session_id, session["scheduled_at"])
     return {"session":jsonable(session),"drivers":jsonable(drivers),"packets":[{**jsonable({k:v for k,v in d.items() if k!="_id"}),"id":str(d["_id"])} for d in latest]}
 
 
