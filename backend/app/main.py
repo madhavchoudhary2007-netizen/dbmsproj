@@ -61,6 +61,7 @@ from .crud_repository import (
 )
 from .database import close_pool, connection, fetch_all, fetch_one, get_pool, open_pool
 from .demo_race_repository import get_demo_race_row, list_demo_race_ids
+from .demo_race_router import create_demo_race_router
 from .pit_repository import PIT_RESERVATION_SELECT, load_pit_strategy_rows, load_pit_telemetry
 from .pit_router import create_pit_router
 from .pit_strategy_router import create_pit_strategy_router
@@ -735,10 +736,12 @@ def demo_race_row(session_id: UUID | str):
     return result
 
 
-@app.get("/api/demo-races")
 def list_demo_races(limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0), user=Depends(current_user)):
     ids = list_demo_race_ids(limit, offset)
     return [demo_race_row(row["session_id"]) for row in ids]
+
+
+app.include_router(create_demo_race_router(current_user, demo_race_row, list_demo_race_ids))
 
 
 def choose_demo_car_numbers(car_count: int) -> list[int]:
