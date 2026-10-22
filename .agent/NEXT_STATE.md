@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-22T19:08:01Z
+updated_at: 2026-10-22T19:14:20Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-145 — Prepare pit strategy unit fixture for SQL repository move
-- worker: W3 | priority: P2 | after: T-144
-- target_files: backend/tests/test_api.py
-- contract: patch pit_repository fetch_one/fetch_all as well as main in existing pit strategy unit test; preserve all assertions
-- verify: focused pit strategy unit test; Ruff <=561
+### T-146 — Extract pit strategy SQL reads
+- worker: W2 | priority: P2 | after: T-145
+- target_files: backend/app/main.py, backend/app/pit_repository.py
+- contract: move session, driver and reservation reads to a typed repository function; preserve SQL, ordering, 404 and response shapes
+- verify: focused pit strategy unit test; Ruff <=561 and mypy <=248
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-145 ✓ 2ff423e; fixture patches both main and future pit_repository SQL I/O boundaries, focused 1 passed, Ruff 561.
 - T-144 ✓ f8e7e93; per-driver policy moved to pure service, focused 2 passed, Ruff 561/mypy 248; full backend 118/0/0 and live acceptance passed.
 - T-143 ✓ c829c30; bounded pit Mongo reads moved to typed repository, focused 2 passed, Ruff 573/mypy 248.
 - T-142 ✓ efd0261; seeded historical pit-strategy read contract 1 passed, Ruff 573.
