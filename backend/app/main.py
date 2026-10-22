@@ -62,10 +62,12 @@ from .crud_repository import (
 )
 from .database import close_pool, connection, fetch_all, fetch_one, get_pool, open_pool
 from .demo_race_repository import (
+    DemoRaceDeleteConflict,
     DemoRaceSetupError,
     create_demo_race_records,
     get_demo_race_row,
     list_demo_race_ids,
+    validate_demo_race_delete,
 )
 from .demo_race_router import (
     DEFAULT_DEMO_RACE_CREATE,
@@ -875,34 +877,10 @@ async def delete_demo_race(session_id: UUID, user=Depends(roles("ADMIN", "STEWAR
         col = mongo_ready()
         if col is None:
             raise HTTPException(503, "MongoDB telemetry store is unavailable")
-        cur.execute("SELECT 1 FROM incident_reports i JOIN penalties p ON p.incident_id=i.id WHERE i.session_id=%s LIMIT 1", (session_id,))
-        if cur.fetchone():
-            raise HTTPException(409, "Demo race has official penalties and cannot be deleted")
-        cur.execute("""SELECT 1 FROM driver_standings st JOIN demo_race_entries de ON de.driver_id=st.driver_id
-            WHERE de.session_id=%s AND st.championship_id<>%s LIMIT 1""",
-            (session_id, marker["championship_id"]))
-        if cur.fetchone():
-            raise HTTPException(409, "Demo race drivers are referenced by another championship's standings")
-        cur.execute("SELECT 1 FROM race_sessions WHERE event_id=%s AND id<>%s LIMIT 1", (marker["event_id"],session_id))
-        if cur.fetchone():
-            raise HTTPException(409, "Demo race event is referenced by another session")
-        cur.execute("SELECT 1 FROM pit_reservations p JOIN pit_boxes b ON b.id=p.pit_box_id WHERE b.event_id=%s AND p.session_id<>%s LIMIT 1", (marker["event_id"],session_id))
-        if cur.fetchone():
-            raise HTTPException(409, "Demo race event has reservations for another session")
-        cur.execute("""SELECT 1 FROM demo_race_entries de WHERE de.session_id=%s AND (
-            EXISTS (SELECT 1 FROM session_results sr WHERE sr.driver_id=de.driver_id AND sr.session_id<>%s) OR
-            EXISTS (SELECT 1 FROM incident_reports ir WHERE ir.driver_id=de.driver_id AND ir.session_id<>%s) OR
-            EXISTS (SELECT 1 FROM demo_race_entries other WHERE other.driver_id=de.driver_id AND other.session_id<>%s)) LIMIT 1""", (session_id,session_id,session_id,session_id))
-        if cur.fetchone():
-            raise HTTPException(409, "Demo race drivers are referenced by another session")
-        cur.execute("""SELECT 1 FROM demo_race_entries de JOIN drivers d ON d.id=de.driver_id
-            LEFT JOIN team_memberships tm ON tm.driver_id=d.id
-            LEFT JOIN teams t ON t.principal_user_id=d.user_id
-            WHERE de.session_id=%s GROUP BY de.driver_id
-            HAVING count(DISTINCT tm.id)<>1 OR count(DISTINCT t.id)>0 LIMIT 1""", (session_id,))
-        # Keep generated drivers that gained additional team or principal references.
-        if cur.fetchone():
-            raise HTTPException(409, "Demo race drivers have additional team references")
+        try:
+            validate_demo_race_delete(cur, session_id, marker)
+        except DemoRaceDeleteConflict as exc:
+            raise HTTPException(409, str(exc)) from exc
         if sim:
             sim.status = "stopped"
             if sim.task and not sim.task.done():

@@ -1,0 +1,19 @@
+{
+  "task_id": "T-153",
+  "status": "PASSED",
+  "files_modified": [
+    {"path": "backend/app/main.py", "lines_added": 6, "lines_removed": 28},
+    {"path": "backend/app/demo_race_repository.py", "lines_added": 38, "lines_removed": 0}
+  ],
+  "diff_summary": "Moved generated-race DELETE reference checks to a typed repository helper using the caller's transaction cursor; unchanged conflict messages map at the route. Four focused checks passed on orchestrator rerun.",
+  "verification": {
+    "command": "DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k 'generated_demo_race_create_list_and_scoped_delete or generated_demo_race_persistence_contract or demo_delete_waits_for_simulator_and_validates_before_stopping'",
+    "exit_code": 0,
+    "tests_passed": 4,
+    "tests_failed": 0,
+    "duration_ms": 1283,
+    "typecheck_errors": 227,
+    "lint_warnings": 555
+  },
+  "unresolved_blockers": []
+}
