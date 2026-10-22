@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-22T20:52:21Z
+updated_at: 2026-10-22T20:54:39Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-153 — Extract generated-race DELETE preflight checks
-- worker: W2 | priority: P2 | after: T-152
+### T-154 — Extract generated-race DELETE SQL writes
+- worker: W2 | priority: P2 | after: T-153
 - target_files: backend/app/main.py, backend/app/demo_race_repository.py
-- contract: move DELETE reference/ownership SQL guards to a typed repository helper using the same transaction cursor; preserve lock, HTTP errors, simulator stop order and cleanup
-- verify: seeded lifecycle/persistence and delete-blocking tests; Ruff <=556, mypy <=227
+- contract: move post-simulator DELETE SQL, ID reads and standings recalculation into a typed repository helper on the caller's cursor; preserve statement order and Mongo cleanup
+- verify: seeded lifecycle/persistence and blocked-delete tests; Ruff <=555, mypy <=227
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-153 ✓ cfe68ef; typed same-cursor DELETE preflight, four focused contracts passed; Ruff 555/mypy 227.
 - T-152 ✓ df03eb2; POST moved to APIRouter, three focused checks passed; Ruff 556/mypy 227.
 - T-151 ✓ bf608f2; creation SQL transaction moved to typed repository; 2 seeded tests passed, Ruff 558/mypy 248; full backend 119/0/0 and live acceptance passed.
 - T-150 ✓ ed6bcaa; seeded persistence contract passed 1/1 on apexgrid-test after worker socket denial; Ruff 558.
@@ -24,7 +25,6 @@ loop_iteration: 1 of 5
 - T-146 ✓ 0385a6e; pit strategy SQL reads moved to typed repository; focused 1 passed, Ruff 561/mypy 248; full isolated backend 118/0/0 and live acceptance passed.
 - T-145 ✓ 2ff423e; fixture patches both main and future pit_repository SQL I/O boundaries, focused 1 passed, Ruff 561.
 - T-144 ✓ f8e7e93; per-driver policy moved to pure service, focused 2 passed, Ruff 561/mypy 248; full backend 118/0/0 and live acceptance passed.
-- T-143 ✓ c829c30; bounded pit Mongo reads moved to typed repository, focused 2 passed, Ruff 573/mypy 248.
 - T-141 ✓ a8e25cf; Telemetry validation test imports schema module, focused 1 passed; full isolated backend 117/0/0 and live acceptance passed.
 - T-140 ✓ 698dd2e; POST ingest moved to router, focused 2 passed, Ruff 573/mypy 248; full collection exposed stale test import.
 - T-139 ✓ 57b488b; ingest write I/O moved to typed repository, seeded 1 passed, Ruff 582/mypy 252.
