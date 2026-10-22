@@ -34,6 +34,7 @@ from psycopg.rows import dict_row, tuple_row
 from .config import APP_ENV, AUTO_DEMO_RACE, CORS_ORIGINS, JWT_ALGORITHM, JWT_MINUTES, JWT_SECRET, MONGODB_DATABASE, MONGODB_URL
 from .auth_cookie import create_csrf_token, set_auth_cookies, verify_csrf_token, clear_auth_cookies
 from .database import close_pool, connection, fetch_all, fetch_one, open_pool, pool
+from .simulation_core import calculate_sector_performance
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("apexgrid")
@@ -1499,16 +1500,11 @@ def advance_simulation_tick(sim: Simulation, timestamp: datetime, rng=None, safe
 
         number = int(driver.get("number") or 1)
         pace_offset = sim.pace_offsets_ms.get(driver_id, (number % 7 - 3) * 95)
-        base_sector_ms = (28600, 30200, 27800)[sector - 1] + int(pace_offset / 3)
-        jitter_limit = base_sector_ms * 0.025
-        sector_ms = int(max(base_sector_ms - jitter_limit,
-                            min(base_sector_ms + jitter_limit, rng.gauss(base_sector_ms, base_sector_ms * 0.009))))
         assignment = pit_assignments.get(driver_id)
         in_pit = (driver_id in pit_driver_ids) or bool(assignment and assignment["starts_at"] <= timestamp < assignment["ends_at"])
-        if safety_car:
-            sector_ms = int(sector_ms * 1.18)
-        elif in_pit:
-            sector_ms = int(sector_ms * 1.3)
+        sector_ms, throttle, brake, speed = calculate_sector_performance(
+            sector, pace_offset, safety_car, in_pit, rng
+        )
 
         splits = sim.sector_splits_by_driver.setdefault(driver_id, [])
         if advancing:
@@ -1523,19 +1519,6 @@ def advance_simulation_tick(sim: Simulation, timestamp: datetime, rng=None, safe
             sim.tire_age_by_driver[driver_id] = tire_age
             sim.tire_wear_by_driver[driver_id] = wear
 
-        if safety_car:
-            throttle = rng.uniform(28, 58)
-            brake = rng.uniform(14, 38)
-            speed = 95 + throttle * 0.75 - brake * 0.45
-        elif in_pit:
-            throttle = rng.uniform(18, 42)
-            brake = rng.uniform(12, 38)
-            speed = 58 + throttle * 0.7 - brake * 0.35
-        else:
-            throttle = rng.uniform(42, 100)
-            brake = rng.uniform(0, 34)
-            speed = 105 + throttle * 1.9 - brake * 1.15
-        speed = round(max(35, min(330, speed + rng.uniform(-7, 7))), 1)
         compound = sim.compound_by_driver.setdefault(driver_id, compounds[number % len(compounds)])
         lap_time_ms = sum(splits) if sector == 3 and advancing else None
         if lap_time_ms is not None:

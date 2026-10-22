@@ -1,0 +1,17 @@
+{
+  "task_id": "T-015",
+  "status": "PASSED",
+  "files_modified": [
+    {"path": "backend/app/main.py", "lines_added": 4, "lines_removed": 21},
+    {"path": "backend/app/simulation_core.py", "lines_added": 46, "lines_removed": 0}
+  ],
+  "diff_summary": "Extracted sector timing and speed/control calculations into a typed helper while preserving RNG draw order and simulation behavior.",
+  "verification": {
+    "command": ".venv/bin/pytest -q backend/tests/test_api.py -k simulation",
+    "exit_code": 0,
+    "tests_passed": 6,
+    "tests_failed": 0,
+    "duration_ms": 507
+  },
+  "unresolved_blockers": []
+}
