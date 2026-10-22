@@ -3,11 +3,6 @@ updated_at: 2026-10-22T12:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-081 — F-DOM-02 provisional results reproducer
-- worker: W3 | priority: P1 | after: T-080
-- target_files: backend/tests/test_database.py
-- contract: strict isolated DB/API xfail for seeded legacy time sanction flagging results and standings provisional
-- verify: DATABASE_URL=disposable .venv/bin/pytest -q backend/tests/test_database.py -k historical_penalty_provisional
 ### T-082 — F-DOM-02 provisional API metadata
 - worker: W2 | priority: P1 | after: T-081
 - target_files: backend/app/main.py
@@ -70,4 +65,5 @@ loop_iteration: 1 of 5
 - T-078 ✓ 67af5a5; Decision rejects ineffective sanctions; isolated backend 89/0/0 and live acceptance pass
 - T-079 ✓ 7659c61; two strict browser xfails on enabled steward time/grid controls
 - T-080 ✓ 9aa3424; disabled controls and accessible guidance; full browser 745/745 passes
+- T-081 ✓ d08b315; strict isolated legacy-sanction xfail reaches missing provisional API field
 - Earlier accepted tasks and evidence are in git history and LOOP.md.
