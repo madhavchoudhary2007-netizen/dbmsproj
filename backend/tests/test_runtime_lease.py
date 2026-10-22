@@ -1,3 +1,4 @@
+import asyncio
 import sys
 import time
 from pathlib import Path
@@ -10,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from backend.app import main as main_module
 from backend.app.main import app
+from backend.app.simulation_core import Simulation
 
 
 def test_runtime_lease_exclusive():
@@ -196,3 +198,42 @@ def test_idle_websocket_loss_unsubscribes_without_bus_events(monkeypatch):
             main_module.bus.unsubscribe(session_id, queue)
         for lease in captured_leases:
             lease.close()
+
+
+@pytest.mark.parametrize("status", ["paused", "running"])
+@pytest.mark.xfail(strict=True, reason="F-STRUCT-01: simulation loop must stop after lease loss")
+def test_simulation_lease_loss(monkeypatch, status):
+    from backend.app.runtime_lease import check_runtime_lease
+
+    session_id = uuid4()
+    sim = Simulation(session_id, [], 2.0, status=status)
+    owner = type("ClosedOwner", (), {"closed": True})()
+    state = app.state._state
+    had_lease = "runtime_lease" in state
+    previous_lease = state.get("runtime_lease")
+    calls = []
+
+    def record_fetch(*args, **kwargs):
+        calls.append((args, kwargs))
+        return None
+
+    try:
+        app.state.runtime_lease = owner
+        with pytest.raises(RuntimeError, match="closed"):
+            check_runtime_lease(owner)
+
+        with monkeypatch.context() as patch:
+            patch.setattr(main_module, "mongo_ready", lambda: object())
+            patch.setattr(main_module, "fetch_one", record_fetch)
+            try:
+                asyncio.run(asyncio.wait_for(main_module.simulation_loop(sim), timeout=0.5))
+            except TimeoutError:
+                pytest.fail("simulation loop did not stop within 0.5 seconds")
+
+        assert sim.status == "error"
+        assert calls == []
+    finally:
+        if had_lease:
+            app.state.runtime_lease = previous_lease
+        else:
+            state.pop("runtime_lease", None)
