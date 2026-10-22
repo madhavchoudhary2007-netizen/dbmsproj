@@ -38,3 +38,13 @@ def set_auth_cookies(response, token: str, csrf_token: str, *, secure: bool) -> 
     response.set_cookie(
         CSRF_COOKIE, csrf_token, httponly=False, secure=secure, samesite="lax", path="/"
     )
+
+
+def clear_auth_cookies(response, *, secure: bool) -> None:
+    """Expire both browser authentication cookies with their original flags."""
+    response.delete_cookie(
+        SESSION_COOKIE, httponly=True, secure=secure, samesite="lax", path="/"
+    )
+    response.delete_cookie(
+        CSRF_COOKIE, httponly=False, secure=secure, samesite="lax", path="/"
+    )

@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 from contextlib import asynccontextmanager
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
+import hmac
 import logging
 import re
 import random
@@ -31,7 +32,7 @@ from psycopg_pool import PoolClosed, PoolTimeout
 from psycopg.rows import dict_row, tuple_row
 
 from .config import APP_ENV, AUTO_DEMO_RACE, CORS_ORIGINS, JWT_ALGORITHM, JWT_MINUTES, JWT_SECRET, MONGODB_DATABASE, MONGODB_URL
-from .auth_cookie import create_csrf_token, set_auth_cookies
+from .auth_cookie import create_csrf_token, set_auth_cookies, verify_csrf_token, clear_auth_cookies
 from .database import close_pool, connection, fetch_all, fetch_one, open_pool, pool
 
 logging.basicConfig(level=logging.INFO)
@@ -154,8 +155,16 @@ def require_db():
         raise HTTPException(503, "PostgreSQL is unavailable")
 
 
+def require_allowed_origin(request: Request):
+    origin = request.headers.get("origin")
+    if origin is not None and origin not in CORS_ORIGINS:
+        raise HTTPException(403, "Origin not allowed")
+
+
 def current_user(request: Request, credentials: HTTPAuthorizationCredentials | None = Depends(bearer)):
-    token = credentials.credentials if credentials else request.cookies.get("apexgrid_session")
+    bearer_token = credentials.credentials if credentials else None
+    cookie_token = request.cookies.get("apexgrid_session")
+    token = bearer_token or cookie_token
     if not token:
         raise HTTPException(401, "Authentication required", headers={"WWW-Authenticate": "Bearer"})
     try:
@@ -163,6 +172,15 @@ def current_user(request: Request, credentials: HTTPAuthorizationCredentials | N
         user_id = claims.get("sub")
         if not user_id:
             raise ValueError()
+        if not bearer_token and cookie_token and request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+            require_allowed_origin(request)
+            csrf_cookie = request.cookies.get("apexgrid_csrf", "")
+            csrf_header = request.headers.get("x-csrf-token", "")
+            session_id = claims.get("jti", "")
+            if (not csrf_cookie or not csrf_header or not session_id
+                    or not hmac.compare_digest(csrf_cookie.encode("utf-8"), csrf_header.encode("utf-8"))
+                    or not verify_csrf_token(csrf_cookie, session_id, JWT_SECRET)):
+                raise HTTPException(403, "CSRF validation failed")
         user = fetch_one("SELECT id,email,full_name,role FROM users WHERE id=%s", (user_id,))
     except (jwt.exceptions.InvalidTokenError, ValueError):
         user = None
@@ -507,7 +525,8 @@ def update_membership(membership_id: UUID, body: MembershipPatch, user=Depends(r
 
 
 @app.post("/api/auth/login")
-def login(body: Login, response: Response):
+def login(body: Login, response: Response, request: Request):
+    require_allowed_origin(request)
     try:
         user = fetch_one("SELECT id,email,password_hash,full_name,role FROM users WHERE lower(email)=lower(%s)", (body.email,))
     except Exception:
@@ -533,6 +552,12 @@ def login(body: Login, response: Response):
 @app.get("/api/auth/me")
 def me(user=Depends(current_user)):
     return user
+
+
+@app.post("/api/auth/logout")
+def logout(response: Response, user=Depends(current_user)):
+    clear_auth_cookies(response, secure=APP_ENV != "local")
+    return {"detail": "Logged out"}
 
 
 @app.get("/api/users")
