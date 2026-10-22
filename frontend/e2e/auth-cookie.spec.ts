@@ -7,10 +7,8 @@ const user = {
   role: "admin",
 };
 const apiPattern = "http://localhost:8000/api/**";
-const xfail = !process.env.RUN_XFAIL;
 
 test("G11 cookie-only reload authenticates through /auth/me", async ({ page }) => {
-  test.fail(xfail, "G11");
   let meCookie: string | undefined;
   let meCalls = 0;
   await page.route(apiPattern, async (route) => {
@@ -42,7 +40,6 @@ test("G11 cookie-only reload authenticates through /auth/me", async ({ page }) =
 });
 
 test("G11 login keeps the session out of localStorage", async ({ page }) => {
-  test.fail(xfail, "G11");
   await page.route(apiPattern, async (route) => {
     const path = new URL(route.request().url()).pathname;
     if (path === "/api/auth/login") {

@@ -1,23 +1,23 @@
 # NEXT_STATE
-updated_at: 2026-10-21T18:48:00Z
+updated_at: 2026-10-22T12:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-054 — G11 frontend cookie API and auth provider
-- worker: W2 | priority: P0 | after: T-063
-- target_files: frontend/lib/api.ts, frontend/components/auth.tsx
-- contract: credentialed fetch with signed-CSRF cookie header; cookie-only /me, login and server logout; no localStorage token writes
-- verify: npm --prefix frontend run typecheck
+### T-066 — Migrate browser audit fixtures to cookie auth
+- worker: W3 | priority: P0 | after: T-054
+- target_files: frontend/e2e/responsive.spec.ts, frontend/e2e/accessibility.spec.ts, frontend/e2e/touch-targets.spec.ts
+- contract: mock signed-out /me for login, authenticated /me for other routes; stop seeding localStorage tokens
+- verify: PLAYWRIGHT_PORT=32173 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts e2e/responsive.spec.ts --grep E2E-R02 --project=desktop-1440
+### T-064 — G11 live WebSocket browser reproducer
+- worker: W3 | priority: P0 | after: T-066
+- target_files: frontend/e2e/live-cookie-ws.spec.ts
+- contract: strict expected-failure live route journey proves cookie WebSocket opens without a JWT subprotocol
+- verify: PLAYWRIGHT_PORT=32173 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts e2e/live-cookie-ws.spec.ts --project=desktop-1440
 ### T-055 — G11 live WebSocket cookie client
-- worker: W2 | priority: P0 | after: T-054
+- worker: W2 | priority: P0 | after: T-064
 - target_files: frontend/components/special-pages.tsx
 - contract: live WS connects by cookie without JWT subprotocol or localStorage token gate
 - verify: npm --prefix frontend run typecheck
-### T-059 — Phase 1 A/C/E backend audit
-- worker: W3 | priority: P1 | origin: Phase 1
-- target_files: .agent/audit/phase1-ace.md
-- contract: evidence-based authorization, SQL, transaction, validation, rate-limit and WS findings
-- verify: test -s .agent/audit/phase1-ace.md
 ### T-015 — G13 simulation boundary extraction
 - worker: W2 | priority: P1 | after: T-012
 - target_files: backend/app/main.py, backend/app/simulation_core.py
@@ -39,7 +39,7 @@ loop_iteration: 1 of 5
 - contract: compare host/container Node and Python; run container gates
 - verify: bash scripts/eval/runtime-parity.sh
 ## Blocked
-- Browser matrix passed 715/715 across five Chromium projects; backend runtime audit clean. Frontend dev dependency audit and quality debt remain.
+- Historical browser matrix passed 715/715 before cookie migration; current full run stopped at 10 stale responsive login fixtures after 269 passes. Backend runtime audit clean. Frontend dev dependency audit and quality debt remain.
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
 - T-019: frontend runner lacks source; test in builder stage.
@@ -57,4 +57,5 @@ loop_iteration: 1 of 5
 - T-061 ✓ a47d81a; three test E501 signatures wrapped; runtime ratchet repair T-062 next
 - T-062 ✓ a3d3322; G11 runtime formatting reduced Ruff count to 633; focused 12 tests pass
 - T-063 ✓ d2e22b3; two browser cookie-auth defects reproduced with RUN_XFAIL=1
+- T-054 ✓ a11619b; focused cookie browser journeys and typecheck pass; broad browser suite exposed stale login fixtures
 - Earlier accepted tasks and evidence are in git history and LOOP.md.
