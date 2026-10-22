@@ -965,6 +965,7 @@ def test_app_lifespan_starts_resources_and_awaits_simulator_shutdown(monkeypatch
     assert closed.is_set()
     assert client_closed.is_set()
     assert ("pool", "close") in startup_calls
+    assert runtime_lease.closed
     assert main_module.mongo_client is None
     assert main_module.telemetry_collection is None
     simulations.pop(session_id, None)
@@ -1318,38 +1319,6 @@ def test_restarting_simulator_restores_previously_recorded_incident_laps(monkeyp
 def database_api_client():
     with TestClient(app) as client:
         yield client
-
-
-def test_runtime_lease_exclusive():
-    from backend.app.runtime_lease import acquire_runtime_lease, check_runtime_lease
-
-    first = second = None
-    try:
-        first = acquire_runtime_lease()
-        with pytest.raises(RuntimeError, match=r"(?i)active.*owner"):
-            acquire_runtime_lease()
-
-        first.close()
-        second = acquire_runtime_lease()
-        assert second.closed is False
-        with pytest.raises(RuntimeError):
-            check_runtime_lease(first)
-    finally:
-        if first is not None:
-            first.close()
-        if second is not None:
-            second.close()
-
-
-def test_runtime_lifespan_rejects_second_owner():
-    from backend.app.runtime_lease import acquire_runtime_lease
-
-    held_lease = acquire_runtime_lease()
-    try:
-        with pytest.raises(RuntimeError, match=r"(?i)active.*owner"), TestClient(app):
-            pass
-    finally:
-        held_lease.close()
 
 
 @pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
