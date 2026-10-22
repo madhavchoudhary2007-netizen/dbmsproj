@@ -21,12 +21,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from backend.app import main as main_module
 from backend.app.main import (
     AutoReservationIn, EventBus, ReservationIn, ReservationStatus, ResultIn,
-    Simulation, Telemetry, advance_simulation_tick, app, choose_demo_car_numbers,
+    Simulation, advance_simulation_tick, app, choose_demo_car_numbers,
     pit_strategy, restore_simulated_incidents, save_results, simulations,
     sync_simulation_lifecycle, telemetry_ws_payload, update_pit_reservation,
     validate_session_laps, websocket_bearer,
 )
 from backend.app.race_archive import seed_historical_laps
+from backend.app.schemas_telemetry import Telemetry
 
 
 def packet(**overrides):
