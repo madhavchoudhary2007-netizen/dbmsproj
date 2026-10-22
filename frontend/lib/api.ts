@@ -11,9 +11,7 @@ export type User = {
 export type Row = Record<string, unknown> & { id?: string };
 
 export function getToken() {
-  return typeof window === "undefined"
-    ? null
-    : localStorage.getItem("apexgrid_token");
+  return null;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -63,11 +61,18 @@ export async function api<T = any>(
   const headers = new Headers(options.headers);
   if (!(options.body instanceof FormData) && options.body)
     headers.set("Content-Type", "application/json");
-  const token = getToken();
-  if (token) headers.set("Authorization", `Bearer ${token}`);
+  const method = (options.method ?? "GET").toUpperCase();
+  if (["POST", "PUT", "PATCH", "DELETE"].includes(method) && typeof document !== "undefined") {
+    const csrfCookie = document.cookie
+      .split(";")
+      .map((cookie) => cookie.trim())
+      .find((cookie) => cookie.startsWith("apexgrid_csrf="))
+      ?.slice("apexgrid_csrf=".length);
+    if (csrfCookie !== undefined) headers.set("X-CSRF-Token", csrfCookie);
+  }
   const response = await fetch(
     `${API_ROOT}${path.startsWith("/") ? path : `/${path}`}`,
-    { ...options, headers, cache: "no-store" },
+    { ...options, headers, credentials: "include", cache: "no-store" },
   );
   if (!response.ok) {
     const status = `${response.status}${response.statusText ? ` ${response.statusText}` : ""}`;

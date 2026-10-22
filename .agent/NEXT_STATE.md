@@ -3,11 +3,16 @@ updated_at: 2026-10-21T18:48:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-063 — G11 browser auth reproductions
-- worker: W3 | priority: P0 | after: T-053
-- target_files: frontend/e2e/auth-cookie.spec.ts
-- contract: strict expected-failure browser journeys for cookie-only startup and login without localStorage bearer token
-- verify: PLAYWRIGHT_PORT=32173 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts e2e/auth-cookie.spec.ts --project=desktop-1440
+### T-054 — G11 frontend cookie API and auth provider
+- worker: W2 | priority: P0 | after: T-063
+- target_files: frontend/lib/api.ts, frontend/components/auth.tsx
+- contract: credentialed fetch with signed-CSRF cookie header; cookie-only /me, login and server logout; no localStorage token writes
+- verify: npm --prefix frontend run typecheck
+### T-055 — G11 live WebSocket cookie client
+- worker: W2 | priority: P0 | after: T-054
+- target_files: frontend/components/special-pages.tsx
+- contract: live WS connects by cookie without JWT subprotocol or localStorage token gate
+- verify: npm --prefix frontend run typecheck
 ### T-059 — Phase 1 A/C/E backend audit
 - worker: W3 | priority: P1 | origin: Phase 1
 - target_files: .agent/audit/phase1-ace.md
@@ -51,4 +56,5 @@ loop_iteration: 1 of 5
 - T-053 ✓ 7b63377; WS cookie/Origin and legacy auth tests pass; all G11 markers retired, isolated suite 80 passed/0 skipped/0 xfailed
 - T-061 ✓ a47d81a; three test E501 signatures wrapped; runtime ratchet repair T-062 next
 - T-062 ✓ a3d3322; G11 runtime formatting reduced Ruff count to 633; focused 12 tests pass
+- T-063 ✓ d2e22b3; two browser cookie-auth defects reproduced with RUN_XFAIL=1
 - Earlier accepted tasks and evidence are in git history and LOOP.md.
