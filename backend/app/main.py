@@ -7,6 +7,7 @@ import random
 import secrets
 import threading
 import time
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeout
 from contextlib import asynccontextmanager
@@ -66,7 +67,11 @@ from .demo_race_repository import (
     get_demo_race_row,
     list_demo_race_ids,
 )
-from .demo_race_router import create_demo_race_router
+from .demo_race_router import (
+    DEFAULT_DEMO_RACE_CREATE,
+    create_demo_race_router,
+    run_demo_race_create,
+)
 from .pit_repository import PIT_RESERVATION_SELECT, load_pit_strategy_rows, load_pit_telemetry
 from .pit_router import create_pit_router
 from .pit_strategy_router import create_pit_strategy_router
@@ -267,8 +272,8 @@ def current_user(
     return jsonable(user)
 
 
-def roles(*allowed):
-    def check(user=Depends(current_user)):
+def roles(*allowed: str) -> Callable[..., Any]:
+    def check(user: Any = Depends(current_user)) -> Any:
         if user["role"] not in allowed:
             raise HTTPException(403, "Insufficient role")
         return user
@@ -746,9 +751,6 @@ def list_demo_races(limit: int = Query(50, ge=1, le=200), offset: int = Query(0,
     return [demo_race_row(row["session_id"]) for row in ids]
 
 
-app.include_router(create_demo_race_router(current_user, demo_race_row, list_demo_race_ids))
-
-
 def choose_demo_car_numbers(car_count: int) -> list[int]:
     # Numbers are unique in this grid; historical drivers may reuse them.
     return random.sample(range(11, 100), car_count)
@@ -782,6 +784,16 @@ def launch_demo_simulation(session_id: UUID | str):
     sim = simulations[str(session_id)]
     sim.status = "running"
     sim.task = asyncio.create_task(simulation_loop(sim))
+
+
+app.include_router(create_demo_race_router(
+    current_user,
+    roles("ADMIN", "STEWARD"),
+    demo_race_row,
+    list_demo_race_ids,
+    _make_demo_race,
+    launch_demo_simulation,
+))
 
 
 def restore_simulation_from_telemetry(sim: "Simulation"):
@@ -842,11 +854,13 @@ async def resume_or_create_auto_demo_race(create_if_missing: bool = True):
     launch_demo_simulation(race["session_id"])
 
 
-@app.post("/api/demo-races", status_code=201)
-async def create_demo_race(body: DemoRaceCreate = DemoRaceCreate(), user=Depends(roles("ADMIN", "STEWARD"))):
-    race = await asyncio.to_thread(_make_demo_race, body.cars)
-    launch_demo_simulation(race["session_id"])
-    return demo_race_row(race["session_id"])
+async def create_demo_race(
+    body: DemoRaceCreate = DEFAULT_DEMO_RACE_CREATE,
+    user: Any = Depends(roles("ADMIN", "STEWARD")),
+) -> Any:
+    return await run_demo_race_create(
+        body, _make_demo_race, launch_demo_simulation, demo_race_row
+    )
 
 
 @app.delete("/api/demo-races/{session_id}", status_code=204)
