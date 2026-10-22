@@ -8,6 +8,11 @@ loop_iteration: 1 of 5
 - target_files: backend/migrations/002_classified_bonus.sql, backend/app/bootstrap.py
 - contract: additive function replacement gates bonuses by classification; bootstrap applies numbered migrations safely
 - verify: focused T-073 --runxfail and isolated backend gate
+### T-075 — F-DOM-03 classification gap reproducer
+- worker: W3 | priority: P1 | after: T-072
+- target_files: backend/tests/test_api.py
+- contract: strict xfail proves a completed session accepts a classified result at position 2 without position 1
+- verify: .venv/bin/pytest -q backend/tests/test_api.py -k completed_results_require_contiguous_classification
 ### T-015 — G13 simulation boundary extraction
 - worker: W2 | priority: P1 | after: T-012
 - target_files: backend/app/main.py, backend/app/simulation_core.py

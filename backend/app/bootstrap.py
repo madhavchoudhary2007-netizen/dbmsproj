@@ -9,12 +9,16 @@ from .race_archive import seed_historical_laps
 
 def main():
     root = Path(__file__).resolve().parents[1]
-    migration = root / "migrations" / "001_initial.sql"
+    migrations_dir = root / "migrations"
+    if not migrations_dir.is_dir():
+        raise SystemExit(f"Required migrations directory missing: {migrations_dir}")
+    migrations = sorted(migrations_dir.glob("[0-9]*.sql"))
+    if not migrations:
+        raise SystemExit(f"No numbered SQL migrations found in: {migrations_dir}")
     seed = root / "db" / "seed.sql"
-    if not migration.exists():
-        raise SystemExit(f"Required migration missing: {migration}")
     with psycopg.connect(DATABASE_URL, autocommit=True) as conn:
-        conn.execute(migration.read_text())
+        for migration in migrations:
+            conn.execute(migration.read_text())
         if SEED_DEMO_DATA and seed.exists():
             conn.execute(seed.read_text())
     if SEED_DEMO_DATA and APP_ENV == "local":
