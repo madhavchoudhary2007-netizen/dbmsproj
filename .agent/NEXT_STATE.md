@@ -1,15 +1,15 @@
 # NEXT_STATE
-updated_at: 2026-10-21T18:43:00Z
+updated_at: 2026-10-21T18:48:00Z
 loop_iteration: 1 of 5
 
-## Queue (top-down; no worker dispatched; <=3 target files and <=150 changed lines per task)
-### T-051 — G11 login session cookies and cookie-authenticated reads
-- worker: W2 | priority: P0 | origin: ADR-002/T-050
-- target_files: backend/app/main.py, backend/app/auth_cookie.py
-- contract: signed session-bound CSRF cookie; secure host-only cookie flags; login retains legacy bearer JSON temporarily; /me accepts session cookie; bearer remains compatible
-- verify: .venv/bin/pytest -q backend/tests/test_api.py --runxfail -k 'cookie_auth_login_sets or cookie_auth_me_uses'
+## Queue (top-down; <=3 target files and <=150 changed lines per task)
+### T-060 — G11 protected-write and Origin reproductions
+- worker: W3 | priority: P0 | after: T-051
+- target_files: backend/tests/test_api.py
+- contract: strict xfails for missing protected-write CSRF, forged cookie/header signature, and disallowed login Origin
+- verify: .venv/bin/pytest -q backend/tests/test_api.py -k cookie_auth_guard
 ### T-052 — G11 CSRF on cookie-authenticated writes and logout
-- worker: W2 | priority: P0 | after: T-051
+- worker: W2 | priority: P0 | after: T-060
 - target_files: backend/app/main.py, backend/app/auth_cookie.py
 - contract: every unsafe cookie-authenticated HTTP request verifies signed CSRF and allowed Origin; logout clears cookies; bearer-only legacy writes continue
 - verify: .venv/bin/pytest -q backend/tests/test_api.py --runxfail -k 'cookie_auth_logout'
@@ -54,27 +54,5 @@ loop_iteration: 1 of 5
 - T-057 ✓ 6a80027; JUnit gate allows xfails, rejects skips/failures/malformed reports; 5 synthetic checks
 - T-058 ✓ fb3da98; CI runs deployment-secret gate and fails unreachable audit
 - T-050 ✓ cf80374; 8 strict cookie/CSRF xfails reproduced, Ruff 639
-- T-013 ✓ 98fbd3e; secret gate 5/5, no output secret
-- T-012 ✓ d2d1c35; simulation 0/1 lap, fixed seed, stop cleanup; 6 focused tests, Ruff 639
-- T-049 ✓ 2baa5cd; search input touch size fixed, mobile all routes 15/15 and full browser 715/715
-- T-016 ✓ 8f47108; CI/full gates accepted, baseline 5 reds remain after browser/backend security fixes
-- T-048 ✓ 1d9c061; all-route touch audit found six filter inputs at 16.5px high
-- T-047 ✓ 139e92f; dev-toolbar false positive excluded; full browser suite 645/645
-- T-009 ✓ 8da6ff7; shared controls >=44px in enabled mobile browser check and production build
-- T-046 ✓ fe207ca; RUN_XFAIL=1 reproduced 51 undersized targets across four routes
-- T-045 ✓ 33f09ff; PyJWT replacement and 8 focused checks, backend audit green, isolated DB 65/0/0 + live acceptance
-- T-044 ✓ 5a80981; security invariant xfails normally and fails with --runxfail
-- T-043 ✓ 8ee4cbb; 7 auth characterization tests, Ruff ratchet 641→639
-- T-042 ✓ 0d020d0; all browser E2E projects now pass 640/640
-- T-041 ✓ 7f59af7; root/login/mobile fixture fixed, 96/96 desktop-project responsive cases passed
-- T-040 ✓ d6e328e; desktop accessibility sweep 16/16
-- T-036 ✓ 6fb9ba0; bounded 96-case/project responsive matrix, fixture follow-up required
-- T-038 ✓ 4ee604b; contrast regression confirmed with RUN_XFAIL=1
-- T-039 ✓ c52d74e; login contrast 6.44:1, build and login axe pass
-- T-035 ✓ 45bab00; login keyboard assertion passes; axe contrast finding remains
-- T-002 ✓ c6921bd; isolated stack 57 pass/0 skip and live acceptance passed
-- T-037 ✓ 70fc6b5; isolated Compose stack accepted
-- T-033 ✓ bounded keyboard Tab focus audit; second browser rerun pending
-- T-032 ✓ remaining table/strategy status roles
-- T-008 ✓ offline responsive test; browser timeout needs triage
-- Earlier accepted tasks are in git history (T-001/003/004/005/007/010/011/025).
+- T-051 ✓ 9aa67ed; session/CSRF cookies and cookie /me, 3 --runxfail checks
+- Earlier accepted tasks and evidence are in git history and LOOP.md.

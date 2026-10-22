@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-21T18:40:00Z
-git_head: 1c64bc1
+git_head: 9aa67ed
 branch: perfection-loop
 architect_sha256: 8753bfed50769fe28099f5f400bf3f7a42223fc98bebddda0db16eb7d0ece31b
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -25,7 +25,7 @@ last_eval_score: NOT_RUN (quality gates and journey coverage remain open)
 - Frontend dev-tool advisories need a safe upgrade path; `npm audit fix --dry-run` offers only in-range `eslint-config-next` and selector-parser updates, and Tailwind 4 is major.
 - Runtime parity, permissions matrix, simulator invariants, role journeys, full evaluation score, and docs audit remain open. `NEXT_STATE.md` is the queue.
 - T-012 simulation boundaries passed 6 focused tests with Ruff steady at 639; T-013 deployment-secret gate passed 5 subprocess cases. ADR-002 plans browser cookie/CSRF migration; architecture relocked at 8753bfed after focused five-lens review, implementation unstarted.
-- Phase 0 complete; 16-route browser smoke, isolated database and live acceptance, characterization tests, quality metrics, CI gates and deployment-secret regression are in place. T-050's eight strict cookie/CSRF xfails reproduce with --runxfail; coverage overall 72%, main 72%, database 100%, config 88%, race_archive 97%, bootstrap 0%. T-057's JUnit gate passes the disposable-stack rerun; T-058 includes secret regression and CI audit reachability.
+- Phase 0 complete; 16-route browser smoke, isolated database and live acceptance, characterization tests, quality metrics, CI gates and deployment-secret regression are in place. T-050's eight strict cookie/CSRF xfails reproduce with --runxfail; coverage overall 72%, main 72%, database 100%, config 88%, race_archive 97%, bootstrap 0%. T-051 added session/CSRF cookies and cookie /me; legacy bearer JSON remains until coordinated frontend migration.
 
 ## Orchestrator direct edits and Taste review
 - Product source: one `frontend/package.json` build-script line switched Next build to webpack due Turbopack bind failure (logged at e854d9b). No other product-source edits.
