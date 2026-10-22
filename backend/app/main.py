@@ -60,6 +60,7 @@ from .crud_repository import (
     update_crud_row,
 )
 from .database import close_pool, connection, fetch_all, fetch_one, get_pool, open_pool
+from .demo_race_repository import get_demo_race_row, list_demo_race_ids
 from .pit_repository import PIT_RESERVATION_SELECT, load_pit_strategy_rows, load_pit_telemetry
 from .pit_router import create_pit_router
 from .pit_strategy_router import create_pit_strategy_router
@@ -725,10 +726,7 @@ app.include_router(pit_strategy_router)
 
 
 def demo_race_row(session_id: UUID | str):
-    row = fetch_one("""SELECT s.id AS session_id,e.id AS event_id,e.name AS event_name,c.name AS circuit_name,
-        s.state,s.total_laps,(SELECT count(*) FROM demo_race_entries de WHERE de.session_id=s.id)::int AS car_count,
-        d.created_at FROM demo_races d JOIN race_sessions s ON s.id=d.session_id
-        JOIN race_events e ON e.id=d.event_id JOIN circuits c ON c.id=e.circuit_id WHERE s.id=%s""", (session_id,))
+    row = get_demo_race_row(session_id)
     if not row:
         return None
     result = jsonable(row)
@@ -739,7 +737,7 @@ def demo_race_row(session_id: UUID | str):
 
 @app.get("/api/demo-races")
 def list_demo_races(limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0), user=Depends(current_user)):
-    ids = fetch_all("SELECT session_id FROM demo_races ORDER BY created_at DESC LIMIT %s OFFSET %s", (limit, offset))
+    ids = list_demo_race_ids(limit, offset)
     return [demo_race_row(row["session_id"]) for row in ids]
 
 
