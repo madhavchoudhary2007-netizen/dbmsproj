@@ -3,11 +3,11 @@ updated_at: 2026-10-22T12:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-067 — G11 browser login JSON reproducer
-- worker: W3 | priority: P0 | after: T-055
-- target_files: backend/tests/test_api.py
-- contract: strict xfail: allowed-Origin browser login receives user only, never bearer token; no-Origin legacy login still returns token
-- verify: .venv/bin/pytest -q backend/tests/test_api.py -k cookie_auth_browser_shape
+### T-068 — G11 browser login JSON user-only
+- worker: W2 | priority: P0 | after: T-067
+- target_files: backend/app/main.py
+- contract: allowed-Origin login JSON is exactly {user}; no-Origin legacy login still returns access_token; cookies for both
+- verify: .venv/bin/pytest -q backend/tests/test_api.py --runxfail -k cookie_auth_browser_shape
 ### T-015 — G13 simulation boundary extraction
 - worker: W2 | priority: P1 | after: T-012
 - target_files: backend/app/main.py, backend/app/simulation_core.py
@@ -51,4 +51,5 @@ loop_iteration: 1 of 5
 - T-066 ✓ 724e732; fixtures migrated, full Playwright matrix 725 passed with exit 0
 - T-064 ✓ cc828eb and fixture correction 846c380; corrected test failed old client/passed new
 - T-055 ✓ f09d80f; cookie-only live WS; full Playwright matrix 730 passed with exit 0
+- T-067 ✓ a103d2f; browser login JSON token leak reproduced, no-Origin legacy login pinned
 - Earlier accepted tasks and evidence are in git history and LOOP.md.

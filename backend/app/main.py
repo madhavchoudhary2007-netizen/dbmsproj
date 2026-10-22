@@ -574,12 +574,15 @@ def login(body: Login, response: Response, request: Request):
     )
     csrf_token = create_csrf_token(session_id, JWT_SECRET)
     set_auth_cookies(response, token, csrf_token, secure=APP_ENV != "local")
+    user_data = jsonable(
+        {key: user[key] for key in ("id", "email", "full_name", "role")}
+    )
+    if request.headers.get("origin"):
+        return {"user": user_data}
     return {
         "access_token": token,
         "token_type": "bearer",
-        "user": jsonable(
-            {key: user[key] for key in ("id", "email", "full_name", "role")}
-        ),
+        "user": user_data,
     }
 
 
