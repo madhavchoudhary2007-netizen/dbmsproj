@@ -21,7 +21,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import { api, asArray, listAll, Row, pretty, API_BASE, getToken } from "@/lib/api";
+import { api, asArray, listAll, Row, pretty, API_BASE } from "@/lib/api";
 import {
   AddButton,
   Button,
@@ -972,15 +972,7 @@ export function LiveTiming() {
     const connect = () => {
       if (!alive) return;
       const wsBase = API_BASE.replace(/^http/, "ws");
-      const token = getToken();
-      if (!token) {
-        setStatus("Sign in to connect");
-        return;
-      }
-      ws = new WebSocket(`${wsBase}/api/ws/sessions/${session}`, [
-        "apexgrid.jwt",
-        token,
-      ]);
+      ws = new WebSocket(`${wsBase}/api/ws/sessions/${session}`);
       ws.onopen = () => {
         if (!alive) return;
         attempt = 0;
