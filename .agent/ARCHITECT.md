@@ -1,7 +1,7 @@
 <!-- LOCK:BEGIN -->
 > STATUS: LOCKED
-> SHA256: 3a1222665ebf8483e8be75e745c319df3e15a1034382d662687e309e9b417d7a
-> LOCKED_AT: 2026-10-22T03:43:55Z
+> SHA256: c9780b9cd1ffe91fcb0fbf369b4b136205eb5c1ffb82e8cf199e42cca18c69c5
+> LOCKED_AT: 2026-10-22T09:33:56Z
 > LOCKED_BY: orchestrator
 <!-- LOCK:END -->
 # ApexGrid architecture — existing system, improvement in place
@@ -136,7 +136,7 @@ PostgreSQL's 17 existing tables are `users`, `teams`, `drivers`, `team_membershi
 |---|---|---|
 | Login | anonymous -> authenticating -> authenticated or error; authenticated -> refreshing/me -> authenticated or anonymous; authenticated -> signed out | `auth/login`, `auth/me`; JWT role checked server-side; localStorage token is current risk. ADR-002 specifies the planned HttpOnly session cookie, signed CSRF cookie/header, credentialed fetch, explicit logout and cookie-authenticated WebSocket; implementation remains pending. |
 | Session | SCHEDULED -> ACTIVE or CANCELLED; ACTIVE <-> PAUSED; ACTIVE/PAUSED -> COMPLETED/CANCELLED/SCHEDULED(reset); COMPLETED/CANCELLED -> SCHEDULED(reset) where API permits | PostgreSQL trigger and timestamp checks; `POST /sessions/{id}/action`; lap 0..72 |
-| Simulation | absent -> running <-> paused -> stopped; stopped/reset -> running after clean start; generated completion -> archived + optionally new auto race | in-memory `simulations`, SQL session and Mongo telemetry; restore from stored packets on restart |
+| Simulation | absent -> running <-> paused -> stopped; stopped/reset -> running after clean start; generated completion -> archived + optionally new auto race | in-memory `simulations`, SQL session and Mongo telemetry; restore from stored packets on restart. ADR-004 requires one active backend process per PostgreSQL database, enforced by a lifespan advisory lock; lock loss fails closed. |
 | Pit reservation | requested -> locked/allocation -> RESERVED or conflict/no-box error; RESERVED -> COMPLETED/CANCELLED; terminal states cannot reopen | SQL row lock, exclusion/unique constraints; auto chooses earliest free event box/window; Mongo/WS reflect assigned driver |
 | Telemetry | produced -> Pydantic validated -> Mongo persisted -> WS published -> client snapshot/stream; WS disconnect -> reconnect + snapshot | reject invalid lap/driver/session; SQL and Mongo may be briefly out of sync, show partial state |
 | Incident/standing | OPEN -> APPROVED or REJECTED; approval -> immutable penalty/points/eligibility; completed result -> recalculated standings | SQL transaction/trigger and explicit-cursor routine; repeat decision must be rejected. ADR-003 rejects new unsupported time/grid sanctions before state transition and labels historical affected outputs provisional. |
@@ -169,6 +169,8 @@ Columns mean 375px / 768px / 1440px. The first item is content priority; the lis
 1. Admin creates a generated race -> API transaction creates event/session/entries/boxes -> simulator advances each driver's sector and lap -> Mongo stores packet -> WS/live UI updates -> auto pit/incident records persist in SQL -> session finishes -> results and lap archive remain selectable in DBMS. Verify E2E-R04/R07/R16 and API-04/06/07/08/10.
 2. Steward selects incident -> decision writes official penalty once -> SQL trigger updates seasonal points and eligibility -> standings recalculate from classified results -> Steward/Standings/DBMS display one consistent record. Verify E2E-R06/R11/R16 and API-03/05/12.
 3. Admin opens DBMS -> authenticated SQL/Mongo metadata and race archive queries -> selector and polling update while live -> completed archive freezes final records -> explicit demonstrations return actual DB outcomes with cleanup. Verify E2E-R16 and API-10/11/12.
+
+The live simulator and WebSocket event bus are process-local. ADR-004 keeps a single process until shared simulator leadership and fan-out exist; a second backend process must fail startup instead of serving a divergent live view.
 
 ### B.7 Performance targets (unverified)
 
@@ -243,6 +245,7 @@ Lens 5 boundary matrix: 0/1/72/73 laps and sector three boundary (API-04); dupli
 - R03: ADR-002 specifies cookie/CSRF auth transport, credentialed CORS, local HTTP exception, and legacy bearer compatibility. Implementation and proof remain open; the current API and local demo must keep working until the migration is accepted.
 - R04: Large mixed UI/API files make the strict W1/W2 packet boundaries costly. Extract in small behavior-preserving steps with one focused verify each.
 - R05: Runtime and Compose availability differ from historical verification. Any result measured on host Python 3.14/Node 26 needs container parity before final evaluation.
+- R06: Process-local simulator and EventBus cannot serve concurrent backend processes coherently. ADR-004's PostgreSQL advisory lock and lock-loss fail-closed path require isolated acceptance and documentation before Phase 2 closes.
 
 ## ADR-002 focused Phase C: auth transport
 
@@ -251,3 +254,7 @@ Pass 1 checked the affected A.2 login/live and API-01/07 paths. Lens 1 traced an
 ## ADR-003 focused Phase C: ineffective sanctions
 
 Pass 1, Lens 1 traced steward decision -> penalty record -> official result/standings and found no race elapsed or starting-grid data to apply time/grid sanctions; ADR-003 keeps those fields and historical rows while rejecting new ineffective values. Lens 2 assigns binary rejection/no-write, points-only compatibility, provisional historical display, browser and isolated acceptance checks to Phase 1 packets. Lens 3 keeps the current steward interface and adds an explanation instead of a new dependency or screen. Lens 4 forbids using best-lap time as race elapsed and requires the full enforcement change proposal to define timing, grid order and data migration. Lens 5 covers positive/zero time/grid values, rejected decisions, seeded legacy five-second sanction and duplicate decisions. Pass 2 found no further amendment. API-05 and E2E-R06/R11 remain open until the tests and affected screens pass.
+
+## ADR-004 focused Phase C: one process for live race state
+
+Pass 1, Lens 1 traced live creation/control, telemetry fan-out and reconnect across API-04/07/08 and found that process-local simulations and subscribers would diverge under two backend processes; one database-wide owner is required. Lens 2 assigns a binary dual-owner/release/lost-connection test on apexgrid-test, plus a full backend and live acceptance rerun. Lens 3 adds no dependency or new service; the guard is small and directly protects the existing capability. Lens 4 uses a PostgreSQL session advisory lock held across the FastAPI lifespan, acquired before restoring simulations and checked while serving; ownership loss fails closed. Lens 5 covers second-process startup refusal, normal release/reacquire, database disconnect and process restart. Pass 2 found zero further architecture amendments. The guard and docs are pending tasks, not passing claims.
