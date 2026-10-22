@@ -32,8 +32,13 @@ from psycopg.rows import dict_row, tuple_row
 
 from .config import APP_ENV, AUTO_DEMO_RACE, CORS_ORIGINS, JWT_ALGORITHM, JWT_MINUTES, JWT_SECRET, MONGODB_DATABASE, MONGODB_URL
 from .auth_cookie import create_csrf_token, set_auth_cookies, verify_csrf_token, clear_auth_cookies
+from .crud_repository import (
+    create_crud_row,
+    get_crud_row,
+    list_crud_rows,
+    update_crud_row,
+)
 from .database import close_pool, connection, fetch_all, fetch_one, open_pool, pool
-from .crud_repository import get_crud_row, list_crud_rows
 from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
 
 logging.basicConfig(level=logging.INFO)
@@ -419,13 +424,7 @@ def crud_routes(resource: str, table: str, cols: tuple[str, ...], joins: str = "
         if not clean:
             raise HTTPException(422, "At least one writable field is required")
         validate_session_laps(table, clean)
-        keys = list(clean)
-        sql = f"INSERT INTO {table} ({','.join(keys)}) VALUES ({','.join(['%s']*len(keys))}) RETURNING *"
-        with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-            cur.execute(sql, [clean[k] for k in keys])
-            row = cur.fetchone()
-            if table == "race_events":
-                cur.execute("INSERT INTO pit_boxes(event_id,number) SELECT %s,n FROM generate_series(1,4) AS n ON CONFLICT(event_id,number) DO NOTHING", (row["id"],))
+        row = create_crud_row(table, clean)
         return jsonable(row)
 
     @app.patch(prefix + "/{item_id}")
@@ -440,11 +439,7 @@ def crud_routes(resource: str, table: str, cols: tuple[str, ...], joins: str = "
                 raise HTTPException(404, "Session not found")
             if existing["state"] != "SCHEDULED" and set(clean) & {"event_id", "session_type", "scheduled_at", "total_laps"}:
                 raise HTTPException(409, "Session context and lap count cannot change after a session starts")
-        keys = list(clean)
-        sql = f"UPDATE {table} SET " + ",".join(f"{k}=%s" for k in keys) + " WHERE id=%s RETURNING *"
-        with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-            cur.execute(sql, [clean[k] for k in keys] + [item_id])
-            row = cur.fetchone()
+        row = update_crud_row(table, item_id, clean)
         if not row:
             raise HTTPException(404, f"{resource[:-1].capitalize()} not found")
         return jsonable(row)
