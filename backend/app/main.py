@@ -69,6 +69,7 @@ from .schemas_operations import Action, AutoReservationIn, Decision, IncidentIn,
 from .schemas_simulation import DemoRaceCreate, SimulationControl
 from .schemas_telemetry import Telemetry
 from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
+from .telemetry_repository import TelemetryIngestError, insert_telemetry
 from .telemetry_router import create_telemetry_router
 from .user_router import create_user_router
 
@@ -696,20 +697,20 @@ def mongo_ready():
 @app.post("/api/telemetry/ingest", status_code=202)
 def ingest(packet: Telemetry, user=Depends(roles("ADMIN", "STEWARD"))):
     col=mongo_ready(); doc=packet.model_dump(mode="json"); doc["session_id"]=str(packet.session_id); doc["driver_id"]=str(packet.driver_id); doc["ts"]=packet.ts
-    with connection() as conn, conn.cursor() as cur:
-        cur.execute("SELECT state FROM race_sessions WHERE id=%s FOR SHARE", (packet.session_id,))
-        session = cur.fetchone()
-        if not session:
-            raise HTTPException(404,"Session not found")
-        if session["state"] != "ACTIVE":
-            raise HTTPException(409,"Telemetry can only be ingested for an active session")
-        cur.execute("SELECT 1 FROM drivers WHERE id=%s", (packet.driver_id,))
-        if not cur.fetchone():
-            raise HTTPException(404,"Driver not found")
-        try:
-            inserted=col.insert_one(doc)
-        except PyMongoError as exc:
-            raise HTTPException(503,"Telemetry store write failed") from exc
+    try:
+        inserted = insert_telemetry(col, packet.session_id, packet.driver_id, doc)
+    except TelemetryIngestError as exc:
+        if exc.outcome == "session_not_found":
+            raise HTTPException(404, "Session not found") from exc
+        if exc.outcome == "session_inactive":
+            raise HTTPException(
+                409, "Telemetry can only be ingested for an active session"
+            ) from exc
+        if exc.outcome == "driver_not_found":
+            raise HTTPException(404, "Driver not found") from exc
+        raise HTTPException(
+            503, "Telemetry store write failed"
+        ) from exc
     clean=telemetry_ws_payload(doc,inserted.inserted_id); publish(packet.session_id,"telemetry.sample",clean)
     return {"accepted":True,"packet":clean}
 

@@ -1,11 +1,46 @@
 from datetime import datetime
-from typing import Any, cast
+from typing import Any, Literal, cast
 from uuid import UUID
 
 from pymongo import DESCENDING
 from pymongo.collection import Collection
+from pymongo.errors import PyMongoError
+from pymongo.results import InsertOneResult
 
-from .database import fetch_all, fetch_one
+from .database import connection, fetch_all, fetch_one
+
+TelemetryIngestOutcome = Literal[
+    "session_not_found", "session_inactive", "driver_not_found", "write_failed"
+]
+
+
+class TelemetryIngestError(Exception):
+    def __init__(self, outcome: TelemetryIngestOutcome):
+        self.outcome = outcome
+        super().__init__(outcome)
+
+
+def insert_telemetry(
+    collection: Collection[dict[str, Any]],
+    session_id: UUID,
+    driver_id: UUID,
+    document: dict[str, Any],
+) -> InsertOneResult:
+    """Validate the relational references and insert within one DB connection scope."""
+    with connection() as conn, conn.cursor() as cur:
+        cur.execute("SELECT state FROM race_sessions WHERE id=%s FOR SHARE", (session_id,))
+        session = cur.fetchone()
+        if not session:
+            raise TelemetryIngestError("session_not_found")
+        if session["state"] != "ACTIVE":
+            raise TelemetryIngestError("session_inactive")
+        cur.execute("SELECT 1 FROM drivers WHERE id=%s", (driver_id,))
+        if not cur.fetchone():
+            raise TelemetryIngestError("driver_not_found")
+        try:
+            return collection.insert_one(document)
+        except PyMongoError as exc:
+            raise TelemetryIngestError("write_failed") from exc
 
 
 def session_exists(session_id: UUID) -> bool:
