@@ -3,6 +3,16 @@ updated_at: 2026-10-22T12:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
+### T-077 — F-DOM-02 unsupported sanction reproducer
+- worker: W3 | priority: P1 | after: ADR-003
+- target_files: backend/tests/test_api.py
+- contract: strict xfail proves positive time/grid decisions pass validation; expect actionable 422 at request boundary
+- verify: .venv/bin/pytest -q backend/tests/test_api.py -k unsupported_sanction; separately prove --runxfail fails old code
+### T-078 — F-DOM-02 decision boundary guard
+- worker: W2 | priority: P1 | after: T-077
+- target_files: backend/app/main.py
+- contract: Pydantic Decision rejects positive time/grid values with actionable cause before DB write; preserve points-only/reject
+- verify: .venv/bin/pytest -q backend/tests/test_api.py -k unsupported_sanction --runxfail
 ### T-015 — G13 simulation boundary extraction
 - worker: W2 | priority: P1 | after: T-012
 - target_files: backend/app/main.py, backend/app/simulation_core.py
