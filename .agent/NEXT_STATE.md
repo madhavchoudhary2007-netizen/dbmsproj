@@ -3,11 +3,11 @@ updated_at: 2026-10-22T08:49:30Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-103 — Telemetry request schema extraction
-- worker: W2 | priority: P1 | after: T-102
-- target_files: backend/app/main.py, backend/app/schemas_telemetry.py
-- contract: extract Telemetry fields/UTC validators without changing ingest contract
-- verify: DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_api.py -k 'telemetry or websocket'
+### T-104 — API-09 analytics router extraction
+- worker: W2 | priority: P1 | after: T-103
+- target_files: backend/app/main.py, backend/app/analytics_router.py
+- contract: move dashboard/analytics GET handlers to APIRouter, preserve auth and wire behavior
+- verify: DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_api.py -k dashboard_analytics_characterization
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (pruned on compaction)
+- T-103 ✓ 9212d0b; Telemetry model extracted, 8 no-skip focused cases, Ruff 603, mypy 259.
 - T-102 ✓ 0802a3d; operations request models extracted, 9 cases, Ruff 603, mypy 259.
 - T-101 ✓ 9604441; auth request models to schemas_auth, 8 focused cases, Ruff 603, mypy 261.
 - T-100 ✓ c3f002e; pit box/reservation reads to repository; 3 focused cases, Ruff 603, mypy 261.
