@@ -3,11 +3,6 @@ updated_at: 2026-10-22T12:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-071 — G11 mobile logout journey access
-- worker: W3 | priority: P1 | after: T-069
-- target_files: frontend/e2e/auth-cookie.spec.ts
-- contract: open mobile navigation before Sign out in both logout journeys, preserving every assertion
-- verify: PLAYWRIGHT_PORT=32173 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts e2e/auth-cookie.spec.ts --grep 'G11 (logout|failed logout)' --project=mobile-320 --project=mobile-375 --project=desktop-1440
 ### T-072 — Phase 1 domain correctness audit
 - worker: W3 | priority: P1 | after: T-071
 - target_files: .agent/audit/phase1-domain.md
@@ -60,4 +55,5 @@ loop_iteration: 1 of 5
 - T-068 ✓ 417d0d2; browser JSON user-only; isolated backend 82 passed/0 skipped/0 xfailed and live acceptance pass
 - T-069 ✓ f2e6e56; four focused browser cookie/login/logout/CSRF cases pass
 - T-070 ✓ 417b922; removed unused token helper, typecheck passes
+- T-071 ✓ 348ec12; mobile navigation helper, six focused logout cases pass
 - Earlier accepted tasks and evidence are in git history and LOOP.md.
