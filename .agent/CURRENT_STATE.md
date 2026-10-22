@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-22T12:00:00Z
-git_head: 8fe4689
+git_head: 8a1cea6
 branch: perfection-loop
 architect_sha256: 3a1222665ebf8483e8be75e745c319df3e15a1034382d662687e309e9b417d7a
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -20,7 +20,7 @@ last_eval_score: NOT_RUN (quality gates and role journeys remain open)
 ## Ratchet and open risks
 - Ruff 641 baseline -> 633 current; mypy strict 311 baseline; frontend strict lint 45 explicit-any errors. Ruff format 7 files at baseline. Coverage overall 72% isolated baseline; domain/service 90% target, overall 80% target remain open. Frontend npm audit had 7 high/2 moderate dev-tool findings; safe upgrade path open.
 - F-ACE01 P2: login has no attempt throttling. T-006 twice failed: five-state fixtures need a route-specific applicability matrix before T-026..028. Role journeys, permissions matrix, simulator invariants, frontend visual states, docs, performance and evaluation score remain open in NEXT_STATE/queue.
-- Phase 1 A/C/E continues. F-DOM-02 P1 remains: stored time/grid penalties do not affect official results. ADR-003 rejects new ineffective sanctions and preserves legacy rows. T-082 adds `provisional` result/standing metadata; focused and full isolated DB gate passed. Browser labels and later full enforcement remain. F-DOM-04/05 telemetry/simulator, F-ACE01 throttling and frontend supply-chain findings remain open.
+- Phase 1 A/C/E continues. F-DOM-02 P1 remains: stored time/grid penalties do not affect official results. ADR-003 rejects new ineffective sanctions and preserves legacy rows. T-082 adds `provisional` result/standing metadata; focused and full isolated DB gate passed. T-083 strict browser xfails reproduce missing session/standings labels across desktop/mobile; T-084 UI fix next. Archive label and later full enforcement remain. F-DOM-04/05 telemetry/simulator, F-ACE01 throttling and frontend supply-chain findings remain open.
 
 ## Orchestrator direct edits and Taste review
 - Product: one `frontend/package.json` build-script line switched Next build to webpack (e854d9b). No other product-source edits.

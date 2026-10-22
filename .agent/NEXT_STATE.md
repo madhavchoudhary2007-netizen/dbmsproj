@@ -3,11 +3,6 @@ updated_at: 2026-10-22T12:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-083 — F-DOM-02 provisional browser reproduction
-- worker: W3 | priority: P1 | after: T-082
-- target_files: frontend/e2e/provisional-results.spec.ts
-- contract: strict switched browser xfails for affected session results and championship standings; unaffected data remains ordinary
-- verify: focused Playwright desktop/mobile with RUN_XFAIL switch
 ### T-084 — F-DOM-02 provisional screen labels
 - worker: W1 | priority: P1 | after: T-083
 - target_files: frontend/components/special-pages.tsx, frontend/app/standings/page.tsx
@@ -72,4 +67,5 @@ loop_iteration: 1 of 5
 - T-080 ✓ 9aa3424; disabled controls and accessible guidance; full browser 745/745 passes
 - T-081 ✓ d08b315; strict isolated legacy-sanction xfail reaches missing provisional API field
 - T-082 ✓ 5d19f6c; provisional API metadata, focused isolated DB regression passes
+- T-083 ✓ 8a1cea6; four strict browser xfails plus four unaffected checks pass across desktop/mobile; RUN_XFAIL=1 reproduces missing labels
 - Earlier accepted tasks and evidence are in git history and LOOP.md.
