@@ -1569,6 +1569,16 @@ def publish(session_id, kind, data):
 
 @app.websocket("/api/ws/sessions/{session_id}")
 async def session_ws(ws: WebSocket, session_id: UUID):
+    runtime_lease = getattr(ws.app.state, "runtime_lease", None)
+    if runtime_lease is not None:
+        try:
+            check_runtime_lease(runtime_lease)
+        except RuntimeError:
+            await ws.close(
+                code=1011,
+                reason="Runtime ownership was lost; restart the backend after PostgreSQL recovery.",
+            )
+            return
     origin = ws.headers.get("origin")
     if origin is not None and origin not in CORS_ORIGINS:
         await ws.close(code=4403, reason="Origin not allowed")
