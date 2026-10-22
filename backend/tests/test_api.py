@@ -1223,6 +1223,57 @@ def database_api_client():
 
 
 @pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
+@pytest.mark.parametrize(("resource", "required_keys"), [
+    ("championships", {"id", "name", "season"}),
+    ("circuits", {"id", "name", "country", "length_km"}),
+    ("teams", {"id", "name", "principal_user_id"}),
+    ("drivers", {"id", "user_id", "licence_number", "number"}),
+    ("events", {"id", "championship_id", "circuit_id", "round_number", "name", "start_date"}),
+    ("sessions", {"id", "event_id", "session_type", "scheduled_at", "total_laps", "safety_car"}),
+])
+def test_crud_read_characterization(database_api_client, resource, required_keys):
+    client = database_api_client
+    admin_login = client.post("/api/auth/login", json={
+        "email": "admin@apexgrid.test", "password": "ApexGrid2026!",
+    })
+    assert admin_login.status_code == 200, admin_login.text
+    admin_headers = {"Authorization": "Bearer " + admin_login.json()["access_token"]}
+
+    driver_login = client.post("/api/auth/login", json={
+        "email": "driver01@apexgrid.test", "password": "ApexGrid2026!",
+    })
+    assert driver_login.status_code == 200, driver_login.text
+    driver_headers = {"Authorization": "Bearer " + driver_login.json()["access_token"]}
+
+    listing = client.get(f"/api/{resource}", headers=admin_headers)
+    assert listing.status_code == 200, listing.text
+    rows = listing.json()
+    assert isinstance(rows, list) and rows, f"expected seeded {resource} rows"
+    assert required_keys <= rows[0].keys()
+    item_id = rows[0]["id"]
+
+    detail = client.get(f"/api/{resource}/{item_id}", headers=admin_headers)
+    assert detail.status_code == 200, detail.text
+    assert isinstance(detail.json(), dict)
+    assert required_keys <= detail.json().keys()
+
+    client.cookies.clear()
+    for path in (f"/api/{resource}", f"/api/{resource}/{item_id}"):
+        anonymous = client.get(path)
+        assert anonymous.status_code == 401, anonymous.text
+        assert anonymous.json() == {"detail": "Authentication required"}
+        assert anonymous.headers["www-authenticate"] == "Bearer"
+
+    driver_listing = client.get(f"/api/{resource}", headers=driver_headers)
+    assert driver_listing.status_code == 200, driver_listing.text
+    assert isinstance(driver_listing.json(), list)
+    assert required_keys <= driver_listing.json()[0].keys()
+    driver_detail = client.get(f"/api/{resource}/{item_id}", headers=driver_headers)
+    assert driver_detail.status_code == 200, driver_detail.text
+    assert required_keys <= driver_detail.json().keys()
+
+
+@pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
 def test_admin_lock_demo_observes_real_wait_and_exclusion_rejection(database_api_client):
     client=database_api_client
     login = client.post("/api/auth/login", json={"email":"admin@apexgrid.test", "password":"ApexGrid2026!"})
