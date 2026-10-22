@@ -50,7 +50,7 @@ test("G11 login keeps the session out of localStorage", async ({ page }) => {
       return;
     }
     if (path === "/api/auth/me") {
-      await route.fulfill({ status: 200, json: user });
+      await route.fulfill({ status: 401, json: { detail: "Authentication required" } });
       return;
     }
     await route.fulfill({ status: 200, json: [] });
