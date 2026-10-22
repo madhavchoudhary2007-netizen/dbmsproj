@@ -205,6 +205,33 @@ def test_cookie_auth_login_sets_host_only_session_and_readable_csrf(
     assert csrf["path"] == "/" and not csrf["domain"]
 
 
+@pytest.mark.xfail(strict=True, reason="G11")
+def test_cookie_auth_browser_shape(auth_characterization_client, monkeypatch):
+    import bcrypt
+
+    user = auth_characterization_user(bcrypt.hashpw(b"correct horse", bcrypt.gensalt()).decode())
+    auth_characterization_fetch(monkeypatch, user)
+    response = auth_characterization_client.post(
+        "/api/auth/login", json={"email": user["email"], "password": "correct horse"},
+        headers={"Origin": "http://localhost:3000"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "user": {key: user[key] for key in ("id", "email", "full_name", "role")}
+    }
+    cookies = cookie_auth_set_cookies(response)
+    assert cookies["apexgrid_session"].value
+    assert cookies["apexgrid_csrf"].value
+
+
+def test_cookie_auth_browser_shape_preserves_legacy_no_origin_token(
+    auth_characterization_client, monkeypatch
+):
+    response = cookie_auth_login(auth_characterization_client, monkeypatch)
+    assert response.status_code == 200
+    assert response.json()["access_token"]
+
+
 def test_cookie_auth_me_uses_session_without_bearer(auth_characterization_client, monkeypatch):
     user = auth_characterization_user()
     cookie_auth_login(auth_characterization_client, monkeypatch)
