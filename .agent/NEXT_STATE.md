@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-22T18:34:37Z
+updated_at: 2026-10-22T18:37:28Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-136 — Update lifespan unit fixture for current pool accessor
-- worker: W3 | priority: P1 | after: T-135
-- target_files: backend/tests/test_api.py
-- contract: mock `main.get_pool` rather than removed `main.pool`; preserve all startup/shutdown assertions
-- verify: focused lifespan unit and T-134 seeded regression on apexgrid-test; Ruff <=583
+### T-137 — Extract telemetry and live GET routes to router
+- worker: W2 | priority: P2 | after: T-136
+- target_files: backend/app/main.py, backend/app/telemetry_router.py
+- contract: preserve GET /api/telemetry and /api/sessions/{id}/live auth, status, shape, pagination, ordering and OpenAPI paths; leave POST ingest in main
+- verify: T-131 seeded contract and OpenAPI route inventory on apexgrid-test; Ruff <=583, mypy <=254
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-136 ✓ 029664e; old lifespan test mock targets get_pool, focused 1 passed; full isolated backend 116/0/0, live acceptance passed.
 - T-135 ✓ e99d7ab; pool reopens for sequential lifespans, focused seeded tests 2 passed, Ruff 583/mypy 254; full gate exposed stale test mock.
 - T-134 ✓ 2120ba9; two-lifespan strict xfail reproduced PoolClosed on second startup; Ruff 583.
 - T-133 ✓ 2692cff; live GET repository extraction, seeded contract 1 passed, Ruff 583, mypy 254; full isolated gate exposed F-STRUCT-03.

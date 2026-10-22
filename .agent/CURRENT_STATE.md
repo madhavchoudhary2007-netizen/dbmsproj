@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-22T18:34:37Z
-git_head: e99d7ab
+updated_at: 2026-10-22T18:37:28Z
+git_head: 029664e
 branch: perfection-loop
 architect_sha256: c9780b9cd1ffe91fcb0fbf369b4b136205eb5c1ffb82e8cf199e42cca18c69c5
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -24,6 +24,7 @@ last_eval_score: NOT_RUN (quality gates and role journeys remain open)
 - T-133 live GET reads moved to typed telemetry repository; seeded contract passed 1/1 on apexgrid-test, Ruff 583, mypy 254. Full isolated suite then found F-STRUCT-03: global psycopg pool cannot reopen for a later TestClient lifespan (114 passed, 1 failed); T-134 reproducer and W2 repair are next. Live acceptance did not run because the gate stopped.
 - T-134 strict two-lifespan regression accepted: ordinary seeded run 1 xfailed; --runxfail fails specifically on second lifespan PostgreSQL down/PoolClosed; Ruff 583. T-135 repairs database pool lifecycle, then marker retirement and full isolated gate are required.
 - T-135 pool recreation/current-pool accessor accepted: both focused seeded contracts passed with --runxfail, Ruff 583, mypy 254. T-134 marker retired (two test lines, orchestrator). Full isolated gate then passed 115 and failed one legacy lifespan unit fixture because it monkeypatches removed `main.pool`; T-136 updates that mock to `main.get_pool`, preserving assertions. Live acceptance awaits full gate.
+- T-136 updated the legacy test mock without changing assertions; focused test and unmarked two-lifespan regression pass. Full isolated backend now passes 116, zero failures/skips/xfails, and live acceptance passes. F-STRUCT-03 closed. Phase 2 next: T-137 read-only telemetry/live router extraction.
 
 ## Orchestrator direct edits and Taste review
 - Product: one `frontend/package.json` build-script line switched Next build to webpack (e854d9b). No other product-source edits.
