@@ -932,7 +932,7 @@ def test_app_lifespan_starts_resources_and_awaits_simulator_shutdown(monkeypatch
         closed = False
 
     pool = FakePool()
-    monkeypatch.setattr(main_module, "pool", pool)
+    monkeypatch.setattr(main_module, "get_pool", lambda: pool)
     monkeypatch.setattr(main_module, "open_pool", lambda: startup_calls.append(("pool", "open")))
     monkeypatch.setattr(main_module, "close_pool", lambda: startup_calls.append(("pool", "close")))
     monkeypatch.setattr(main_module, "MongoClient", FakeMongoClient)
