@@ -1,13 +1,13 @@
 # CURRENT_STATE
 updated_at: 2026-10-22T08:49:30Z
-git_head: fcba18d
+git_head: 07954ad
 branch: perfection-loop
-architect_sha256: 3a1222665ebf8483e8be75e745c319df3e15a1034382d662687e309e9b417d7a
+architect_sha256: c9780b9cd1ffe91fcb0fbf369b4b136205eb5c1ffb82e8cf199e42cca18c69c5
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
 last_eval_score: NOT_RUN (quality gates and role journeys remain open)
 
 ## Verified setup and contracts
-- Boot and architecture lock pass (ADR-003 relock 9e0a5a3). Work stays on `perfection-loop`. Disposable databases use only Compose project `apexgrid-test`, ports 15432/27018. Never touch running databases, secrets or master.
+- Boot and architecture lock pass (ADR-004 relock 07954ad). Work stays on `perfection-loop`. Disposable databases use only Compose project `apexgrid-test`, ports 15432/27018. Never touch running databases, secrets or master.
 - PostgreSQL owns official race data; MongoDB owns telemetry. ADR-001/002 authorize additive migrations, finding-backed contract changes, and cookie/CSRF browser auth. Existing routes/data are preserved.
 - Host venv Python 3.14/Node 26 differs from backend container Python 3.12/frontend container Node 22. Runtime parity gate remains open.
 
@@ -20,7 +20,7 @@ last_eval_score: NOT_RUN (quality gates and role journeys remain open)
 ## Ratchet and open risks
 - Ruff 641 baseline -> 602 after T-104; mypy strict 311 baseline -> 259 after T-102; frontend strict lint 45 explicit-any errors. Ruff format 7 files at baseline. Coverage overall 72% isolated baseline; domain/service 90% target, overall 80% target remain open. Frontend npm audit had 7 high/2 moderate dev-tool findings; safe upgrade path open.
 - F-ACE01 P2: login has no attempt throttling. T-006 twice failed: five-state fixtures need a route-specific applicability matrix before T-026..028. Role journeys, permissions matrix, simulator invariants, frontend visual states, docs, performance and evaluation score remain open in NEXT_STATE/queue.
-- Phase 1 A/C/E P0/P1 findings closed after T-088: unsupported new time/grid sanctions are rejected and historical classifications, standings and archive are labelled provisional. Isolated backend 92/92 and browser 775/775 pass; live acceptance and typecheck pass. Phase 2 structure active; T-015 extracted sector performance helper and six simulation tests pass. T-016 restored Ruff count to 633 with eight focused tests passing. T-089 moved Simulation/MAX_SESSION_LAPS to simulation_core and T-090/T-091 pinned CRUD behavior. T-092/T-094/T-096 moved CRUD read/write/delete I/O into crud_repository; mypy 261, Ruff 615. T-097/T-098 pinned and split dashboard/analytics reads; T-099/T-100 pinned and split pit reads. T-101..103 extracted auth/operation/telemetry schemas; mypy 259. T-104 moved analytics routes to APIRouter, Ruff 602. T-105 repaired route inventory tests; full isolated backend 103 passed, zero failed/skipped/xfailed. T-106 moved pit GET handlers to APIRouter, 3 focused tests pass. T-107 remaining request schemas next. ADR-003 full enforcement remains P2 Phase 3 work; F-DOM-04/05, F-ACE01 and F-E02 remain P2.
+- Phase 1 A/C/E P0/P1 findings closed after T-088. Phase 2 structure active: CRUD, analytics and pit read repositories; auth/operations/telemetry/competition/simulation schemas; analytics and pit read APIRouters. T-105 full isolated backend: 103 passed, zero failed/skipped/xfailed. T-107 remaining request schemas: 4 focused cases, Ruff 602, mypy 259. ADR-004 relocked single-process live runtime design; T-108 strict reproducer next, guard implementation pending. ADR-003 full enforcement remains P2 Phase 3 work; F-DOM-04/05, F-ACE01 and F-E02 remain P2.
 
 ## Orchestrator direct edits and Taste review
 - Product: one `frontend/package.json` build-script line switched Next build to webpack (e854d9b). No other product-source edits.
