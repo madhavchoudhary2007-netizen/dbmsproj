@@ -145,3 +145,58 @@ def test_active_websocket_loss_closes_before_delivering_event(monkeypatch):
             main_module.bus.unsubscribe(session_id, queue)
         for lease in captured_leases:
             lease.close()
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="F-STRUCT-01: idle WebSocket retains its bus subscription after lease loss",
+)
+def test_idle_websocket_loss_unsubscribes_without_bus_events(monkeypatch):
+    real_acquire = main_module.acquire_runtime_lease
+    captured_leases = []
+    session_id = uuid4()
+
+    def capture_runtime_lease():
+        lease = real_acquire()
+        captured_leases.append(lease)
+        return lease
+
+    try:
+        with monkeypatch.context() as patch:
+            patch.setattr(main_module, "acquire_runtime_lease", capture_runtime_lease)
+            with TestClient(app) as client:
+                assert len(captured_leases) == 1
+                patch.setattr(main_module.jwt, "decode", lambda *args, **kwargs: {"sub": "qa-user"})
+                patch.setattr(main_module, "fetch_one", lambda *args, **kwargs: {"id": "qa-user"})
+                with client.websocket_connect(
+                    f"/api/ws/sessions/{session_id}",
+                    subprotocols=["apexgrid.jwt", "qa-token"],
+                ):
+                    deadline = time.monotonic() + 2
+                    subscriptions = []
+                    while time.monotonic() < deadline:
+                        with main_module.bus.lock:
+                            subscriptions = list(main_module.bus.clients.get(str(session_id), ()))
+                        if subscriptions:
+                            break
+                        time.sleep(0.01)
+                    assert subscriptions, "WebSocket did not subscribe before timeout"
+
+                    captured_leases[0].close()
+                    deadline = time.monotonic() + 2
+                    while time.monotonic() < deadline:
+                        with main_module.bus.lock:
+                            subscriptions = list(main_module.bus.clients.get(str(session_id), ()))
+                        if not subscriptions:
+                            break
+                        time.sleep(0.01)
+                    assert not subscriptions, (
+                        "idle WebSocket retained its bus subscription after lease loss"
+                    )
+    finally:
+        with main_module.bus.lock:
+            subscriptions = list(main_module.bus.clients.get(str(session_id), ()))
+        for _, queue in subscriptions:
+            main_module.bus.unsubscribe(session_id, queue)
+        for lease in captured_leases:
+            lease.close()
