@@ -558,7 +558,6 @@ def test_results_reject_scheduled_sessions(monkeypatch):
     assert error.value.status_code == 409
 
 
-@pytest.mark.xfail(strict=True, reason="F-DOM-03")
 def test_completed_results_require_contiguous_classification(monkeypatch):
     from contextlib import contextmanager
     from fastapi import HTTPException
