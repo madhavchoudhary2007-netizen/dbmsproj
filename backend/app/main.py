@@ -60,7 +60,7 @@ from .crud_repository import (
     update_crud_row,
 )
 from .database import close_pool, connection, fetch_all, fetch_one, get_pool, open_pool
-from .pit_repository import PIT_RESERVATION_SELECT
+from .pit_repository import PIT_RESERVATION_SELECT, load_pit_telemetry
 from .pit_router import create_pit_router
 from .runtime_lease import acquire_runtime_lease, check_runtime_lease
 from .schemas_auth import Login, UserCreate, UserPatch
@@ -734,34 +734,14 @@ def pit_strategy(session_id: UUID, user=Depends(current_user)):
     sim = simulations.get(str(session_id))
     is_live = session["state"] in {"ACTIVE", "PAUSED"} and sim is not None and sim.is_generated
     col = mongo_ready()
-    latest_by_driver: dict[str, dict[str, Any]] = {}
-    stop_lap_by_id: dict[str, int] = {}
-    stop_compound_by_id: dict[str, str] = {}
     if col is not None:
-        # The compact live payload contains the latest sample for each car. Stops are
-        # matched to the packet that carries their reservation id for historical lap data.
-        for packet in col.find({"session_id": str(session_id)}).sort("ts", DESCENDING).limit(2000):
-            did = str(packet.get("driver_id", ""))
-            if did and did not in latest_by_driver:
-                latest_by_driver[did] = packet
-            reservation_id = packet.get("pit_reservation_id")
-            if reservation_id and packet.get("pit_state") in {"IN_PIT", "PIT", "BOX"}:
-                stop_lap_by_id.setdefault(str(reservation_id), int(packet.get("lap") or 0))
-        # Recover all reservation lap numbers in one query, including stops older
-        # than the bounded scan used to load current driver samples.
-        for stop in col.aggregate([
-            {"$match": {"session_id": str(session_id), "pit_reservation_id": {"$exists": True},
-                "pit_state": {"$in": ["IN_PIT", "PIT", "BOX"]}}},
-            {"$sort": {"ts": 1}},
-            {"$group": {"_id": "$pit_reservation_id", "lap": {"$first": "$lap"},
-                "compound": {"$first": "$tire_compound"}}},
-        ]):
-            if stop.get("lap") is not None:
-                stop_lap_by_id[str(stop["_id"])] = int(stop["lap"])
-            if stop.get("compound"):
-                stop_compound_by_id[str(stop["_id"])] = stop["compound"]
+        latest_by_driver, stop_lap_by_id, stop_compound_by_id = load_pit_telemetry(col, session_id)
     elif is_live:
         raise HTTPException(503, "MongoDB telemetry store is unavailable")
+    else:
+        latest_by_driver = {}
+        stop_lap_by_id = {}
+        stop_compound_by_id = {}
 
     stops_by_driver: dict[str, list[dict[str, Any]]] = {}
     for row in reservations:
