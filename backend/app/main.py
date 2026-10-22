@@ -1,37 +1,56 @@
 from __future__ import annotations
 
 import asyncio
-from contextlib import asynccontextmanager
-from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
 import hmac
 import logging
 import random
 import secrets
 import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FutureTimeout
+from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
 from typing import Any, Literal
 from uuid import UUID, uuid4
 
 import bcrypt
-from bson import ObjectId
-from fastapi import Depends, FastAPI, HTTPException, Query, Request, Response, WebSocket, WebSocketDisconnect
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
-from pydantic import BaseModel
-from pymongo import MongoClient, DESCENDING
-from pymongo.errors import PyMongoError
-from psycopg import IntegrityError, OperationalError
-from psycopg import sql
+from bson import ObjectId
+from fastapi import (
+    Depends,
+    FastAPI,
+    HTTPException,
+    Query,
+    Request,
+    Response,
+    WebSocket,
+    WebSocketDisconnect,
+)
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from psycopg import IntegrityError, OperationalError, sql
 from psycopg.errors import CheckViolation, ExclusionViolation, ForeignKeyViolation, UniqueViolation
-from psycopg_pool import PoolClosed, PoolTimeout
 from psycopg.rows import dict_row, tuple_row
+from psycopg_pool import PoolClosed, PoolTimeout
+from pydantic import BaseModel
+from pymongo import DESCENDING, MongoClient
+from pymongo.errors import PyMongoError
+from starlette.middleware.base import RequestResponseEndpoint
 
-from .config import APP_ENV, AUTO_DEMO_RACE, CORS_ORIGINS, JWT_ALGORITHM, JWT_MINUTES, JWT_SECRET, MONGODB_DATABASE, MONGODB_URL
-from .auth_cookie import create_csrf_token, set_auth_cookies, verify_csrf_token, clear_auth_cookies
 from .analytics_router import create_analytics_router
+from .auth_cookie import clear_auth_cookies, create_csrf_token, set_auth_cookies, verify_csrf_token
+from .config import (
+    APP_ENV,
+    AUTO_DEMO_RACE,
+    CORS_ORIGINS,
+    JWT_ALGORITHM,
+    JWT_MINUTES,
+    JWT_SECRET,
+    MONGODB_DATABASE,
+    MONGODB_URL,
+)
 from .crud_repository import (
     CrudDeleteError,
     create_crud_row,
@@ -43,13 +62,13 @@ from .crud_repository import (
 from .database import close_pool, connection, fetch_all, fetch_one, open_pool, pool
 from .pit_repository import PIT_RESERVATION_SELECT
 from .pit_router import create_pit_router
-from .runtime_lease import acquire_runtime_lease
-from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
+from .runtime_lease import acquire_runtime_lease, check_runtime_lease
 from .schemas_auth import Login, UserCreate, UserPatch
 from .schemas_competition import MembershipIn, MembershipPatch, ResultIn
 from .schemas_operations import Action, AutoReservationIn, Decision, IncidentIn, ReservationIn
 from .schemas_simulation import DemoRaceCreate, SimulationControl
 from .schemas_telemetry import Telemetry
+from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("apexgrid")
@@ -65,9 +84,10 @@ telemetry_collection = None
 
 
 @asynccontextmanager
-async def lifespan(_: FastAPI):
+async def lifespan(application: FastAPI):
     global mongo_client, telemetry_collection
     runtime_lease = acquire_runtime_lease()
+    application.state.runtime_lease = runtime_lease
     try:
         open_pool()
     except Exception:
@@ -105,11 +125,26 @@ async def lifespan(_: FastAPI):
             except Exception:
                 pass
         finally:
+            application.state.runtime_lease = None
             runtime_lease.close()
 
 
 app = FastAPI(title="ApexGrid API", version="1.0.0", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=CORS_ORIGINS, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+
+
+@app.middleware("http")
+async def require_runtime_lease(request: Request, call_next: RequestResponseEndpoint) -> Response:
+    runtime_lease = getattr(request.app.state, "runtime_lease", None)
+    if runtime_lease is not None:
+        try:
+            check_runtime_lease(runtime_lease)
+        except RuntimeError:
+            return JSONResponse(
+                status_code=503,
+                content={"detail": "PostgreSQL runtime ownership was lost. Restart the backend to restore service."},
+            )
+    return await call_next(request)
 
 
 def jsonable(value: Any) -> Any:
