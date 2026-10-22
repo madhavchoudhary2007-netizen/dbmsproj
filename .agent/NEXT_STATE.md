@@ -7,7 +7,7 @@ loop_iteration: 1 of 5
 - worker: W2 | priority: P1 | after: T-102
 - target_files: backend/app/main.py, backend/app/schemas_telemetry.py
 - contract: extract Telemetry fields/UTC validators without changing ingest contract
-- verify: .venv/bin/pytest -q backend/tests/test_api.py -k 'telemetry or websocket'
+- verify: DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_api.py -k 'telemetry or websocket'
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
