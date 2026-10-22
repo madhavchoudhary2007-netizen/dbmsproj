@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-22T18:57:53Z
+updated_at: 2026-10-22T19:00:26Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-143 — Extract pit-strategy Mongo read boundary
-- worker: W2 | priority: P2 | after: T-142
-- target_files: backend/app/main.py, backend/app/pit_repository.py
-- contract: move bounded latest-packet and stop aggregation Mongo reads to typed repository; preserve strategy statuses/shape
-- verify: seeded T-142 and existing pit strategy unit test on apexgrid-test; Ruff <=573, mypy <=248
+### T-144 — Extract pure per-driver pit strategy policy
+- worker: W2 | priority: P2 | after: T-143
+- target_files: backend/app/main.py, backend/app/pit_strategy_service.py
+- contract: move one-driver tire/stop/status/window projection from pit_strategy to pure function; preserve seeded and live unit output
+- verify: T-142 seeded and live/history unit test on apexgrid-test; Ruff <=573, mypy <=248
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-143 ✓ c829c30; bounded pit Mongo reads moved to typed repository, focused 2 passed, Ruff 573/mypy 248.
 - T-142 ✓ efd0261; seeded historical pit-strategy read contract 1 passed, Ruff 573.
 - T-141 ✓ a8e25cf; Telemetry validation test imports schema module, focused 1 passed; full isolated backend 117/0/0 and live acceptance passed.
 - T-140 ✓ 698dd2e; POST ingest moved to router, focused 2 passed, Ruff 573/mypy 248; full collection exposed stale test import.
