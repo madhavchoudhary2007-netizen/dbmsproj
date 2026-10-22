@@ -5,13 +5,39 @@ from uuid import UUID
 
 from pymongo.collection import Collection
 
-from .database import fetch_all
+from .database import fetch_all, fetch_one
 
 PIT_RESERVATION_SELECT = """SELECT r.*,b.number AS box_number,t.name AS team_name,
     d.full_name AS driver_name,dr.number AS driver_number
     FROM pit_reservations r JOIN pit_boxes b ON b.id=r.pit_box_id
     JOIN teams t ON t.id=r.team_id LEFT JOIN drivers dr ON dr.id=r.driver_id
     LEFT JOIN users d ON d.id=dr.user_id"""
+
+
+def load_pit_strategy_rows(
+    session_id: UUID,
+) -> tuple[dict[str, Any] | None, list[dict[str, Any]], list[dict[str, Any]]]:
+    session = fetch_one("""SELECT s.id,s.state,s.total_laps,
+        EXISTS(SELECT 1 FROM demo_races dr WHERE dr.session_id=s.id) AS generated,
+        s.scheduled_at FROM race_sessions s WHERE s.id=%s""", (session_id,))
+    if not session:
+        return None, [], []
+    drivers = fetch_all("""SELECT d.id AS driver_id,u.full_name AS driver_name,d.number AS driver_number,
+        m.team_id,t.name AS team_name
+        FROM drivers d
+        LEFT JOIN users u ON u.id=d.user_id
+        LEFT JOIN LATERAL (SELECT team_id FROM team_memberships tm
+          WHERE tm.driver_id=d.id AND tm.start_date<=%s::date AND (tm.end_date IS NULL OR tm.end_date>=%s::date)
+          ORDER BY tm.start_date DESC LIMIT 1) m ON true
+        LEFT JOIN teams t ON t.id=m.team_id WHERE d.id IN (
+          SELECT driver_id FROM demo_race_entries WHERE session_id=%s
+          UNION SELECT driver_id FROM session_results WHERE session_id=%s
+          UNION SELECT driver_id FROM pit_reservations WHERE session_id=%s AND driver_id IS NOT NULL
+        ) ORDER BY d.number""",
+        (session["scheduled_at"], session["scheduled_at"], session_id, session_id, session_id))
+    reservations = fetch_all(PIT_RESERVATION_SELECT +
+        " WHERE r.session_id=%s ORDER BY r.starts_at,r.id", (session_id,))
+    return session, drivers, reservations
 
 
 def list_pit_boxes(event_id: UUID) -> list[dict[str, Any]]:

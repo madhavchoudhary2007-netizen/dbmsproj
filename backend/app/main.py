@@ -60,7 +60,7 @@ from .crud_repository import (
     update_crud_row,
 )
 from .database import close_pool, connection, fetch_all, fetch_one, get_pool, open_pool
-from .pit_repository import PIT_RESERVATION_SELECT, load_pit_telemetry
+from .pit_repository import PIT_RESERVATION_SELECT, load_pit_strategy_rows, load_pit_telemetry
 from .pit_router import create_pit_router
 from .pit_strategy_service import project_pit_strategy
 from .runtime_lease import acquire_runtime_lease, check_runtime_lease
@@ -711,26 +711,9 @@ app.include_router(
 
 @app.get("/api/sessions/{session_id}/pit-strategy")
 def pit_strategy(session_id: UUID, user=Depends(current_user)):
-    session = fetch_one("""SELECT s.id,s.state,s.total_laps,
-        EXISTS(SELECT 1 FROM demo_races dr WHERE dr.session_id=s.id) AS generated,
-        s.scheduled_at FROM race_sessions s WHERE s.id=%s""", (session_id,))
+    session, drivers, reservations = load_pit_strategy_rows(session_id)
     if not session:
         raise HTTPException(404, "Session not found")
-    drivers = fetch_all("""SELECT d.id AS driver_id,u.full_name AS driver_name,d.number AS driver_number,
-        m.team_id,t.name AS team_name
-        FROM drivers d
-        LEFT JOIN users u ON u.id=d.user_id
-        LEFT JOIN LATERAL (SELECT team_id FROM team_memberships tm
-          WHERE tm.driver_id=d.id AND tm.start_date<=%s::date AND (tm.end_date IS NULL OR tm.end_date>=%s::date)
-          ORDER BY tm.start_date DESC LIMIT 1) m ON true
-        LEFT JOIN teams t ON t.id=m.team_id WHERE d.id IN (
-          SELECT driver_id FROM demo_race_entries WHERE session_id=%s
-          UNION SELECT driver_id FROM session_results WHERE session_id=%s
-          UNION SELECT driver_id FROM pit_reservations WHERE session_id=%s AND driver_id IS NOT NULL
-        ) ORDER BY d.number""",
-        (session["scheduled_at"], session["scheduled_at"], session_id, session_id, session_id))
-    reservations = fetch_all(PIT_RESERVATION_SELECT +
-        " WHERE r.session_id=%s ORDER BY r.starts_at,r.id", (session_id,))
 
     sim = simulations.get(str(session_id))
     is_live = session["state"] in {"ACTIVE", "PAUSED"} and sim is not None and sim.is_generated
