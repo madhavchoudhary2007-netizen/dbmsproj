@@ -69,6 +69,7 @@ from .schemas_operations import Action, AutoReservationIn, Decision, IncidentIn,
 from .schemas_simulation import DemoRaceCreate, SimulationControl
 from .schemas_telemetry import Telemetry
 from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
+from .user_repository import get_user as get_user_record, list_users
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("apexgrid")
@@ -441,12 +442,12 @@ def logout(response: Response, user=Depends(current_user)):
 @app.get("/api/users")
 def users(limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0), user=Depends(roles("ADMIN"))):
     l, o = limit_offset(limit, offset)
-    return jsonable(fetch_all("SELECT id,email,full_name,role FROM users ORDER BY full_name,email LIMIT %s OFFSET %s", (l,o)))
+    return jsonable(list_users(l, o))
 
 
 @app.get("/api/users/{user_id}")
 def get_user(user_id: UUID, user=Depends(roles("ADMIN"))):
-    result=fetch_one("SELECT id,email,full_name,role FROM users WHERE id=%s",(user_id,))
+    result = get_user_record(user_id)
     if not result: raise HTTPException(404,"User not found")
     return jsonable(result)
 
