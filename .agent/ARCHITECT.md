@@ -1,7 +1,7 @@
 <!-- LOCK:BEGIN -->
 > STATUS: LOCKED
-> SHA256: 8753bfed50769fe28099f5f400bf3f7a42223fc98bebddda0db16eb7d0ece31b
-> LOCKED_AT: 2026-10-21T18:30:04Z
+> SHA256: 3a1222665ebf8483e8be75e745c319df3e15a1034382d662687e309e9b417d7a
+> LOCKED_AT: 2026-10-22T03:43:55Z
 > LOCKED_BY: orchestrator
 <!-- LOCK:END -->
 # ApexGrid architecture — existing system, improvement in place
@@ -126,7 +126,7 @@ type RaceArchive = { session: Session; results: unknown[]; incidents: unknown[];
 type DataState<T> = { kind: "empty" } | { kind: "loading"; previous?: T } | { kind: "populated"; data: T } | { kind: "error"; message: string; retry: () => void } | { kind: "partial"; data: T; message: string; retry: () => void };
 ```
 
-Pydantic inputs already in `backend/app/main.py`: `Login`, `Action`, `IncidentIn`, `Decision`, `ReservationIn`, `AutoReservationIn`, `Telemetry`, `ResultIn`, `DemoRaceCreate`, `SimulationControl`. SQL row ownership and invariants are in `backend/migrations/001_initial.sql`; full route fields remain in `docs/contracts.md`. Future W2 packets should replace untyped frontend `Row`/`any` boundaries incrementally while preserving wire names unless an ADR-001 finding/change proposal justifies a contract change and a separate ADR records it.
+Pydantic inputs already in `backend/app/main.py`: `Login`, `Action`, `IncidentIn`, `Decision`, `ReservationIn`, `AutoReservationIn`, `Telemetry`, `ResultIn`, `DemoRaceCreate`, `SimulationControl`. ADR-003 specifies HTTP 422 for new positive time/grid sanction decisions until official race elapsed and starting-grid rules exist; historical rows remain and affected results must be labelled provisional. SQL row ownership and invariants are in `backend/migrations/001_initial.sql`; full route fields remain in `docs/contracts.md`. Future W2 packets should replace untyped frontend `Row`/`any` boundaries incrementally while preserving wire names unless an ADR-001 finding/change proposal justifies a contract change and a separate ADR records it.
 
 PostgreSQL's 17 existing tables are `users`, `teams`, `drivers`, `team_memberships`, `championships`, `circuits`, `race_events`, `race_sessions`, `incident_reports`, `demo_races`, `demo_race_entries`, `penalties`, `penalty_points`, `session_results`, `driver_standings`, `pit_boxes`, and `pit_reservations`. MongoDB currently owns the `telemetry` collection. Neither store is being redesigned.
 
@@ -139,7 +139,7 @@ PostgreSQL's 17 existing tables are `users`, `teams`, `drivers`, `team_membershi
 | Simulation | absent -> running <-> paused -> stopped; stopped/reset -> running after clean start; generated completion -> archived + optionally new auto race | in-memory `simulations`, SQL session and Mongo telemetry; restore from stored packets on restart |
 | Pit reservation | requested -> locked/allocation -> RESERVED or conflict/no-box error; RESERVED -> COMPLETED/CANCELLED; terminal states cannot reopen | SQL row lock, exclusion/unique constraints; auto chooses earliest free event box/window; Mongo/WS reflect assigned driver |
 | Telemetry | produced -> Pydantic validated -> Mongo persisted -> WS published -> client snapshot/stream; WS disconnect -> reconnect + snapshot | reject invalid lap/driver/session; SQL and Mongo may be briefly out of sync, show partial state |
-| Incident/standing | OPEN -> APPROVED or REJECTED; approval -> immutable penalty/points/eligibility; completed result -> recalculated standings | SQL transaction/trigger and explicit-cursor routine; repeat decision must be rejected |
+| Incident/standing | OPEN -> APPROVED or REJECTED; approval -> immutable penalty/points/eligibility; completed result -> recalculated standings | SQL transaction/trigger and explicit-cursor routine; repeat decision must be rejected. ADR-003 rejects new unsupported time/grid sanctions before state transition and labels historical affected outputs provisional. |
 
 ### B.5 Layout contract by screen
 
@@ -247,3 +247,7 @@ Lens 5 boundary matrix: 0/1/72/73 laps and sector three boundary (API-04); dupli
 ## ADR-002 focused Phase C: auth transport
 
 Pass 1 checked the affected A.2 login/live and API-01/07 paths. Lens 1 traced anonymous login -> cookies -> reload `/me` -> protected write -> live WebSocket -> logout; owners T-050 (backend reproducer), T-051/T-052 (backend runtime), T-053 (frontend API/provider), T-054 (WebSocket client), T-055 (browser and acceptance fixtures). Lens 2 requires explicit cookie flags, login shape, CSRF rejection, Origin rejection, refresh, logout, and isolated acceptance commands; these are pending tests, not claimed passing. Lens 3 found no new dependency or abstraction; the existing JWT and standard-library HMAC suffice. Lens 4 required session-bound signed CSRF, constant-time comparisons, credentialed allow-listed CORS, and WebSocket Origin checks; ADR-002 records each. Lens 5 added expired/invalid JWT, missing/mismatched/planted CSRF, old bearer client compatibility, local HTTP cookie behavior, and logout/reload boundaries to T-050/T-055. Pass 2 found zero further architecture amendments; implementation and checks remain in the queue.
+
+## ADR-003 focused Phase C: ineffective sanctions
+
+Pass 1, Lens 1 traced steward decision -> penalty record -> official result/standings and found no race elapsed or starting-grid data to apply time/grid sanctions; ADR-003 keeps those fields and historical rows while rejecting new ineffective values. Lens 2 assigns binary rejection/no-write, points-only compatibility, provisional historical display, browser and isolated acceptance checks to Phase 1 packets. Lens 3 keeps the current steward interface and adds an explanation instead of a new dependency or screen. Lens 4 forbids using best-lap time as race elapsed and requires the full enforcement change proposal to define timing, grid order and data migration. Lens 5 covers positive/zero time/grid values, rejected decisions, seeded legacy five-second sanction and duplicate decisions. Pass 2 found no further amendment. API-05 and E2E-R06/R11 remain open until the tests and affected screens pass.
