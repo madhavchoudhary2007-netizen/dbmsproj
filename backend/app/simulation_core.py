@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass, field
-from typing import Any, Protocol
+from typing import Protocol
 from uuid import UUID
 
 MAX_SESSION_LAPS = 72
@@ -11,9 +11,9 @@ MAX_SESSION_LAPS = 72
 @dataclass
 class Simulation:
     session_id: UUID
-    drivers: list[dict]
+    drivers: list[dict[str, object]]
     rate_hz: float
-    task: asyncio.Task | None = None
+    task: asyncio.Task[None] | None = None
     status: str = "stopped"
     lap_by_driver: dict[str, int] = field(default_factory=dict)
     sector_by_driver: dict[str, int] = field(default_factory=dict)
@@ -31,10 +31,10 @@ class Simulation:
     runs_completed: int = 0
     is_generated: bool = False
     incident_laps_recorded: set[int] = field(default_factory=set)
-    pit_reservations_by_driver: dict[str, dict[str, Any]] = field(default_factory=dict)
+    pit_reservations_by_driver: dict[str, dict[str, object]] = field(default_factory=dict)
     pit_due_tire_age_by_driver: dict[str, int] = field(default_factory=dict)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.total_laps is not None:
             self.total_laps = min(max(int(self.total_laps), 0), MAX_SESSION_LAPS)
 
