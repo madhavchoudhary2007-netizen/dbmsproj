@@ -3,11 +3,6 @@ updated_at: 2026-10-22T12:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-091 — API-02 representative CRUD write characterization
-- worker: W3 | priority: P1 | after: T-090
-- target_files: backend/tests/test_api.py
-- contract: pin create/patch/delete statuses, shapes, and role boundaries for championships/circuits
-- verify: DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_api.py -k crud_write_characterization
 ### T-092 — Generic CRUD read repository split
 - worker: W2 | priority: P1 | after: T-091
 - target_files: backend/app/main.py, backend/app/crud_repository.py
@@ -20,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (pruned on compaction)
+- T-091 ✓ 630b7d1; two seeded CRUD write/role characterization cases pass.
 - T-089 ✓ ca212ff; Simulation/MAX_SESSION_LAPS moved to simulation_core, six tests pass, Ruff 632.
 - T-090 ✓ 29bf2b5; six seeded CRUD list/detail status/shape/role cases pass.
 - T-016 ✓ 66f325e; Ruff violations 645→633, eight focused tests pass.
