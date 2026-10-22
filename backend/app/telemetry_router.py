@@ -7,21 +7,56 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pymongo.collection import Collection
 
+from .schemas_telemetry import Telemetry
 from .telemetry_repository import (
+    TelemetryIngestError,
     driver_exists,
     get_live_session,
     get_live_telemetry,
+    insert_telemetry,
     list_telemetry,
     session_exists,
 )
+
+INGEST_ERROR_RESPONSES = {
+    "session_not_found": (404, "Session not found"),
+    "session_inactive": (
+        409,
+        "Telemetry can only be ingested for an active session",
+    ),
+    "driver_not_found": (404, "Driver not found"),
+}
 
 
 def create_telemetry_router(
     current_user: Callable[..., Any],
     jsonable: Callable[[Any], Any],
     mongo_ready: Callable[[], Collection[dict[str, Any]]],
+    roles: Callable[..., Any],
+    telemetry_ws_payload: Callable[[dict[str, Any], Any], dict[str, Any]],
+    publish: Callable[[UUID, str, dict[str, Any]], Any],
 ) -> APIRouter:
     router = APIRouter()
+    ingest_dependency = Depends(roles("ADMIN", "STEWARD"))
+    @router.post("/api/telemetry/ingest", status_code=202)
+    def ingest(packet: Telemetry, user: Any = ingest_dependency):
+        collection = mongo_ready()
+        document = packet.model_dump(mode="json")
+        document["session_id"] = str(packet.session_id)
+        document["driver_id"] = str(packet.driver_id)
+        document["ts"] = packet.ts
+        try:
+            inserted = insert_telemetry(
+                collection, packet.session_id, packet.driver_id, document
+            )
+        except TelemetryIngestError as exc:
+            status_code, detail = INGEST_ERROR_RESPONSES.get(
+                exc.outcome, (503, "Telemetry store write failed")
+            )
+            raise HTTPException(status_code, detail) from exc
+        clean = telemetry_ws_payload(document, inserted.inserted_id)
+        publish(packet.session_id, "telemetry.sample", clean)
+        return {"accepted": True, "packet": clean}
 
     @router.get("/api/telemetry")
     def telemetry(
@@ -40,7 +75,6 @@ def create_telemetry_router(
             {**jsonable({key: value for key, value in doc.items() if key != "_id"}), "id": str(doc["_id"])}
             for doc in documents
         ]
-
     @router.get("/api/sessions/{session_id}/live")
     def live(session_id: UUID, user=Depends(current_user)):
         session = get_live_session(session_id)
@@ -53,5 +87,4 @@ def create_telemetry_router(
             for doc in latest
         ]
         return {"session": jsonable(session), "drivers": jsonable(drivers), "packets": packets}
-
     return router

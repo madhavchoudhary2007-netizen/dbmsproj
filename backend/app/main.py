@@ -67,9 +67,7 @@ from .schemas_auth import Login, UserCreate, UserPatch
 from .schemas_competition import MembershipIn, MembershipPatch, ResultIn
 from .schemas_operations import Action, AutoReservationIn, Decision, IncidentIn, ReservationIn
 from .schemas_simulation import DemoRaceCreate, SimulationControl
-from .schemas_telemetry import Telemetry
 from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
-from .telemetry_repository import TelemetryIngestError, insert_telemetry
 from .telemetry_router import create_telemetry_router
 from .user_router import create_user_router
 
@@ -694,28 +692,20 @@ def mongo_ready():
     return telemetry_collection
 
 
-@app.post("/api/telemetry/ingest", status_code=202)
-def ingest(packet: Telemetry, user=Depends(roles("ADMIN", "STEWARD"))):
-    col=mongo_ready(); doc=packet.model_dump(mode="json"); doc["session_id"]=str(packet.session_id); doc["driver_id"]=str(packet.driver_id); doc["ts"]=packet.ts
-    try:
-        inserted = insert_telemetry(col, packet.session_id, packet.driver_id, doc)
-    except TelemetryIngestError as exc:
-        if exc.outcome == "session_not_found":
-            raise HTTPException(404, "Session not found") from exc
-        if exc.outcome == "session_inactive":
-            raise HTTPException(
-                409, "Telemetry can only be ingested for an active session"
-            ) from exc
-        if exc.outcome == "driver_not_found":
-            raise HTTPException(404, "Driver not found") from exc
-        raise HTTPException(
-            503, "Telemetry store write failed"
-        ) from exc
-    clean=telemetry_ws_payload(doc,inserted.inserted_id); publish(packet.session_id,"telemetry.sample",clean)
-    return {"accepted":True,"packet":clean}
+def publish(session_id, kind, data):
+    bus.send(session_id,{"type":kind,"ts":datetime.now(timezone.utc).isoformat().replace("+00:00","Z"),"session_id":str(session_id),"data":jsonable(data)})
 
 
-app.include_router(create_telemetry_router(current_user, jsonable, mongo_ready))
+app.include_router(
+    create_telemetry_router(
+        current_user,
+        jsonable,
+        mongo_ready,
+        roles,
+        telemetry_ws_payload,
+        publish,
+    )
+)
 
 
 @app.get("/api/sessions/{session_id}/pit-strategy")
@@ -1499,10 +1489,6 @@ async def control_simulation(session_id: UUID, body: SimulationControl, user=Dep
             sim = Simulation(session_id, [], body.rate_hz or 2.0)
             simulations[str(session_id)] = sim
     return {"session_id": str(session_id), "state": sim.status, "cars": len(sim.drivers), "rate_hz": sim.rate_hz}
-
-
-def publish(session_id, kind, data):
-    bus.send(session_id,{"type":kind,"ts":datetime.now(timezone.utc).isoformat().replace("+00:00","Z"),"session_id":str(session_id),"data":jsonable(data)})
 
 
 async def _check_ws_runtime_lease(ws: WebSocket) -> bool:
