@@ -92,6 +92,7 @@ score: NOT_RUN
 - Existing Playwright config and 16-route smoke test require stronger authenticated journey coverage. Login keyboard audit and responsive run are open from prior work.
 
 ## Findings
+- T-147 moved pit strategy GET into an APIRouter with a re-export for direct callers and late-bound runtime access. Ruff improved 561 to 559; mypy stayed 248. Full isolated backend passed 118 with zero failures/skips/xfails and live acceptance passed. T-148 queued (2026-10-22).
 - T-146 extracted pit strategy session, driver and reservation SQL into typed repository I/O with unchanged query/order and route behavior. Focused 1 passed; Ruff 561, mypy 248; disposable backend 118 passed, 0 failed/skipped/xfailed, and live acceptance passed. T-147 queued (2026-10-22).
 - T-145 prepared the pit strategy live/history unit fixture for SQL-read repository extraction by patching both I/O boundaries. Focused test passed 1/1 with unchanged assertions; Ruff stayed 561. T-146 queued (2026-10-22).
 - F-STRUCT-03, area C, P1, closed by T-134..T-136: a second FastAPI TestClient lifespan after pool.close() could not reopen the module-global psycopg pool (`backend/app/database.py:11-22`); strict regression reproduced `PoolClosed`, pool recreation and current-pool lookup fixed it, and the full isolated backend/live gate passed.

@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-22T19:17:29Z
+updated_at: 2026-10-22T20:32:20Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-147 — Move pit strategy handler to APIRouter
-- worker: W2 | priority: P2 | after: T-146
-- target_files: backend/app/main.py, backend/app/pit_strategy_router.py
-- contract: preserve route registration, direct pit_strategy test import, 404, Mongo partial behavior, live/history response and injection boundaries
-- verify: focused pit strategy unit test; Ruff <=561 and mypy <=248
+### T-148 — Move demo race read SQL to repository
+- worker: W2 | priority: P2 | after: T-147
+- target_files: backend/app/main.py, backend/app/demo_race_repository.py
+- contract: extract demo_race_row SELECT and paged list-ID SELECT without changing response, order or simulation state
+- verify: focused seeded demo race lifecycle test; Ruff <=559 and mypy <=248
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-147 ✓ 77e05b9; pit strategy GET moved to APIRouter and re-exported, focused 1 passed, Ruff 559/mypy 248; full isolated backend 118/0/0 and live acceptance passed.
 - T-146 ✓ 0385a6e; pit strategy SQL reads moved to typed repository; focused 1 passed, Ruff 561/mypy 248; full isolated backend 118/0/0 and live acceptance passed.
 - T-145 ✓ 2ff423e; fixture patches both main and future pit_repository SQL I/O boundaries, focused 1 passed, Ruff 561.
 - T-144 ✓ f8e7e93; per-driver policy moved to pure service, focused 2 passed, Ruff 561/mypy 248; full backend 118/0/0 and live acceptance passed.
