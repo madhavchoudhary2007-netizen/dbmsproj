@@ -33,7 +33,9 @@ from psycopg.rows import dict_row, tuple_row
 from .config import APP_ENV, AUTO_DEMO_RACE, CORS_ORIGINS, JWT_ALGORITHM, JWT_MINUTES, JWT_SECRET, MONGODB_DATABASE, MONGODB_URL
 from .auth_cookie import create_csrf_token, set_auth_cookies, verify_csrf_token, clear_auth_cookies
 from .crud_repository import (
+    CrudDeleteError,
     create_crud_row,
+    delete_crud_row,
     get_crud_row,
     list_crud_rows,
     update_crud_row,
@@ -446,49 +448,10 @@ def crud_routes(resource: str, table: str, cols: tuple[str, ...], joins: str = "
 
     @app.delete(prefix + "/{item_id}", status_code=204)
     def delete_item(item_id: UUID, user=Depends(roles("ADMIN"))):
-        dependencies = {
-            "championships": ("race_events", "championship_id"),
-            "circuits": ("race_events", "circuit_id"),
-            "teams": ("team_memberships", "team_id"),
-            "drivers": ("session_results", "driver_id"),
-            "race_events": ("race_sessions", "event_id"),
-            "race_sessions": ("session_results", "session_id"),
-        }
-        with connection() as conn, conn.cursor() as cur:
-            child = dependencies.get(table)
-            if child:
-                child_table, foreign_key = child
-                cur.execute(f"SELECT 1 FROM {child_table} WHERE {foreign_key}=%s LIMIT 1", (item_id,))
-                if cur.fetchone():
-                    raise HTTPException(409, "Resource is referenced by official records")
-            if table == "drivers":
-                cur.execute("SELECT 1 FROM incident_reports WHERE driver_id=%s UNION ALL SELECT 1 FROM team_memberships WHERE driver_id=%s LIMIT 1", (item_id,item_id))
-                if cur.fetchone(): raise HTTPException(409,"Resource is referenced by official records")
-            if table == "teams":
-                cur.execute("SELECT 1 FROM pit_reservations WHERE team_id=%s LIMIT 1",(item_id,))
-                if cur.fetchone(): raise HTTPException(409,"Resource is referenced by official records")
-            if table == "race_sessions":
-                cur.execute("SELECT state FROM race_sessions WHERE id=%s", (item_id,))
-                existing = cur.fetchone()
-                if existing and existing["state"] in ("ACTIVE", "PAUSED"):
-                    raise HTTPException(409, "Finish or cancel an active session before deleting it")
-                cur.execute("SELECT 1 FROM demo_races WHERE session_id=%s", (item_id,))
-                if cur.fetchone():
-                    raise HTTPException(409, "Generated races must be removed through the demo-race endpoint")
-                col = telemetry_collection
-                if col is not None and col.count_documents({"session_id": str(item_id)}, limit=1):
-                    raise HTTPException(409, "Session has telemetry records and cannot be deleted")
-                if col is None:
-                    raise HTTPException(503, "MongoDB telemetry store is unavailable")
-                cur.execute("SELECT 1 FROM incident_reports WHERE session_id=%s UNION ALL SELECT 1 FROM pit_reservations WHERE session_id=%s LIMIT 1",(item_id,item_id))
-                if cur.fetchone(): raise HTTPException(409,"Resource is referenced by official records")
-            if table == "race_events":
-                cur.execute("SELECT 1 FROM pit_reservations p JOIN pit_boxes b ON b.id=p.pit_box_id WHERE b.event_id=%s LIMIT 1",(item_id,))
-                if cur.fetchone(): raise HTTPException(409,"Resource is referenced by official records")
-                cur.execute("DELETE FROM pit_boxes WHERE event_id=%s", (item_id,))
-            cur.execute(f"DELETE FROM {table} WHERE id=%s", (item_id,))
-            if cur.rowcount == 0:
-                raise HTTPException(404, f"{resource[:-1].capitalize()} not found")
+        try:
+            delete_crud_row(table, resource, item_id, telemetry_collection)
+        except CrudDeleteError as exc:
+            raise HTTPException(exc.status_code, exc.detail) from exc
         return None
 
 

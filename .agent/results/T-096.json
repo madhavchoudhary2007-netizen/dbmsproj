@@ -1,0 +1,19 @@
+{
+  "task_id": "T-096",
+  "status": "PASSED",
+  "files_modified": [
+    {"path": "backend/app/main.py", "lines_added": 6, "lines_removed": 43},
+    {"path": "backend/app/crud_repository.py", "lines_added": 88, "lines_removed": 1}
+  ],
+  "diff_summary": "Moved guarded CRUD delete database work into the repository with typed error outcomes; route retains exact HTTP mapping.",
+  "verification": {
+    "command": "DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_api.py -k 'crud_write_characterization or crud_delete_guard_characterization'",
+    "exit_code": 0,
+    "tests_passed": 3,
+    "tests_failed": 0,
+    "duration_ms": 1779,
+    "typecheck_errors": 261,
+    "lint_warnings": 615
+  },
+  "unresolved_blockers": []
+}
