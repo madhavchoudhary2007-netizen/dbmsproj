@@ -8,6 +8,11 @@ loop_iteration: 1 of 5
 - target_files: backend/app/main.py, backend/app/analytics_repository.py
 - contract: move dashboard/analytics SQL to repository, preserve public HTTP and JSON contract
 - verify: DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_api.py -k dashboard_analytics_characterization
+### T-099 — API-06 pit read characterization
+- worker: W3 | priority: P1 | after: T-097; independent of T-098
+- target_files: backend/tests/test_api.py
+- contract: pin pit box/reservation list shapes, ordering, validation and auth
+- verify: DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_api.py -k pit_read_characterization
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
