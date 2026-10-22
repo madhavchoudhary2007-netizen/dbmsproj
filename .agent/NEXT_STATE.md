@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-22T18:41:39Z
+updated_at: 2026-10-22T18:45:15Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-138 — Characterize telemetry ingest write contract
-- worker: W3 | priority: P2 | after: T-137
-- target_files: backend/tests/test_telemetry_ingest_contract.py
-- contract: pin seeded active-session POST 202/body/persisted Mongo packet and role/inactive failures with scoped cleanup; no product changes
-- verify: focused seeded test on apexgrid-test, Ruff <=582
+### T-139 — Extract telemetry ingest write I/O to repository
+- worker: W2 | priority: P2 | after: T-138
+- target_files: backend/app/main.py, backend/app/telemetry_repository.py
+- contract: preserve POST ingest auth/status/body, SQL state+driver checks and Mongo insert transaction; typed repository result/errors
+- verify: T-138 seeded contract on apexgrid-test; Ruff <=582, mypy <=252
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-138 ✓ e01de68; seeded ingest write contract 1 passed, exact-ID cleanup, Ruff 582.
 - T-137 ✓ d006544; two GET handlers moved to telemetry router, seeded 1 passed, Ruff 582/mypy 252; full backend 116/0/0 and live acceptance passed.
 - T-136 ✓ 029664e; old lifespan test mock targets get_pool, focused 1 passed; full isolated backend 116/0/0, live acceptance passed.
 - T-135 ✓ e99d7ab; pool reopens for sequential lifespans, focused seeded tests 2 passed, Ruff 583/mypy 254; full gate exposed stale test mock.

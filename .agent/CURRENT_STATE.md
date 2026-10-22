@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-22T18:41:39Z
-git_head: d006544
+updated_at: 2026-10-22T18:45:15Z
+git_head: e01de68
 branch: perfection-loop
 architect_sha256: c9780b9cd1ffe91fcb0fbf369b4b136205eb5c1ffb82e8cf199e42cca18c69c5
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -26,6 +26,7 @@ last_eval_score: NOT_RUN (quality gates and role journeys remain open)
 - T-135 pool recreation/current-pool accessor accepted: both focused seeded contracts passed with --runxfail, Ruff 583, mypy 254. T-134 marker retired (two test lines, orchestrator). Full isolated gate then passed 115 and failed one legacy lifespan unit fixture because it monkeypatches removed `main.pool`; T-136 updates that mock to `main.get_pool`, preserving assertions. Live acceptance awaits full gate.
 - T-136 updated the legacy test mock without changing assertions; focused test and unmarked two-lifespan regression pass. Full isolated backend now passes 116, zero failures/skips/xfails, and live acceptance passes. F-STRUCT-03 closed. Phase 2 next: T-137 read-only telemetry/live router extraction.
 - T-137 moved telemetry/live GET handlers into a typed router; seeded read contract passed, OpenAPI paths remain, Ruff 582 and mypy 252. Full isolated backend passed 116 with zero fail/skip/xfail; live acceptance passed. Phase 2 next: characterize telemetry ingest write before extracting it.
+- T-138 seeded ingest characterization passed 1/1 on apexgrid-test with scoped Mongo cleanup, auth/role/active-state, accepted payload and GET visibility checks; Ruff 582. T-139 extracts ingest write I/O into repository; router move follows.
 
 ## Orchestrator direct edits and Taste review
 - Product: one `frontend/package.json` build-script line switched Next build to webpack (e854d9b). No other product-source edits.
