@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import Any, Literal, cast
 from uuid import UUID
 
 import bcrypt
@@ -17,6 +17,9 @@ class UserPatchError(ValueError):
     def __init__(self, detail: str) -> None:
         super().__init__(detail)
         self.detail = detail
+
+
+UserDeleteResult = Literal["deleted", "not_found", "referenced"]
 
 
 def create_user(user: UserCreate) -> dict[str, Any]:
@@ -93,3 +96,21 @@ def update_user(user_id: UUID, patch: UserPatch) -> dict[str, Any] | None:
         )
         updated = cur.fetchone()
     return updated
+
+
+def delete_user(user_id: UUID) -> UserDeleteResult:
+    """Delete a user atomically after checking existence and official references."""
+    with connection() as conn, conn.cursor() as cur:
+        cur.execute("SELECT 1 FROM users WHERE id=%s FOR UPDATE", (user_id,))
+        if not cur.fetchone():
+            return "not_found"
+        cur.execute(
+            "SELECT 1 FROM teams WHERE principal_user_id=%s "
+            "UNION ALL SELECT 1 FROM drivers WHERE user_id=%s "
+            "UNION ALL SELECT 1 FROM incident_reports WHERE decided_by=%s LIMIT 1",
+            (user_id, user_id, user_id),
+        )
+        if cur.fetchone():
+            return "referenced"
+        cur.execute("DELETE FROM users WHERE id=%s", (user_id,))
+    return "deleted"

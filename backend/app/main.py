@@ -72,6 +72,7 @@ from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_perf
 from .user_repository import (
     UserPatchError,
     create_user as create_user_record,
+    delete_user as delete_user_record,
     get_user as get_user_record,
     list_users,
     update_user as update_user_record,
@@ -476,12 +477,11 @@ def update_user(user_id: UUID, body: UserPatch, user=Depends(roles("ADMIN"))):
 
 @app.delete("/api/users/{user_id}", status_code=204)
 def delete_user(user_id: UUID, user=Depends(roles("ADMIN"))):
-    with connection() as conn,conn.cursor() as cur:
-        cur.execute("SELECT 1 FROM users WHERE id=%s",(user_id,))
-        if not cur.fetchone(): raise HTTPException(404,"User not found")
-        cur.execute("SELECT 1 FROM teams WHERE principal_user_id=%s UNION ALL SELECT 1 FROM drivers WHERE user_id=%s UNION ALL SELECT 1 FROM incident_reports WHERE decided_by=%s LIMIT 1",(user_id,user_id,user_id))
-        if cur.fetchone(): raise HTTPException(409,"User is referenced by official records")
-        cur.execute("DELETE FROM users WHERE id=%s",(user_id,))
+    result = delete_user_record(user_id)
+    if result == "not_found":
+        raise HTTPException(404, "User not found")
+    if result == "referenced":
+        raise HTTPException(409, "User is referenced by official records")
     return None
 
 
