@@ -159,7 +159,6 @@ def test_standings_and_overlapping_pit_reservation(db):
         cur.execute("SELECT reserve_pit_box(%s,%s,%s,'2026-03-15 08:30+00','2026-03-15 09:30+00')", (box, session, team))
 
 
-@pytest.mark.xfail(strict=True, reason="F-DOM-02")
 def test_historical_penalty_provisional(db, monkeypatch):
     _, cur = db
     cur.execute("SELECT id FROM championships WHERE name='ApexGrid World Series' AND season=2026")

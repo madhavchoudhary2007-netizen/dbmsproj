@@ -3,11 +3,16 @@ updated_at: 2026-10-22T12:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-082 — F-DOM-02 provisional API metadata
-- worker: W2 | priority: P1 | after: T-081
-- target_files: backend/app/main.py
-- contract: add provisional bool to result and standings rows when historical nonzero time/grid sanction affects them
-- verify: focused T-081 --runxfail on disposable DB
+### T-083 — F-DOM-02 provisional browser reproduction
+- worker: W3 | priority: P1 | after: T-082
+- target_files: frontend/e2e/provisional-results.spec.ts
+- contract: strict switched browser xfails for affected session results and championship standings; unaffected data remains ordinary
+- verify: focused Playwright desktop/mobile with RUN_XFAIL switch
+### T-084 — F-DOM-02 provisional screen labels
+- worker: W1 | priority: P1 | after: T-083
+- target_files: frontend/components/special-pages.tsx, frontend/app/standings/page.tsx
+- contract: visibly label affected classification and standings provisional with reason and next step; unaffected view remains ordinary
+- verify: focused T-083 RUN_XFAIL=1 desktop/mobile
 ### T-015 — G13 simulation boundary extraction
 - worker: W2 | priority: P1 | after: T-012
 - target_files: backend/app/main.py, backend/app/simulation_core.py
@@ -66,4 +71,5 @@ loop_iteration: 1 of 5
 - T-079 ✓ 7659c61; two strict browser xfails on enabled steward time/grid controls
 - T-080 ✓ 9aa3424; disabled controls and accessible guidance; full browser 745/745 passes
 - T-081 ✓ d08b315; strict isolated legacy-sanction xfail reaches missing provisional API field
+- T-082 ✓ 5d19f6c; provisional API metadata, focused isolated DB regression passes
 - Earlier accepted tasks and evidence are in git history and LOOP.md.
