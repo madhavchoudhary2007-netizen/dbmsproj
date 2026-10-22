@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-21T18:40:00Z
-git_head: 4353aaa
+git_head: a47d81a
 branch: perfection-loop
 architect_sha256: 8753bfed50769fe28099f5f400bf3f7a42223fc98bebddda0db16eb7d0ece31b
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -26,10 +26,11 @@ last_eval_score: NOT_RUN (quality gates and journey coverage remain open)
 - Runtime parity, permissions matrix, simulator invariants, role journeys, full evaluation score, and docs audit remain open. `NEXT_STATE.md` is the queue.
 - T-012 simulation boundaries passed 6 focused tests with Ruff steady at 639; T-013 deployment-secret gate passed 5 subprocess cases. ADR-002 plans browser cookie/CSRF migration; architecture relocked at 8753bfed after focused five-lens review, implementation unstarted.
 - T-060 accepted: three strict G11 cookie-write/Origin tests xfail normally and fail with --runxfail (all return 200 before the fix). T-059 audit found F-ACE01 P2: login has no attempt throttling; its verify passed, and its audit file was included in T-060's broad .agent commit.
-- T-052 accepted at 4353aaa: cookie writes validate Origin and signed CSRF, logout clears cookies; six focused cases passed. Orchestrator removed 8 obsolete G11 xfail markers (5 from T-052, 3 from T-051); disposable-stack backend gate then passed 78 tests, 2 WS xfails, 0 skips, plus live acceptance. T-053 WS cookie/Origin is next.
+- T-052 accepted at 4353aaa and T-053 at 7b63377: cookie writes validate Origin/signed CSRF, logout clears cookies, cookie WS validates Origin; legacy bearer and WS subprotocol still work. T-061 at a47d81a wrapped three Ruff E501 test signatures. After orchestrator removed all remaining G11 xfail markers, disposable-stack backend gate passed 80 tests, 0 skips/xfails, plus live acceptance.
 - Phase 0 complete; 16-route browser smoke, isolated database and live acceptance, characterization tests, quality metrics, CI gates and deployment-secret regression are in place. T-050's eight strict cookie/CSRF xfails reproduce with --runxfail; coverage overall 72%, main 72%, database 100%, config 88%, race_archive 97%, bootstrap 0%. T-051 added session/CSRF cookies and cookie /me; legacy bearer JSON remains until coordinated frontend migration.
 
 ## Orchestrator direct edits and Taste review
 - Product source: one `frontend/package.json` build-script line switched Next build to webpack due Turbopack bind failure (logged at e854d9b). No other product-source edits.
 - Removed accepted strict xfail markers and unused pytest import from security/touch tests (6 test lines total), then reran full suites. T-009/T-049 CSS changes added no dependency, abstraction, palette, or new focal action; no new Taste defect in their diff. Existing large-file/spacing debt remains queued.
 - Removed 8 accepted G11 xfail marker lines in backend/tests/test_api.py after T-052; isolated DB and live acceptance rerun passed.
+- Removed 2 accepted WebSocket xfail marker lines in backend/tests/test_api.py after T-053; isolated DB and live acceptance rerun passed.

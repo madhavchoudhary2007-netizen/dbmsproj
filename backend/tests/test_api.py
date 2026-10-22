@@ -296,7 +296,6 @@ def test_cookie_auth_guard_rejects_login_from_disallowed_origin(
     assert response.status_code == 403
 
 
-@pytest.mark.xfail(strict=True, reason="G11")
 def test_cookie_auth_websocket_accepts_session_without_jwt_subprotocol(
     auth_characterization_client, monkeypatch
 ):
@@ -313,7 +312,6 @@ def test_cookie_auth_websocket_accepts_session_without_jwt_subprotocol(
         assert ws.accepted_subprotocol is None
 
 
-@pytest.mark.xfail(strict=True, reason="G11")
 def test_cookie_auth_websocket_rejects_unapproved_origin(
     auth_characterization_client, monkeypatch
 ):

@@ -3,16 +3,6 @@ updated_at: 2026-10-21T18:48:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-053 — G11 WebSocket cookie and Origin
-- worker: W2 | priority: P0 | after: T-052
-- target_files: backend/app/main.py
-- contract: session cookie WS accepted with allowed Origin; disallowed Origin rejected for all WS; legacy subprotocol remains
-- verify: .venv/bin/pytest -q backend/tests/test_api.py --runxfail -k 'cookie_auth_websocket'
-### T-061 — Ruff ratchet in G11 tests
-- worker: W3 | priority: P1 | after: T-060
-- target_files: backend/tests/test_api.py
-- contract: remove newly introduced E501 findings in G11 test helpers/cases without changing assertions or behavior
-- verify: .venv/bin/pytest -q backend/tests/test_api.py -k 'cookie_auth_guard or cookie_auth_logout'
 ### T-062 — Ruff ratchet in G11 runtime
 - worker: W2 | priority: P1 | after: T-053
 - target_files: backend/app/main.py, backend/app/auth_cookie.py
@@ -58,4 +48,6 @@ loop_iteration: 1 of 5
 - T-060 ✓ 83f6dfb; three strict guard xfails reproduced with --runxfail
 - T-059 ✓ verification passed; audit found F-ACE01 P2 login throttling (audit committed with T-060)
 - T-052 ✓ 4353aaa; six CSRF/logout/Origin cases pass, isolated suite 78 passed/2 WS xfailed/0 skipped
+- T-053 ✓ 7b63377; WS cookie/Origin and legacy auth tests pass; all G11 markers retired, isolated suite 80 passed/0 skipped/0 xfailed
+- T-061 ✓ a47d81a; three test E501 signatures wrapped; runtime ratchet repair T-062 next
 - Earlier accepted tasks and evidence are in git history and LOOP.md.
