@@ -897,6 +897,25 @@ def test_app_lifespan_starts_resources_and_awaits_simulator_shutdown(monkeypatch
     closed = Event()
     client_closed = Event()
 
+    class FakeRuntimeLease:
+        closed = False
+
+        def close(self):
+            self.closed = True
+            startup_calls.append(("lease", "close"))
+
+    runtime_lease = FakeRuntimeLease()
+    monkeypatch.setattr(
+        main_module, "acquire_runtime_lease",
+        lambda: startup_calls.append(("lease", "acquire")) or runtime_lease,
+        raising=False,
+    )
+    monkeypatch.setattr(
+        main_module, "check_runtime_lease",
+        lambda lease: startup_calls.append(("lease", "check", lease is runtime_lease)),
+        raising=False,
+    )
+
     class FakeMongoClient:
         def __init__(self, *_args, **_kwargs):
             self.admin = self
@@ -1320,6 +1339,18 @@ def test_runtime_lease_exclusive():
             first.close()
         if second is not None:
             second.close()
+
+
+@pytest.mark.xfail(strict=True, reason="F-STRUCT-01")
+def test_runtime_lifespan_rejects_second_owner():
+    from backend.app.runtime_lease import acquire_runtime_lease
+
+    held_lease = acquire_runtime_lease()
+    try:
+        with pytest.raises(RuntimeError, match=r"(?i)active.*owner"), TestClient(app):
+            pass
+    finally:
+        held_lease.close()
 
 
 @pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
