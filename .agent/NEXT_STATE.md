@@ -3,11 +3,11 @@ updated_at: 2026-10-22T08:49:30Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-106 — API-06 pit read router extraction
-- worker: W2 | priority: P1 | after: T-105
-- target_files: backend/app/main.py, backend/app/pit_router.py
-- contract: move pit GET handlers to APIRouter, preserve auth/UUID/JSON behavior
-- verify: DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_api.py -k 'pit_read_characterization or contract_routes_are_registered or reservation_requires_timezone_and_status_endpoint_exists'
+### T-107 — Competition and simulator request schemas
+- worker: W2 | priority: P1 | after: T-106
+- target_files: backend/app/main.py, backend/app/schemas_competition.py, backend/app/schemas_simulation.py
+- contract: extract membership/result/demo/simulator models with validation unchanged
+- verify: DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_api.py -k 'admin_user_management_and_protected_driver_session_fields or demo_car_numbers_are_distinct or simulation_stop_clears_pending_pit_reservations or completed_results'
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (pruned on compaction)
+- T-106 ✓ fcba18d; pit GET APIRouter, 3 focused seeded/route cases, Ruff 602, mypy 259.
 - T-105 ✓ 072f240; OpenAPI route inventory repair, 2 cases, full isolated backend 103 passed, no skips/failures.
 - T-104 ✓ ee93cac; dashboard/analytics APIRouter contract passed, Ruff 602, mypy 259; full backend revealed two route-inventory test assumptions, T-105 queued.
 - T-103 ✓ 9212d0b; Telemetry model extracted, 8 no-skip focused cases, Ruff 603, mypy 259.
