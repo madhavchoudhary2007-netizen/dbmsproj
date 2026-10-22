@@ -1094,6 +1094,83 @@ def test_dbms_workspace_table_browser_is_whitelisted_and_redacts_hashes(database
         row["driver_id"] for row in second.json())
 
 
+@pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
+def test_dashboard_analytics_characterization(database_api_client):
+    client = database_api_client
+    client.cookies.clear()
+    anonymous_dashboard = client.get("/api/dashboard")
+    anonymous_analytics = client.get("/api/analytics/drivers")
+    for response in (anonymous_dashboard, anonymous_analytics):
+        assert response.status_code == 401, response.text
+        assert response.json() == {"detail": "Authentication required"}
+
+    login = client.post("/api/auth/login", json={
+        "email": "admin@apexgrid.test", "password": "ApexGrid2026!",
+    })
+    assert login.status_code == 200, login.text
+    headers = {"Authorization": "Bearer " + login.json()["access_token"]}
+    client.cookies.clear()
+
+    dashboard = client.get("/api/dashboard", headers=headers)
+    assert dashboard.status_code == 200, dashboard.text
+    dashboard_data = dashboard.json()
+    assert set(dashboard_data) == {
+        "active_sessions", "scheduled_events", "open_incidents", "drivers", "active_session",
+    }
+    for key in ("active_sessions", "scheduled_events", "open_incidents", "drivers"):
+        assert isinstance(dashboard_data[key], int)
+    assert dashboard_data["active_session"] is None or isinstance(dashboard_data["active_session"], dict)
+
+    default = client.get("/api/analytics/drivers", headers=headers)
+    assert default.status_code == 200, default.text
+    rows = default.json()
+    assert isinstance(rows, list) and len(rows) <= 50
+    analytics_keys = {
+        "driver_id", "full_name", "number", "team_name", "sessions", "classified",
+        "best_finish", "wins", "avg_lap_time_ms", "points",
+    }
+    for row in rows:
+        assert set(row) == analytics_keys
+        assert isinstance(row["driver_id"], str) and isinstance(row["full_name"], str)
+        assert isinstance(row["number"], int)
+        assert row["team_name"] is None or isinstance(row["team_name"], str)
+        for key in ("sessions", "classified", "wins"):
+            assert isinstance(row[key], int)
+        assert row["best_finish"] is None or isinstance(row["best_finish"], int)
+        assert row["avg_lap_time_ms"] is None or isinstance(row["avg_lap_time_ms"], (int, float))
+        assert isinstance(row["points"], (int, float))
+
+    related = main_module.fetch_one("""SELECT d.id AS driver_id, ch.id AS championship_id,
+        ch.season, c.id AS circuit_id FROM drivers d
+        JOIN session_results sr ON sr.driver_id=d.id
+        JOIN race_sessions rs ON rs.id=sr.session_id
+        JOIN race_events e ON e.id=rs.event_id
+        JOIN championships ch ON ch.id=e.championship_id
+        JOIN circuits c ON c.id=e.circuit_id LIMIT 1""")
+    assert related, "expected a seeded driver result with championship and circuit"
+    query = (f"?driver_id={related['driver_id']}&championship_id={related['championship_id']}"
+             f"&season={related['season']}&circuit_id={related['circuit_id']}&limit=1&offset=0")
+    filtered = client.get("/api/analytics/drivers" + query, headers=headers)
+    assert filtered.status_code == 200, filtered.text
+    filtered_rows = filtered.json()
+    assert len(filtered_rows) == 1 and filtered_rows[0]["driver_id"] == str(related["driver_id"])
+    next_page = client.get("/api/analytics/drivers" + query.replace("offset=0", "offset=1"), headers=headers)
+    assert next_page.status_code == 200 and next_page.json() == []
+    for params in ("limit=0", "offset=-1"):
+        invalid = client.get("/api/analytics/drivers?" + params, headers=headers)
+        assert invalid.status_code == 422, invalid.text
+
+    client.cookies.clear()
+    driver_login = client.post("/api/auth/login", json={
+        "email": "driver01@apexgrid.test", "password": "ApexGrid2026!",
+    })
+    assert driver_login.status_code == 200, driver_login.text
+    driver_headers = {"Authorization": "Bearer " + driver_login.json()["access_token"]}
+    client.cookies.clear()
+    assert client.get("/api/dashboard", headers=driver_headers).status_code == 200
+    assert client.get("/api/analytics/drivers", headers=driver_headers).status_code == 200
+
+
 def test_dbms_mongo_collection_browser_lists_real_collections_and_pages_filtered_documents(monkeypatch):
     class Cursor:
         def __init__(self, docs):
