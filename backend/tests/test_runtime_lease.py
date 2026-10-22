@@ -147,10 +147,6 @@ def test_active_websocket_loss_closes_before_delivering_event(monkeypatch):
             lease.close()
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="F-STRUCT-01: idle WebSocket retains its bus subscription after lease loss",
-)
 def test_idle_websocket_loss_unsubscribes_without_bus_events(monkeypatch):
     real_acquire = main_module.acquire_runtime_lease
     captured_leases = []

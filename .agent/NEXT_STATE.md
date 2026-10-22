@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-22T13:57:00Z
+updated_at: 2026-10-22T14:03:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-120 — Close idle WebSocket after lease loss
-- worker: W2 | priority: P1 | after: T-119
-- target_files: backend/app/main.py
-- contract: bounded queue wait checks lifespan lease even without bus events; on loss close 1011 and unsubscribe within 2 seconds
-- verify: DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_runtime_lease.py -k idle_websocket_loss --runxfail
+### T-121 — Reproduce simulator continuation after lease loss
+- worker: W3 | priority: P1 | after: T-120
+- target_files: backend/tests/test_runtime_lease.py
+- contract: strict expected-failure unit test proves paused/running simulator loops stop with error before database read after a closed runtime lease
+- verify: APP_ENV=local .venv/bin/pytest -q backend/tests/test_runtime_lease.py -k simulation_lease_loss
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (pruned on compaction)
+- T-120 ✓ d5ebb3c; idle WS bounded check passed, Ruff 600, mypy 259; marker retired, full isolated backend 109 passed, zero skip/fail/xfail.
 - T-119 ✓ 5dbed9a; strict idle WS xfail accepted; --runxfail retains subscriber after loss, Ruff 600.
 - T-118 ✓ 883edc5; active WS pre-send guard --runxfail passed, Ruff 600, mypy 259; marker retired, full isolated backend 108 passed, zero skip/fail/xfail.
 - T-117 ✓ 655b2a7; strict active WS xfail accepted; --runxfail delivers stale event, Ruff 600.
