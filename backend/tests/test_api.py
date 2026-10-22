@@ -370,6 +370,50 @@ def test_cookie_auth_login_sets_secure_cookies_outside_local_mode(
     assert cookies["apexgrid_csrf"]["secure"]
 
 
+def archive_provisional_response(monkeypatch, penalties):
+    session_id, driver_id = uuid4(), uuid4()
+    result = {"driver_id": driver_id, "position": 1, "lap_time_ms": 85000,
+              "driver_name": "Test Driver", "number": 7, "licence_number": "TEST-7"}
+    monkeypatch.setitem(main_module.app.dependency_overrides, main_module.admin, lambda: {"role": "ADMIN"})
+    monkeypatch.setattr(main_module, "fetch_one", lambda *_: {"id": session_id, "state": "COMPLETED"})
+
+    def fetch_all(query, _params=()):
+        if "FROM session_results" in query:
+            return [result]
+        if "FROM drivers d" in query:
+            return [{"id": driver_id, "number": 7, "licence_number": "TEST-7", "driver_name": "Test Driver"}]
+        if "FROM penalties" in query:
+            return penalties
+        return []
+
+    class Collection:
+        def distinct(self, *_args): return []
+        def find_one(self, *_args, **_kwargs): return None
+        def aggregate(self, *_args): return []
+        def count_documents(self, *_args): return 0
+
+    monkeypatch.setattr(main_module, "fetch_all", fetch_all)
+    monkeypatch.setattr(main_module, "mongo_ready", Collection)
+    response = TestClient(app).get(f"/api/dbms/races/{session_id}?include_laps=false")
+    assert response.status_code == 200
+    body = response.json()
+    assert set(body) == {"session", "results", "incidents", "penalties", "pit_reservations",
+                         "drivers", "laps", "laps_included", "completed_driver_laps", "latest",
+                         "telemetry_count", "updated_at", "lap_source"}
+    return body
+
+
+@pytest.mark.xfail(strict=True, reason="F-DOM-02")
+def test_archive_provisional_historical_positive_sanction_results(monkeypatch):
+    body = archive_provisional_response(monkeypatch, [{"time_seconds": 5, "grid_places": 0}])
+    assert body["results"][0]["provisional"] is True
+
+
+def test_archive_provisional_unaffected_results_remain_false(monkeypatch):
+    body = archive_provisional_response(monkeypatch, [])
+    assert body["results"][0].get("provisional", False) is False
+
+
 def test_historical_archive_fills_missing_laps_without_replacing_recorded_data():
     session_id = uuid4()
     first_driver, second_driver = uuid4(), uuid4()
