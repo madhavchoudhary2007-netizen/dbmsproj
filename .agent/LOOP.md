@@ -92,6 +92,7 @@ score: NOT_RUN
 - Existing Playwright config and 16-route smoke test require stronger authenticated journey coverage. Login keyboard audit and responsive run are open from prior work.
 
 ## Findings
+- T-146 extracted pit strategy session, driver and reservation SQL into typed repository I/O with unchanged query/order and route behavior. Focused 1 passed; Ruff 561, mypy 248; disposable backend 118 passed, 0 failed/skipped/xfailed, and live acceptance passed. T-147 queued (2026-10-22).
 - T-145 prepared the pit strategy live/history unit fixture for SQL-read repository extraction by patching both I/O boundaries. Focused test passed 1/1 with unchanged assertions; Ruff stayed 561. T-146 queued (2026-10-22).
 - F-STRUCT-03, area C, P1, closed by T-134..T-136: a second FastAPI TestClient lifespan after pool.close() could not reopen the module-global psycopg pool (`backend/app/database.py:11-22`); strict regression reproduced `PoolClosed`, pool recreation and current-pool lookup fixed it, and the full isolated backend/live gate passed.
 - T-134 strict xfail reproduced F-STRUCT-03 on a second lifespan; T-135 made the pool reopen, and focused seeded tests passed 2/2. Marker retired. Full isolated gate afterward passed 115 and failed one legacy lifespan unit fixture because it monkeypatches removed `main.pool` (`backend/tests/test_api.py:935`); T-136 will point the mock at `main.get_pool` without changing assertions. Live acceptance was not reached (2026-10-22).
