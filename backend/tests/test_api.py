@@ -1301,7 +1301,6 @@ def database_api_client():
         yield client
 
 
-@pytest.mark.xfail(strict=True, reason="F-STRUCT-01")
 def test_runtime_lease_exclusive():
     from backend.app.runtime_lease import acquire_runtime_lease, check_runtime_lease
 
