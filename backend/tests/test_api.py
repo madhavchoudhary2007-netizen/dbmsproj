@@ -639,7 +639,6 @@ def test_incident_decisions_always_return_current_driver_state(monkeypatch, appr
 
 
 @pytest.mark.parametrize("field", ["time_seconds", "grid_places"])
-@pytest.mark.xfail(strict=True, reason="F-DOM-02: positive time and grid sanctions are not yet rejected")
 def test_unsupported_sanction_fields_are_rejected_with_guidance(field):
     with pytest.raises(ValidationError) as exc_info:
         main_module.Decision(approve=True, **{field: 1})
