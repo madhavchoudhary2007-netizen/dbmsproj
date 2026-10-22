@@ -3,11 +3,6 @@ updated_at: 2026-10-21T18:48:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-060 — G11 protected-write and Origin reproductions
-- worker: W3 | priority: P0 | after: T-051
-- target_files: backend/tests/test_api.py
-- contract: strict xfails for missing protected-write CSRF, forged cookie/header signature, and disallowed login Origin
-- verify: .venv/bin/pytest -q backend/tests/test_api.py -k cookie_auth_guard
 ### T-052 — G11 CSRF on cookie-authenticated writes and logout
 - worker: W2 | priority: P0 | after: T-060
 - target_files: backend/app/main.py, backend/app/auth_cookie.py
@@ -55,4 +50,6 @@ loop_iteration: 1 of 5
 - T-058 ✓ fb3da98; CI runs deployment-secret gate and fails unreachable audit
 - T-050 ✓ cf80374; 8 strict cookie/CSRF xfails reproduced, Ruff 639
 - T-051 ✓ 9aa67ed; session/CSRF cookies and cookie /me, 3 --runxfail checks
+- T-060 ✓ 83f6dfb; three strict guard xfails reproduced with --runxfail
+- T-059 ✓ verification passed; audit found F-ACE01 P2 login throttling (audit committed with T-060)
 - Earlier accepted tasks and evidence are in git history and LOOP.md.

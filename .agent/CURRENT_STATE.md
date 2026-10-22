@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-21T18:40:00Z
-git_head: 9aa67ed
+git_head: 83f6dfb
 branch: perfection-loop
 architect_sha256: 8753bfed50769fe28099f5f400bf3f7a42223fc98bebddda0db16eb7d0ece31b
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -25,6 +25,7 @@ last_eval_score: NOT_RUN (quality gates and journey coverage remain open)
 - Frontend dev-tool advisories need a safe upgrade path; `npm audit fix --dry-run` offers only in-range `eslint-config-next` and selector-parser updates, and Tailwind 4 is major.
 - Runtime parity, permissions matrix, simulator invariants, role journeys, full evaluation score, and docs audit remain open. `NEXT_STATE.md` is the queue.
 - T-012 simulation boundaries passed 6 focused tests with Ruff steady at 639; T-013 deployment-secret gate passed 5 subprocess cases. ADR-002 plans browser cookie/CSRF migration; architecture relocked at 8753bfed after focused five-lens review, implementation unstarted.
+- T-060 accepted: three strict G11 cookie-write/Origin tests xfail normally and fail with --runxfail (all return 200 before the fix). T-059 audit found F-ACE01 P2: login has no attempt throttling; its verify passed, and its audit file was included in T-060's broad .agent commit.
 - Phase 0 complete; 16-route browser smoke, isolated database and live acceptance, characterization tests, quality metrics, CI gates and deployment-secret regression are in place. T-050's eight strict cookie/CSRF xfails reproduce with --runxfail; coverage overall 72%, main 72%, database 100%, config 88%, race_archive 97%, bootstrap 0%. T-051 added session/CSRF cookies and cookie /me; legacy bearer JSON remains until coordinated frontend migration.
 
 ## Orchestrator direct edits and Taste review
