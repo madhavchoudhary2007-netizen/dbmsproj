@@ -66,3 +66,34 @@ def test_runtime_lease_loss_fails_closed(monkeypatch):
     finally:
         for lease in captured_leases:
             lease.close()
+
+
+@pytest.mark.xfail(strict=True, reason="F-STRUCT-01")
+def test_runtime_websocket_loss(monkeypatch):
+    from starlette.websockets import WebSocketDisconnect
+
+    real_acquire = main_module.acquire_runtime_lease
+    captured_leases = []
+
+    def capture_runtime_lease():
+        lease = real_acquire()
+        captured_leases.append(lease)
+        return lease
+
+    try:
+        with monkeypatch.context() as patch:
+            patch.setattr(main_module, "acquire_runtime_lease", capture_runtime_lease)
+            with TestClient(app) as client:
+                assert len(captured_leases) == 1
+                captured_leases[0].close()
+                with (
+                    pytest.raises(WebSocketDisconnect) as disconnected,
+                    client.websocket_connect(f"/api/ws/sessions/{uuid4()}"),
+                ):
+                    pass
+
+            assert disconnected.value.code == 1011
+            assert "runtime ownership was lost" in disconnected.value.reason.lower()
+    finally:
+        for lease in captured_leases:
+            lease.close()
