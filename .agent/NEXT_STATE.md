@@ -3,11 +3,11 @@ updated_at: 2026-10-22T12:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-068 — G11 browser login JSON user-only
-- worker: W2 | priority: P0 | after: T-067
-- target_files: backend/app/main.py
-- contract: allowed-Origin login JSON is exactly {user}; no-Origin legacy login still returns access_token; cookies for both
-- verify: .venv/bin/pytest -q backend/tests/test_api.py --runxfail -k cookie_auth_browser_shape
+### T-069 — G11 browser logout and CSRF journeys
+- worker: W3 | priority: P0 | after: T-068
+- target_files: frontend/e2e/auth-cookie.spec.ts
+- contract: browser logout sends signed double-submit header/cookie; success redirects, server failure retains signed-in state with retry message
+- verify: PLAYWRIGHT_PORT=32173 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts e2e/auth-cookie.spec.ts --project=desktop-1440
 ### T-015 — G13 simulation boundary extraction
 - worker: W2 | priority: P1 | after: T-012
 - target_files: backend/app/main.py, backend/app/simulation_core.py
@@ -52,4 +52,5 @@ loop_iteration: 1 of 5
 - T-064 ✓ cc828eb and fixture correction 846c380; corrected test failed old client/passed new
 - T-055 ✓ f09d80f; cookie-only live WS; full Playwright matrix 730 passed with exit 0
 - T-067 ✓ a103d2f; browser login JSON token leak reproduced, no-Origin legacy login pinned
+- T-068 ✓ 417d0d2; browser JSON user-only; isolated backend 82 passed/0 skipped/0 xfailed and live acceptance pass
 - Earlier accepted tasks and evidence are in git history and LOOP.md.

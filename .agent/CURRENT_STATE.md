@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-21T18:40:00Z
-git_head: a103d2f
+git_head: 417d0d2
 branch: perfection-loop
 architect_sha256: 8753bfed50769fe28099f5f400bf3f7a42223fc98bebddda0db16eb7d0ece31b
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -32,6 +32,7 @@ last_eval_score: NOT_RUN (quality gates and journey coverage remain open)
 - T-066 accepted at 724e732: three audit fixtures use cookie-based /me and a signed-out login response. Full Playwright matrix exits 0 with 725/725 passed across five projects. Live WS browser reproduction and client migration are next.
 - T-064/T-055 accepted at cc828eb/f09d80f. Corrected the browser WebSocket fixture to preserve Next's own socket; with RUN_XFAIL=1 it failed on the old token gate and passed on the new cookie client. Marker removed; full Playwright matrix exits 0 with 730/730. Browser login response still includes a bearer token despite ADR-002; T-067 is next.
 - T-067 accepted at a103d2f: strict xfail reproduces browser Origin login JSON leaking access_token/token_type, while no-Origin legacy token assertion passes. Ruff remains 633. T-068 backend response fix is next.
+- T-068 accepted at 417d0d2: allowed-Origin login returns `{user}` only; no-Origin legacy token response remains. Ruff 633. Removed xfail; isolated backend suite 82 passed/0 skips/xfails, plus live acceptance. Browser logout/CSRF verification is next.
 - Phase 0 complete; 16-route browser smoke, isolated database and live acceptance, characterization tests, quality metrics, CI gates and deployment-secret regression are in place. T-050's eight strict cookie/CSRF xfails reproduce with --runxfail; coverage overall 72%, main 72%, database 100%, config 88%, race_archive 97%, bootstrap 0%. T-051 added session/CSRF cookies and cookie /me; legacy bearer JSON remains until coordinated frontend migration.
 
 ## Orchestrator direct edits and Taste review

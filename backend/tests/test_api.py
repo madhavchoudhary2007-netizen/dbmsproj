@@ -205,7 +205,6 @@ def test_cookie_auth_login_sets_host_only_session_and_readable_csrf(
     assert csrf["path"] == "/" and not csrf["domain"]
 
 
-@pytest.mark.xfail(strict=True, reason="G11")
 def test_cookie_auth_browser_shape(auth_characterization_client, monkeypatch):
     import bcrypt
 
