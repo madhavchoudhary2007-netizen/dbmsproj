@@ -638,6 +638,37 @@ def test_incident_decisions_always_return_current_driver_state(monkeypatch, appr
     assert result["driver"] == {"eligibility": "ACTIVE", "season_points": 0}
 
 
+@pytest.mark.parametrize("field", ["time_seconds", "grid_places"])
+@pytest.mark.xfail(strict=True, reason="F-DOM-02: positive time and grid sanctions are not yet rejected")
+def test_unsupported_sanction_fields_are_rejected_with_guidance(field):
+    with pytest.raises(ValidationError) as exc_info:
+        main_module.Decision(approve=True, **{field: 1})
+
+    message = str(exc_info.value).lower()
+    assert field in message
+    assert any(reason in message for reason in ("unsupported", "cannot be applied", "not supported"))
+    assert "points" in message and any(step in message for step in ("use", "until", "implement"))
+
+
+@pytest.mark.parametrize(
+    "decision",
+    [
+        {"approve": True, "time_seconds": 0, "grid_places": 0},
+        {"approve": True, "points": 3},
+        {"approve": False, "points": 3},
+    ],
+)
+def test_unsupported_sanction_zero_and_points_only_decisions_remain_valid(decision):
+    parsed = main_module.Decision(**decision)
+    assert parsed.model_dump() == {
+        "approve": decision["approve"],
+        "notes": None,
+        "points": decision.get("points", 0),
+        "time_seconds": decision.get("time_seconds", 0),
+        "grid_places": decision.get("grid_places", 0),
+    }
+
+
 def test_manual_pit_reservation_allows_steward_role():
     from fastapi.routing import APIRoute
 
