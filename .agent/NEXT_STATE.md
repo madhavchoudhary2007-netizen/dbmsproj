@@ -3,11 +3,6 @@ updated_at: 2026-10-21T18:48:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-052 — G11 CSRF on cookie-authenticated writes and logout
-- worker: W2 | priority: P0 | after: T-060
-- target_files: backend/app/main.py, backend/app/auth_cookie.py
-- contract: every unsafe cookie-authenticated HTTP request verifies signed CSRF and allowed Origin; logout clears cookies; bearer-only legacy writes continue
-- verify: .venv/bin/pytest -q backend/tests/test_api.py --runxfail -k 'cookie_auth_logout'
 ### T-053 — G11 WebSocket cookie and Origin
 - worker: W2 | priority: P0 | after: T-052
 - target_files: backend/app/main.py
@@ -52,4 +47,5 @@ loop_iteration: 1 of 5
 - T-051 ✓ 9aa67ed; session/CSRF cookies and cookie /me, 3 --runxfail checks
 - T-060 ✓ 83f6dfb; three strict guard xfails reproduced with --runxfail
 - T-059 ✓ verification passed; audit found F-ACE01 P2 login throttling (audit committed with T-060)
+- T-052 ✓ 4353aaa; six CSRF/logout/Origin cases pass, isolated suite 78 passed/2 WS xfailed/0 skipped
 - Earlier accepted tasks and evidence are in git history and LOOP.md.

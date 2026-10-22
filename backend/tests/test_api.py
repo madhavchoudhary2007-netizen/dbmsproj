@@ -191,7 +191,6 @@ def cookie_auth_set_cookies(response):
     return cookies
 
 
-@pytest.mark.xfail(strict=True, reason="G11")
 def test_cookie_auth_login_sets_host_only_session_and_readable_csrf(
     auth_characterization_client, monkeypatch
 ):
@@ -206,7 +205,6 @@ def test_cookie_auth_login_sets_host_only_session_and_readable_csrf(
     assert csrf["path"] == "/" and not csrf["domain"]
 
 
-@pytest.mark.xfail(strict=True, reason="G11")
 def test_cookie_auth_me_uses_session_without_bearer(auth_characterization_client, monkeypatch):
     user = auth_characterization_user()
     cookie_auth_login(auth_characterization_client, monkeypatch)
@@ -216,7 +214,6 @@ def test_cookie_auth_me_uses_session_without_bearer(auth_characterization_client
 
 
 @pytest.mark.parametrize("csrf_value", [None, "wrong-token"], ids=["missing", "wrong"])
-@pytest.mark.xfail(strict=True, reason="G11")
 def test_cookie_auth_logout_rejects_missing_or_wrong_csrf(
     auth_characterization_client, monkeypatch, csrf_value
 ):
@@ -228,7 +225,6 @@ def test_cookie_auth_logout_rejects_missing_or_wrong_csrf(
     assert response.status_code == 403
 
 
-@pytest.mark.xfail(strict=True, reason="G11")
 def test_cookie_auth_logout_accepts_csrf_and_clears_both_cookies(
     auth_characterization_client, monkeypatch
 ):
@@ -259,7 +255,6 @@ def cookie_auth_mock_user_update_db(monkeypatch):
     monkeypatch.setattr(main_module, "connection", lambda: nullcontext(connection))
 
 
-@pytest.mark.xfail(strict=True, reason="G11")
 def test_cookie_auth_guard_rejects_protected_write_without_csrf(auth_characterization_client, monkeypatch):
     cookie_auth_login(auth_characterization_client, monkeypatch, role="ADMIN")
     cookie_auth_mock_user_update_db(monkeypatch)
@@ -270,7 +265,6 @@ def test_cookie_auth_guard_rejects_protected_write_without_csrf(auth_characteriz
     assert response.status_code == 403
 
 
-@pytest.mark.xfail(strict=True, reason="G11")
 def test_cookie_auth_guard_rejects_forged_signed_csrf_pair(auth_characterization_client, monkeypatch):
     cookie_auth_login(auth_characterization_client, monkeypatch, role="ADMIN")
     cookie_auth_mock_user_update_db(monkeypatch)
@@ -284,7 +278,6 @@ def test_cookie_auth_guard_rejects_forged_signed_csrf_pair(auth_characterization
     assert response.status_code == 403
 
 
-@pytest.mark.xfail(strict=True, reason="G11")
 def test_cookie_auth_guard_rejects_login_from_disallowed_origin(auth_characterization_client, monkeypatch):
     import bcrypt
 
@@ -336,7 +329,6 @@ def test_cookie_auth_websocket_rejects_unapproved_origin(
         pass
 
 
-@pytest.mark.xfail(strict=True, reason="G11")
 def test_cookie_auth_login_sets_secure_cookies_outside_local_mode(
     auth_characterization_client, monkeypatch
 ):
