@@ -70,9 +70,11 @@ from .schemas_simulation import DemoRaceCreate, SimulationControl
 from .schemas_telemetry import Telemetry
 from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
 from .user_repository import (
+    UserPatchError,
     create_user as create_user_record,
     get_user as get_user_record,
     list_users,
+    update_user as update_user_record,
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -463,24 +465,12 @@ def create_user(body: UserCreate, user=Depends(roles("ADMIN"))):
 
 @app.patch("/api/users/{user_id}")
 def update_user(user_id: UUID, body: UserPatch, user=Depends(roles("ADMIN"))):
-    values=body.model_dump(exclude_unset=True)
-    if not values: raise HTTPException(422,"At least one field is required")
-    if "password" in values:
-        password=values.pop("password")
-        if password is None: raise HTTPException(422,"Password cannot be null")
-        values["password_hash"]=bcrypt.hashpw(password.encode("utf-8"),bcrypt.gensalt()).decode("utf-8")
-    if "email" in values:
-        if values["email"] is None: raise HTTPException(422,"Email cannot be null")
-        values["email"]=values["email"].strip()
-    if "full_name" in values:
-        if values["full_name"] is None: raise HTTPException(422,"Full name cannot be null")
-        values["full_name"]=values["full_name"].strip()
-    if "role" in values and values["role"] is None: raise HTTPException(422,"Role cannot be null")
-    fields=list(values)
-    with connection() as conn,conn.cursor(row_factory=dict_row) as cur:
-        cur.execute("UPDATE users SET "+",".join(f"{field}=%s" for field in fields)+" WHERE id=%s RETURNING id,email,full_name,role",[values[field] for field in fields]+[user_id])
-        updated=cur.fetchone()
-    if not updated: raise HTTPException(404,"User not found")
+    try:
+        updated = update_user_record(user_id, body)
+    except UserPatchError as exc:
+        raise HTTPException(422, exc.detail) from exc
+    if not updated:
+        raise HTTPException(404, "User not found")
     return jsonable(updated)
 
 
