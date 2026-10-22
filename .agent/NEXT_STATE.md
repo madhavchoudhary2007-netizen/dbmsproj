@@ -3,10 +3,10 @@ updated_at: 2026-10-22T08:49:30Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-099 — API-06 pit read characterization
-- worker: W3 | priority: P1 | after: T-097; independent of T-098
-- target_files: backend/tests/test_api.py
-- contract: pin pit box/reservation list shapes, ordering, validation and auth
+### T-100 — API-06 pit read repository extraction
+- worker: W2 | priority: P1 | after: T-099
+- target_files: backend/app/main.py, backend/app/pit_repository.py
+- contract: move pit box/reservation read SQL and shared SELECT to repository, preserve route behavior
 - verify: DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_api.py -k pit_read_characterization
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (pruned on compaction)
+- T-099 ✓ efc9feb; seeded pit box/reservation read contract, 1 case, Ruff 605.
 - T-098 ✓ f8adaf9; dashboard/analytics SQL to repository, 1 seeded case, Ruff 605, mypy 261.
 - T-097 ✓ 91e2f9a; dashboard/analytics shape/filter/role characterization, 1 seeded case. Full isolated backend 102 passed, 0 skipped/failed.
 - T-096 ✓ 28f1620; guarded generic CRUD delete moved to repository, 3 seeded cases, Ruff 615, mypy 261.
