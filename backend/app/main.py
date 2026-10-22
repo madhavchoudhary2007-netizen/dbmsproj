@@ -43,6 +43,7 @@ from .crud_repository import (
 from .database import close_pool, connection, fetch_all, fetch_one, open_pool, pool
 from .pit_repository import PIT_RESERVATION_SELECT
 from .pit_router import create_pit_router
+from .runtime_lease import acquire_runtime_lease
 from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
 from .schemas_auth import Login, UserCreate, UserPatch
 from .schemas_competition import MembershipIn, MembershipPatch, ResultIn
@@ -66,6 +67,7 @@ telemetry_collection = None
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     global mongo_client, telemetry_collection
+    runtime_lease = acquire_runtime_lease()
     try:
         open_pool()
     except Exception:
@@ -88,19 +90,22 @@ async def lifespan(_: FastAPI):
     try:
         yield
     finally:
-        tasks = [sim.task for sim in simulations.values() if sim.task and not sim.task.done()]
-        for task in tasks:
-            task.cancel()
-        if tasks:
-            await asyncio.gather(*tasks, return_exceptions=True)
-        if mongo_client:
-            mongo_client.close()
-        mongo_client = None
-        telemetry_collection = None
         try:
-            close_pool()
-        except Exception:
-            pass
+            tasks = [sim.task for sim in simulations.values() if sim.task and not sim.task.done()]
+            for task in tasks:
+                task.cancel()
+            if tasks:
+                await asyncio.gather(*tasks, return_exceptions=True)
+            if mongo_client:
+                mongo_client.close()
+            mongo_client = None
+            telemetry_collection = None
+            try:
+                close_pool()
+            except Exception:
+                pass
+        finally:
+            runtime_lease.close()
 
 
 app = FastAPI(title="ApexGrid API", version="1.0.0", lifespan=lifespan)
