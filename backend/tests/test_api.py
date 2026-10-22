@@ -844,6 +844,7 @@ def test_constraint_demo_rolls_back_if_the_database_accepts_invalid_data(monkeyp
 
 def test_pit_strategy_reports_pending_live_decision_and_historical_stops(monkeypatch):
     from backend.app import main as main_module
+    from backend.app import pit_repository
     session_id = uuid4()
     driver_id = uuid4()
     box_id = uuid4()
@@ -853,11 +854,15 @@ def test_pit_strategy_reports_pending_live_decision_and_historical_stops(monkeyp
         "id": session_id, "state": "ACTIVE", "total_laps": 30, "generated": True,
         "scheduled_at": datetime(2026, 10, 5, tzinfo=timezone.utc),
     })
+    monkeypatch.setattr(pit_repository, "fetch_one",
+                        lambda *args: main_module.fetch_one(*args), raising=False)
     monkeypatch.setattr(main_module, "fetch_all", lambda query, _params: [driver] if "demo_race_entries" in query else [{
         "id": box_id, "driver_id": driver_id, "box_number": 2, "status": "COMPLETED",
         "starts_at": datetime(2026, 10, 5, 1, tzinfo=timezone.utc),
         "ends_at": datetime(2026, 10, 5, 1, 1, tzinfo=timezone.utc),
     }])
+    monkeypatch.setattr(pit_repository, "fetch_all",
+                        lambda query, params: main_module.fetch_all(query, params))
     class Collection:
         def find(self, *_args): return self
         def sort(self, *_args): return self
