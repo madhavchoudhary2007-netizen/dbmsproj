@@ -63,7 +63,8 @@ def db():
         cur = conn.cursor()
         cur.execute(f'CREATE SCHEMA "{schema}"')
         cur.execute(f'SET search_path TO "{schema}", public')
-        cur.execute((ROOT / "migrations/001_initial.sql").read_text())
+        for migration in sorted((ROOT / "migrations").glob("[0-9]*.sql")):
+            cur.execute(migration.read_text())
         cur.execute((ROOT / "db/seed.sql").read_text())
         yield conn, cur
     finally:
@@ -154,6 +155,29 @@ def test_standings_and_overlapping_pit_reservation(db):
     cur.execute("SELECT reserve_pit_box(%s,%s,%s,'2026-03-15 08:00+00','2026-03-15 09:00+00')", (box, session, team))
     with pytest.raises(Exception):
         cur.execute("SELECT reserve_pit_box(%s,%s,%s,'2026-03-15 08:30+00','2026-03-15 09:30+00')", (box, session, team))
+
+
+@pytest.mark.xfail(strict=True, reason="F-DOM-01")
+def test_unclassified_bonus_points_do_not_count(db):
+    _, cur = db
+    now = datetime.now(timezone.utc)
+    cur.execute("INSERT INTO championships(name,season) VALUES ('Unclassified bonus regression',2099) RETURNING id")
+    championship_id = cur.fetchone()[0]
+    cur.execute("SELECT id FROM circuits WHERE name='Harbor Ring'")
+    circuit_id = cur.fetchone()[0]
+    cur.execute("SELECT id FROM drivers WHERE number=1 ORDER BY licence_number LIMIT 1")
+    driver_id = cur.fetchone()[0]
+    cur.execute("""INSERT INTO race_events(championship_id,circuit_id,round_number,name,start_date)
+        VALUES (%s,%s,1,'Unclassified bonus regression',%s) RETURNING id""", (championship_id,circuit_id,now))
+    event_id = cur.fetchone()[0]
+    cur.execute("""INSERT INTO race_sessions(event_id,session_type,state,scheduled_at,started_at,ended_at,total_laps)
+        VALUES (%s,'RACE','COMPLETED',%s,%s,%s,1) RETURNING id""", (event_id,now,now,now))
+    session_id = cur.fetchone()[0]
+    cur.execute("""INSERT INTO session_results(session_id,driver_id,position,lap_time_ms,pole,fastest_lap,classified)
+        VALUES (%s,%s,1,90000,true,true,false)""", (session_id,driver_id))
+    cur.execute("SELECT recalculate_standings(%s)", (championship_id,))
+    cur.execute("SELECT points FROM driver_standings WHERE championship_id=%s AND driver_id=%s", (championship_id,driver_id))
+    assert cur.fetchone()[0] == 0
 
 
 def test_penalty_requires_approved_incident_and_matching_driver(db):
