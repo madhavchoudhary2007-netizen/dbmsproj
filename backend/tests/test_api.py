@@ -1301,6 +1301,28 @@ def database_api_client():
         yield client
 
 
+@pytest.mark.xfail(strict=True, reason="F-STRUCT-01")
+def test_runtime_lease_exclusive():
+    from backend.app.runtime_lease import acquire_runtime_lease, check_runtime_lease
+
+    first = second = None
+    try:
+        first = acquire_runtime_lease()
+        with pytest.raises(RuntimeError, match=r"(?i)active.*owner"):
+            acquire_runtime_lease()
+
+        first.close()
+        second = acquire_runtime_lease()
+        assert second.closed is False
+        with pytest.raises(RuntimeError):
+            check_runtime_lease(first)
+    finally:
+        if first is not None:
+            first.close()
+        if second is not None:
+            second.close()
+
+
 @pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
 @pytest.mark.parametrize(("resource", "required_keys"), [
     ("championships", {"id", "name", "season"}),
