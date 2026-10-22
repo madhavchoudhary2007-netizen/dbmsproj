@@ -175,9 +175,10 @@ def test_auth_characterization_websocket_accepts_and_rejects_tokens(
     assert rejected.value.reason == "Invalid or expired token"
 
 
-def cookie_auth_login(client, monkeypatch):
+def cookie_auth_login(client, monkeypatch, role="DRIVER"):
     import bcrypt
     user = auth_characterization_user(bcrypt.hashpw(b"correct horse", bcrypt.gensalt()).decode())
+    user["role"] = role
     auth_characterization_fetch(monkeypatch, user)
     return auth_characterization_login(client, user, "correct horse")
 
@@ -243,6 +244,57 @@ def test_cookie_auth_logout_accepts_csrf_and_clears_both_cookies(
                if any(value.startswith(f"{name}=") and ("max-age=0" in value or "expires=" in value)
                       for value in headers)}
     assert cleared == {"apexgrid_session", "apexgrid_csrf"}
+
+
+def cookie_auth_mock_user_update_db(monkeypatch):
+    from contextlib import nullcontext
+    from unittest.mock import Mock
+
+    cursor = Mock()
+    cursor.fetchone.return_value = {
+        "id": 42, "email": "driver@example.test", "full_name": "Test Driver", "role": "ADMIN"
+    }
+    connection = Mock()
+    connection.cursor.return_value = nullcontext(cursor)
+    monkeypatch.setattr(main_module, "connection", lambda: nullcontext(connection))
+
+
+@pytest.mark.xfail(strict=True, reason="G11")
+def test_cookie_auth_guard_rejects_protected_write_without_csrf(auth_characterization_client, monkeypatch):
+    cookie_auth_login(auth_characterization_client, monkeypatch, role="ADMIN")
+    cookie_auth_mock_user_update_db(monkeypatch)
+    response = auth_characterization_client.patch(
+        "/api/users/00000000-0000-4000-8000-000000000042",
+        json={"full_name": "Changed"}, headers={"Origin": "http://localhost:3000"},
+    )
+    assert response.status_code == 403
+
+
+@pytest.mark.xfail(strict=True, reason="G11")
+def test_cookie_auth_guard_rejects_forged_signed_csrf_pair(auth_characterization_client, monkeypatch):
+    cookie_auth_login(auth_characterization_client, monkeypatch, role="ADMIN")
+    cookie_auth_mock_user_update_db(monkeypatch)
+    forged = "planted-nonce.invalid-signature"
+    auth_characterization_client.cookies.set("apexgrid_csrf", forged)
+    response = auth_characterization_client.patch(
+        "/api/users/00000000-0000-4000-8000-000000000042",
+        json={"full_name": "Changed"},
+        headers={"Origin": "http://localhost:3000", "X-CSRF-Token": forged},
+    )
+    assert response.status_code == 403
+
+
+@pytest.mark.xfail(strict=True, reason="G11")
+def test_cookie_auth_guard_rejects_login_from_disallowed_origin(auth_characterization_client, monkeypatch):
+    import bcrypt
+
+    user = auth_characterization_user(bcrypt.hashpw(b"correct horse", bcrypt.gensalt()).decode())
+    auth_characterization_fetch(monkeypatch, user)
+    response = auth_characterization_client.post(
+        "/api/auth/login", json={"email": user["email"], "password": "correct horse"},
+        headers={"Origin": "https://unapproved.example"},
+    )
+    assert response.status_code == 403
 
 
 @pytest.mark.xfail(strict=True, reason="G11")
