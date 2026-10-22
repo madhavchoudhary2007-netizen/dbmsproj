@@ -3,11 +3,11 @@ updated_at: 2026-10-22T12:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-085 — F-DOM-02 archive provisional API reproducer
-- worker: W3 | priority: P1 | after: T-084
-- target_files: backend/tests/test_api.py
-- contract: strict xfail for historical affected archive result; unaffected result stays ordinary
-- verify: .venv/bin/pytest -q backend/tests/test_api.py -k archive_provisional
+### T-086 — F-DOM-02 archive provisional API repair
+- worker: W2 | priority: P1 | after: T-085
+- target_files: backend/app/main.py
+- contract: archive results carry provisional boolean for completed race with historical positive time/grid sanction
+- verify: .venv/bin/pytest -q backend/tests/test_api.py -k archive_provisional --runxfail
 ### T-015 — G13 simulation boundary extraction
 - worker: W2 | priority: P1 | after: T-012
 - target_files: backend/app/main.py, backend/app/simulation_core.py
@@ -36,6 +36,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (pruned on compaction)
+- T-085 ✓ 3baeac7; strict archive xfail reproduced missing provisional result field; unaffected case passed
 - T-084 ✓ 7ad491a; provisional session and standings labels, focused browser 8/8
 - T-057 ✓ 6a80027; JUnit gate allows xfails, rejects skips/failures/malformed reports; 5 synthetic checks
 - T-058 ✓ fb3da98; CI runs deployment-secret gate and fails unreachable audit
