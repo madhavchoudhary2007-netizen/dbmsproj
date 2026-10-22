@@ -92,6 +92,7 @@ score: NOT_RUN
 - Existing Playwright config and 16-route smoke test require stronger authenticated journey coverage. Login keyboard audit and responsive run are open from prior work.
 
 ## Findings
+- F-STRUCT-03, area C, P1, open: a second FastAPI TestClient lifespan after pool.close() cannot reopen the module-global psycopg pool (`backend/app/database.py:11-22`); the isolated backend gate after T-133 passed 114 tests then failed T-131 login with `PoolClosed` and HTTP 503. T-134 will add a strict sequential-lifespan reproducer before W2 repairs pool ownership.
 - F-STRUCT-02, area C, P0, closed by T-123/T-124: backend-cwd `app.main` import failed on an absolute `backend.app.config` import; strict subprocess xfail reproduced it, relative import fixed it, and disposable backend/live gates passed.
 - F-STRUCT-01, area A/C, P1, closed by T-108..T-124: process-local `simulations` and `EventBus` are guarded by an exclusive PostgreSQL startup lease, fail-closed HTTP/WebSocket/simulation paths on ownership loss, and deployment docs. Strict reproductions, 112-test disposable backend gate and live acceptance passed.
 - F-DOM-01, area A, P1, closed by T-073/T-074: unclassified session results earned pole/fastest-lap points through unconditional terms in `recalculate_standings` (`backend/migrations/001_initial.sql:264`); strict DB xfail proved 2 points, additive 002 migration gates both bonuses, full isolated backend and live acceptance pass.
