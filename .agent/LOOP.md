@@ -50,6 +50,7 @@ score: NOT_RUN
 - T-097 pinned dashboard/driver-analytics response shapes, filter/paging and role statuses. Seeded case passed; full isolated backend after T-096/T-097: 102 passed, zero failed/skipped/xfailed (2026-10-22).
 - T-098 moved dashboard and driver analytics reads into analytics_repository with parameterized filters; T-097 seeded contract passed. Ruff 605, mypy 261 (2026-10-22).
 - T-099 pinned seeded pit box/reservation reads, box order, response shapes, authentication and UUID validation. One scoped case passed on apexgrid-test; Ruff 605 (2026-10-22).
+- T-100 moved pit box/reservation read SQL and the shared select into pit_repository; scoped read and adjacent reservation checks: 3 passed. Ruff 603, mypy 261 (2026-10-22).
 - Phase 0 closed after T-057/T-058: the isolated `db-baseline.sh` run passed 69 tests, separately reported 8 xfails and 0 real skips, and passed live acceptance; CI now runs all 11 full gates including deployment-secret regression and rejects unreachable registries. Browser smoke/responsive suite passed 715/715 across five projects and all 16 routes. Quality gates remain recorded red targets, not claimed passing.
 - Host pytest: 31 passed, 26 skipped; coverage overall 44.58% (777/1743 lines), app module percentages: bootstrap 0.0, config 88.2, database 50.0, main 43.6, race_archive 97.1. These numbers are not an isolated-stack baseline.
 - Docker and local sockets required scoped sandbox escalation; the isolated stack started and was seeded successfully.

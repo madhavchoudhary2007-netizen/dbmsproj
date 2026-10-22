@@ -3,11 +3,11 @@ updated_at: 2026-10-22T08:49:30Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-100 — API-06 pit read repository extraction
-- worker: W2 | priority: P1 | after: T-099
-- target_files: backend/app/main.py, backend/app/pit_repository.py
-- contract: move pit box/reservation read SQL and shared SELECT to repository, preserve route behavior
-- verify: DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_api.py -k pit_read_characterization
+### T-101 — Auth request schema extraction
+- worker: W2 | priority: P1 | after: T-100
+- target_files: backend/app/main.py, backend/app/schemas_auth.py
+- contract: extract Login/UserCreate/UserPatch without changing validation or route annotations
+- verify: DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_api.py -k 'auth_characterization or admin_user_management_and_protected_driver_session_fields'
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (pruned on compaction)
+- T-100 ✓ c3f002e; pit box/reservation reads to repository; 3 focused cases, Ruff 603, mypy 261.
 - T-099 ✓ efc9feb; seeded pit box/reservation read contract, 1 case, Ruff 605.
 - T-098 ✓ f8adaf9; dashboard/analytics SQL to repository, 1 seeded case, Ruff 605, mypy 261.
 - T-097 ✓ 91e2f9a; dashboard/analytics shape/filter/role characterization, 1 seeded case. Full isolated backend 102 passed, 0 skipped/failed.
