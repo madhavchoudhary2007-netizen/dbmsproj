@@ -1418,9 +1418,26 @@ def cancel_automatic_pit_reservations(session_id: UUID | str):
         publish(session_id, "pit.update", row)
 
 
+def _simulation_lease_is_valid(sim: Simulation) -> bool:
+    runtime_lease = getattr(app.state, "runtime_lease", None)
+    if runtime_lease is None:
+        return True
+    try:
+        check_runtime_lease(runtime_lease)
+    except RuntimeError as error:
+        sim.status = "error"
+        log.error("Simulation stopped after PostgreSQL runtime ownership loss: %s", error)
+        return False
+    return True
+
+
 async def simulation_loop(sim: Simulation):
+    if not _simulation_lease_is_valid(sim):
+        return
     col = mongo_ready()
     while sim.status in {"running", "paused"}:
+        if not _simulation_lease_is_valid(sim):
+            return
         if sim.status == "paused":
             await asyncio.sleep(0.05)
             continue
