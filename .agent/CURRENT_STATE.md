@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-22T18:55:35Z
-git_head: a8e25cf
+updated_at: 2026-10-22T18:57:53Z
+git_head: efd0261
 branch: perfection-loop
 architect_sha256: c9780b9cd1ffe91fcb0fbf369b4b136205eb5c1ffb82e8cf199e42cca18c69c5
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -23,6 +23,7 @@ last_eval_score: NOT_RUN (quality gates and role journeys remain open)
 - Phase 1 A/C/E P0/P1 findings closed after T-088. Phase 2 structure active: CRUD, analytics, pit, user and telemetry repositories; auth/operations/telemetry/competition/simulation schemas; analytics, pit read, user and telemetry APIRouters. ADR-004 single-process lease guards accepted; F-STRUCT-01/02 closed. ADR-003 full enforcement and P2 findings remain.
 - T-133..T-136: F-STRUCT-03 psycopg pool could not reopen across app lifespans; strict regression reproduced it, W2 recreated the pool, test fixture updated without weaker assertions. Full isolated backend and live acceptance passed; finding closed.
 - T-137..T-141: telemetry GET/live/ingest reads and writes moved to typed repository/router with seeded characterization. T-141 updated stale test schema import. Full isolated backend now passes 117 tests, zero failures/skips/xfails; live acceptance passes login, simulator, MongoDB, WebSocket, pits, standings, DBMS and generated races. Ruff 573, mypy 248. Next Phase 2 task: characterize pit strategy before splitting its oversized handler.
+- T-142 pit-strategy seeded historical read contract passed 1/1 without fixture mutation, Ruff 573. T-143 extracts bounded Mongo pit telemetry read into pit_repository while preserving live/historical decisions.
 
 ## Orchestrator direct edits and Taste review
 - Product: one `frontend/package.json` build-script line switched Next build to webpack (e854d9b). No other product-source edits.
