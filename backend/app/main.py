@@ -62,6 +62,7 @@ from .crud_repository import (
 from .database import close_pool, connection, fetch_all, fetch_one, get_pool, open_pool
 from .pit_repository import PIT_RESERVATION_SELECT, load_pit_strategy_rows, load_pit_telemetry
 from .pit_router import create_pit_router
+from .pit_strategy_router import create_pit_strategy_router
 from .pit_strategy_service import project_pit_strategy
 from .runtime_lease import acquire_runtime_lease, check_runtime_lease
 from .schemas_auth import Login, UserCreate, UserPatch
@@ -709,40 +710,18 @@ app.include_router(
 )
 
 
-@app.get("/api/sessions/{session_id}/pit-strategy")
-def pit_strategy(session_id: UUID, user=Depends(current_user)):
-    session, drivers, reservations = load_pit_strategy_rows(session_id)
-    if not session:
-        raise HTTPException(404, "Session not found")
-
-    sim = simulations.get(str(session_id))
-    is_live = session["state"] in {"ACTIVE", "PAUSED"} and sim is not None and sim.is_generated
-    col = mongo_ready()
-    if col is not None:
-        latest_by_driver, stop_lap_by_id, stop_compound_by_id = load_pit_telemetry(col, session_id)
-    elif is_live:
-        raise HTTPException(503, "MongoDB telemetry store is unavailable")
-    else:
-        latest_by_driver = {}
-        stop_lap_by_id = {}
-        stop_compound_by_id = {}
-
-    stops_by_driver: dict[str, list[dict[str, Any]]] = {}
-    for row in reservations:
-        did = str(row.get("driver_id") or "")
-        if not did:
-            continue
-        stops_by_driver.setdefault(did, []).append({
-            "reservation_id": row["id"], "lap": stop_lap_by_id.get(str(row["id"])),
-            "compound": stop_compound_by_id.get(str(row["id"])), "box_number": row.get("box_number"), "status": row.get("status"),
-            "starts_at": row.get("starts_at"), "ends_at": row.get("ends_at"),
-        })
-
-    projected = project_pit_strategy(
-        session_id, session["state"], session["generated"], is_live, session["total_laps"],
-        MAX_SESSION_LAPS, drivers, latest_by_driver, stops_by_driver, sim, tire_stint_target,
-    )
-    return jsonable(projected)
+pit_strategy_router, pit_strategy = create_pit_strategy_router(
+    current_user,
+    load_pit_strategy_rows,
+    load_pit_telemetry,
+    lambda: mongo_ready(),
+    lambda session_key: simulations.get(session_key),
+    project_pit_strategy,
+    MAX_SESSION_LAPS,
+    tire_stint_target,
+    jsonable,
+)
+app.include_router(pit_strategy_router)
 
 
 def demo_race_row(session_id: UUID | str):
