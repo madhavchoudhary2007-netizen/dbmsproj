@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-21T18:40:00Z
-git_head: a11619b
+git_head: 724e732
 branch: perfection-loop
 architect_sha256: 8753bfed50769fe28099f5f400bf3f7a42223fc98bebddda0db16eb7d0ece31b
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -29,6 +29,7 @@ last_eval_score: NOT_RUN (quality gates and journey coverage remain open)
 - T-052 accepted at 4353aaa and T-053 at 7b63377: cookie writes validate Origin/signed CSRF, logout clears cookies, cookie WS validates Origin; legacy bearer and WS subprotocol still work. T-061 at a47d81a wrapped three Ruff E501 test signatures. After orchestrator removed all remaining G11 xfail markers, disposable-stack backend gate passed 80 tests, 0 skips/xfails, plus live acceptance.
 - T-063 at d2e22b3 added two strict browser cookie-auth reproductions; RUN_XFAIL=1 confirms cookie-only startup skips /me and login writes localStorage. Frontend API/provider and WS client remain to migrate.
 - T-054 accepted at a11619b: browser fetch sends credentials and CSRF; provider probes /me, login skips token storage, logout requires server success. The two focused cookie browser journeys pass. Full Playwright run reached 269 passed then stopped at 10 responsive `/login` failures: older fixtures return authenticated /me for login and hide the form; T-066 fixture migration queued. Live WS client still pending.
+- T-066 accepted at 724e732: three audit fixtures use cookie-based /me and a signed-out login response. Full Playwright matrix exits 0 with 725/725 passed across five projects. Live WS browser reproduction and client migration are next.
 - Phase 0 complete; 16-route browser smoke, isolated database and live acceptance, characterization tests, quality metrics, CI gates and deployment-secret regression are in place. T-050's eight strict cookie/CSRF xfails reproduce with --runxfail; coverage overall 72%, main 72%, database 100%, config 88%, race_archive 97%, bootstrap 0%. T-051 added session/CSRF cookies and cookie /me; legacy bearer JSON remains until coordinated frontend migration.
 
 ## Orchestrator direct edits and Taste review
