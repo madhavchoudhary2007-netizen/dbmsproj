@@ -537,8 +537,9 @@ def test_reservation_requires_timezone_and_status_endpoint_exists():
             "starts_at": "2026-10-05T10:00:00",
             "ends_at": "2026-10-05T11:00:00Z",
         })
-    assert "/api/pit-reservations/{reservation_id}" in {route.path for route in app.routes}
-    assert "/api/pit-reservations/auto" in {route.path for route in app.routes}
+    paths = set(app.openapi()["paths"])
+    assert "/api/pit-reservations/{reservation_id}" in paths
+    assert "/api/pit-reservations/auto" in paths
     with pytest.raises(ValidationError):
         AutoReservationIn.model_validate({
             "session_id": "a2100000-0000-4000-8000-000000000001",
@@ -745,7 +746,7 @@ def test_websocket_bus_keeps_newest_when_client_falls_behind():
 
 
 def test_contract_routes_are_registered():
-    paths = {route.path for route in app.routes}
+    paths = set(app.openapi()["paths"])
     expected = {
         "/api/auth/login", "/api/auth/me", "/api/sessions/{session_id}/action",
         "/api/incidents/{incident_id}/decision", "/api/pit-reservations",
@@ -757,6 +758,7 @@ def test_contract_routes_are_registered():
         "/api/demo-races", "/api/demo-races/{session_id}",
         "/api/dbms/lock-demo",
         "/api/users", "/api/users/{user_id}",
+        "/api/dashboard", "/api/analytics/drivers",
     }
     assert expected <= paths
 
