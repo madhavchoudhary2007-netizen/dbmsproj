@@ -1,0 +1,16 @@
+{
+  "task_id": "T-113",
+  "status": "PASSED",
+  "files_modified": [{"path": "backend/tests/test_runtime_lease.py", "lines_added": 27, "lines_removed": 0}],
+  "diff_summary": "Added strict F-STRUCT-01 regression for HTTP health/live requests after owner-connection loss. Orchestrator proved --runxfail fails on HTTP 200 after loss on apexgrid-test; Ruff remains 602.",
+  "verification": {
+    "command": "DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local .venv/bin/pytest -q backend/tests/test_runtime_lease.py -k runtime_lease_loss",
+    "exit_code": 0,
+    "tests_passed": 0,
+    "tests_failed": 0,
+    "duration_ms": 400,
+    "typecheck_errors": 0,
+    "lint_warnings": 0
+  },
+  "unresolved_blockers": []
+}
