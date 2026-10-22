@@ -33,6 +33,7 @@ from psycopg.rows import dict_row, tuple_row
 from .config import APP_ENV, AUTO_DEMO_RACE, CORS_ORIGINS, JWT_ALGORITHM, JWT_MINUTES, JWT_SECRET, MONGODB_DATABASE, MONGODB_URL
 from .auth_cookie import create_csrf_token, set_auth_cookies, verify_csrf_token, clear_auth_cookies
 from .database import close_pool, connection, fetch_all, fetch_one, open_pool, pool
+from .crud_repository import get_crud_row, list_crud_rows
 from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
 
 logging.basicConfig(level=logging.INFO)
@@ -403,11 +404,11 @@ def crud_routes(resource: str, table: str, cols: tuple[str, ...], joins: str = "
     @app.get(prefix)
     def listing(limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0), user=Depends(current_user)):
         l, o = limit_offset(limit, offset)
-        return jsonable(fetch_all(base + " ORDER BY 1 LIMIT %s OFFSET %s", (l, o)))
+        return jsonable(list_crud_rows(base, l, o))
 
     @app.get(prefix + "/{item_id}")
     def get_item(item_id: UUID, user=Depends(current_user)):
-        result = fetch_one(base + " WHERE " + table + ".id=%s", (item_id,))
+        result = get_crud_row(base, table, item_id)
         if not result:
             raise HTTPException(404, f"{resource[:-1].capitalize()} not found")
         return jsonable(result)
