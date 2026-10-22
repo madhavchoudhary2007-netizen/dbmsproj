@@ -716,7 +716,9 @@ async def session_action(session_id: UUID, body: Action, user=Depends(roles("ADM
 
 @app.get("/api/sessions/{session_id}/results")
 def results(session_id: UUID, user=Depends(current_user)):
-    return jsonable(fetch_all("""SELECT r.*,u.full_name AS driver_name,d.number,t.name AS team_name
+    return jsonable(fetch_all("""SELECT r.*,u.full_name AS driver_name,d.number,t.name AS team_name,
+      EXISTS(SELECT 1 FROM incident_reports i JOIN penalties p ON p.incident_id=i.id
+        WHERE i.session_id=r.session_id AND (p.time_seconds>0 OR p.grid_places>0)) AS provisional
       FROM session_results r JOIN race_sessions s ON s.id=r.session_id
       JOIN drivers d ON d.id=r.driver_id JOIN users u ON u.id=d.user_id
       LEFT JOIN LATERAL (SELECT team_id FROM team_memberships m WHERE m.driver_id=d.id
@@ -770,7 +772,14 @@ def recalculate(championship_id: UUID, user=Depends(roles("ADMIN", "STEWARD"))):
 
 @app.get("/api/championships/{championship_id}/standings")
 def standings(championship_id: UUID, user=Depends(current_user)):
-    return jsonable(fetch_all("SELECT s.*,u.full_name AS driver_name,d.number,t.name AS team_name FROM driver_standings s JOIN drivers d ON d.id=s.driver_id JOIN users u ON u.id=d.user_id LEFT JOIN team_memberships tm ON tm.driver_id=d.id AND tm.end_date IS NULL LEFT JOIN teams t ON t.id=tm.team_id WHERE s.championship_id=%s ORDER BY s.rank", (championship_id,)))
+    return jsonable(fetch_all("""SELECT s.*,u.full_name AS driver_name,d.number,t.name AS team_name,
+      EXISTS(SELECT 1 FROM race_events re JOIN race_sessions rs ON rs.event_id=re.id
+        JOIN incident_reports i ON i.session_id=rs.id JOIN penalties p ON p.incident_id=i.id
+        WHERE re.championship_id=s.championship_id AND rs.session_type='RACE'
+          AND rs.state='COMPLETED' AND (p.time_seconds>0 OR p.grid_places>0)) AS provisional
+      FROM driver_standings s JOIN drivers d ON d.id=s.driver_id JOIN users u ON u.id=d.user_id
+      LEFT JOIN team_memberships tm ON tm.driver_id=d.id AND tm.end_date IS NULL
+      LEFT JOIN teams t ON t.id=tm.team_id WHERE s.championship_id=%s ORDER BY s.rank""", (championship_id,)))
 
 
 @app.get("/api/incidents")
