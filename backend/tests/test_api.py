@@ -1350,6 +1350,54 @@ def test_crud_read_characterization(database_api_client, resource, required_keys
     assert required_keys <= driver_detail.json().keys()
 
 
+@pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
+def test_pit_read_characterization(database_api_client):
+    client = database_api_client
+    seeded = main_module.fetch_one("""SELECT e.id AS event_id, s.id AS session_id
+        FROM race_events e JOIN race_sessions s ON s.event_id=e.id
+        WHERE EXISTS (SELECT 1 FROM pit_boxes b WHERE b.event_id=e.id)
+          AND NOT EXISTS (SELECT 1 FROM pit_reservations r WHERE r.session_id=s.id)
+        ORDER BY e.id, s.id LIMIT 1""")
+    assert seeded, "expected a seeded event with pit boxes and a reservation-free session"
+
+    client.cookies.clear()
+    for path in (f"/api/pit-boxes?event_id={seeded['event_id']}",
+                 f"/api/pit-reservations?session_id={seeded['session_id']}"):
+        anonymous = client.get(path)
+        assert anonymous.status_code == 401, anonymous.text
+        assert anonymous.json() == {"detail": "Authentication required"}
+        assert anonymous.headers["www-authenticate"] == "Bearer"
+
+    login = client.post("/api/auth/login", json={
+        "email": "admin@apexgrid.test", "password": "ApexGrid2026!",
+    })
+    assert login.status_code == 200, login.text
+    headers = {"Authorization": "Bearer " + login.json()["access_token"]}
+    client.cookies.clear()
+
+    boxes_response = client.get(f"/api/pit-boxes?event_id={seeded['event_id']}", headers=headers)
+    assert boxes_response.status_code == 200, boxes_response.text
+    boxes = boxes_response.json()
+    assert isinstance(boxes, list) and boxes
+    box_keys = {"id", "event_id", "number", "reservation_id", "session_id", "driver_id",
+                "allocation_source", "starts_at", "ends_at", "status", "team_name",
+                "driver_name", "driver_number"}
+    assert all(set(box) == box_keys for box in boxes)
+    assert [box["number"] for box in boxes] == sorted(box["number"] for box in boxes)
+    assert all(box["event_id"] == str(seeded["event_id"]) for box in boxes)
+
+    reservations_response = client.get(
+        f"/api/pit-reservations?session_id={seeded['session_id']}", headers=headers
+    )
+    assert reservations_response.status_code == 200, reservations_response.text
+    assert reservations_response.json() == []
+
+    for path in ("/api/pit-boxes?event_id=not-a-uuid",
+                 "/api/pit-reservations?session_id=not-a-uuid"):
+        invalid = client.get(path, headers=headers)
+        assert invalid.status_code == 422, invalid.text
+
+
 @pytest.mark.skipif(
     not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database"
 )
