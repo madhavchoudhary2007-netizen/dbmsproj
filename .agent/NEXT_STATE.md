@@ -3,11 +3,11 @@ updated_at: 2026-10-22T12:00:00Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-075 — F-DOM-03 classification gap reproducer
-- worker: W3 | priority: P1 | after: T-072
-- target_files: backend/tests/test_api.py
-- contract: strict xfail proves a completed session accepts a classified result at position 2 without position 1
-- verify: .venv/bin/pytest -q backend/tests/test_api.py -k completed_results_require_contiguous_classification
+### T-076 — F-DOM-03 classification position validation
+- worker: W2 | priority: P1 | after: T-075
+- target_files: backend/app/main.py
+- contract: validate final classified positions 1..n for completed sessions inside result write transaction; 422 and no publish on gap
+- verify: .venv/bin/pytest -q backend/tests/test_api.py -k completed_results_require_contiguous_classification --runxfail
 ### T-015 — G13 simulation boundary extraction
 - worker: W2 | priority: P1 | after: T-012
 - target_files: backend/app/main.py, backend/app/simulation_core.py
@@ -59,4 +59,5 @@ loop_iteration: 1 of 5
 - T-072 ✓ fb806c0; five evidence-backed A-area findings
 - T-073 ✓ 5c2e9c4; strict DB xfail, --runxfail proves two unclassified bonus points
 - T-074 ✓ d6770a6; additive 002 scoring migration and ordered bootstrap; focused --runxfail passes
+- T-075 ✓ 6deb44f; strict completed-session gap xfail, --runxfail proves missing 422
 - Earlier accepted tasks and evidence are in git history and LOOP.md.
