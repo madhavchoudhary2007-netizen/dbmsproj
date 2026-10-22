@@ -41,7 +41,8 @@ from .crud_repository import (
     update_crud_row,
 )
 from .database import close_pool, connection, fetch_all, fetch_one, open_pool, pool
-from .pit_repository import PIT_RESERVATION_SELECT, list_pit_boxes, list_pit_reservations
+from .pit_repository import PIT_RESERVATION_SELECT
+from .pit_router import create_pit_router
 from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
 from .schemas_auth import Login, UserCreate, UserPatch
 from .schemas_operations import Action, AutoReservationIn, Decision, IncidentIn, ReservationIn
@@ -631,14 +632,7 @@ def decide_incident(incident_id: UUID, body: Decision, user=Depends(roles("ADMIN
     return out
 
 
-@app.get("/api/pit-boxes")
-def pit_boxes(event_id: UUID, user=Depends(current_user)):
-    return jsonable(list_pit_boxes(event_id))
-
-
-@app.get("/api/pit-reservations")
-def pit_reservations(session_id: UUID, user=Depends(current_user)):
-    return jsonable(list_pit_reservations(session_id))
+app.include_router(create_pit_router(current_user, jsonable))
 
 
 @app.post("/api/pit-reservations", status_code=201)
