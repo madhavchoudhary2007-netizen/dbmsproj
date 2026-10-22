@@ -68,7 +68,6 @@ def test_runtime_lease_loss_fails_closed(monkeypatch):
             lease.close()
 
 
-@pytest.mark.xfail(strict=True, reason="F-STRUCT-01")
 def test_runtime_websocket_loss(monkeypatch):
     from starlette.websockets import WebSocketDisconnect
 
