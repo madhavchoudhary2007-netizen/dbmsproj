@@ -8,6 +8,16 @@ loop_iteration: 1 of 5
 - target_files: frontend/components/special-pages.tsx
 - contract: disable ineffective time/grid controls in review dialog, explain reason/next step; presentation only
 - verify: RUN_XFAIL=1 dynamic-port Playwright steward-sanctions focused matrix
+### T-081 — F-DOM-02 provisional results reproducer
+- worker: W3 | priority: P1 | after: T-080
+- target_files: backend/tests/test_database.py
+- contract: strict isolated DB/API xfail for seeded legacy time sanction flagging results and standings provisional
+- verify: DATABASE_URL=disposable .venv/bin/pytest -q backend/tests/test_database.py -k historical_penalty_provisional
+### T-082 — F-DOM-02 provisional API metadata
+- worker: W2 | priority: P1 | after: T-081
+- target_files: backend/app/main.py
+- contract: add provisional bool to result and standings rows when historical nonzero time/grid sanction affects them
+- verify: focused T-081 --runxfail on disposable DB
 ### T-015 — G13 simulation boundary extraction
 - worker: W2 | priority: P1 | after: T-012
 - target_files: backend/app/main.py, backend/app/simulation_core.py

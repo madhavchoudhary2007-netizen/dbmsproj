@@ -709,6 +709,8 @@ export function StewardDesk() {
                     min="0"
                     value={seconds}
                     onChange={(e) => setSeconds(+e.target.value)}
+                    disabled
+                    aria-describedby="sanction-limit-explanation"
                   />
                 </label>
                 <label>
@@ -718,9 +720,14 @@ export function StewardDesk() {
                     min="0"
                     value={grid}
                     onChange={(e) => setGrid(+e.target.value)}
+                    disabled
+                    aria-describedby="sanction-limit-explanation"
                   />
                 </label>
               </div>
+              <p id="sanction-limit-explanation" className="muted">
+                Official timing/grid enforcement is unavailable. Use penalty points and notes for now.
+              </p>
               <div className="form-actions">
                 <Button
                   disabled={busy || active.state !== "OPEN"}
