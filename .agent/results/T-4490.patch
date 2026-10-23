@@ -1,0 +1,327 @@
+diff --git a/backend/tests/test_api.py b/backend/tests/test_api.py
+index c7559fb..f01c5b7 100644
+--- a/backend/tests/test_api.py
++++ b/backend/tests/test_api.py
+@@ -1,4 +1,5 @@
+ """Fast, database independent checks of wire validation and live fan-out."""
++
+ import asyncio
+ import json
+ import os
+@@ -47,13 +48,26 @@ def packet(**overrides):
+     value = {
+         "session_id": "a2100000-0000-4000-8000-000000000001",
+         "driver_id": "a2100000-0000-4000-8000-000000000002",
+-        "ts": "2026-10-05T10:00:00Z", "lap": 1, "sector": 2,
+-        "elapsed_ms": 10000, "lap_time_ms": 90000, "sector_ms": [30000, 30000, 30000],
+-        "position": 1, "speed_kph": 210, "throttle_pct": 100, "brake_pct": 0,
+-        "tire_compound": "MEDIUM", "tire_age_laps": 4, "tire_wear_pct": 12,
+-        "tire_temp_c": [80, 82, 79, 81], "pit_state": "TRACK",
+-        "pit_reservation_id": None, "pit_box_number": None, "pit_team_id": None,
+-        "pit_starts_at": None, "pit_ends_at": None,
++        "ts": "2026-10-05T10:00:00Z",
++        "lap": 1,
++        "sector": 2,
++        "elapsed_ms": 10000,
++        "lap_time_ms": 90000,
++        "sector_ms": [30000, 30000, 30000],
++        "position": 1,
++        "speed_kph": 210,
++        "throttle_pct": 100,
++        "brake_pct": 0,
++        "tire_compound": "MEDIUM",
++        "tire_age_laps": 4,
++        "tire_wear_pct": 12,
++        "tire_temp_c": [80, 82, 79, 81],
++        "pit_state": "TRACK",
++        "pit_reservation_id": None,
++        "pit_box_number": None,
++        "pit_team_id": None,
++        "pit_starts_at": None,
++        "pit_ends_at": None,
+     }
+     return {**value, **overrides}
+ 
+@@ -95,6 +109,7 @@ def auth_characterization_expired_token():
+ 
+     def part(value):
+         return base64.urlsafe_b64encode(value).rstrip(b"=")
++
+     header = part(b'{"alg":"HS256","typ":"JWT"}')
+     payload = part(b'{"sub":"42","role":"DRIVER","exp":1}')
+     message = header + b"." + payload
+@@ -106,6 +121,7 @@ def test_auth_characterization_login_success_and_claims(auth_characterization_cl
+     import base64
+ 
+     import bcrypt
++
+     user = auth_characterization_user(bcrypt.hashpw(b"correct horse", bcrypt.gensalt()).decode())
+     auth_characterization_fetch(monkeypatch, user)
+     response = auth_characterization_login(auth_characterization_client, user, "correct horse")
+@@ -121,6 +137,7 @@ def test_auth_characterization_login_success_and_claims(auth_characterization_cl
+ 
+ def test_auth_characterization_invalid_login(auth_characterization_client, monkeypatch):
+     import bcrypt
++
+     user = auth_characterization_user(bcrypt.hashpw(b"correct horse", bcrypt.gensalt()).decode())
+     auth_characterization_fetch(monkeypatch, user)
+     response = auth_characterization_client.post(
+@@ -160,6 +177,7 @@ def test_auth_characterization_me_valid_user_shape(auth_characterization_client,
+     user = auth_characterization_user()
+     auth_characterization_fetch(monkeypatch, user)
+     import bcrypt
++
+     user["password_hash"] = bcrypt.hashpw(b"correct horse", bcrypt.gensalt()).decode()
+     login = auth_characterization_login(auth_characterization_client, user, "correct horse")
+     response = auth_characterization_client.get(
+@@ -174,6 +192,7 @@ def test_auth_characterization_websocket_accepts_and_rejects_tokens(
+ ):
+     import bcrypt
+     from starlette.websockets import WebSocketDisconnect
++
+     user = auth_characterization_user(bcrypt.hashpw(b"correct horse", bcrypt.gensalt()).decode())
+     auth_characterization_fetch(monkeypatch, user)
+     login = auth_characterization_login(auth_characterization_client, user, "correct horse")
+@@ -198,6 +217,7 @@ def test_auth_characterization_websocket_accepts_and_rejects_tokens(
+ 
+ def cookie_auth_login(client, monkeypatch, role="DRIVER"):
+     import bcrypt
++
+     user = auth_characterization_user(bcrypt.hashpw(b"correct horse", bcrypt.gensalt()).decode())
+     user["role"] = role
+     auth_characterization_fetch(monkeypatch, user)
+@@ -206,6 +226,7 @@ def cookie_auth_login(client, monkeypatch, role="DRIVER"):
+ 
+ def cookie_auth_set_cookies(response):
+     from http.cookies import SimpleCookie
++
+     cookies = SimpleCookie()
+     for header in response.headers.get_list("set-cookie"):
+         cookies.load(header)
+@@ -301,7 +322,10 @@ def cookie_auth_mock_user_update_db(monkeypatch):
+ 
+     cursor = Mock()
+     cursor.fetchone.return_value = {
+-        "id": 42, "email": "driver@example.test", "full_name": "Test Driver", "role": "ADMIN"
++        "id": 42,
++        "email": "driver@example.test",
++        "full_name": "Test Driver",
++        "role": "ADMIN",
+     }
+     connection = Mock()
+     connection.cursor.return_value = nullcontext(cursor)
+@@ -315,7 +339,8 @@ def test_cookie_auth_guard_rejects_protected_write_without_csrf(
+     cookie_auth_mock_user_update_db(monkeypatch)
+     response = auth_characterization_client.patch(
+         "/api/users/00000000-0000-4000-8000-000000000042",
+-        json={"full_name": "Changed"}, headers={"Origin": "http://localhost:3000"},
++        json={"full_name": "Changed"},
++        headers={"Origin": "http://localhost:3000"},
+     )
+     assert response.status_code == 403
+ 
+@@ -366,10 +391,9 @@ def test_cookie_auth_websocket_accepts_session_without_jwt_subprotocol(
+         assert ws.accepted_subprotocol is None
+ 
+ 
+-def test_cookie_auth_websocket_rejects_unapproved_origin(
+-    auth_characterization_client, monkeypatch
+-):
++def test_cookie_auth_websocket_rejects_unapproved_origin(auth_characterization_client, monkeypatch):
+     from starlette.websockets import WebSocketDisconnect
++
+     login = cookie_auth_login(auth_characterization_client, monkeypatch)
+     session = login.cookies.get("apexgrid_session", "missing-cookie")
+     legacy_token = session if session != "missing-cookie" else login.json()["access_token"]
+@@ -691,15 +715,18 @@ def test_reservation_status_transition_closes_only_reserved_booking(monkeypatch)
+             return self.cursor_instance
+ 
+     cursor_conn = Connection("RESERVED")
++
+     @contextmanager
+     def fake_connection():
+         yield cursor_conn
++
+     events = []
+     monkeypatch.setattr("backend.app.main.connection", fake_connection)
+     monkeypatch.setattr("backend.app.main.publish", lambda *args: events.append(args))
+ 
+     result = update_pit_reservation(
+-        uuid4(), ReservationStatus(status="CANCELLED"),
++        uuid4(),
++        ReservationStatus(status="CANCELLED"),
+         user={"id": "admin-1", "role": "ADMIN"},
+     )
+     assert result["status"] == "CANCELLED"
+@@ -708,7 +735,8 @@ def test_reservation_status_transition_closes_only_reserved_booking(monkeypatch)
+     cursor_conn.cursor_instance.status = "CANCELLED"
+     with pytest.raises(HTTPException) as error:
+         update_pit_reservation(
+-            uuid4(), ReservationStatus(status="COMPLETED"),
++            uuid4(),
++            ReservationStatus(status="COMPLETED"),
+             user={"id": "admin-1", "role": "ADMIN"},
+         )
+     assert error.value.status_code == 409
+@@ -716,7 +744,10 @@ def test_reservation_status_transition_closes_only_reserved_booking(monkeypatch)
+ 
+ def test_results_reject_scheduled_sessions(monkeypatch):
+     from fastapi import HTTPException
+-    monkeypatch.setattr("backend.app.main.fetch_one", lambda *_: {"state": "SCHEDULED", "generated": False})
++
++    monkeypatch.setattr(
++        "backend.app.main.fetch_one", lambda *_: {"state": "SCHEDULED", "generated": False}
++    )
+     with pytest.raises(HTTPException) as error:
+         save_results(uuid4(), [], user={"id": "admin-1", "role": "ADMIN"})
+     assert error.value.status_code == 409
+@@ -728,15 +759,27 @@ def test_completed_results_require_contiguous_classification(monkeypatch):
+     from fastapi import HTTPException
+ 
+     class Cursor:
+-        def __init__(self, row): self.row = row
+-        def __enter__(self): return self
+-        def __exit__(self, *_): pass
+-        def execute(self, *_): pass
+-        def fetchall(self): return [self.row]
++        def __init__(self, row):
++            self.row = row
++
++        def __enter__(self):
++            return self
++
++        def __exit__(self, *_):
++            pass
++
++        def execute(self, *_):
++            pass
++
++        def fetchall(self):
++            return [self.row]
+ 
+     class Connection:
+-        def __init__(self, row): self.row = row
+-        def cursor(self, **_): return Cursor(self.row)
++        def __init__(self, row):
++            self.row = row
++
++        def cursor(self, **_):
++            return Cursor(self.row)
+ 
+     driver_id = uuid4()
+     persisted_row = {"driver_id": driver_id, "position": 2, "classified": True}
+@@ -747,7 +790,9 @@ def test_completed_results_require_contiguous_classification(monkeypatch):
+ 
+     events = []
+     session_id = uuid4()
+-    monkeypatch.setattr("backend.app.main.fetch_one", lambda *_: {"state": "COMPLETED", "generated": False})
++    monkeypatch.setattr(
++        "backend.app.main.fetch_one", lambda *_: {"state": "COMPLETED", "generated": False}
++    )
+     monkeypatch.setattr("backend.app.main.connection", fake_connection)
+     monkeypatch.setattr("backend.app.main.publish", lambda *args: events.append(args))
+ 
+@@ -769,12 +814,21 @@ def test_incident_decisions_always_return_current_driver_state(monkeypatch, appr
+     from backend.app import main as main_module
+ 
+     incident_id, session_id, driver_id = uuid4(), uuid4(), uuid4()
+-    incident = {"id": incident_id, "session_id": session_id, "driver_id": driver_id, "state": "OPEN"}
++    incident = {
++        "id": incident_id,
++        "session_id": session_id,
++        "driver_id": driver_id,
++        "state": "OPEN",
++    }
+     cursor = None
+ 
+     class Cursor:
+-        def __enter__(self): return self
+-        def __exit__(self, *_): pass
++        def __enter__(self):
++            return self
++
++        def __exit__(self, *_):
++            pass
++
+         def execute(self, query, _params):
+             if query.startswith("SELECT * FROM incident_reports"):
+                 self.row = incident
+@@ -784,11 +838,15 @@ def test_incident_decisions_always_return_current_driver_state(monkeypatch, appr
+                 self.row = {"eligibility": "ACTIVE", "season_points": 0}
+             else:
+                 raise AssertionError(f"Unexpected SQL: {query}")
+-        def fetchone(self): return self.row
++
++        def fetchone(self):
++            return self.row
+ 
+     cursor = Cursor()
++
+     class Connection:
+-        def cursor(self, **_): return cursor
++        def cursor(self, **_):
++            return cursor
+ 
+     @contextmanager
+     def fake_connection():
+@@ -797,7 +855,8 @@ def test_incident_decisions_always_return_current_driver_state(monkeypatch, appr
+     monkeypatch.setattr(main_module, "connection", fake_connection)
+     monkeypatch.setattr(main_module, "publish", lambda *_: None)
+     result = main_module.decide_incident(
+-        incident_id, main_module.Decision(approve=approve),
++        incident_id,
++        main_module.Decision(approve=approve),
+         user={"id": uuid4(), "role": "STEWARD"},
+     )
+     assert result["penalty"] is penalty
+@@ -811,7 +870,9 @@ def test_unsupported_sanction_fields_are_rejected_with_guidance(field):
+ 
+     message = str(exc_info.value).lower()
+     assert field in message
+-    assert any(reason in message for reason in ("unsupported", "cannot be applied", "not supported"))
++    assert any(
++        reason in message for reason in ("unsupported", "cannot be applied", "not supported")
++    )
+     assert "points" in message and any(step in message for step in ("use", "until", "implement"))
+ 
+ 
+@@ -837,8 +898,13 @@ def test_unsupported_sanction_zero_and_points_only_decisions_remain_valid(decisi
+ def test_manual_pit_reservation_allows_steward_role():
+     from fastapi.routing import APIRoute
+ 
+-    route = next(route for route in app.routes if isinstance(route, APIRoute)
+-                 and route.path == "/api/pit-reservations" and "POST" in route.methods)
++    route = next(
++        route
++        for route in app.routes
++        if isinstance(route, APIRoute)
++        and route.path == "/api/pit-reservations"
++        and "POST" in route.methods
++    )
+     role_check = route.dependant.dependencies[0].call
+     assert role_check(user={"id": str(uuid4()), "role": "STEWARD"})["role"] == "STEWARD"
+ 
+@@ -847,8 +913,13 @@ def test_session_crud_does_not_accept_lifecycle_timestamps():
+     from fastapi import HTTPException
+     from fastapi.routing import APIRoute
+ 
+-    route = next(route for route in app.routes if isinstance(route, APIRoute)
+-                 and route.path == "/api/sessions/{item_id}" and "PATCH" in route.methods)
++    route = next(
++        route
++        for route in app.routes
++        if isinstance(route, APIRoute)
++        and route.path == "/api/sessions/{item_id}"
++        and "PATCH" in route.methods
++    )
+     with pytest.raises(HTTPException) as error:
+         route.endpoint(uuid4(), {"started_at": "2026-10-05T10:00:00Z"}, user={"role": "ADMIN"})
+     assert error.value.status_code == 422
+@@ -856,6 +927,7 @@ def test_session_crud_does_not_accept_lifecycle_timestamps():
+ 
+ def test_websocket_bus_keeps_newest_when_client_falls_behind():
+     bus = EventBus()
++
+     async def exercise():
+         q = bus.subscribe("session-a")
+         await asyncio.to_thread(lambda: [bus.send("session-a", {"n": n}) for n in range(55)])
