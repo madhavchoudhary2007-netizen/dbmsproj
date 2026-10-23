@@ -1,0 +1,81 @@
+diff --git a/backend/app/api/dbms_sql.py b/backend/app/api/dbms_sql.py
+index 0b88284..e2354f7 100644
+--- a/backend/app/api/dbms_sql.py
++++ b/backend/app/api/dbms_sql.py
+@@ -20,4 +20,27 @@ def create_dbms_sql_router(
+             )
+         )
+ 
+-    return router, {"dbms_schema": dbms_schema}
++    @router.get("/api/dbms/indexes")
++    def dbms_indexes(user=admin_dependency):
++        return jsonable(
++            fetch_all(
++                "SELECT tablename,indexname,indexdef FROM pg_indexes WHERE schemaname='public' OR"
++                "DER BY tablename,indexname"
++            )
++        )
++
++    @router.get("/api/dbms/locks")
++    def dbms_locks(user=admin_dependency):
++        return jsonable(
++            fetch_all(
++                "SELECT locktype,mode,granted,relation::regclass::text AS relation,pid FROM pg_lo"
++                "cks WHERE database=(SELECT oid FROM pg_database WHERE datname=current_database()"
++                ") ORDER BY granted,mode"
++            )
++        )
++
++    return router, {
++        "dbms_schema": dbms_schema,
++        "dbms_indexes": dbms_indexes,
++        "dbms_locks": dbms_locks,
++    }
+diff --git a/backend/app/main.py b/backend/app/main.py
+index 827ced8..c93f6d8 100644
+--- a/backend/app/main.py
++++ b/backend/app/main.py
+@@ -1796,6 +1796,8 @@ dbms_sql_router, dbms_sql_handlers = create_dbms_sql_router(
+     admin_dependency,
+ )
+ dbms_schema = dbms_sql_handlers["dbms_schema"]
++dbms_indexes = dbms_sql_handlers["dbms_indexes"]
++dbms_locks = dbms_sql_handlers["dbms_locks"]
+ app.include_router(dbms_sql_router)
+ 
+ 
+@@ -2113,16 +2115,6 @@ def dbms_eer(user=admin_dependency):
+     return {"columns": columns, "relationships": relationships}
+ 
+ 
+-@app.get("/api/dbms/indexes")
+-def dbms_indexes(user=admin_dependency):
+-    return jsonable(
+-        fetch_all(
+-            "SELECT tablename,indexname,indexdef FROM pg_indexes WHERE schemaname='public' OR"
+-            "DER BY tablename,indexname"
+-        )
+-    )
+-
+-
+ @app.get("/api/dbms/explain")
+ def dbms_explain(query: Literal["leaderboard", "licence"], user=admin_dependency):
+     sql = {
+@@ -2165,17 +2157,6 @@ def constraint_demo(user=admin_dependency):
+     return result
+ 
+ 
+-@app.get("/api/dbms/locks")
+-def dbms_locks(user=admin_dependency):
+-    return jsonable(
+-        fetch_all(
+-            "SELECT locktype,mode,granted,relation::regclass::text AS relation,pid FROM pg_lo"
+-            "cks WHERE database=(SELECT oid FROM pg_database WHERE datname=current_database()"
+-            ") ORDER BY granted,mode"
+-        )
+-    )
+-
+-
+ @app.get("/api/dbms/telemetry")
+ def dbms_telemetry(user=admin_dependency):
+     try:

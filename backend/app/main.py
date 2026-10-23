@@ -1796,6 +1796,8 @@ dbms_sql_router, dbms_sql_handlers = create_dbms_sql_router(
     admin_dependency,
 )
 dbms_schema = dbms_sql_handlers["dbms_schema"]
+dbms_indexes = dbms_sql_handlers["dbms_indexes"]
+dbms_locks = dbms_sql_handlers["dbms_locks"]
 app.include_router(dbms_sql_router)
 
 
@@ -2113,16 +2115,6 @@ def dbms_eer(user=admin_dependency):
     return {"columns": columns, "relationships": relationships}
 
 
-@app.get("/api/dbms/indexes")
-def dbms_indexes(user=admin_dependency):
-    return jsonable(
-        fetch_all(
-            "SELECT tablename,indexname,indexdef FROM pg_indexes WHERE schemaname='public' OR"
-            "DER BY tablename,indexname"
-        )
-    )
-
-
 @app.get("/api/dbms/explain")
 def dbms_explain(query: Literal["leaderboard", "licence"], user=admin_dependency):
     sql = {
@@ -2163,17 +2155,6 @@ def constraint_demo(user=admin_dependency):
     if result.get("constraint") == "unexpectedly accepted":
         raise HTTPException(500, "Database accepted a driver number outside the allowed range")
     return result
-
-
-@app.get("/api/dbms/locks")
-def dbms_locks(user=admin_dependency):
-    return jsonable(
-        fetch_all(
-            "SELECT locktype,mode,granted,relation::regclass::text AS relation,pid FROM pg_lo"
-            "cks WHERE database=(SELECT oid FROM pg_database WHERE datname=current_database()"
-            ") ORDER BY granted,mode"
-        )
-    )
 
 
 @app.get("/api/dbms/telemetry")

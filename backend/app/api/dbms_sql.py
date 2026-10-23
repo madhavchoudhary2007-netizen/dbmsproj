@@ -20,4 +20,27 @@ def create_dbms_sql_router(
             )
         )
 
-    return router, {"dbms_schema": dbms_schema}
+    @router.get("/api/dbms/indexes")
+    def dbms_indexes(user=admin_dependency):
+        return jsonable(
+            fetch_all(
+                "SELECT tablename,indexname,indexdef FROM pg_indexes WHERE schemaname='public' OR"
+                "DER BY tablename,indexname"
+            )
+        )
+
+    @router.get("/api/dbms/locks")
+    def dbms_locks(user=admin_dependency):
+        return jsonable(
+            fetch_all(
+                "SELECT locktype,mode,granted,relation::regclass::text AS relation,pid FROM pg_lo"
+                "cks WHERE database=(SELECT oid FROM pg_database WHERE datname=current_database()"
+                ") ORDER BY granted,mode"
+            )
+        )
+
+    return router, {
+        "dbms_schema": dbms_schema,
+        "dbms_indexes": dbms_indexes,
+        "dbms_locks": dbms_locks,
+    }
