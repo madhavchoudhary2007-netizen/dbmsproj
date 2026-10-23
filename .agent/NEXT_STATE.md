@@ -1,18 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-23T06:45:00Z
+updated_at: 2026-10-23T07:00:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-166 — F-DOM-05 replay seed reproduction
-- worker: W3 | priority: P2 | after: T-165
-- target_files: backend/tests/test_simulation_replay.py
-- contract: strict expected-failure seeded replay/persistence test; deterministic generated lap, gap and pit outputs after restart
-- verify: APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_simulation_replay.py
 ### T-167 — F-DOM-05 persisted simulation seed
 - worker: W2 | priority: P2 | after: T-166
 - target_files: backend/app/demo_race_repository.py, backend/migrations/003_simulation_seed.sql
 - contract: additive nullable seed persistence; generated grid choices use dedicated seeded RNG, legacy rows untouched
-- verify: APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q --runxfail backend/tests/test_simulation_replay.py
+- verify: APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q --runxfail backend/tests/test_simulation_replay.py -k 'migration or repository'
 ### T-175 — F-DOM-05 seeded simulator and restore
 - worker: W2 | priority: P2 | after: T-167
 - target_files: backend/app/main.py, backend/app/simulation_core.py
@@ -26,6 +21,7 @@ loop_iteration: 0 of 8
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-166 ✓ 9a5aca1; 4 strict xfails; --runxfail 4 old-code failures, no DB/server.
 - T-174 ✓ ca06899; exact older retry now 202 same ID, focused --runxfail 5/5; full rerun pending.
 - T-173 ✓ fe8aabd; 4 pass/1 strict xfail, --runxfail proves older exact retry 409.
 - T-172 ✓ 3051e13; seeded fixture derives forward packet from latest telemetry; Ruff passes, disposable rerun pending.
