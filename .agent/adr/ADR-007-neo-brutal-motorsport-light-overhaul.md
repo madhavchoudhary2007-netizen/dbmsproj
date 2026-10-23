@@ -1,6 +1,6 @@
 # ADR-007 — Neo-brutal motorsport (light) overhaul
 
-Status: PROPOSED — owner approval required at T-302
+Status: ACCEPTED — owner approved in chat on 2026-10-23
 Date: 2026-10-23
 Branch: overhaul/neo-brutal, based on perfection-loop 1acf8e1
 
@@ -8,9 +8,9 @@ Branch: overhaul/neo-brutal, based on perfection-loop 1acf8e1
 
 The owner supplied docs/overhaul-plan.md and explicitly requested a frontend redesign plus backend hardening in place. The locked architecture currently retains the dark identity and forbids visual redesign. Its old score and state are historical; the plan records Ruff 540, format 23 files, mypy 222, frontend lint 2 errors and npm audit 7 high/2 moderate. No fresh overhaul quality score is claimed. T-300 boot passed on the Codex harness. No frontend/backend file has changed in Phase 0.
 
-This ADR is a design proposal. Relocking ARCHITECT.md records the proposal; it does not activate product or gate edits. T-302 requires the owner's explicit "approved" before either.
+Approval evidence: owner message "ok approved continue", followed by "dont stop you have all permissions". T-302 is satisfied. Proceed through the plan with individual ADRs, contract preservation, isolated database testing and unchanged thresholds; no destructive or production action is authorized by this record.
 
-## Decision proposed for approval
+## Decision
 
 1. **Archetype and scope.** Adopt **Neo-Brutal Motorsport (light)** as the visual identity, retaining Enterprise SaaS/Analytics interaction density and the Developer Tool DBMS sub-area. Permit frontend visual redesign. Preserve all race flows, SQL rules, routes, methods, response contracts and persisted IDs; retain every feature, chart, modal, tested copy string, data hook, aria name, state class and /dbms hash route. No wholesale rewrite or data reset.
 2. **Palette gate with unchanged bands.** In palette.spec.ts replace body background luminance <=0.12 with >=0.85; heading contrast remains >=4.5. A-3 role string becomes `#FFFDF5,#FFFFFF,#FF6B6B`. Keep the current scorer's exact bands: dominant 50–70%, secondary 20–40%, accent 5–15%, nearest-role distance-squared <=900. The plan's 55–65/25–35/7–12 design targets are tighter layout targets, not replacement/widened gates. Change layout when a route misses a band.
@@ -45,7 +45,7 @@ Pass1 amended the proposal for the palette-band distinction, motion/display conf
 
 ## Risks and approval boundary
 
-- Owner approval is pending. All frontend/backend and gate changes are blocked at T-302.
+- Owner approval was received at T-302; future implementation still needs the scoped verification and ADRs required by this decision.
 - Motion catalogue needs alignment (T-440); retaining long durations would violate the owner rule. The draft authorizes no exception for them.
 - Semantic colours/textures can reduce counted palette pixels; routes must still meet unchanged role bands through layout.
 - Large refactors, changed response models and Docker/CI changes require scoped proof and applicable approval; the plan's desired end state is not a passing baseline.

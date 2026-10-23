@@ -1,7 +1,7 @@
 <!-- LOCK:BEGIN -->
 > STATUS: LOCKED
-> SHA256: 80f8ab5074bfe238e9467f3eabde3df685f801fce2a1f667c8bd6f3d533ed421
-> LOCKED_AT: 2026-10-23T14:51:57Z
+> SHA256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
+> LOCKED_AT: 2026-10-23T14:57:55Z
 > LOCKED_BY: orchestrator
 <!-- LOCK:END -->
 # ApexGrid architecture — existing system, improvement in place
@@ -71,11 +71,11 @@ Core gates: `bash scripts/agent/verify-lock.sh`; `npm --prefix frontend run type
 
 ### A.4 Archetype score
 
-Enterprise SaaS / Analytics: **5** matching signals (tables, dashboards, filters, roles, KPIs). Developer / Technical Tool: **3** (API documentation, DBMS/query-plan tooling, telemetry observability). Consumer: **0**; Editorial: **0**. Interaction density remains Enterprise SaaS/Analytics with a technical DBMS sub-area. ADR-007 proposes the owner-selected **Neo-Brutal Motorsport (light)** identity: cream/paper, ink borders and zero-blur hard shadows, red primary action, domain colours, Space Grotesk/Space Mono. This replaces the dark-identity constraint only after explicit owner approval at T-302; no product change is enacted by this lock.
+Enterprise SaaS / Analytics: **5** matching signals (tables, dashboards, filters, roles, KPIs). Developer / Technical Tool: **3** (API documentation, DBMS/query-plan tooling, telemetry observability). Consumer: **0**; Editorial: **0**. Interaction density remains Enterprise SaaS/Analytics with a technical DBMS sub-area. ADR-007 adopts the owner-selected **Neo-Brutal Motorsport (light)** identity: cream/paper, ink borders and zero-blur hard shadows, red primary action, domain colours, Space Grotesk/Space Mono. Owner explicitly approved at T-302 on 2026-10-23; implementation follows the plan and remains unverified until its gates pass.
 
 ### A.5 Non-goals
 
-No wholesale rewrite of working race flows, SQL rules, public API routes or persisted IDs. ADR-001 permits reasoned fonts, coordinated auth, additive disposable-stack migrations without dropping/rewriting data, and individually justified API ADRs. ADR-007 proposes lifting the visual-redesign restriction for the frontend only, subject to T-302 approval; retain every feature, chart, modal, tested copy, hook, aria name, state class and DBMS hash route. Backend security/structure and existing-capability DBMS additions follow the plan; any API path/method/response change still requires its own ADR and owner approval. No new service split, external telemetry provider, fixture reset, unrelated product area or production deployment. Phase0 changes architecture/configuration only.
+No wholesale rewrite of working race flows, SQL rules, public API routes or persisted IDs. ADR-001 permits reasoned fonts, coordinated auth, additive disposable-stack migrations without dropping/rewriting data, and individually justified API ADRs. ADR-007 lifts the visual-redesign restriction for the frontend only following T-302 owner approval; retain every feature, chart, modal, tested copy, hook, aria name, state class and DBMS hash route. Backend security/structure and existing-capability DBMS additions follow the plan; any API path/method/response change still requires its own ADR and owner approval. No new service split, external telemetry provider, fixture reset, unrelated product area or production deployment. Phase0 changes architecture/configuration only.
 
 ### A.6 Assumptions and unknowns
 
@@ -147,7 +147,7 @@ PostgreSQL's 17 existing tables are `users`, `teams`, `drivers`, `team_membershi
 
 ### B.5 Layout contract by screen
 
-ADR-007 proposes the following frontend layout contract after T-302 approval, with all existing features/copy/hooks preserved. Columns mean 375px / 768px / 1440px; also verify 320/5120. Shared shell: drawer below1000, sidebar above1000, one primary per viewport. Space Grotesk/Mono, 0/4/8/12/16/24/32/48/64 spacing, >=44px targets, zero-blur shadows/radius0 or9999, all five states. Body palette light>=0.85, heading contrast>=4.5, A-3 roles cream/paper/red with unchanged50–70/20–40/5–15 bands. No gate is modified by this document.
+ADR-007 defines the following owner-approved frontend layout contract, with all existing features/copy/hooks preserved. Columns mean 375px / 768px / 1440px; also verify 320/5120. Shared shell: drawer below1000, sidebar above1000, one primary per viewport. Space Grotesk/Mono, 0/4/8/12/16/24/32/48/64 spacing, >=44px targets, zero-blur shadows/radius0 or9999, all five states. Body palette light>=0.85, heading contrast>=4.5, A-3 roles cream/paper/red with unchanged50–70/20–40/5–15 bands. No gate is modified by this document.
 
 | Screen | 375 / 768 / 1440 arrangement | Primary action |
 |---|---|---|
@@ -275,8 +275,10 @@ Pass 1, Lens 1 traced API-07 ingest -> Mongo -> WebSocket/live/DBMS and retained
 
 Pass 1, Lens 1 traced generated race create -> SQL demo_races/entries -> simulator tick -> Mongo telemetry -> active-race restore and found the roster and seed must both survive restart. Lens 2 requires strict pre-fix failure for fixed-seed repeatability plus seed create/restore carry-through, migration 003 applied on apexgrid-test, then full backend/live acceptance. Lens 3 adds no dependency or screen; an internal seed is the smallest in-place change. Lens 4 uses a stable per-driver/progress RNG so a resumed race does not depend on process-global random draw count; nonseeded legacy races preserve current behavior. Lens 5 covers null legacy seed, 0 and maximum 63-bit seed, multiple drivers, restart with the same roster and external inputs, and the 72-lap cap. Pass 2 found zero further architecture amendments; explicit wall-clock and pit/safety-car inputs remain a replay precondition, recorded in ADR-006 and Risks R08.
 
-## ADR-007 focused Phase C: proposed light overhaul
+## ADR-007 focused Phase C: approved light overhaul
 
-Owner plan docs/overhaul-plan.md sections0,1,3–6 replaces the prior perfection-loop execution queue. ADR-007 records a proposal pending T-302 explicit approval. A.4/A.5/B.5 are amended only for that future scope. Lens1 retains R01–R16/API01–12 and separately approves additions; Lens2 preserves palette bands/contrast, adds F-7/8/9 and hard F-2 with collected-test proof; Lens3 narrows the light-font/hard-shadow/texture exceptions with one red primary and max3 accents; Lens4 preserves storage/contracts, atomic W1/W2/W3 ownership and accept-only commits; Lens5 found motion durations/display minimum conflicts (T-440) and the real-heading contrast filter gap (T-441). Pass1 amended those conditions; Pass2 produced zero additional architecture amendments. Full lens trace and binary owners are in ADR-007. No gate, frontend/backend file or migration is changed by this amendment.
+Owner plan docs/overhaul-plan.md sections0,1,3–6 replaces the prior perfection-loop execution queue. ADR-007 was approved by the owner at T-302 on 2026-10-23. A.4/A.5/B.5 define that scope; no passing implementation is implied. Lens1 retains R01–R16/API01–12 and separately approves additions; Lens2 preserves palette bands/contrast, adds F-7/8/9 and hard F-2 with collected-test proof; Lens3 narrows the light-font/hard-shadow/texture exceptions with one red primary and max3 accents; Lens4 preserves storage/contracts, atomic W1/W2/W3 ownership and accept-only commits; Lens5 found motion durations/display minimum conflicts (T-440) and the real-heading contrast filter gap (T-441). Pass1 amended those conditions; Pass2 produced zero additional architecture amendments. Full lens trace and binary owners are in ADR-007. No gate, frontend/backend file or migration is changed by this amendment.
 
-Risks: T-302 approval is pending; no product dispatch before it. Longer catalogue animations and display text below48px must satisfy owner duration/leading rules through T-440. Palette role coverage may require layout changes, never wider bands. Historical score100 excludes new quality gates and is not a verified overhaul score. scripts/agent/lock.sh commits directly, so its canonical lock-banner operation is reproduced without its Git tail and verified before accept.sh commits, honoring the owner's commit-only-through-accept instruction.
+Risks: T-302 owner approval is recorded; scoped product dispatch may proceed, with verification required. Longer catalogue animations and display text below48px must satisfy owner duration/leading rules through T-440. Palette role coverage may require layout changes, never wider bands. Historical score100 excludes new quality gates and is not a verified overhaul score. scripts/agent/lock.sh commits directly, so its canonical lock-banner operation is reproduced without its Git tail and verified before accept.sh commits, honoring the owner's commit-only-through-accept instruction.
+
+ADR-007 activation review: all five focused lenses rechecked after the owner approved the existing proposal; no scope or threshold amendment was added. Individual API changes retain their own ADR and safety boundary.
