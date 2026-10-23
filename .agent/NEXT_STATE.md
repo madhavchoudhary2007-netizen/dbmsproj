@@ -3,15 +3,21 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-44118 W3 — OPEN
-- target_files: backend/tests/test_telemetry_ingest_contract.py, backend/tests/test_telemetry_ordering.py, backend/tests/test_telemetry_router_contract.py
+### T-44120 W3 — OPEN
+- target_files: backend/tests/test_pit_strategy_contract.py
 - contract: canonical format only, exactAST preserved, <=150lines.
-- verify: .venv/bin/ruff check backend/tests/test_telemetry_ingest_contract.py backend/tests/test_telemetry_ordering.py backend/tests/test_telemetry_router_contract.py && .venv/bin/ruff format --check --output-format concise backend/tests/test_telemetry_ingest_contract.py backend/tests/test_telemetry_ordering.py backend/tests/test_telemetry_router_contract.py && .venv/bin/python .agent/check-format-progress.py backend/tests/test_telemetry_ingest_contract.py && .venv/bin/python .agent/check-format-progress.py backend/tests/test_telemetry_ordering.py && .venv/bin/python .agent/check-format-progress.py backend/tests/test_telemetry_router_contract.py
+- verify: .venv/bin/ruff check backend/tests/test_pit_strategy_contract.py && .venv/bin/ruff format --check --output-format concise backend/tests/test_pit_strategy_contract.py && .venv/bin/python .agent/check-format-progress.py backend/tests/test_pit_strategy_contract.py
+
+### T-44119 W2 — OPEN
+- target_files: backend/app/auth_cookie.py, backend/app/demo_race_router.py, backend/app/pit_strategy_router.py
+- contract: canonical format only, exactAST preserved, <=150lines.
+- verify: .venv/bin/ruff check backend/app/auth_cookie.py backend/app/demo_race_router.py backend/app/pit_strategy_router.py && .venv/bin/ruff format --check --output-format concise backend/app/auth_cookie.py backend/app/demo_race_router.py backend/app/pit_strategy_router.py && .venv/bin/python .agent/check-format-progress.py backend/app/auth_cookie.py && .venv/bin/python .agent/check-format-progress.py backend/app/demo_race_router.py && .venv/bin/python .agent/check-format-progress.py backend/app/pit_strategy_router.py
 
 ## Blocked
 - T-310 remains open until full app Ruff/format exit0; T-311 accepted8570e58; no intermediate count is a parent pass.
 
 ## Done
+- T-44118 acceptedebb3b8f; verify0.
 - T-44117 accepted7789fde; verify0.
 - T-44116 accepted265c60d; verify0.
 - T-441 accepteda49641c; verify0.

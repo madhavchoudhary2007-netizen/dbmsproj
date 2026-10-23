@@ -51,16 +51,30 @@ def create_pit_strategy_router(
             driver_id = str(row.get("driver_id") or "")
             if not driver_id:
                 continue
-            stops_by_driver.setdefault(driver_id, []).append({
-                "reservation_id": row["id"], "lap": stop_lap_by_id.get(str(row["id"])),
-                "compound": stop_compound_by_id.get(str(row["id"])),
-                "box_number": row.get("box_number"), "status": row.get("status"),
-                "starts_at": row.get("starts_at"), "ends_at": row.get("ends_at"),
-            })
+            stops_by_driver.setdefault(driver_id, []).append(
+                {
+                    "reservation_id": row["id"],
+                    "lap": stop_lap_by_id.get(str(row["id"])),
+                    "compound": stop_compound_by_id.get(str(row["id"])),
+                    "box_number": row.get("box_number"),
+                    "status": row.get("status"),
+                    "starts_at": row.get("starts_at"),
+                    "ends_at": row.get("ends_at"),
+                }
+            )
 
         projected = project_strategy(
-            session_id, session["state"], session["generated"], is_live, session["total_laps"],
-            max_session_laps, drivers, latest_by_driver, stops_by_driver, sim, tire_stint_target,
+            session_id,
+            session["state"],
+            session["generated"],
+            is_live,
+            session["total_laps"],
+            max_session_laps,
+            drivers,
+            latest_by_driver,
+            stops_by_driver,
+            sim,
+            tire_stint_target,
         )
         return jsonable(projected)
 

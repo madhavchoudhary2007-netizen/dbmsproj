@@ -104,8 +104,14 @@ def create_demo_race_router(
         user: Any = admin_steward_dependency,
     ) -> None:
         await run_demo_race_delete(
-            session_id, get_simulations(), connection, row_factory, mongo_ready,
-            delete_conflict, validate_delete, delete_records,
+            session_id,
+            get_simulations(),
+            connection,
+            row_factory,
+            mongo_ready,
+            delete_conflict,
+            validate_delete,
+            delete_records,
         )
 
     return router

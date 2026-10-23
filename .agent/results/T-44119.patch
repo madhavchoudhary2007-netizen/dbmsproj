@@ -1,0 +1,80 @@
+diff --git a/backend/app/auth_cookie.py b/backend/app/auth_cookie.py
+index 29cbdeb..5e8ab4c 100644
+--- a/backend/app/auth_cookie.py
++++ b/backend/app/auth_cookie.py
+@@ -41,9 +41,5 @@ def set_auth_cookies(response, token: str, csrf_token: str, *, secure: bool) ->
+ 
+ def clear_auth_cookies(response, *, secure: bool) -> None:
+     """Expire both browser authentication cookies with their original flags."""
+-    response.delete_cookie(
+-        SESSION_COOKIE, httponly=True, secure=secure, samesite="lax", path="/"
+-    )
+-    response.delete_cookie(
+-        CSRF_COOKIE, httponly=False, secure=secure, samesite="lax", path="/"
+-    )
++    response.delete_cookie(SESSION_COOKIE, httponly=True, secure=secure, samesite="lax", path="/")
++    response.delete_cookie(CSRF_COOKIE, httponly=False, secure=secure, samesite="lax", path="/")
+diff --git a/backend/app/demo_race_router.py b/backend/app/demo_race_router.py
+index 53c9cf6..2bd89de 100644
+--- a/backend/app/demo_race_router.py
++++ b/backend/app/demo_race_router.py
+@@ -104,8 +104,14 @@ def create_demo_race_router(
+         user: Any = admin_steward_dependency,
+     ) -> None:
+         await run_demo_race_delete(
+-            session_id, get_simulations(), connection, row_factory, mongo_ready,
+-            delete_conflict, validate_delete, delete_records,
++            session_id,
++            get_simulations(),
++            connection,
++            row_factory,
++            mongo_ready,
++            delete_conflict,
++            validate_delete,
++            delete_records,
+         )
+ 
+     return router
+diff --git a/backend/app/pit_strategy_router.py b/backend/app/pit_strategy_router.py
+index 25e2c9e..b40538c 100644
+--- a/backend/app/pit_strategy_router.py
++++ b/backend/app/pit_strategy_router.py
+@@ -51,16 +51,30 @@ def create_pit_strategy_router(
+             driver_id = str(row.get("driver_id") or "")
+             if not driver_id:
+                 continue
+-            stops_by_driver.setdefault(driver_id, []).append({
+-                "reservation_id": row["id"], "lap": stop_lap_by_id.get(str(row["id"])),
+-                "compound": stop_compound_by_id.get(str(row["id"])),
+-                "box_number": row.get("box_number"), "status": row.get("status"),
+-                "starts_at": row.get("starts_at"), "ends_at": row.get("ends_at"),
+-            })
++            stops_by_driver.setdefault(driver_id, []).append(
++                {
++                    "reservation_id": row["id"],
++                    "lap": stop_lap_by_id.get(str(row["id"])),
++                    "compound": stop_compound_by_id.get(str(row["id"])),
++                    "box_number": row.get("box_number"),
++                    "status": row.get("status"),
++                    "starts_at": row.get("starts_at"),
++                    "ends_at": row.get("ends_at"),
++                }
++            )
+ 
+         projected = project_strategy(
+-            session_id, session["state"], session["generated"], is_live, session["total_laps"],
+-            max_session_laps, drivers, latest_by_driver, stops_by_driver, sim, tire_stint_target,
++            session_id,
++            session["state"],
++            session["generated"],
++            is_live,
++            session["total_laps"],
++            max_session_laps,
++            drivers,
++            latest_by_driver,
++            stops_by_driver,
++            sim,
++            tire_stint_target,
+         )
+         return jsonable(projected)
+ 
