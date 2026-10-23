@@ -3,11 +3,11 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-44108 — simulation test UTC aliases
+### T-44109 — scoped test fixture complexity
 - worker: W3 | priority: P1 | origin: bounded T-311 subdivision
 - target_files: backend/tests/test_api.py
-- contract: timezone.utc to equivalent UTC only; preserve fixtures/assertions; two simulation tests before/after
-- verify: .venv/bin/ruff check --select UP017,I,F401 backend/tests/test_api.py && .venv/bin/ruff format --check backend/tests/test_api.py && .venv/bin/pytest -q backend/tests/test_api.py -k 'timing_repeat_for_fixed_clock_and_seed or individual_pace_clocks'
+- contract: move two Cursor fixtures into factories, identical class/assert AST; <=150
+- verify: .venv/bin/ruff check backend/tests/test_api.py && .venv/bin/ruff format --check backend/tests/test_api.py && .venv/bin/pytest -q backend/tests/test_api.py -k 'mongo_collection_browser_lists_real_collections or demo_delete_waits_for_simulator'
 ### T-44105 — canonical formatting progress
 - worker: W2 | priority: P1 | origin: bounded T-310/311 subdivision
 - target_files: backend/app/main.py
@@ -19,6 +19,7 @@ phase: 1 honest green baseline
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-44108 accepteda893c67; verify0.
 - T-44106 acceptedc6e5749; verify0.
 - T-44103 accepted307771a; verify0.
 - T-44104 accepted639e5a9; verify0.

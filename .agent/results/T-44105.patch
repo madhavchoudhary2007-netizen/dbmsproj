@@ -1,0 +1,121 @@
+diff --git a/backend/app/main.py b/backend/app/main.py
+index 96e3e4e..9dc791a 100644
+--- a/backend/app/main.py
++++ b/backend/app/main.py
+@@ -539,7 +539,8 @@ def results(session_id: UUID, user=authenticated_user_dependency):
+       FROM session_results r JOIN race_sessions s ON s.id=r.session_id
+       JOIN drivers d ON d.id=r.driver_id JOIN users u ON u.id=d.user_id
+       LEFT JOIN LATERAL (SELECT team_id FROM team_memberships m WHERE m.driver_id=d.id
+-        AND m.start_date<=s.scheduled_at::date AND (m.end_date IS NULL OR m.end_date>=s.scheduled_at::date)
++        AND m.start_date<=s.scheduled_at::date AND (m.end_date IS NULL OR """
++            """m.end_date>=s.scheduled_at::date)
+         ORDER BY m.start_date DESC LIMIT 1) membership ON true
+       LEFT JOIN teams t ON t.id=membership.team_id WHERE r.session_id=%s ORDER BY r.position""",
+             (session_id,),
+@@ -1199,7 +1200,8 @@ def clear_session_measurements(session_id: UUID | str):
+     with connection() as conn, conn.cursor() as cur:
+         cur.execute(
+             """SELECT e.championship_id,
+-            EXISTS(SELECT 1 FROM incident_reports i JOIN penalties p ON p.incident_id=i.id WHERE i.session_id=s.id) AS has_penalties
++            EXISTS(SELECT 1 FROM incident_reports i JOIN penalties p ON """
++            """p.incident_id=i.id WHERE i.session_id=s.id) AS has_penalties
+             FROM race_sessions s JOIN race_events e ON e.id=s.event_id WHERE s.id=%s""",
+             (session_id,),
+         )
+@@ -1578,7 +1580,13 @@ async def simulation_loop(sim: Simulation):
+                         pole = driver_id == pole_driver_id
+                         fastest_lap = driver_id == fastest_driver_id
+                         cur.execute(
+-                            "INSERT INTO session_results(session_id,driver_id,position,lap_time_ms,pole,fastest_lap,classified) VALUES (%s,%s,%s,%s,%s,%s,TRUE) ON CONFLICT(session_id,driver_id) DO UPDATE SET position=excluded.position,lap_time_ms=excluded.lap_time_ms,pole=excluded.pole,fastest_lap=excluded.fastest_lap,classified=TRUE",
++                            "INSERT INTO session_results(session_id,driver_id,position,"
++                            "lap_time_ms,pole,fastest_lap,"
++                            "classified) VALUES (%s,%s,%s,%s,%s,%s,TRUE) "
++                            "ON CONFLICT(session_id,driver_id) "
++                            "DO UPDATE SET "
++                            "position=excluded.position,lap_time_ms=excluded.lap_time_ms,"
++                            "pole=excluded.pole,fastest_lap=excluded.fastest_lap,classified=TRUE",
+                             (sim.session_id, driver_id, position, best_lap_ms, pole, fastest_lap),
+                         )
+                         rows.append(
+@@ -1661,7 +1669,8 @@ async def control_simulation(
+             """SELECT d.id,d.number,tm.team_id,t.name AS team_name
+             FROM drivers d JOIN team_memberships tm ON tm.driver_id=d.id
+               AND tm.start_date<=%s::date AND (tm.end_date IS NULL OR tm.end_date>=%s::date)
+-            JOIN teams t ON t.id=tm.team_id WHERE d.eligibility='ACTIVE' ORDER BY d.number LIMIT %s""",
++            JOIN teams t ON t.id=tm.team_id WHERE d.eligibility='ACTIVE' ORDER BY """
++            """d.number LIMIT %s""",
+             (session["scheduled_at"], session["scheduled_at"], body.cars or 10),
+         )
+         if not drivers:
+@@ -1936,9 +1945,15 @@ def dbms_table_rows(
+ @app.get("/api/dbms/races")
+ def dbms_races(user=admin_dependency):
+     return jsonable(
+-        fetch_all("""SELECT s.id,s.state,s.total_laps,s.started_at,s.ended_at,e.name AS event_name,c.name AS circuit_name
+-      FROM race_sessions s JOIN race_events e ON e.id=s.event_id JOIN circuits c ON c.id=e.circuit_id LEFT JOIN demo_races d ON d.session_id=s.id
+-      WHERE s.session_type='RACE' ORDER BY CASE WHEN s.state='ACTIVE' THEN 0 WHEN s.state='PAUSED' THEN 1 ELSE 2 END,COALESCE(d.auto_repeat,false) DESC,s.scheduled_at DESC""")
++        fetch_all(
++            """SELECT s.id,s.state,s.total_laps,s.started_at,s.ended_at,e.name AS """
++            """event_name,c.name AS circuit_name
++      FROM race_sessions s JOIN race_events e ON e.id=s.event_id JOIN circuits c ON """
++            """c.id=e.circuit_id LEFT JOIN demo_races d ON d.session_id=s.id
++      WHERE s.session_type='RACE' ORDER BY CASE WHEN s.state='ACTIVE' THEN 0 WHEN """
++            """s.state='PAUSED' THEN 1 ELSE 2 END,COALESCE(d.auto_repeat,false) """
++            """DESC,s.scheduled_at DESC"""
++        )
+     )
+ 
+ 
+@@ -2113,20 +2128,31 @@ def session_laps(session_id: UUID, user=authenticated_user_dependency):
+ 
+ @app.get("/api/dbms/eer")
+ def dbms_eer(user=admin_dependency):
+-    columns = fetch_all("""SELECT c.table_name,c.column_name,c.data_type,EXISTS(SELECT 1 FROM information_schema.key_column_usage k
+-      JOIN information_schema.table_constraints t ON t.constraint_name=k.constraint_name AND t.constraint_schema=k.constraint_schema
+-      WHERE t.constraint_type='PRIMARY KEY' AND k.table_schema='public' AND k.table_name=c.table_name AND k.column_name=c.column_name) AS primary_key
+-      FROM information_schema.columns c WHERE c.table_schema='public' ORDER BY c.table_name,c.ordinal_position""")
+-    relationships = fetch_all("""SELECT DISTINCT child.relname AS child,ca.attname AS foreign_key,parent.relname AS parent,
++    columns = fetch_all(
++        """SELECT c.table_name,c.column_name,c.data_type,EXISTS(SELECT """
++        """1 FROM information_schema.key_column_usage k
++      JOIN information_schema.table_constraints t ON """
++        """t.constraint_name=k.constraint_name AND t.constraint_schema=k.constraint_schema
++      WHERE t.constraint_type='PRIMARY KEY' AND k.table_schema='public' AND """
++        """k.table_name=c.table_name AND k.column_name=c.column_name) AS primary_key
++      FROM information_schema.columns c WHERE c.table_schema='public' ORDER BY """
++        """c.table_name,c.ordinal_position"""
++    )
++    relationships = fetch_all(
++        """SELECT DISTINCT child.relname AS child,ca.attname AS """
++        """foreign_key,parent.relname AS parent,
+       pa.attname AS parent_key,NOT ca.attnotnull AS optional,
+-      CASE WHEN EXISTS(SELECT 1 FROM pg_constraint uq WHERE uq.conrelid=f.conrelid AND uq.contype IN ('p','u') AND uq.conkey <@ f.conkey)
++      CASE WHEN EXISTS(SELECT 1 FROM pg_constraint uq WHERE uq.conrelid=f.conrelid AND """
++        """uq.contype IN ('p','u') AND uq.conkey <@ f.conkey)
+         THEN '0..1' ELSE '0..many' END AS children_per_parent
+-      FROM pg_constraint f JOIN pg_class child ON child.oid=f.conrelid JOIN pg_namespace ns ON ns.oid=child.relnamespace
++      FROM pg_constraint f JOIN pg_class child ON child.oid=f.conrelid JOIN """
++        """pg_namespace ns ON ns.oid=child.relnamespace
+       JOIN pg_class parent ON parent.oid=f.confrelid
+       CROSS JOIN LATERAL unnest(f.conkey,f.confkey) AS pair(child_num,parent_num)
+       JOIN pg_attribute ca ON ca.attrelid=f.conrelid AND ca.attnum=pair.child_num
+       JOIN pg_attribute pa ON pa.attrelid=f.confrelid AND pa.attnum=pair.parent_num
+-      WHERE f.contype='f' AND ns.nspname='public' ORDER BY child.relname,ca.attname""")
++      WHERE f.contype='f' AND ns.nspname='public' ORDER BY child.relname,ca.attname"""
++    )
+     return {"columns": columns, "relationships": relationships}
+ 
+ 
+@@ -2264,7 +2290,11 @@ def dbms_mongo_collection_documents(
+     sector: int | None = Query(None, ge=1, le=3),
+     user=admin_dependency,
+ ):
+-    "Browse one real Mongo collection without permitting arbitrary collection names or query syntax."
++    (
++        "Browse one real Mongo collection without permitting arbitrary collection "
++        # Keep the docstring split within the configured line length.
++        "names or query syntax."
++    )
+     try:
+         database = mongo_database_ready()
+         if (
