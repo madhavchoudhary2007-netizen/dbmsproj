@@ -3,15 +3,21 @@ updated_at: 2026-10-23
 phase: 2 security (Phase1 complete; baseline score51.2974)
 
 ## Queue
-### T-44135 W3 — OPEN
-- target_files: backend/tests/test_token_revocation.py
-- contract: Add failing-first offline repository tests for ADR008 mapping/SQL and outage, as bounded childT323. New module not yetexists; import dynamically inside eachtest and assert find_spec notNone, so red failures are assertions, notcollectionerrors. Mock database calls entirely. Cover opaquejti +UUIDform deterministicuuid5mapping, parameterized select ofunexpired revocation, insertboundkey+expiryONCONFLICT, purgeonlyexpired, errorspropagatenotfalse. <=140lines.
-- verify: .venv/bin/ruff check backend/tests/test_token_revocation.py && .venv/bin/ruff format --check backend/tests/test_token_revocation.py && .venv/bin/python .agent/check-red-tests.py T-44135 backend/tests/test_token_revocation.py
+### T-44137 W2 — OPEN
+- target_files: backend/app/token_revocation.py, backend/migrations/004_token_revocation.sql
+- contract: Implement ADR008 revocation repository and additive004 migration only; no wiringyet. Unit tests alreadyred5asserts. No migration execution here, rootonlydisposable later.
+- verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/pytest -q backend/tests/test_token_revocation.py && .venv/bin/ruff check backend/app/token_revocation.py && .venv/bin/ruff format --check backend/app/token_revocation.py && .venv/bin/mypy --strict backend/app/token_revocation.py
+
+### T-322 W2 — OPEN
+- target_files: backend/app/security_headers.py, backend/app/main.py
+- contract: Implement pureASGI security headers perT322, newmodule andmainregistration. AllHTTPresponses including404 and middleware503 getheaders. Preserve existingCORS/auth/lease. HSTS enabled only os.getenv('COOKIE_SECURE')=='1'; do notchange existingsecurecookiebehavior (separateexistingproductionflag). No HSTS withflagabsent/0.
+- verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/pytest -q backend/tests/test_security_headers.py && .venv/bin/ruff check backend/app/security_headers.py backend/app/main.py && .venv/bin/ruff format --check backend/app/security_headers.py backend/app/main.py && .venv/bin/mypy --strict backend/app/security_headers.py
 
 ## Blocked
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44135 accepted7afadff; verify0.
 - T-44129 accepteda3c0554; verify0.
 - T-44136 accepted31e5494; verify0.
 - T-321 acceptedcaf033f; verify0.

@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: a3c0554
+git_head: 7afadff
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -56,3 +56,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T-44136 accepted31e5494: Mapped missing_lease to runtime_lease=down in the expected readiness services; retained all cases and assertions. Verify exit0; 2 changed lines.
 
 - T-44129 accepteda3c0554: Added typed liveness and readiness endpoints, with an exact-path lease middleware bypass. Readiness reuses health() and reports missing or invalid leases as down; liveness returns no-store. Verify exit0; 36 changed lines.
+
+- T-44135 accepted7afadff: Added five offline, failing-first repository tests for deterministic jti mapping, bound lookup and write SQL, expired-only purge, and database error propagation. The red-test recorder confirmed five assertion failures with no errors or skips. Verify exit0; 115 changed lines.
