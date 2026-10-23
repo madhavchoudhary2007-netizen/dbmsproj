@@ -1,33 +1,23 @@
 # NEXT_STATE
-updated_at: 2026-10-23T08:00:00Z
+updated_at: 2026-10-23T08:05:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-181 — eliminate explicit any in frontend/lib/api.ts
-- worker: W2 | priority: P1 | origin: EVAL score F-2 & explicit-any ratchet
-- target_files: frontend/lib/api.ts
-- contract: replace 5 explicit any with strict/unknown types preserving behavior
-- verify: bash -c "cd frontend && npx eslint lib/api.ts"
-### T-182 — eliminate explicit any in shell and race-database components
-- worker: W1 | priority: P1 | origin: EVAL score F-2 & explicit-any ratchet
-- target_files: frontend/components/shell.tsx,frontend/components/race-database.tsx
-- contract: replace 6 explicit any in shell.tsx and race-database.tsx with strict types
-- verify: bash -c "cd frontend && npx eslint components/shell.tsx components/race-database.tsx"
-### T-183 — eliminate explicit any in dbms-workspace component
-- worker: W1 | priority: P1 | origin: EVAL score F-2 & explicit-any ratchet
+### T-186 — type NavItem and NavGroup in frontend/components/shell.tsx
+- worker: W1 | priority: P1 | origin: frontend typecheck gate
+- target_files: frontend/components/shell.tsx
+- contract: define NavItem tuple and NavGroup interface to resolve Link and span props
+- verify: bash -c "cd frontend && npx eslint components/shell.tsx"
+### T-187 — type snapshot and table rows in frontend/components/race-database.tsx
+- worker: W1 | priority: P1 | origin: frontend typecheck gate
+- target_files: frontend/components/race-database.tsx
+- contract: type RaceSnapshot, selectedState, and asArray rows for DataTable
+- verify: bash -c "cd frontend && npx eslint components/race-database.tsx"
+### T-188 — type tableData and plan nodes in frontend/components/dbms-workspace.tsx
+- worker: W1 | priority: P1 | origin: frontend typecheck gate
 - target_files: frontend/components/dbms-workspace.tsx
-- contract: replace 9 explicit any with strict types preserving schema and cell renderers
+- contract: resolve remaining TS types for overview, tableData, and readData
 - verify: bash -c "cd frontend && npx eslint components/dbms-workspace.tsx"
-### T-184 — eliminate explicit any in special-pages component
-- worker: W1 | priority: P1 | origin: EVAL score F-2 & explicit-any ratchet
-- target_files: frontend/components/special-pages.tsx
-- contract: replace 25 explicit any with strict types preserving props and renderers
-- verify: bash -c "cd frontend && npx eslint components/special-pages.tsx"
-### T-185 — fix APP_ENV in full-gates backend coverage gate
-- worker: W3 | priority: P1 | origin: EVAL score F-3
-- target_files: scripts/eval/full-gates.sh
-- contract: ensure APP_ENV='local' is present in backend coverage invocation so all 136 tests pass
-- verify: grep -q "APP_ENV='local'" scripts/eval/full-gates.sh
 
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
@@ -36,6 +26,11 @@ loop_iteration: 0 of 8
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-185 ✓ 74b9811; added APP_ENV='local' to backend coverage invocation; 136/136 tests pass at 82% coverage.
+- T-184 ✓ 0218106; eliminated 25 explicit any in special-pages.tsx; zero eslint errors/warnings.
+- T-183 ✓ 6aa0756; eliminated 9 explicit any in dbms-workspace.tsx.
+- T-182 ✓ 8f5f73e; eliminated 6 explicit any in shell.tsx and race-database.tsx.
+- T-181 ✓ 63e1125; eliminated 5 explicit any in lib/api.ts.
 - T-180 ✓ c7f2d45; scored edge dimension E-1..E-5; responsive 320/5120 passes, other checks open.
 - T-179 ✓ 5a9941a; scored performance dimension P-1..P-6; Lighthouse not installed (NOT_RUN), bundle/invariants/axe open.
 - T-178 ✓ d1e4d57; scored aesthetic dimension A-1..A-7; spacing lint 154 hits, banned/motion clean, palette/focal/motion open.
@@ -52,8 +47,3 @@ loop_iteration: 0 of 8
 - T-171 ✓ safe npm audit fix: Next/eslint 16.4.2; critical 0, high 7/moderate 2 deferred major-only; typecheck/build and isolated 127/0/0 pass.
 - T-170 ✓ 8573293; mypy strict 222 baseline restored; Ruff 543, login 6/6.
 - T-169 ✓ 4e88ceb; focused 6/6; full isolated backend 127/0/0 and live acceptance; mypy +1 repair T-170.
-- T-168 ✓ 098a9c2; 4 pass/2 strict xfail, --runxfail exposed successful-login 429.
-- T-163 ✓ 2bb95f8; focused 4/4, full isolated 90 pass/35 fail from counting successful logins; repair T-168/169.
-- T-162 ✓ 6963b4f; 1 pass/3 strict xfails; --runxfail proved 3 missing-429 failures.
-- T-161 ✓ 97c7268; session action characterization passed.
-- T-160 ✓ 8b60194; membership router/repository split accepted, full isolated backend 120/0/0.

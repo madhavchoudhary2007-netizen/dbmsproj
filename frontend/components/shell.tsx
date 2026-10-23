@@ -19,10 +19,18 @@ import {
   MapPinned,
   Trophy,
   X,
+  type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "./auth";
 import { useEffect, useRef, useState } from "react";
-const groups = [
+
+type NavItem = [href: string, name: string, icon: LucideIcon];
+interface NavGroup {
+  name: string;
+  items: NavItem[];
+}
+
+const groups: NavGroup[] = [
   {
     name: "RACE CONTROL",
     items: [
