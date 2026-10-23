@@ -4,19 +4,15 @@ phase: 2 security (Phase1 complete; baseline score51.2974)
 
 ## Queue
 ### T-44143 W3 — OPEN
-- target_files: backend/tests/test_token_revocation_db.py
+- target_files: backend/tests/test_token_revocation_db.py, scripts/eval/db-baseline.sh
 - contract: Add real disposable-PostgreSQL tests for ADR008 repository and migration004. Worker verifies syntax/lint only offline; ROOT runs real tests on apexgrid-test before acceptance. No skip/xfail; explicitguard rejects non-testURL (port15432/dbapexgrid/localhost or127.0.0.1 and APEXGRID_TEST_STACK=1). Never run DB tests yourself.
 - verify: .venv/bin/ruff check backend/tests/test_token_revocation_db.py && .venv/bin/ruff format --check backend/tests/test_token_revocation_db.py && .venv/bin/python -m py_compile backend/tests/test_token_revocation_db.py
-
-### T-325 W3 — OPEN
-- target_files: backend/tests/test_login_throttle.py
-- contract: Close planT325 with explicit offline spoofing test across default and TRUST_PROXY=0 setting. Existing source-throttle test alreadychanges XForwardedFor eachrequest; parameterize default/explicit0 (envunsetor0), preserveall6attemptassertions. Do not implementtrustedproxylogic orchangeauthbehavior. Allloginlimiter testsmustcollected(notfilteredoutbyotherfile-k).
-- verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/pytest -q backend/tests/test_login_throttle.py && .venv/bin/ruff check backend/tests/test_login_throttle.py && .venv/bin/ruff format --check backend/tests/test_login_throttle.py
 
 ## Blocked
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-325 accepted2bff831; verify0.
 - T-44142 accepted42f0a46; verify0.
 - T-324 accepted61643df; verify0.
 - T-44140 accepted3bb47c9; verify0.

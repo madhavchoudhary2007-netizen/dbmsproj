@@ -35,7 +35,7 @@ bash "$SCRIPT_DIR/test-stack.sh" up
 set +e
 (
   cd "$REPO_ROOT"
-  DATABASE_URL="$DATABASE_URL" MONGODB_URL="$MONGODB_URL" \
+  APEXGRID_TEST_STACK=1 DATABASE_URL="$DATABASE_URL" MONGODB_URL="$MONGODB_URL" \
     MONGODB_DATABASE='apexgrid' APP_ENV='local' \
     PYTHONPATH="$REPO_ROOT/backend${PYTHONPATH:+:$PYTHONPATH}" \
     "$TEST_PYTHON" -m pytest backend/tests -q --junitxml="$REPORT"
