@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 7768158
+git_head: 049a179
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -53,3 +53,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T44154 worker Verify field summarized instead of literal; root normalized envelope format, accepted only after actual command rerun0. No re-dispatch needed per failed-format rule. Full isolated rerun in progress. T44155 staged theme token file W1 running; not imported until Tailwind4 integration.
 
 - T-44155 accepted7768158: Added staged Tailwind4 theme tokens and approved nb aliases; not yet imported and no route rendering changes. Four static commands, zero test cases. Verify exit0; 63 changed lines.
+
+- T-44156 accepted049a179: Moved four unchanged validation and CRUD helpers to core.validation with main aliases; AST and aliases verified. Verify exit0; 64 changed lines.

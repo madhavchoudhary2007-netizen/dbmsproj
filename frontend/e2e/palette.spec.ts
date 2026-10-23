@@ -28,7 +28,7 @@ const routes = [
 ] as const;
 
 for (const [id, route] of routes) {
-  test(`${id} ${route} colour discipline at 1440px matches dark archetype`, async ({ page }) => {
+  test(`${id} ${route} colour discipline at 1440px matches light archetype`, async ({ page }) => {
     await page.route("**/api/**", async (routeRequest) => {
       const pathname = new URL(routeRequest.request().url()).pathname;
       if (pathname === "/api/auth/me") {
@@ -71,8 +71,8 @@ for (const [id, route] of routes) {
 
     const result = await page.evaluate(measurePalette);
 
-    // Dark archetype: background luminance <= 0.12
-    expect(result.bgLum).toBeLessThanOrEqual(0.12);
+    // Light archetype: background luminance >= 0.85
+    expect(result.bgLum).toBeGreaterThanOrEqual(0.85);
 
     // Headings pass AA (>= 4.5:1) against parent when present
     for (const contrast of result.headingContrasts) {
