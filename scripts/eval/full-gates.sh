@@ -59,7 +59,7 @@ run_gate 'browser E2E (all configured Playwright projects)' \
     --config frontend/playwright.config.ts --reporter=line
 run_gate 'backend coverage' \
   env DATABASE_URL="$DATABASE_URL" MONGODB_URL="$MONGODB_URL" \
-    MONGODB_DATABASE="$MONGODB_DATABASE" \
+    MONGODB_DATABASE="$MONGODB_DATABASE" APP_ENV='local' \
     PYTHONPATH="$REPO_ROOT/backend${PYTHONPATH:+:$PYTHONPATH}" \
     "$PYTHON" -m pytest -q --cov=backend/app --cov-report=term-missing \
     --cov-report=xml:coverage.xml backend/tests
