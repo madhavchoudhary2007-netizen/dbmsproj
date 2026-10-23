@@ -49,3 +49,5 @@ Integration tests must use PostgreSQL, not SQLite.
 The product requirements remove the DBMS demonstrations.
 
 Perfection loop authorizations: `.agent/adr/ADR-001-perfection-loop-authorizations.md` (agent-architecture ADR namespace).
+
+- ADR-008 JWT logout revocation: .agent/adr/ADR-008-jwt-revocation.md (planned additive disposable-stack store; existing opaque jti and API contracts retained).

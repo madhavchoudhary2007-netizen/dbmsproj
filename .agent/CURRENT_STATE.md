@@ -1,8 +1,8 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 4089fb6
+git_head: c0c8061
 branch: overhaul/neo-brutal
-architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
+architect_sha256: c05eeb0c03461c7292c04802ce8f4814efccd0a3ec78e84cba0ab993c10b3d24
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
 archetype: Neo-Brutal Motorsport (light); ADR007 approved
 last_eval_score: no verified overhaul score; historical100 omits new gates
@@ -51,3 +51,5 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 - T-312 acceptede0f7adf: Added precise Response and validator annotations; validation bodies and schema behavior are unchanged. Verify exit0; 20 changed lines.
 
 - T-313 accepted4089fb6: Included backend/app and backend/tests in both Ruff checks, clarified the temporary mypy allowance, and preserved the remaining CI gates. Verify exit0; 75 changed lines.
+
+- T-314 acceptedc0c8061: Validated expected IDs and weights, including unknown IDs with null weights; updated hard gate and NOT_RUN behavior. Added isolated scorer regressions with exit-code checks. Total diff: 106 added and 14 removed lines. Verify exit0; 120 changed lines.

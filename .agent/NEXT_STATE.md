@@ -3,14 +3,15 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-314 W3 — OPEN
-- target_files: scripts/eval/score.sh, .agent/protocol/evaluation.md, backend/tests/test_score.py
-- contract: ADR007 newweights/hardF2, rejectmissing/duplicate/reweighted/null evidence fordelivery.
-- verify: .venv/bin/pytest -q backend/tests/test_score.py && .venv/bin/ruff check backend/tests/test_score.py && .venv/bin/ruff format --check --output-format concise backend/tests/test_score.py
+### T-44127 O — IN_REVIEW
+- target_files: .agent/adr/ADR-008-jwt-revocation.md, .agent/ARCHITECT.md, DECISIONS.md
+- contract: preserveopaquejti, plannedrevocationonly, focusedC/canonicallock.
+- verify: bash scripts/agent/verify-lock.sh && bash scripts/agent/budget.sh
 
 ## Blocked
 
 ## Done
+- T-314 acceptedc0c8061; verify0.
 - T-313 accepted4089fb6; verify0.
 - T-312 acceptede0f7adf; verify0.
 - T-310 accepted35578c9; verify0.

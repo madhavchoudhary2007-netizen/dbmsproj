@@ -1,7 +1,7 @@
 <!-- LOCK:BEGIN -->
 > STATUS: LOCKED
-> SHA256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
-> LOCKED_AT: 2026-10-23T14:57:55Z
+> SHA256: c05eeb0c03461c7292c04802ce8f4814efccd0a3ec78e84cba0ab993c10b3d24
+> LOCKED_AT: 2026-10-23T18:32:02Z
 > LOCKED_BY: orchestrator
 <!-- LOCK:END -->
 # ApexGrid architecture — existing system, improvement in place
@@ -131,6 +131,8 @@ type DataState<T> = { kind: "empty" } | { kind: "loading"; previous?: T } | { ki
 ADR-005 authorizes one API-07 ingest error-contract addition for F-DOM-04: nonidentical or older telemetry returns HTTP 409. An exact retry keeps the existing HTTP 202 response shape and packet ID without another write or live event. This is approved work, not a claim that the current ingest path enforces it.
 
 Pydantic inputs already in `backend/app/main.py`: `Login`, `Action`, `IncidentIn`, `Decision`, `ReservationIn`, `AutoReservationIn`, `Telemetry`, `ResultIn`, `DemoRaceCreate`, `SimulationControl`. ADR-003 specifies HTTP 422 for new positive time/grid sanction decisions until official race elapsed and starting-grid rules exist; historical rows remain and affected results must be labelled provisional. SQL row ownership and invariants are in `backend/migrations/001_initial.sql`; full route fields remain in `docs/contracts.md`. Future W2 packets should replace untyped frontend `Row`/`any` boundaries incrementally while preserving wire names unless an ADR-001 finding/change proposal justifies a contract change and a separate ADR records it.
+
+ADR-008 permits the planned additive revoked_tokens(jti UUID primary key, expires_at UTC) authentication store on the disposable stack. Existing opaque jti strings remain unchanged in JWT/CSRF and map deterministically to UUID storage keys. Signature/expiry validation precedes revocation lookup; logout records revocation before clearing cookies, HTTP/WS reject revoked tokens, login cleans expired rows, and no-jti tokens remain valid until expiry. API responses and user fields stay unchanged; implementation/proof are pending T-320/T-323.
 
 PostgreSQL's 17 existing tables are `users`, `teams`, `drivers`, `team_memberships`, `championships`, `circuits`, `race_events`, `race_sessions`, `incident_reports`, `demo_races`, `demo_race_entries`, `penalties`, `penalty_points`, `session_results`, `driver_standings`, `pit_boxes`, and `pit_reservations`. MongoDB currently owns the `telemetry` collection. Neither store is being redesigned.
 
@@ -282,3 +284,7 @@ Owner plan docs/overhaul-plan.md sections0,1,3–6 replaces the prior perfection
 Risks: T-302 owner approval is recorded; scoped product dispatch may proceed, with verification required. Longer catalogue animations and display text below48px must satisfy owner duration/leading rules through T-440. Palette role coverage may require layout changes, never wider bands. Historical score100 excludes new quality gates and is not a verified overhaul score. scripts/agent/lock.sh commits directly, so its canonical lock-banner operation is reproduced without its Git tail and verified before accept.sh commits, honoring the owner's commit-only-through-accept instruction.
 
 ADR-007 activation review: all five focused lenses rechecked after the owner approved the existing proposal; no scope or threshold amendment was added. Individual API changes retain their own ADR and safety boundary.
+
+## ADR-008 focused Phase C: logout revocation
+
+The five-lens trace, opaque-jti/UUID compatibility amendment and zero-amendment second pass are recorded in ADR-008. B.3/B.4 now permit this planned authentication transition: authenticated -> logout revocation persisted -> cookies cleared -> reused HTTP401 / new WS4401. T-320 owns failing-first and edge tests, T-323 the additive migration/repository/HTTP/WS enforcement; only apexgrid-test may be migrated. No-jti compatibility and fail-closed database availability are explicit risks. Existing role/Origin/CSRF/cookie/API contracts remain. No runtime or schema change is enacted by this amendment.
