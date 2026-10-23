@@ -8,17 +8,13 @@ phase: 1 honest green baseline
 - target_files: backend/tests/test_api.py
 - contract: <=150 changed lines, identical AST/canonical content, strict format progress
 - verify: .venv/bin/python .agent/check-format-progress.py backend/tests/test_api.py
-### T-4499 — canonical formatting progress
-- worker: W2 | priority: P1 | origin: bounded T-310/311 subdivision
-- target_files: backend/app/main.py
-- contract: <=150 changed lines, identical AST/canonical content, strict format progress
-- verify: .venv/bin/python .agent/check-format-progress.py backend/app/main.py
 ## Blocked
 - T-310/T-311 remain open until full parent Ruff/format/frontend-lint commands exit0; no intermediate count is a parent pass.
 - T-440 (O, before motion packets): align plan2.3/2.7 with owner100–300ms and display>=48px leading limits; those conflicting catalogue specifications are missing a correction task.
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-4499 accepted73599b2; verify0.
 - T-4498 acceptedd8abb08; verify0.
 - T-4497 acceptedf941fc9; verify0.
 - T-4496 accepted293ac25; verify0.
