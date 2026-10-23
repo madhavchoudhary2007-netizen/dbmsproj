@@ -2485,31 +2485,50 @@ def test_demo_delete_waits_for_simulator_and_validates_before_stopping(monkeypat
 
     session_id, event_id, championship_id = uuid4(), uuid4(), uuid4()
     events = []
+
     class Cursor:
-        def __enter__(self): return self
-        def __exit__(self, *_): pass
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            pass
+
         def execute(self, query, _params=None):
             self.rows = []
             if query.startswith("SELECT d.session_id,d.event_id"):
-                self.row = {"session_id": session_id, "event_id": event_id,
-                            "championship_id": championship_id}
+                self.row = {
+                    "session_id": session_id,
+                    "event_id": event_id,
+                    "championship_id": championship_id,
+                }
             elif query.startswith("SELECT 1 FROM incident_reports i JOIN penalties") and blocked:
                 self.row = {"exists": 1}
             else:
                 self.row = None
-            if query.startswith("SELECT driver_id FROM demo_race_entries") or query.startswith("SELECT d.user_id FROM demo_race_entries"):
+            if query.startswith("SELECT driver_id FROM demo_race_entries") or query.startswith(
+                "SELECT d.user_id FROM demo_race_entries"
+            ):
                 self.rows = []
             if query.startswith("DELETE "):
                 events.append("sql-delete")
                 assert "simulator-stopped" in events
-        def fetchone(self): return self.row
-        def fetchall(self): return self.rows
+
+        def fetchone(self):
+            return self.row
+
+        def fetchall(self):
+            return self.rows
 
     cursor = Cursor()
+
     class Connection:
-        def cursor(self, **_): return cursor
+        def cursor(self, **_):
+            return cursor
+
     @contextmanager
-    def fake_connection(): yield Connection()
+    def fake_connection():
+        yield Connection()
+
     class Collection:
         def delete_many(self, _query): events.append("mongo-delete")
 
@@ -2570,43 +2589,90 @@ def test_auto_demo_race_keeps_archive_and_starts_new_session(database_api_client
                 break
             time.sleep(0.1)
         assert new_session_id
-        assert client.get(f"/api/sessions/{session_id}/live", headers=headers).json()["session"]["state"] == "COMPLETED"
+        assert (
+            client.get(f"/api/sessions/{session_id}/live", headers=headers).json()["session"][
+                "state"
+            ]
+            == "COMPLETED"
+        )
         assert len(client.get(f"/api/sessions/{session_id}/results", headers=headers).json()) == 6
-        assert len(client.get(f"/api/sessions/{session_id}/laps", headers=headers).json()["laps"]) == 6
-        assert mongo_ready().count_documents({"session_id":session_id}) >= 6
-        assert client.get(f"/api/sessions/{new_session_id}/live", headers=headers).json()["session"]["state"] == "ACTIVE"
+        assert (
+            len(client.get(f"/api/sessions/{session_id}/laps", headers=headers).json()["laps"]) == 6
+        )
+        assert mongo_ready().count_documents({"session_id": session_id}) >= 6
+        assert (
+            client.get(f"/api/sessions/{new_session_id}/live", headers=headers).json()["session"][
+                "state"
+            ]
+            == "ACTIVE"
+        )
     finally:
         assert client.delete(f"/api/demo-races/{session_id}", headers=headers).status_code == 204
         if new_session_id:
-            assert client.delete(f"/api/demo-races/{new_session_id}", headers=headers).status_code == 204
+            assert (
+                client.delete(f"/api/demo-races/{new_session_id}", headers=headers).status_code
+                == 204
+            )
 
 
 @pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
 def test_principal_ownership_and_telemetry_ingest_policy(database_api_client):
-    client=database_api_client
-    admin_login=client.post("/api/auth/login",json={"email":"admin@apexgrid.test","password":"ApexGrid2026!"})
-    principal_login=client.post("/api/auth/login",json={"email":"principal@apexgrid.test","password":"ApexGrid2026!"})
-    driver_login=client.post("/api/auth/login",json={"email":"driver01@apexgrid.test","password":"ApexGrid2026!"})
-    assert admin_login.status_code==principal_login.status_code==driver_login.status_code==200
-    admin_headers={"Authorization":"Bearer "+admin_login.json()["access_token"]}
-    principal_headers={"Authorization":"Bearer "+principal_login.json()["access_token"]}
-    driver_headers={"Authorization":"Bearer "+driver_login.json()["access_token"]}
+    client = database_api_client
+    admin_login = client.post(
+        "/api/auth/login", json={"email": "admin@apexgrid.test", "password": "ApexGrid2026!"}
+    )
+    principal_login = client.post(
+        "/api/auth/login", json={"email": "principal@apexgrid.test", "password": "ApexGrid2026!"}
+    )
+    driver_login = client.post(
+        "/api/auth/login", json={"email": "driver01@apexgrid.test", "password": "ApexGrid2026!"}
+    )
+    assert admin_login.status_code == principal_login.status_code == driver_login.status_code == 200
+    admin_headers = {"Authorization": "Bearer " + admin_login.json()["access_token"]}
+    principal_headers = {"Authorization": "Bearer " + principal_login.json()["access_token"]}
+    driver_headers = {"Authorization": "Bearer " + driver_login.json()["access_token"]}
 
-    teams=client.get("/api/teams",headers=admin_headers).json()
-    owned=next(team for team in teams if team.get("principal_user_id")==principal_login.json()["user"]["id"])
-    other=next(team for team in teams if team["id"]!=owned["id"])
-    event=client.get("/api/events",headers=admin_headers).json()[0]
-    session=next(item for item in client.get("/api/sessions",headers=admin_headers).json() if item["event_id"]==event["id"])
-    box=client.get(f"/api/pit-boxes?event_id={event['id']}",headers=admin_headers).json()[0]
-    rejected=client.post("/api/pit-reservations",headers=principal_headers,json={
-        "pit_box_id":box["id"],"session_id":session["id"],"team_id":other["id"],
-        "starts_at":"2045-01-01T00:00:00Z","ends_at":"2045-01-01T00:05:00Z",
-    })
-    assert rejected.status_code==403
+    teams = client.get("/api/teams", headers=admin_headers).json()
+    owned = next(
+        team
+        for team in teams
+        if team.get("principal_user_id") == principal_login.json()["user"]["id"]
+    )
+    other = next(team for team in teams if team["id"] != owned["id"])
+    event = client.get("/api/events", headers=admin_headers).json()[0]
+    session = next(
+        item
+        for item in client.get("/api/sessions", headers=admin_headers).json()
+        if item["event_id"] == event["id"]
+    )
+    box = client.get(f"/api/pit-boxes?event_id={event['id']}", headers=admin_headers).json()[0]
+    rejected = client.post(
+        "/api/pit-reservations",
+        headers=principal_headers,
+        json={
+            "pit_box_id": box["id"],
+            "session_id": session["id"],
+            "team_id": other["id"],
+            "starts_at": "2045-01-01T00:00:00Z",
+            "ends_at": "2045-01-01T00:05:00Z",
+        },
+    )
+    assert rejected.status_code == 403
 
-    inactive=next(item for item in client.get("/api/sessions",headers=admin_headers).json() if item["state"]!="ACTIVE")
-    driver_id=client.get("/api/drivers",headers=admin_headers).json()[0]["id"]
-    telemetry_packet=packet(session_id=inactive["id"],driver_id=driver_id)
-    assert client.post("/api/telemetry/ingest",headers=driver_headers,json=telemetry_packet).status_code==403
-    admin_rejected=client.post("/api/telemetry/ingest",headers=admin_headers,json=telemetry_packet)
-    assert admin_rejected.status_code==409
+    inactive = next(
+        item
+        for item in client.get("/api/sessions", headers=admin_headers).json()
+        if item["state"] != "ACTIVE"
+    )
+    driver_id = client.get("/api/drivers", headers=admin_headers).json()[0]["id"]
+    telemetry_packet = packet(session_id=inactive["id"], driver_id=driver_id)
+    assert (
+        client.post(
+            "/api/telemetry/ingest", headers=driver_headers, json=telemetry_packet
+        ).status_code
+        == 403
+    )
+    admin_rejected = client.post(
+        "/api/telemetry/ingest", headers=admin_headers, json=telemetry_packet
+    )
+    assert admin_rejected.status_code == 409

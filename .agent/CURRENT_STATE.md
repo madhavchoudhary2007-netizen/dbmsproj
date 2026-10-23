@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 121a209
+git_head: 19620dd
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -53,3 +53,6 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 
 
 - Formatting children T-4484..T-44100 accepted via accept.sh, exact AST/canonical contents retained, <=150 per packet. Current formatter debt main43/test_api331. Latest full Ruff119(main64/test_api36/demo15/config4), down from542. No current score claimed.
+
+- T-44101 accepted19620dd: Completed main and demo repository canonical formatting preserving both ASTs and contents. Verify exit0; 103 changed lines.
+- Added .agent/check-lint-progress.py: bounded literal/comment cleanup requires unchanged AST/directives, strict selected-rule count decrease and format0. Parent all-rules zero gate remains mandatory. Main+demo full formatting completedT-44101; main61 findings remain, demo13/config4, before literal cleanup.
