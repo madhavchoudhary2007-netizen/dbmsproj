@@ -14,13 +14,14 @@ def create_pit_router(
     jsonable: Callable[[Any], Any],
 ) -> APIRouter:
     router = APIRouter()
+    current_user_dep = Depends(current_user)
 
     @router.get("/api/pit-boxes")
-    def pit_boxes(event_id: UUID, user=Depends(current_user)):
+    def pit_boxes(event_id: UUID, user=current_user_dep):
         return jsonable(list_pit_boxes(event_id))
 
     @router.get("/api/pit-reservations")
-    def pit_reservations(session_id: UUID, user=Depends(current_user)):
+    def pit_reservations(session_id: UUID, user=current_user_dep):
         return jsonable(list_pit_reservations(session_id))
 
     return router

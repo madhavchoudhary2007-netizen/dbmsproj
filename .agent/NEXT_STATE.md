@@ -3,11 +3,16 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-443 — T-311 typed performance fixture and tooling lint
-- worker: W3 | priority: P1 | origin: missing atomic subdivision of T-311 (>3 files/150 lines)
-- target_files: frontend/e2e/perf-fps.spec.ts, scripts/eval/verify-bundle-size.py
-- contract: replace two explicit-any casts with precise browser memory types; Ruff-clean bundle checker; preserve every assertion/threshold
-- verify: .venv/bin/ruff check scripts/eval/verify-bundle-size.py && .venv/bin/ruff format --check scripts/eval/verify-bundle-size.py && npm --prefix frontend run lint -- --max-warnings 0
+### T-444 — T-310 router dependency-default lint batch
+- worker: W2 | priority: P1 | origin: bounded subdivision T-310
+- target_files: backend/app/analytics_router.py, backend/app/auth_router.py, backend/app/pit_router.py
+- contract: bind Depends objects during router construction, preserve HTTP/OpenAPI behavior; format, <=150 changed lines
+- verify: .venv/bin/ruff check backend/app/analytics_router.py backend/app/auth_router.py backend/app/pit_router.py && .venv/bin/ruff format --check backend/app/analytics_router.py backend/app/auth_router.py backend/app/pit_router.py
+### T-445 — T-311 precise database assertions
+- worker: W3 | priority: P1 | origin: bounded subdivision T-311
+- target_files: backend/tests/test_database.py
+- contract: narrow broad SQL exceptions to driver DB errors, strict equal-column zips, UTC alias; preserve every SQLSTATE and assertion
+- verify: .venv/bin/ruff check --select B017,B905,UP017 backend/tests/test_database.py
 
 ## Blocked
 - T-310/T-311 remain open until full parent Ruff/format/frontend-lint commands exit0; no intermediate count is a parent pass.
@@ -15,6 +20,7 @@ phase: 1 honest green baseline
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-443 accepted6cca3aa; frontend lint/typecheck+three existing scripts green; neo lint not yet present.
 - T-302 accepted59a180e; explicit owner approval recorded and lock verified.
 - T-442 accepted7bdbf4c; three files Ruff/format green, disposable full gate running.
 - T-300 accepted e465e89; boot exit0, lock/budgets pass, boot OK.

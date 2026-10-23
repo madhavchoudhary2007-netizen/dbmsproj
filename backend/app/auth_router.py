@@ -24,6 +24,7 @@ def create_auth_router(
 ) -> APIRouter:
     router = APIRouter()
     limiter = LoginLimiter()
+    current_user_dep = Depends(current_user_dependency)
 
     @router.post("/api/auth/login")
     def login(body: Login, response: Response, request: Request) -> dict[str, Any]:
@@ -48,10 +49,7 @@ def create_auth_router(
             raise HTTPException(503, "PostgreSQL is unavailable") from None
         try:
             valid_password = bool(
-                user
-                and bcrypt.checkpw(
-                    body.password.encode(), user["password_hash"].encode()
-                )
+                user and bcrypt.checkpw(body.password.encode(), user["password_hash"].encode())
             )
         except (ValueError, TypeError):
             valid_password = False
@@ -67,21 +65,17 @@ def create_auth_router(
         )
         csrf_token = create_csrf_token(session_id, JWT_SECRET)
         set_auth_cookies(response, token, csrf_token, secure=secure_cookies())
-        user_data = jsonable(
-            {key: user[key] for key in ("id", "email", "full_name", "role")}
-        )
+        user_data = jsonable({key: user[key] for key in ("id", "email", "full_name", "role")})
         if request.headers.get("origin"):
             return {"user": user_data}
         return {"access_token": token, "token_type": "bearer", "user": user_data}
 
     @router.get("/api/auth/me")
-    def me(user: Any = Depends(current_user_dependency)) -> Any:
+    def me(user: Any = current_user_dep) -> Any:
         return user
 
     @router.post("/api/auth/logout")
-    def logout(
-        response: Response, user: Any = Depends(current_user_dependency)
-    ) -> dict[str, str]:
+    def logout(response: Response, user: Any = current_user_dep) -> dict[str, str]:
         clear_auth_cookies(response, secure=secure_cookies())
         return {"detail": "Logged out"}
 
