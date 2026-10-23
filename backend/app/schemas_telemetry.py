@@ -36,14 +36,14 @@ class Telemetry(BaseModel):
 
     @field_validator("ts")
     @classmethod
-    def utc_timestamp(cls, value):
+    def utc_timestamp(cls, value: datetime) -> datetime:
         if value.tzinfo is None or value.utcoffset() is None:
             raise ValueError("Timestamp must include a UTC offset")
         return value.astimezone(UTC)
 
     @field_validator("pit_starts_at", "pit_ends_at")
     @classmethod
-    def utc_pit_timestamp(cls, value):
+    def utc_pit_timestamp(cls, value: datetime | None) -> datetime | None:
         if value is None:
             return value
         if value.tzinfo is None or value.utcoffset() is None:

@@ -10,7 +10,7 @@ class Login(BaseModel):
 
     @field_validator("email")
     @classmethod
-    def valid_email(cls, value):
+    def valid_email(cls, value: str) -> str:
         if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", value):
             raise ValueError("Enter a valid email address")
         return value
@@ -24,14 +24,14 @@ class UserCreate(BaseModel):
 
     @field_validator("email")
     @classmethod
-    def valid_email(cls, value):
+    def valid_email(cls, value: str) -> str:
         if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", value):
             raise ValueError("Enter a valid email address")
         return value
 
     @field_validator("password")
     @classmethod
-    def bcrypt_length(cls, value):
+    def bcrypt_length(cls, value: str) -> str:
         if len(value.encode("utf-8")) > 72:
             raise ValueError("Password must be at most 72 UTF-8 bytes")
         return value
@@ -45,14 +45,14 @@ class UserPatch(BaseModel):
 
     @field_validator("email")
     @classmethod
-    def valid_email(cls, value):
+    def valid_email(cls, value: str | None) -> str | None:
         if value is not None and not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", value):
             raise ValueError("Enter a valid email address")
         return value
 
     @field_validator("password")
     @classmethod
-    def bcrypt_length(cls, value):
+    def bcrypt_length(cls, value: str | None) -> str | None:
         if value is not None and len(value.encode("utf-8")) > 72:
             raise ValueError("Password must be at most 72 UTF-8 bytes")
         return value

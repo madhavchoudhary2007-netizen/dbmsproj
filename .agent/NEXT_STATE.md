@@ -3,15 +3,20 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-310 O — IN_REVIEW
-- target_files: backend/app/main.py
-- contract: accept original full Ruff/format milestone after W2children.
-- verify: .venv/bin/ruff check backend/app && .venv/bin/ruff format --check backend/app
+### T-313 W3 — OPEN
+- target_files: .github/workflows/ci.yml
+- contract: RequiredCIgates with servicecontainers; temporarymypyexceptiononly.
+- verify: npx --offline --yes @action-validator/cli .github/workflows/ci.yml
+
+### T-312 W2 — OPEN
+- target_files: backend/app/auth_cookie.py, backend/app/schemas_auth.py, backend/app/schemas_telemetry.py
+- contract: Preciseannotationsonly; globalcountbelow222.
+- verify: .venv/bin/mypy --strict backend/app/auth_cookie.py backend/app/schemas_auth.py backend/app/schemas_telemetry.py && .venv/bin/ruff check backend/app/auth_cookie.py backend/app/schemas_auth.py backend/app/schemas_telemetry.py && .venv/bin/ruff format --check --output-format concise backend/app/auth_cookie.py backend/app/schemas_auth.py backend/app/schemas_telemetry.py
 
 ## Blocked
-- T-310 remains open until full app Ruff/format exit0; T-311 accepted8570e58; no intermediate count is a parent pass.
 
 ## Done
+- T-310 accepted35578c9; verify0.
 - T-44122 accepted024f663; verify0.
 - T-44121 accepted0aafbee; verify0.
 - T-44120 acceptedcd970ca; verify0.
@@ -59,5 +64,5 @@ phase: 1 honest green baseline
 - T-4481 accepted2cf7b01; verify0.
 - T-4480 accepted4a3ab7f; verify0.
 - Phase0 T-300/T-301/T-302 accepted; ADR007 activated.
-- Phase1 children T-442..T-460 accepted where recorded in CURRENT_STATE/git; T-450/T-461 were not dispatched. Parent T-310/T-311 remain open.
+- Phase1 children T-442..T-460 accepted where recorded in CURRENT_STATE/git; T-450/T-461 were not dispatched. Parents T-310/T-311 accepted.
 - Latest T-46012e8ea1 database tests full Ruff/format0 and unchangedAST; T-4595601bbd bootstrap format unchangedAST.

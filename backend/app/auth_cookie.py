@@ -4,6 +4,8 @@ import hashlib
 import hmac
 import secrets
 
+from starlette.responses import Response
+
 SESSION_COOKIE = "apexgrid_session"
 CSRF_COOKIE = "apexgrid_csrf"
 
@@ -29,7 +31,7 @@ def verify_csrf_token(value: str, session_id: str, secret: str) -> bool:
     return hmac.compare_digest(signature, expected)
 
 
-def set_auth_cookies(response, token: str, csrf_token: str, *, secure: bool) -> None:
+def set_auth_cookies(response: Response, token: str, csrf_token: str, *, secure: bool) -> None:
     """Set host-only browser session cookies with shared ADR-002 flags."""
     response.set_cookie(
         SESSION_COOKIE, token, httponly=True, secure=secure, samesite="lax", path="/"
@@ -39,7 +41,7 @@ def set_auth_cookies(response, token: str, csrf_token: str, *, secure: bool) -> 
     )
 
 
-def clear_auth_cookies(response, *, secure: bool) -> None:
+def clear_auth_cookies(response: Response, *, secure: bool) -> None:
     """Expire both browser authentication cookies with their original flags."""
     response.delete_cookie(SESSION_COOKIE, httponly=True, secure=secure, samesite="lax", path="/")
     response.delete_cookie(CSRF_COOKIE, httponly=False, secure=secure, samesite="lax", path="/")

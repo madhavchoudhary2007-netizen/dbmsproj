@@ -1,0 +1,99 @@
+diff --git a/backend/app/auth_cookie.py b/backend/app/auth_cookie.py
+index 5e8ab4c..ab63d70 100644
+--- a/backend/app/auth_cookie.py
++++ b/backend/app/auth_cookie.py
+@@ -4,6 +4,8 @@ import hashlib
+ import hmac
+ import secrets
+ 
++from starlette.responses import Response
++
+ SESSION_COOKIE = "apexgrid_session"
+ CSRF_COOKIE = "apexgrid_csrf"
+ 
+@@ -29,7 +31,7 @@ def verify_csrf_token(value: str, session_id: str, secret: str) -> bool:
+     return hmac.compare_digest(signature, expected)
+ 
+ 
+-def set_auth_cookies(response, token: str, csrf_token: str, *, secure: bool) -> None:
++def set_auth_cookies(response: Response, token: str, csrf_token: str, *, secure: bool) -> None:
+     """Set host-only browser session cookies with shared ADR-002 flags."""
+     response.set_cookie(
+         SESSION_COOKIE, token, httponly=True, secure=secure, samesite="lax", path="/"
+@@ -39,7 +41,7 @@ def set_auth_cookies(response, token: str, csrf_token: str, *, secure: bool) ->
+     )
+ 
+ 
+-def clear_auth_cookies(response, *, secure: bool) -> None:
++def clear_auth_cookies(response: Response, *, secure: bool) -> None:
+     """Expire both browser authentication cookies with their original flags."""
+     response.delete_cookie(SESSION_COOKIE, httponly=True, secure=secure, samesite="lax", path="/")
+     response.delete_cookie(CSRF_COOKIE, httponly=False, secure=secure, samesite="lax", path="/")
+diff --git a/backend/app/schemas_auth.py b/backend/app/schemas_auth.py
+index 5f6f844..594cdc5 100644
+--- a/backend/app/schemas_auth.py
++++ b/backend/app/schemas_auth.py
+@@ -10,7 +10,7 @@ class Login(BaseModel):
+ 
+     @field_validator("email")
+     @classmethod
+-    def valid_email(cls, value):
++    def valid_email(cls, value: str) -> str:
+         if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", value):
+             raise ValueError("Enter a valid email address")
+         return value
+@@ -24,14 +24,14 @@ class UserCreate(BaseModel):
+ 
+     @field_validator("email")
+     @classmethod
+-    def valid_email(cls, value):
++    def valid_email(cls, value: str) -> str:
+         if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", value):
+             raise ValueError("Enter a valid email address")
+         return value
+ 
+     @field_validator("password")
+     @classmethod
+-    def bcrypt_length(cls, value):
++    def bcrypt_length(cls, value: str) -> str:
+         if len(value.encode("utf-8")) > 72:
+             raise ValueError("Password must be at most 72 UTF-8 bytes")
+         return value
+@@ -45,14 +45,14 @@ class UserPatch(BaseModel):
+ 
+     @field_validator("email")
+     @classmethod
+-    def valid_email(cls, value):
++    def valid_email(cls, value: str | None) -> str | None:
+         if value is not None and not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", value):
+             raise ValueError("Enter a valid email address")
+         return value
+ 
+     @field_validator("password")
+     @classmethod
+-    def bcrypt_length(cls, value):
++    def bcrypt_length(cls, value: str | None) -> str | None:
+         if value is not None and len(value.encode("utf-8")) > 72:
+             raise ValueError("Password must be at most 72 UTF-8 bytes")
+         return value
+diff --git a/backend/app/schemas_telemetry.py b/backend/app/schemas_telemetry.py
+index 190ef32..6ecfc5b 100644
+--- a/backend/app/schemas_telemetry.py
++++ b/backend/app/schemas_telemetry.py
+@@ -36,14 +36,14 @@ class Telemetry(BaseModel):
+ 
+     @field_validator("ts")
+     @classmethod
+-    def utc_timestamp(cls, value):
++    def utc_timestamp(cls, value: datetime) -> datetime:
+         if value.tzinfo is None or value.utcoffset() is None:
+             raise ValueError("Timestamp must include a UTC offset")
+         return value.astimezone(UTC)
+ 
+     @field_validator("pit_starts_at", "pit_ends_at")
+     @classmethod
+-    def utc_pit_timestamp(cls, value):
++    def utc_pit_timestamp(cls, value: datetime | None) -> datetime | None:
+         if value is None:
+             return value
+         if value.tzinfo is None or value.utcoffset() is None:
