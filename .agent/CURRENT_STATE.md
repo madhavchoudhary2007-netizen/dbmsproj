@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: b549015
+git_head: b886991
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -43,3 +43,11 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T-44175 acceptedd0e50ef: Added white-on-red checker with24 controls, character offsets, declaration precedence and conditional JSX literals. Verify0.
 
 - T-44177 acceptedb549015: Integrated shadow/contrast into shared scanner and selftests; good fixtures0 and bad fixtures1. Verify0.
+
+- T-44178 acceptedb886991: Moved unchanged EXPLAIN handler into SQL router with precise Connection callback and preserved alias. Verify0.
+
+- T44180 rejected beforeaccept: unnecessary untyped registration helper hid connection types; repair1 requests direct typed factory nesting and exact Verify envelope. Isolated clone only. Rootfull214PASS0skip/livePASS after EXPLAIN, mypy217/Ruff0.
+
+- T44179 motion candidate rejected: seconds/important false positives, unknown timing/10s delay and no-preference bypass. Repair1 adds exact probes; patch stays isolated.
+
+- T44180repair1 Verify failed C90111>10, contradicting root estimate. Repair2 allows fully typed helper as temporary complexity boundary with precise Connection callback; no gate relaxed.

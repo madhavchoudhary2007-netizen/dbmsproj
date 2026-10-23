@@ -1,0 +1,187 @@
+diff --git a/backend/app/api/dbms_sql.py b/backend/app/api/dbms_sql.py
+index 97f0d17..fce9c61 100644
+--- a/backend/app/api/dbms_sql.py
++++ b/backend/app/api/dbms_sql.py
+@@ -2,13 +2,75 @@ from collections.abc import Callable
+ from contextlib import AbstractContextManager
+ from typing import Any, Literal
+ 
+-from fastapi import APIRouter
++from fastapi import APIRouter, HTTPException
+ from psycopg import Connection
++from psycopg.errors import CheckViolation
+ from psycopg.rows import tuple_row
+ 
+ from ..database import DatabaseRow
+ 
+ 
++def _register_demo_handlers(
++    router: APIRouter,
++    admin_dependency: Any,
++    connection: Callable[[], AbstractContextManager[Connection[DatabaseRow]]],
++) -> dict[str, Callable[..., Any]]:
++    @router.post("/api/dbms/constraint-demo")
++    def constraint_demo(user=admin_dependency):
++        with connection() as conn, conn.cursor(row_factory=tuple_row) as cur:
++            cur.execute("SAVEPOINT constraint_demo")
++            try:
++                cur.execute(
++                    "INSERT INTO drivers(licence_number,number,eligibility) VALUES ('APX-DEMO-CON"
++                    "STRAINT',-1,'ACTIVE')"
++                )
++                result = {"constraint": "unexpectedly accepted"}
++                cur.execute("ROLLBACK TO SAVEPOINT constraint_demo")
++            except CheckViolation as exc:
++                constraint = getattr(exc.diag, "constraint_name", None)
++                cur.execute("ROLLBACK TO SAVEPOINT constraint_demo")
++                if constraint != "drivers_number_check":
++                    raise HTTPException(
++                        500, "Invalid driver row failed an unexpected check constraint"
++                    ) from exc
++                result = {"constraint": constraint, "rejected": True, "sqlstate": exc.sqlstate}
++            cur.execute("RELEASE SAVEPOINT constraint_demo")
++        if result.get("constraint") == "unexpectedly accepted":
++            raise HTTPException(500, "Database accepted a driver number outside the allowed range")
++        return result
++
++    @router.post("/api/dbms/transaction-demo")
++    def transaction_demo(user=admin_dependency):
++        with connection() as conn, conn.cursor(row_factory=tuple_row) as cur:
++            cur.execute("SELECT txid_current()")
++            txid = cur.fetchone()[0]
++            cur.execute(
++                "CREATE TEMP TABLE IF NOT EXISTS transaction_demo_probe(value integer) "
++                "ON COMMIT DROP"
++            )
++            cur.execute("TRUNCATE transaction_demo_probe")
++            cur.execute("INSERT INTO transaction_demo_probe VALUES (1)")
++            cur.execute("SELECT count(*) FROM transaction_demo_probe")
++            before = cur.fetchone()[0]
++            cur.execute("SAVEPOINT tx_demo")
++            cur.execute("INSERT INTO transaction_demo_probe VALUES (2)")
++            cur.execute("SELECT count(*) FROM transaction_demo_probe")
++            during = cur.fetchone()[0]
++            cur.execute("ROLLBACK TO SAVEPOINT tx_demo")
++            cur.execute("SELECT count(*) FROM transaction_demo_probe")
++            after = cur.fetchone()[0]
++        return {
++            "transaction_id": txid,
++            "before": before,
++            "during": during,
++            "after_rollback": after,
++            "savepoint_rolled_back": during == 2 and after == before,
++            "committed_effects": 0,
++        }
++
++    return {"constraint_demo": constraint_demo, "transaction_demo": transaction_demo}
++
++
+ def create_dbms_sql_router(
+     fetch_all: Callable[..., Any],
+     jsonable: Callable[[Any], Any],
+@@ -90,10 +152,13 @@ def create_dbms_sql_router(
+             plan = cur.fetchone()[0]
+         return {"query": query, "plan": plan}
+ 
++    demo_handlers = _register_demo_handlers(router, admin_dependency, connection)
++
+     return router, {
+         "dbms_schema": dbms_schema,
+         "dbms_indexes": dbms_indexes,
+         "dbms_locks": dbms_locks,
+         "dbms_eer": dbms_eer,
+         "dbms_explain": dbms_explain,
++        **demo_handlers,
+     }
+diff --git a/backend/app/main.py b/backend/app/main.py
+index 513470e..a4d4183 100644
+--- a/backend/app/main.py
++++ b/backend/app/main.py
+@@ -32,8 +32,8 @@ from fastapi.middleware.cors import CORSMiddleware
+ from fastapi.responses import JSONResponse
+ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+ from psycopg import IntegrityError, OperationalError, sql
+-from psycopg.errors import CheckViolation, ExclusionViolation, ForeignKeyViolation, UniqueViolation
+-from psycopg.rows import dict_row, tuple_row
++from psycopg.errors import ExclusionViolation, ForeignKeyViolation, UniqueViolation
++from psycopg.rows import dict_row
+ from psycopg_pool import PoolClosed, PoolTimeout
+ from pymongo import DESCENDING, MongoClient
+ from pymongo.collection import Collection
+@@ -1801,6 +1801,8 @@ dbms_indexes = dbms_sql_handlers["dbms_indexes"]
+ dbms_locks = dbms_sql_handlers["dbms_locks"]
+ dbms_eer = dbms_sql_handlers["dbms_eer"]
+ dbms_explain = dbms_sql_handlers["dbms_explain"]
++constraint_demo = dbms_sql_handlers["constraint_demo"]
++transaction_demo = dbms_sql_handlers["transaction_demo"]
+ app.include_router(dbms_sql_router)
+ 
+ 
+@@ -2088,31 +2090,6 @@ def session_laps(session_id: UUID, user=authenticated_user_dependency):
+     )
+ 
+ 
+-@app.post("/api/dbms/constraint-demo")
+-def constraint_demo(user=admin_dependency):
+-    with connection() as conn, conn.cursor(row_factory=tuple_row) as cur:
+-        cur.execute("SAVEPOINT constraint_demo")
+-        try:
+-            cur.execute(
+-                "INSERT INTO drivers(licence_number,number,eligibility) VALUES ('APX-DEMO-CON"
+-                "STRAINT',-1,'ACTIVE')"
+-            )
+-            result = {"constraint": "unexpectedly accepted"}
+-            cur.execute("ROLLBACK TO SAVEPOINT constraint_demo")
+-        except CheckViolation as exc:
+-            constraint = getattr(exc.diag, "constraint_name", None)
+-            cur.execute("ROLLBACK TO SAVEPOINT constraint_demo")
+-            if constraint != "drivers_number_check":
+-                raise HTTPException(
+-                    500, "Invalid driver row failed an unexpected check constraint"
+-                ) from exc
+-            result = {"constraint": constraint, "rejected": True, "sqlstate": exc.sqlstate}
+-        cur.execute("RELEASE SAVEPOINT constraint_demo")
+-    if result.get("constraint") == "unexpectedly accepted":
+-        raise HTTPException(500, "Database accepted a driver number outside the allowed range")
+-    return result
+-
+-
+ @app.get("/api/dbms/telemetry")
+ def dbms_telemetry(user=admin_dependency):
+     try:
+@@ -2425,35 +2402,6 @@ def dbms_lock_demo(user=admin_dependency):
+             lock_demo_guard.release()
+ 
+ 
+-@app.post("/api/dbms/transaction-demo")
+-def transaction_demo(user=admin_dependency):
+-    with connection() as conn, conn.cursor(row_factory=tuple_row) as cur:
+-        cur.execute("SELECT txid_current()")
+-        txid = cur.fetchone()[0]
+-        cur.execute(
+-            "CREATE TEMP TABLE IF NOT EXISTS transaction_demo_probe(value integer) ON COMMIT DROP"
+-        )
+-        cur.execute("TRUNCATE transaction_demo_probe")
+-        cur.execute("INSERT INTO transaction_demo_probe VALUES (1)")
+-        cur.execute("SELECT count(*) FROM transaction_demo_probe")
+-        before = cur.fetchone()[0]
+-        cur.execute("SAVEPOINT tx_demo")
+-        cur.execute("INSERT INTO transaction_demo_probe VALUES (2)")
+-        cur.execute("SELECT count(*) FROM transaction_demo_probe")
+-        during = cur.fetchone()[0]
+-        cur.execute("ROLLBACK TO SAVEPOINT tx_demo")
+-        cur.execute("SELECT count(*) FROM transaction_demo_probe")
+-        after = cur.fetchone()[0]
+-    return {
+-        "transaction_id": txid,
+-        "before": before,
+-        "during": during,
+-        "after_rollback": after,
+-        "savepoint_rolled_back": during == 2 and after == before,
+-        "committed_effects": 0,
+-    }
+-
+-
+ @app.post("/api/dbms/recalculate")
+ def dbms_recalculate(championship_id: UUID, user=admin_dependency):
+     return recalculate(championship_id, user)
