@@ -8,15 +8,11 @@ phase: 1 honest green baseline
 - contract: honest edge baseline, no stale100/unsupportedpasses.
 - verify: .venv/bin/python -c "import json;d=json.load(open('.agent/eval/edge.json'));e={'E-1': 3, 'E-2': 4, 'E-3': 2, 'E-4': 2, 'E-5': 2};assert len(d['checks'])==len(e);assert {c['id']:c['weight'] for c in d['checks']}==e;assert all((c['passed'] is None or isinstance(c['passed'],bool)) and isinstance(c['detail'],str) and c['detail'] for c in d['checks'])"
 
-### T-44125 W3 — OPEN
-- target_files: .agent/eval/performance.json
-- contract: honest performance baseline, no stale100/unsupportedpasses.
-- verify: .venv/bin/python -c "import json;d=json.load(open('.agent/eval/performance.json'));e={'P-1': 3, 'P-2': 3, 'P-3': 2, 'P-4': 3, 'P-5': 2, 'P-6': 2};assert len(d['checks'])==len(e);assert {c['id']:c['weight'] for c in d['checks']}==e;assert all((c['passed'] is None or isinstance(c['passed'],bool)) and isinstance(c['detail'],str) and c['detail'] for c in d['checks'])"
-
 ## Blocked
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44125 accepted4eed78c; verify0.
 - T-44124 accepted1d5cb48; verify0.
 - T-44123 acceptedfd18bfd; verify0.
 - T-44128 acceptedad19d48; verify0.

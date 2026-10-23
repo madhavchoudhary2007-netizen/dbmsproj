@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 1d5cb48
+git_head: 4eed78c
 branch: overhaul/neo-brutal
 architect_sha256: c05eeb0c03461c7292c04802ce8f4814efccd0a3ec78e84cba0ab993c10b3d24
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -40,3 +40,5 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 - T-44123 acceptedfd18bfd: Recorded fresh functional evidence for F-1 through F-9 with the required IDs and weights; retained the F-4 and F-8 failures and disclosed npm moderate vulnerabilities. Verify exit0; 58 changed lines.
 
 - T-44124 accepted1d5cb48: Recorded fresh aesthetic evidence for A-1 through A-7 with exact rubric weights; preserved A-5 and A-6 judgments. Verify exit0; 46 changed lines.
+
+- T-44125 accepted4eed78c: Recorded all six performance checks with their specified weights and evidence-based results; artifact is 40 lines. Verify exit0; 40 changed lines.
