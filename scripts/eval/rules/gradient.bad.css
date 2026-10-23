@@ -1,0 +1,1 @@
+/* Forbidden outside textures.css. */ .bad { background: linear-gradient(red, blue); } .bad { background-image: radial-gradient(red, blue); } .bad { --paint: repeating-conic-gradient(red, blue); } .bad { mask-image: conic-gradient(red, blue); } .bad { @apply bg-gradient-to-r bg-linear-to-r bg-radial bg-conic; }

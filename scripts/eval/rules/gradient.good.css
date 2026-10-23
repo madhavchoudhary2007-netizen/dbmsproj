@@ -1,0 +1,1 @@
+/* Allowed only in the exact texture stylesheet. */ .tx-grid { background-image: linear-gradient(#000 1px, transparent 1px); } .tx-dots { --dots: radial-gradient(#000 1px, transparent 1.5px); } .tx-caution { background: repeating-linear-gradient(-45deg, #000, #ffd93d); } .tx-flag { @apply bg-gradient-to-r bg-linear-to-r bg-radial bg-conic; }
