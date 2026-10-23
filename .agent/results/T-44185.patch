@@ -1,0 +1,51 @@
+diff --git a/frontend/e2e/palette.spec.ts b/frontend/e2e/palette.spec.ts
+index fd6c621..b8f4dd4 100644
+--- a/frontend/e2e/palette.spec.ts
++++ b/frontend/e2e/palette.spec.ts
+@@ -1,4 +1,6 @@
+ import { expect, test } from "@playwright/test";
++import sharp from "sharp";
++import { scorePixels } from "../../scripts/eval/palette-core";
+ import { measurePalette } from "./palette-measure";
+ 
+ const adminUser = {
+@@ -28,7 +30,7 @@ const routes = [
+ ] as const;
+ 
+ for (const [id, route] of routes) {
+-  test(`${id} ${route} colour discipline at 1440px matches light archetype`, async ({ page }) => {
++  test(`${id} ${route} colour discipline at 1440px matches light archetype`, async ({ page }, testInfo) => {
+     await page.route("**/api/**", async (routeRequest) => {
+       const pathname = new URL(routeRequest.request().url()).pathname;
+       if (pathname === "/api/auth/me") {
+@@ -69,6 +71,30 @@ for (const [id, route] of routes) {
+ 
+     await page.goto(route, { waitUntil: "domcontentloaded" });
+ 
++    if (page.viewportSize()?.width === 1440) {
++      await page.evaluate(async () => {
++        await document.fonts.ready;
++        await new Promise<void>((resolve) => {
++          requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
++        });
++      });
++      const screenshot = await page.screenshot({ fullPage: true });
++      const { data, info } = await sharp(screenshot)
++        .removeAlpha()
++        .raw()
++        .toBuffer({ resolveWithObject: true });
++      const roleScore = scorePixels(data, info.channels);
++      await testInfo.attach("palette-screenshot-1440", {
++        body: screenshot,
++        contentType: "image/png",
++      });
++      await testInfo.attach("palette-role-shares-1440", {
++        body: Buffer.from(JSON.stringify({ ...roleScore, width: info.width, height: info.height, channels: info.channels }, null, 2)),
++        contentType: "application/json",
++      });
++      expect(roleScore.ok, `A3 screenshot role shares: ${JSON.stringify(roleScore.share)}`).toBe(true);
++    }
++
+     const result = await page.evaluate(measurePalette);
+ 
+     // Light archetype: background luminance >= 0.85

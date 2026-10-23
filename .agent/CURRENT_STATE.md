@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 008414f
+git_head: f385ea8
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -44,3 +44,7 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T-44184 accepted008414f: Moved unchanged race-list endpoint into SQLrouter; mainalias and query ordering preserved. Verify0.
 
 - Root read one101-line range accidentally (main1890–1990), no secrets exposed; subsequent source ranges capped80.
+
+- T-44183 acceptedf385ea8: Extracted exact approved role-pixel scorer and boundary selftests; existing CLI now resolves installed Sharp offline and defaults to ADR007 roles. Verify0.
+
+- T44185 worker reported25 added lines but actual27 (imports omitted); root corrected envelope counts before integration. No product/source outside task changed.
