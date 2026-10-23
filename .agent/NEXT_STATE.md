@@ -3,11 +3,11 @@ updated_at: 2026-10-23T08:25:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-206 — record A-1 passed in aesthetic.json
-- worker: Orchestrator | priority: P1 | origin: EVAL score A-1
-- target_files: .agent/eval/aesthetic.json
-- contract: record A-1 passed based on lint-spacing.sh exiting 0 with zero non-scale pixel spacing violations
-- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh
+### T-207 — add palette.spec.ts for route colour discipline
+- worker: W3 | priority: P1 | origin: EVAL score A-3
+- target_files: frontend/e2e/palette.spec.ts
+- contract: add palette.spec.ts testing dark archetype background luminance and contrast across 16 routes
+- verify: PLAYWRIGHT_PORT=32145 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts palette.spec.ts --project=desktop-1440 && git checkout -- frontend/next-env.d.ts frontend/AGENTS.md
 
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.

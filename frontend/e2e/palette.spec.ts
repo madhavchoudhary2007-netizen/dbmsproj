@@ -1,0 +1,121 @@
+import { expect, test } from "@playwright/test";
+
+const adminUser = {
+  id: 999,
+  email: "smoke@example.test",
+  full_name: "Smoke Audit",
+  role: "ADMIN",
+};
+
+const routes = [
+  ["E2E-R01", "/"],
+  ["E2E-R02", "/login"],
+  ["E2E-R03", "/dashboard"],
+  ["E2E-R04", "/live"],
+  ["E2E-R05", "/sessions"],
+  ["E2E-R06", "/stewards"],
+  ["E2E-R07", "/pit-wall"],
+  ["E2E-R08", "/championships"],
+  ["E2E-R09", "/events"],
+  ["E2E-R10", "/circuits"],
+  ["E2E-R11", "/standings"],
+  ["E2E-R12", "/teams"],
+  ["E2E-R13", "/drivers"],
+  ["E2E-R14", "/users"],
+  ["E2E-R15", "/analytics"],
+  ["E2E-R16", "/dbms"],
+] as const;
+
+for (const [id, route] of routes) {
+  test(`${id} ${route} colour discipline at 1440px matches dark archetype`, async ({ page }) => {
+    await page.route("**/api/**", async (routeRequest) => {
+      const pathname = new URL(routeRequest.request().url()).pathname;
+      if (pathname === "/api/auth/me") {
+        if (route === "/login") {
+          await routeRequest.fulfill({ status: 401, json: { detail: "Authentication required" } });
+        } else {
+          await routeRequest.fulfill({ status: 200, json: adminUser });
+        }
+        return;
+      }
+      if (pathname === "/api/dashboard") {
+        await routeRequest.fulfill({
+          status: 200,
+          json: { active_sessions: 1, scheduled_events: 2, open_incidents: 0, drivers: 20 },
+        });
+        return;
+      }
+      if (pathname === "/api/health") {
+        await routeRequest.fulfill({ status: 200, json: { status: "healthy" } });
+        return;
+      }
+      if (pathname === "/api/championships") {
+        await routeRequest.fulfill({
+          status: 200,
+          json: [{ id: 1, name: "Formula Apex 2026", season: 2026 }],
+        });
+        return;
+      }
+      if (pathname === "/api/dbms/overview") {
+        await routeRequest.fulfill({
+          status: 200,
+          json: { postgres: { status: "connected" }, mongodb: { status: "connected" } },
+        });
+        return;
+      }
+      await routeRequest.fulfill({ status: 200, json: [] });
+    });
+
+    await page.goto(route, { waitUntil: "domcontentloaded" });
+
+    const result = await page.evaluate(() => {
+      function parseRgb(colorStr: string): [number, number, number] {
+        const match = colorStr.match(/\d+/g);
+        if (!match || match.length < 3) return [0, 0, 0];
+        return [parseInt(match[0], 10), parseInt(match[1], 10), parseInt(match[2], 10)];
+      }
+
+      function getLuminance(rgb: [number, number, number]): number {
+        const [r, g, b] = rgb.map((c) => {
+          const s = c / 255;
+          return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+        });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      }
+
+      function getContrastRatio(l1: number, l2: number): number {
+        const lighter = Math.max(l1, l2);
+        const darker = Math.min(l1, l2);
+        return (lighter + 0.05) / (darker + 0.05);
+      }
+
+      const bodyBg = window.getComputedStyle(document.body).backgroundColor;
+      const bodyBgRgb = parseRgb(bodyBg);
+      const bgLum = getLuminance(bodyBgRgb);
+
+      // Sample headings
+      const headings = Array.from(document.querySelectorAll("h1, h2, h3"));
+      const headingContrasts = headings.map((h) => {
+        const style = window.getComputedStyle(h);
+        const color = parseRgb(style.color);
+        const parentBg = parseRgb(window.getComputedStyle(h.parentElement ?? document.body).backgroundColor);
+        return getContrastRatio(getLuminance(color), getLuminance(parentBg));
+      });
+
+      return {
+        bgLum,
+        headingContrasts,
+      };
+    });
+
+    // Dark archetype: background luminance <= 0.12
+    expect(result.bgLum).toBeLessThanOrEqual(0.12);
+
+    // Headings pass AA (>= 4.5:1) against parent when present
+    for (const contrast of result.headingContrasts) {
+      if (contrast > 1) {
+        expect(contrast).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+  });
+}
