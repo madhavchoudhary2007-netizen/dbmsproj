@@ -2220,50 +2220,106 @@ def test_admin_user_management_and_protected_driver_session_fields(database_api_
         assert old_login.status_code == 401
         assert new_login.status_code == 200
 
-        created_driver=client.post("/api/drivers",headers=admin_headers,json={"user_id":user_id,"licence_number":f"TEST-{suffix}","number":900+random.randrange(100),"eligibility":"RACE_BANNED"})  # noqa: S311 -- seeded pseudo-random driver number is non-security API test data
-        assert created_driver.status_code==201,created_driver.text
-        driver=created_driver.json(); driver_id=driver["id"]
-        assert driver["eligibility"]=="ACTIVE"
-        protected=client.patch(f"/api/drivers/{driver_id}",headers=admin_headers,json={"eligibility":"RACE_BANNED"})
-        assert protected.status_code==422
-        assert client.delete(f"/api/users/{user_id}",headers=admin_headers).status_code==409
+        created_driver = client.post(
+            "/api/drivers",
+            headers=admin_headers,
+            json={
+                "user_id": user_id,
+                "licence_number": f"TEST-{suffix}",
+                "number": 900 + random.randrange(100),
+                "eligibility": "RACE_BANNED",
+            },
+        )  # noqa: S311 -- seeded pseudo-random driver number is non-security API test data
+        assert created_driver.status_code == 201, created_driver.text
+        driver = created_driver.json()
+        driver_id = driver["id"]
+        assert driver["eligibility"] == "ACTIVE"
+        protected = client.patch(
+            f"/api/drivers/{driver_id}", headers=admin_headers, json={"eligibility": "RACE_BANNED"}
+        )
+        assert protected.status_code == 422
+        assert client.delete(f"/api/users/{user_id}", headers=admin_headers).status_code == 409
 
-        event=client.get("/api/events",headers=admin_headers).json()[0]
-        created_session=client.post("/api/sessions",headers=admin_headers,json={"event_id":event["id"],"session_type":"PRACTICE","scheduled_at":"2027-01-01T12:00:00Z","state":"ACTIVE"})
-        assert created_session.status_code==201,created_session.text
-        session=created_session.json(); session_id=session["id"]
-        assert session["state"]=="SCHEDULED"
-        protected_state=client.patch(f"/api/sessions/{session_id}",headers=admin_headers,json={"state":"CANCELLED"})
-        assert protected_state.status_code==422
-        sim=Simulation(session_id,[{"id":driver_id,"number":driver["number"]}],2,status="running")
-        sim.elapsed_by_driver={driver_id:100000}; sim.lap_by_driver={driver_id:2}; sim.tire_age_by_driver={driver_id:1}; sim.tire_wear_by_driver={driver_id:1.1}
-        simulations[session_id]=sim
-        assert client.post(f"/api/sessions/{session_id}/action",headers=admin_headers,json={"action":"start"}).status_code==200
-        paused=client.post(f"/api/sessions/{session_id}/action",headers=admin_headers,json={"action":"pause"})
-        assert paused.status_code==200 and sim.status=="paused"
-        resumed=client.post(f"/api/sessions/{session_id}/action",headers=admin_headers,json={"action":"resume"})
-        assert resumed.status_code==200 and sim.status=="running"
-        reset=client.post(f"/api/sessions/{session_id}/action",headers=admin_headers,json={"action":"reset"})
-        assert reset.status_code==200 and sim.status=="stopped"
-        assert sim.elapsed_by_driver=={driver_id:0} and sim.tire_age_by_driver=={driver_id:0}
-        assert client.post(f"/api/sessions/{session_id}/action",headers=admin_headers,json={"action":"start"}).status_code==200
-        finished=client.post(f"/api/sessions/{session_id}/action",headers=admin_headers,json={"action":"finish"})
-        assert finished.status_code==200 and sim.status=="stopped"
+        event = client.get("/api/events", headers=admin_headers).json()[0]
+        created_session = client.post(
+            "/api/sessions",
+            headers=admin_headers,
+            json={
+                "event_id": event["id"],
+                "session_type": "PRACTICE",
+                "scheduled_at": "2027-01-01T12:00:00Z",
+                "state": "ACTIVE",
+            },
+        )
+        assert created_session.status_code == 201, created_session.text
+        session = created_session.json()
+        session_id = session["id"]
+        assert session["state"] == "SCHEDULED"
+        protected_state = client.patch(
+            f"/api/sessions/{session_id}", headers=admin_headers, json={"state": "CANCELLED"}
+        )
+        assert protected_state.status_code == 422
+        sim = Simulation(
+            session_id, [{"id": driver_id, "number": driver["number"]}], 2, status="running"
+        )
+        sim.elapsed_by_driver = {driver_id: 100000}
+        sim.lap_by_driver = {driver_id: 2}
+        sim.tire_age_by_driver = {driver_id: 1}
+        sim.tire_wear_by_driver = {driver_id: 1.1}
+        simulations[session_id] = sim
+        assert (
+            client.post(
+                f"/api/sessions/{session_id}/action",
+                headers=admin_headers,
+                json={"action": "start"},
+            ).status_code
+            == 200
+        )
+        paused = client.post(
+            f"/api/sessions/{session_id}/action", headers=admin_headers, json={"action": "pause"}
+        )
+        assert paused.status_code == 200 and sim.status == "paused"
+        resumed = client.post(
+            f"/api/sessions/{session_id}/action", headers=admin_headers, json={"action": "resume"}
+        )
+        assert resumed.status_code == 200 and sim.status == "running"
+        reset = client.post(
+            f"/api/sessions/{session_id}/action", headers=admin_headers, json={"action": "reset"}
+        )
+        assert reset.status_code == 200 and sim.status == "stopped"
+        assert sim.elapsed_by_driver == {driver_id: 0} and sim.tire_age_by_driver == {driver_id: 0}
+        assert (
+            client.post(
+                f"/api/sessions/{session_id}/action",
+                headers=admin_headers,
+                json={"action": "start"},
+            ).status_code
+            == 200
+        )
+        finished = client.post(
+            f"/api/sessions/{session_id}/action", headers=admin_headers, json={"action": "finish"}
+        )
+        assert finished.status_code == 200 and sim.status == "stopped"
     finally:
-        simulations.pop(session_id,None)
-        if session_id: client.delete(f"/api/sessions/{session_id}",headers=admin_headers)
-        if driver_id: client.delete(f"/api/drivers/{driver_id}",headers=admin_headers)
-        if user_id: client.delete(f"/api/users/{user_id}",headers=admin_headers)
+        simulations.pop(session_id, None)
+        if session_id:
+            client.delete(f"/api/sessions/{session_id}", headers=admin_headers)
+        if driver_id:
+            client.delete(f"/api/drivers/{driver_id}", headers=admin_headers)
+        if user_id:
+            client.delete(f"/api/users/{user_id}", headers=admin_headers)
 
 
 @pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
 def test_generated_demo_race_create_list_and_scoped_delete(database_api_client):
     client = database_api_client
-    login = client.post("/api/auth/login", json={"email":"admin@apexgrid.test", "password":"ApexGrid2026!"})
+    login = client.post(
+        "/api/auth/login", json={"email": "admin@apexgrid.test", "password": "ApexGrid2026!"}
+    )
     assert login.status_code == 200, login.text
-    headers = {"Authorization":"Bearer "+login.json()["access_token"]}
-    assert client.post("/api/demo-races", headers=headers, json={"cars":5}).status_code == 422
-    created = client.post("/api/demo-races", headers=headers, json={"cars":6})
+    headers = {"Authorization": "Bearer " + login.json()["access_token"]}
+    assert client.post("/api/demo-races", headers=headers, json={"cars": 5}).status_code == 422
+    created = client.post("/api/demo-races", headers=headers, json={"cars": 6})
     assert created.status_code == 201, created.text
     race = created.json()
     session_id = race["session_id"]
@@ -2325,21 +2381,27 @@ def test_generated_demo_race_persistence_contract(database_api_client):
                 WHERE de.session_id=d.session_id) AS memberships,
             (SELECT count(*) FROM pit_boxes WHERE event_id=d.event_id) AS pit_boxes
             FROM demo_races d JOIN race_events e ON e.id=d.event_id
-            JOIN race_sessions rs ON rs.id=d.session_id WHERE d.session_id=%s""", (session_id,))
+            JOIN race_sessions rs ON rs.id=d.session_id WHERE d.session_id=%s""",
+            (session_id,),
+        )
         assert persisted and persisted["championship_id"]
         assert persisted["session_type"] == "RACE" and persisted["state"] == "ACTIVE"
         counts = ("entries", "drivers", "users", "memberships", "pit_boxes")
         assert [persisted[key] for key in counts] == [6, 6, 6, 6, 4]
-        generated = fetch_all("""SELECT de.driver_id, dr.user_id
+        generated = fetch_all(
+            """SELECT de.driver_id, dr.user_id
             FROM demo_race_entries de JOIN drivers dr ON dr.id=de.driver_id
-            WHERE de.session_id=%s""", (session_id,))
+            WHERE de.session_id=%s""",
+            (session_id,),
+        )
         driver_ids = [row["driver_id"] for row in generated]
         user_ids = [row["user_id"] for row in generated]
         assert len(set(driver_ids)) == len(set(user_ids)) == 6
     finally:
         deleted = client.delete(f"/api/demo-races/{session_id}", headers=headers)
         assert deleted.status_code == 204, deleted.text
-    remaining = fetch_one("""SELECT
+    remaining = fetch_one(
+        """SELECT
         (SELECT count(*) FROM demo_races WHERE session_id=%s) AS races,
         (SELECT count(*) FROM demo_race_entries WHERE session_id=%s) AS entries,
         (SELECT count(*) FROM race_sessions WHERE id=%s) AS sessions,
