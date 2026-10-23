@@ -3,11 +3,11 @@ updated_at: 2026-10-22T20:54:39Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-156 — Extract login route into APIRouter
-- worker: W2 | priority: P2 | after: T-155
+### T-157 — Extract me/logout routes into auth APIRouter
+- worker: W2 | priority: P2 | after: T-156
 - target_files: backend/app/main.py, backend/app/auth_router.py
-- contract: move login handler into a typed router while preserving cookie, bearer, Origin and main.fetch_one monkeypatch behavior; me/logout stay for the next packet
-- verify: existing auth/cookie characterization tests; Ruff <=553, mypy <=226
+- contract: move me/logout into auth router while preserving current_user dependency, CSRF/logout behavior and public paths
+- verify: existing auth/cookie characterization tests; Ruff <=549, mypy <=225
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-156 ✓ 746ae38; login moved to auth APIRouter, 20 focused tests; full backend 119/0/0 and live acceptance, Ruff 549/mypy 225.
 - T-155 ✓ 10f5c1d; DELETE route/orchestration moved into demo APIRouter; focused 5/5; full isolated backend 119/0/0 and live acceptance, Ruff 553/mypy 226.
 - T-154 ✓ 5808275; ordered DELETE SQL moved to same-cursor repository helper; focused 4/4 on apexgrid-test, Ruff 554/mypy 227.
 - T-153 ✓ cfe68ef; typed same-cursor DELETE preflight, four focused contracts passed; Ruff 555/mypy 227.
@@ -43,5 +44,4 @@ loop_iteration: 1 of 5
 - T-128 ✓ 39770df; user PATCH validation/hash/UPDATE moved to typed repository, 3 seeded checks passed, Ruff 591, mypy 259; orchestrator reran after worker socket denial.
 - T-127 ✓ 1f2fe12; user creation hashing and INSERT moved to typed repository; seeded contract 2 passed, Ruff 599, mypy 259. Worker socket denied; orchestrator reran.
 - T-126 ✓ d2201f5; user list/detail SQL moved to typed repository; seeded contract 2 passed on apexgrid-test, Ruff 600, mypy 259. Worker socket denied; orchestrator reran after type repair.
-- T-125 ✓ e410407; seeded auth/user contract 2 passed on apexgrid-test, Ruff 600. Worker socket denied; orchestrator reran, corrected generated-ID fixture and cleanup definition before acceptance.
-- T-001..T-124: accepted history and evidence in git/LOOP.md.
+- T-001..T-125: accepted history and evidence in git/LOOP.md.
