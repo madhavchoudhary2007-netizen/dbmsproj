@@ -3,15 +3,21 @@ updated_at: 2026-10-23
 phase: 3 API contract guard (Phases0–2 complete; baseline score51.2974)
 
 ## Queue
-### T-44150 W3 — OPEN
-- target_files: scripts/eval/lint-neobrutal.sh, scripts/eval/rules/radius.good.css, scripts/eval/rules/radius.bad.css
-- contract: Phase5 T360 boundedchild1, allowedinterleavewithbackendperplan§4: create lint-neobrutal.sh foundation enforcingONLYradius sofar, plusonegood/bad radiusfixture. LaterchildrenaddotherADR007rules; don'tclaimwholeT360complete. DefaultscanactualSRC_DIRS viaexisting_dirs.sh, targetedfileargsforverification, --self-test usescommittedfixtures and exits0 onlycorrectgood0/badnonzero. NormalcurrentrepoexpectedFAILoldradiusbaseline; reporthitsnochangeUI.
-- verify: bash scripts/eval/lint-neobrutal.sh --self-test
+### T-44153 W3 — OPEN
+- target_files: scripts/eval/source_text.py, scripts/eval/lint-neobrutal.sh
+- contract: T360 foundation readability: extract sourcecommentmasking fromembeddedchecker into formatted reusable stdlibmodule scripts/eval/source_text.py. Sharedmask_comments(text:str,css:bool=False)->str preservesoffset/newlines/quotes andonlyJSlinecomments exactlycurrentbehavior. Checker callshelper, allradiuspatterns/selftests/fixtures/output remainunchanged. No additionalrulesyet.
+- verify: bash scripts/eval/lint-neobrutal.sh --self-test && .venv/bin/ruff check scripts/eval/source_text.py && .venv/bin/ruff format --check scripts/eval/source_text.py && .venv/bin/mypy --strict scripts/eval/source_text.py
 
-## Blocked
+### T-44152 W2 — OPEN
+- target_files: backend/app/core/serialization.py, backend/app/core/security.py, backend/app/main.py
+- contract: T331 puremovechild2: move jsonable and telemetry_ws_payload verbatim tocore/serialization.py andwebsocket_bearer tocore/security.py; retainmainpublicaliasesimports andsamebindingsforrouterfactories. No logic/type changes.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,importlib,pathlib,subprocess; old=ast.parse(subprocess.check_output(["git","show","4c707d9:backend/app/main.py"],text=True)); originals={n.name:ast.dump(n) for n in old.body if isinstance(n,ast.FunctionDef)}; moves={"jsonable":"serialization","telemetry_ws_payload":"serialization","websocket_bearer":"security"}; assert all(originals[n]==ast.dump(next(x for x in ast.parse(pathlib.Path("backend/app/core/"+m+".py").read_text()).body if isinstance(x,ast.FunctionDef) and x.name==n)) for n,m in moves.items()); main=importlib.import_module("backend.app.main"); assert all(getattr(main,n) is getattr(importlib.import_module("backend.app.core."+m),n) for n,m in moves.items()); print("PASS exact function bodies and main public aliases")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k 'websocket_uses_bearer or mongo_telemetry_payload or mongo_naive_utc' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py && .venv/bin/ruff check backend/app/main.py backend/app/core && .venv/bin/ruff format --check backend/app/main.py backend/app/core
+
+## Deferred
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44150 accepted4c707d9; verify0.
 - T-44151 accepted462ea55; verify0.
 - T-330 accepted3afff87; verify0.
 - T-44149 accepted62443d0; verify0.
@@ -33,67 +39,4 @@ phase: 3 API contract guard (Phases0–2 complete; baseline score51.2974)
 - T-44137 accepted4b6a0fd; verify0.
 - T-44135 accepted7afadff; verify0.
 - T-44129 accepteda3c0554; verify0.
-- T-44136 accepted31e5494; verify0.
-- T-321 acceptedcaf033f; verify0.
-- T-44134 accepted749f9c5; verify0.
-- T-44133 accepted091e4de; verify0.
-- T-44130 acceptedce4b44b; verify0.
-- T-44126 acceptedc2eb8d2; verify0.
-- T-44125 accepted4eed78c; verify0.
-- T-44124 accepted1d5cb48; verify0.
-- T-44123 acceptedfd18bfd; verify0.
-- T-44128 acceptedad19d48; verify0.
-- T-44127 accepted34dbb99; verify0.
-- T-314 acceptedc0c8061; verify0.
-- T-313 accepted4089fb6; verify0.
-- T-312 acceptede0f7adf; verify0.
-- T-310 accepted35578c9; verify0.
-- T-44122 accepted024f663; verify0.
-- T-44121 accepted0aafbee; verify0.
-- T-44120 acceptedcd970ca; verify0.
-- T-44119 accepted64ae141; verify0.
-- T-44118 acceptedebb3b8f; verify0.
-- T-44117 accepted7789fde; verify0.
-- T-44116 accepted265c60d; verify0.
-- T-441 accepteda49641c; verify0.
-- T-44115 accepted0224127; verify0.
-- T-44114 accepted8969b47; verify0.
-- T-440 accepted5248d21; catalogue alignment verify0.
-- T-44113 accepted11595ad; verify0.
-- T-44111 acceptedb069dab; verify0.
-- T-44112 accepted518b4b4; verify0.
-- T-44110 acceptedfd42784; verify0.
-- T-44107 accepted2429939; verify0.
-- T-311 accepted8570e58; verify0.
-- T-44109 acceptedd9258cb; verify0.
-- T-44105 accepted41a5b46; verify0.
-- T-44108 accepteda893c67; verify0.
-- T-44106 acceptedc6e5749; verify0.
-- T-44103 accepted307771a; verify0.
-- T-44104 accepted639e5a9; verify0.
-- T-44102 accepted111241c; verify0.
-- T-44101 accepted19620dd; verify0.
-- T-44100 accepted121a209; verify0.
-- T-4499 accepted73599b2; verify0.
-- T-4498 acceptedd8abb08; verify0.
-- T-4497 acceptedf941fc9; verify0.
-- T-4496 accepted293ac25; verify0.
-- T-4495 acceptedadc090f; verify0.
-- T-4494 accepted4ce3333; verify0.
-- T-4493 accepted5218003; verify0.
-- T-4492 accepteda928c9c; verify0.
-- T-4491 accepted6e710b3; verify0.
-- T-4490 accepted1f55cb6; verify0.
-- T-4489 acceptedab5592b; verify0.
-- T-4488 accepted918245b; verify0.
-- T-4487 acceptedb5afb5a; verify0.
-- T-4486 accepteda141bc4; verify0.
-- T-4485 acceptede2d86a7; verify0.
-- T-4484 accepted2cc09da; verify0.
-- T-4482 accepteda20f2a0; verify0.
-- T-4483 acceptedbfad8d0; verify0.
-- T-4481 accepted2cf7b01; verify0.
-- T-4480 accepted4a3ab7f; verify0.
-- Phase0 T-300/T-301/T-302 accepted; ADR007 activated.
-- Phase1 children T-442..T-460 accepted where recorded in CURRENT_STATE/git; T-450/T-461 were not dispatched. Parents T-310/T-311 accepted.
-- Latest T-46012e8ea1 database tests full Ruff/format0 and unchangedAST; T-4595601bbd bootstrap format unchangedAST.
+- Older accepted tasks: git history and CURRENT_STATE phase summaries.
