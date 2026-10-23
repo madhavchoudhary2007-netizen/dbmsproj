@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Aggregate the four dimension files into .agent/eval/score.json. Exit 0 only if presentable.
-# passed: true | false | null (NOT_RUN: excluded from the denominator, listed under not_run).
+# passed: true | false | null (NOT_RUN: counted in denominator as false, listed under not_run).
 set -euo pipefail
 cd .agent/eval
 pct() { jq '([.checks[]|select(.passed==true)|.weight]|add//0) as $p
-            | ([.checks[]|select(.passed!=null)|.weight]|add//0) as $a
+            | ([.checks[].weight]|add//0) as $a
             | if $a==0 then 0 else 100*$p/$a end' "$1.json"; }
 F=$(pct functional); A=$(pct aesthetic); P=$(pct performance); E=$(pct edge)
 FILES="functional.json aesthetic.json performance.json edge.json"
