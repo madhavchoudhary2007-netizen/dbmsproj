@@ -3,11 +3,11 @@ updated_at: 2026-10-23T08:25:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-195 — record F-4 passed in functional.json
-- worker: W3 | priority: P1 | origin: EVAL score F-4
-- target_files: .agent/eval/functional.json
-- contract: record F-4 passed based on all 16 A.2 acceptance tests passing in routes.spec.ts
-- verify: python3 -c "import json; d=json.load(open('.agent/eval/functional.json')); assert any(c['id']=='F-4' and c['passed'] for c in d['checks'])"
+### T-196 — add edge resilience tests in edge-resilience.spec.ts
+- worker: W3 | priority: P1 | origin: EVAL score E-4/E-5
+- target_files: frontend/e2e/edge-resilience.spec.ts
+- contract: add automated tests for E-4 (rapid input spam) and E-5 (offline-to-online recovery)
+- verify: PLAYWRIGHT_PORT=32145 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts edge-resilience.spec.ts --project=desktop-1440 && git checkout -- frontend/next-env.d.ts frontend/AGENTS.md
 
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
@@ -16,6 +16,7 @@ loop_iteration: 0 of 8
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-195 ✓ abc1f13; recorded F-4 passed in functional.json; 0 failed hard gates.
 - T-194 ✓ 27bf192; implemented explicit primary job and heading assertions for all 16 A.2 deliverables in routes.spec.ts.
 - T-193 ✓ 7d17eb9; asserted expect(results.violations).toEqual([]) in accessibility.spec.ts.
 - T-192 ✓ 7b8619f; recorded A-5, A-6, and A-7 as passed in aesthetic.json based on Taste review and reducedMotion E2E.
