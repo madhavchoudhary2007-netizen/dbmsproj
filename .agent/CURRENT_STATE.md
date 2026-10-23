@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-23T05:09:31Z
-git_head: 4e88ceb
+updated_at: 2026-10-23T05:10:29Z
+git_head: 8573293
 branch: perfection-loop
 architect_sha256: c9780b9cd1ffe91fcb0fbf369b4b136205eb5c1ffb82e8cf199e42cca18c69c5
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -25,7 +25,7 @@ last_eval_score: NOT_RUN (quality gates and role journeys remain open)
 - T-137..T-141: telemetry GET/live/ingest reads and writes moved to typed repository/router with seeded characterization. T-141 updated stale test schema import. Full isolated backend now passes 117 tests, zero failures/skips/xfails; live acceptance passes login, simulator, MongoDB, WebSocket, pits, standings, DBMS and generated races. Ruff 573, mypy 248. Next Phase 2 task: characterize pit strategy before splitting its oversized handler.
 - T-142 pit-strategy seeded historical read contract passed 1/1 without fixture mutation, Ruff 573. T-143 extracts bounded Mongo pit telemetry read into pit_repository while preserving live/historical decisions.
 - T-143 moved bounded latest packets and stop-history aggregation to typed pit_repository; seeded historical and live unit tests passed 2/2, Ruff 573/mypy 248. Full isolated gate pending after next pit-strategy split.
-- T-144..T-155 split pit strategy and generated-race boundaries. T-156/T-157 moved auth routes into APIRouter. T-158..T-160 characterized membership API, moved SQL to typed repository and handlers to APIRouter; focused 2/2 after T-160, full disposable backend 120/0/0 and live acceptance passed. Ruff 543, mypy 222. T-161 characterized session lifecycle; owner override caps Phase 2 after accepted auth and membership splits. T-162 strict F-ACE01 tests: 1 pass/3 xfail; --runxfail 3 missing-429 failures. T-163 focused 4/4; full isolated red 90 pass/35 fail because successful logins count toward limit. T-168 strict success regression accepted (4 pass/2 xfail); T-169 repair passed 6/6; full isolated 127/0/0 and live acceptance. New mypy limiter error raises count 222→223; T-170 fixes before F-E02; F-E02/DOM-04/05 and evaluation follow.
+- T-144..T-155 split pit strategy and generated-race boundaries. T-156/T-157 moved auth routes into APIRouter. T-158..T-160 characterized membership API, moved SQL to typed repository and handlers to APIRouter; focused 2/2 after T-160, full disposable backend 120/0/0 and live acceptance passed. Ruff 543, mypy 222. T-161 characterized session lifecycle; owner override caps Phase 2 after accepted auth and membership splits. T-162 strict F-ACE01 tests: 1 pass/3 xfail; --runxfail 3 missing-429 failures. T-163 focused 4/4; full isolated red 90 pass/35 fail because successful logins count toward limit. T-168 strict success regression accepted (4 pass/2 xfail); T-169 repair passed 6/6; full isolated 127/0/0 and live acceptance. T-170 restored mypy strict 222 and Ruff 543; F-ACE01 closed. F-E02 audit/upgrade next; F-E02/DOM-04/05 and evaluation follow.
 
 ## Orchestrator direct edits and Taste review
 - 2026-10-23: retired three accepted F-ACE01 xfail decorators and sorted the test import (4 test lines); focused 4/4, full gate exposed success-count defect. No product source edited. Retired two T-168 xfails (3 test lines); focused 6/6 and full isolated 127/0/0.

@@ -11,6 +11,7 @@ phase: 2 — structure, in progress
 cycle: 0 of 8
 score: NOT_RUN
 
+- T-170 accepted: mypy limiter regression fixed without behavior change. Global strict count restored to 222; Ruff 543, focused login 6/6. F-ACE01 closed after prior 127/0/0 disposable backend and live acceptance. Five owner-priority tasks accepted before first evaluation.
 - T-169 accepted: reservation-specific release after valid credentials/DB outage; six unmarked login tests pass. Full disposable backend 127 passed, zero failures/skips/xfails; live acceptance passes. Ruff 543 unchanged. Mypy strict rose 222→223 due a tuple-index type in login_limiter; T-170 is queued before closing F-ACE01.
 - T-168 accepted: two strict success-path xfails; --runxfail fails on 429 for repeated valid login and six valid accounts sharing one source. Ruff stays 543. T-169 will release successful admissions.
 - T-163 focused 4/4 after limiter, but full isolated gate failed: 90 passed/35 failed/0 skips because the source limit counted successful logins across tests. This is a real shared-source usability defect; T-168/169 test-first repair before F-E02. No F-ACE01 closure claim.
@@ -139,7 +140,7 @@ score: NOT_RUN
 - F-DOM-03, area A, P1, closed by T-075/T-076: result upserts allowed completed classified position gaps (`backend/app/main.py:727-744`); strict API xfail proved missing 422, final position set now validates within the write transaction; full isolated backend and live acceptance pass.
 - F-DOM-04, area A, P2, open: telemetry insert/broadcast accepts duplicate and older packets (`backend/app/main.py:914-932`); test ordering/idempotency.
 - F-DOM-05, area A, P2, open: production simulator uses global random state without persisted seed (`backend/app/main.py:1451-1455,1661`); test restart/replay determinism.
-- F-ACE01, area C/E, P2, open: `/api/auth/login` does not throttle repeated invalid guesses (`backend/app/main.py:509-529`); the independent Phase 1 audit in `.agent/audit/phase1-ace.md` records evidence and the required per-account/per-source limit.
+- F-ACE01, area C/E, P2, closed by T-162/163/168/169/170: `/api/auth/login` does not throttle repeated invalid guesses (`backend/app/main.py:509-529`); the independent Phase 1 audit in `.agent/audit/phase1-ace.md` records evidence and the required per-account/per-source limit.
 - F-A11, area D, P1, closed by T-039: `/login` copyright text was 3.88:1 against `#0b0e12` (axe serious at `frontend/app/globals.css:1073`); `--muted` yields 6.44:1. `RUN_XFAIL=1` reproduced before and passed after; marker removed.
 - F-A12, area D, P1, closed by T-040: browser test waited for visible actionable control before Tab; desktop accessibility sweep passed 16/16 afterward.
 - F-A13, area D, P1, closed by T-041: responsive audit root redirect and login/mobile action fixtures corrected; desktop browser project passed 96/96 route-width cases.

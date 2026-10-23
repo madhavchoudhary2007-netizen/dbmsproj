@@ -1,13 +1,8 @@
 # NEXT_STATE
-updated_at: 2026-10-23T05:09:31Z
+updated_at: 2026-10-23T05:10:29Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-170 — Restore mypy ratchet after login limiter
-- worker: W2 | priority: P2 | origin: T-169
-- target_files: backend/app/login_limiter.py
-- contract: remove new tuple-index mypy error without behavior change; global strict count <=222
-- verify: .venv/bin/mypy --strict backend/app/login_limiter.py
 ### T-164 — F-DOM-04 ordered telemetry reproduction
 - worker: W3 | priority: P2 | after: F-E02
 - target_files: backend/tests/test_telemetry_ordering.py
@@ -36,6 +31,7 @@ loop_iteration: 0 of 8
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-170 ✓ 8573293; mypy strict 222 baseline restored; Ruff 543, login 6/6.
 - T-169 ✓ 4e88ceb; focused 6/6; full isolated backend 127/0/0 and live acceptance; mypy +1 repair T-170.
 - T-168 ✓ 098a9c2; 4 pass/2 strict xfail, --runxfail exposed successful-login 429.
 - T-163 ✓ 2bb95f8; focused 4/4, full isolated 90 pass/35 fail from counting successful logins; repair T-168/169.
