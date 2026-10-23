@@ -1,0 +1,19 @@
+{
+  "task_id": "T-155",
+  "status": "PASSED",
+  "files_modified": [
+    { "path": "backend/app/demo_race_router.py", "lines_added": 57, "lines_removed": 1 },
+    { "path": "backend/app/main.py", "lines_added": 18, "lines_removed": 25 }
+  ],
+  "diff_summary": "Moved generated-race DELETE orchestration into the demo router with a call-time compatible main wrapper; preserved SQL, simulator and Mongo order.",
+  "verification": {
+    "command": "DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 MONGODB_DATABASE=apexgrid APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k 'generated_demo_race_create_list_and_scoped_delete or generated_demo_race_persistence_contract or demo_delete_waits_for_simulator_and_validates_before_stopping or contract_routes_are_registered'",
+    "exit_code": 0,
+    "tests_passed": 5,
+    "tests_failed": 0,
+    "duration_ms": 1260,
+    "typecheck_errors": 226,
+    "lint_warnings": 553
+  },
+  "unresolved_blockers": []
+}

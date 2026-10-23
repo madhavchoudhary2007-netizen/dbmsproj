@@ -3,12 +3,51 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Callable
 from typing import Any
+from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from .schemas_simulation import DemoRaceCreate
 
 DEFAULT_DEMO_RACE_CREATE = DemoRaceCreate()
+
+
+async def run_demo_race_delete(
+    session_id: UUID,
+    simulations: dict[str, Any],
+    connection: Callable[[], Any],
+    row_factory: Any,
+    mongo_ready: Callable[[], Any],
+    delete_conflict: type[Exception],
+    validate_delete: Callable[[Any, Any, dict[str, Any]], Any],
+    delete_records: Callable[[Any, Any, dict[str, Any]], Any],
+) -> None:
+    sim = simulations.get(str(session_id))
+    with connection() as conn, conn.cursor(row_factory=row_factory) as cur:
+        cur.execute(
+            """SELECT d.session_id,d.event_id,e.championship_id FROM demo_races d
+            JOIN race_events e ON e.id=d.event_id WHERE d.session_id=%s FOR UPDATE OF d""",
+            (session_id,),
+        )
+        marker = cur.fetchone()
+        if not marker:
+            raise HTTPException(404, "Generated demo race not found")
+        col = mongo_ready()
+        if col is None:
+            raise HTTPException(503, "MongoDB telemetry store is unavailable")
+        try:
+            validate_delete(cur, session_id, marker)
+        except delete_conflict as exc:
+            raise HTTPException(409, str(exc)) from exc
+        if sim:
+            sim.status = "stopped"
+            if sim.task and not sim.task.done():
+                sim.task.cancel()
+                await asyncio.gather(sim.task, return_exceptions=True)
+        delete_records(cur, session_id, marker)
+    if sim:
+        simulations.pop(str(session_id), None)
+    col.delete_many({"session_id": str(session_id)})
 
 
 async def run_demo_race_create(
@@ -29,6 +68,13 @@ def create_demo_race_router(
     list_demo_race_ids: Callable[[int, int], list[dict[str, Any]]],
     make_demo_race: Callable[[int | None], Any],
     launch_demo_simulation: Callable[[Any], Any],
+    get_simulations: Callable[[], dict[str, Any]],
+    connection: Callable[[], Any],
+    row_factory: Any,
+    mongo_ready: Callable[[], Any],
+    delete_conflict: type[Exception],
+    validate_delete: Callable[[Any, Any, dict[str, Any]], Any],
+    delete_records: Callable[[Any, Any, dict[str, Any]], Any],
 ) -> APIRouter:
     router = APIRouter()
     user_dependency = Depends(current_user)
@@ -50,6 +96,16 @@ def create_demo_race_router(
     ) -> Any:
         return await run_demo_race_create(
             body, make_demo_race, launch_demo_simulation, demo_race_row
+        )
+
+    @router.delete("/api/demo-races/{session_id}", status_code=204)
+    async def delete_demo_race(
+        session_id: UUID,
+        user: Any = admin_steward_dependency,
+    ) -> None:
+        await run_demo_race_delete(
+            session_id, get_simulations(), connection, row_factory, mongo_ready,
+            delete_conflict, validate_delete, delete_records,
         )
 
     return router

@@ -74,6 +74,7 @@ from .demo_race_router import (
     DEFAULT_DEMO_RACE_CREATE,
     create_demo_race_router,
     run_demo_race_create,
+    run_demo_race_delete,
 )
 from .pit_repository import PIT_RESERVATION_SELECT, load_pit_strategy_rows, load_pit_telemetry
 from .pit_router import create_pit_router
@@ -796,6 +797,13 @@ app.include_router(create_demo_race_router(
     list_demo_race_ids,
     _make_demo_race,
     launch_demo_simulation,
+    lambda: simulations,
+    connection,
+    dict_row,
+    mongo_ready,
+    DemoRaceDeleteConflict,
+    validate_demo_race_delete,
+    delete_demo_race_records,
 ))
 
 
@@ -866,32 +874,17 @@ async def create_demo_race(
     )
 
 
-@app.delete("/api/demo-races/{session_id}", status_code=204)
 async def delete_demo_race(session_id: UUID, user=Depends(roles("ADMIN", "STEWARD"))):
-    sim = simulations.get(str(session_id))
-    with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-        cur.execute("""SELECT d.session_id,d.event_id,e.championship_id FROM demo_races d
-            JOIN race_events e ON e.id=d.event_id WHERE d.session_id=%s FOR UPDATE OF d""", (session_id,))
-        marker = cur.fetchone()
-        if not marker:
-            raise HTTPException(404, "Generated demo race not found")
-        col = mongo_ready()
-        if col is None:
-            raise HTTPException(503, "MongoDB telemetry store is unavailable")
-        try:
-            validate_demo_race_delete(cur, session_id, marker)
-        except DemoRaceDeleteConflict as exc:
-            raise HTTPException(409, str(exc)) from exc
-        if sim:
-            sim.status = "stopped"
-            if sim.task and not sim.task.done():
-                sim.task.cancel()
-                await asyncio.gather(sim.task, return_exceptions=True)
-        delete_demo_race_records(cur, session_id, marker)
-    if sim:
-        simulations.pop(str(session_id), None)
-    col.delete_many({"session_id":str(session_id)})
-    return None
+    return await run_demo_race_delete(
+        session_id,
+        simulations,
+        connection,
+        dict_row,
+        mongo_ready,
+        DemoRaceDeleteConflict,
+        validate_demo_race_delete,
+        delete_demo_race_records,
+    )
 
 
 class EventBus:
