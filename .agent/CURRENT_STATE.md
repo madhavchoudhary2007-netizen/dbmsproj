@@ -1,37 +1,29 @@
 # CURRENT_STATE
-updated_at: 2026-10-23T12:55:00Z
-git_head: d594d21
-branch: perfection-loop
+updated_at: 2026-10-23
+git_head: 1acf8e1
+branch: overhaul/neo-brutal
 architect_sha256: 0dbd38b2c32d662bc2d5aaa31178ba23a93b28d1f8a6dfd23a8322e5bf229cda
-archetype: enterprise-saas (5 signals); developer-tool secondary (3)
-last_eval_score: 100.00 (functional 100, aesthetic 100, performance 100, edge 100; failed gates: 0, not_run: 0, presentable: true)
+harness: codex
+archetype: existing enterprise-saas; Neo-Brutal Motorsport (light) proposed in T-301
+last_eval_score: historical 100 claim is not a verified baseline for this overhaul
 
-## Verified setup and contracts
-- Boot and architecture lock pass (ADR-004 relock 07954ad). Work stays on `perfection-loop`. Disposable databases use only Compose project `apexgrid-test`, ports 15432/27018. Never touch running databases, secrets or master.
-- PostgreSQL owns official race data; MongoDB owns telemetry. ADR-001/002 permit additive migrations, finding-backed contracts and cookie/CSRF browser auth. ADR-005 ingest ordering is verified. ADR-006 permits nullable demo-race seed migration for deterministic replay; implementation pending.
-- Host venv Python 3.14/Node 26 differs from backend container Python 3.12/frontend container Node 22. Runtime parity gate remains open.
+## Active work
+- Owner's neo-brutal overhaul replaces the prior perfection-loop task queue. Source of tasks: docs/overhaul-plan.md sections 0,1,3-6. Product changes wait for explicit ADR-007 approval at T-302.
+- T-300 boot exit 0: architecture lock verifies; CURRENT/NEXT budgets pass; boot OK. Created overhaul/neo-brutal from perfection-loop 1acf8e1.
+- H=codex; models.env defaults HARNESS via caller and uses gpt-6.1-sol/medium for Codex orchestrator. Worker models/efforts/cap and context windows preserved. Claude 433000 context settings were owner-supplied edits and are preserved.
+- Owner-supplied docs/overhaul-plan.md and .claude/settings.json are being recorded unchanged with T-300; accept.sh stages all changes, so both are explicitly listed in that task's targets.
 
-## Verified gates and components
-- Isolated backend gate after T-086: 92 passed, 0 failed/skipped/xfailed; live acceptance passed login, simulator, MongoDB, WebSocket, pits, standings, DBMS, generated races. T-074 additive 002 migration applied on disposable stack; F-DOM-01 and F-DOM-03 closed. `pip-audit` runtime requirements had no known vulnerabilities at last run.
-- Browser matrix after T-080: 745/745 passed across five Chromium projects. Desktop axe/keyboard sweep covered all 16 routes. G11 cookie/CSRF transport and browser journeys are verified with isolated backend, live acceptance and full browser gates. Steward time/grid controls are disabled with accessible guidance; focused desktop/mobile journey passed.
-- Cookie auth: session/CSRF cookies, Origin checks, protected-write signed CSRF, cookie WebSocket, browser credentialed fetch, cookie-only /me, server logout and user-only browser login JSON are implemented. No-Origin bearer API and legacy WebSocket clients remain supported. T-069 verifies logout CSRF request and retry on 503. `getToken` removed by T-070.
-- Frontend typecheck and webpack production build passed at last run. Phase 0 CI/full-gates harness accepted; `.agent/commands.env` has real E2E and zero-warning lint commands.
+## Contracts and guardrails
+- Preserve every feature, route, copy string, data hook, aria name, state class and DBMS hash route. APIs additive only, each contract change needs ADR and owner approval at the stated hard stop.
+- No secrets/.env access, recursive removal, real-database or production-volume changes. Database testing uses disposable apexgrid-test only.
+- At most two workers. Packets only, accept.sh rerun/commit required. No bulk product edits by orchestrator. Commit only through accept.sh on overhaul/neo-brutal.
+- scripts/agent/status.sh, root status.sh and owner edits in run-loop.sh remain owner property.
 
-## Ratchet and open risks
-- Ruff 641 baseline -> 561 after T-144; mypy strict 311 baseline -> 248 after T-140; frontend strict lint 45 explicit-any errors. Ruff format 7 files at baseline. Coverage overall 72% isolated baseline; domain/service 90% target, overall 80% target remain open. Frontend safe npm audit fix upgraded Next and eslint-config-next 16.3.8→16.4.2; critical 1→0, high 7/moderate 2 remain because only breaking Tailwind/eslint migrations are offered. Typecheck/build pass; strict lint stays 45.
-- F-ACE01 closed by T-170. T-006 twice failed: five-state fixtures need a route-specific applicability matrix before T-026..028. Role journeys, permissions matrix, simulator invariants, frontend visual states, docs, performance and evaluation score remain open in NEXT_STATE/queue.
-- Phase 1 A/C/E P0/P1 findings closed after T-088. Phase 2 structure active: CRUD, analytics, pit, user and telemetry repositories; auth/operations/telemetry/competition/simulation schemas; analytics, pit read, user and telemetry APIRouters. ADR-004 single-process lease guards accepted; F-STRUCT-01/02 closed. ADR-003 full enforcement and P2 findings remain.
-- T-133..T-136: F-STRUCT-03 psycopg pool could not reopen across app lifespans; strict regression reproduced it, W2 recreated the pool, test fixture updated without weaker assertions. Full isolated backend and live acceptance passed; finding closed.
-- F-DOM-04 closed: disposable backend 132/0/0/0 and live acceptance. F-DOM-05 test-first T-166, migration/repo T-167, seeded engine/create/restore T-175, S311 ratchet T-176: focused unmarked 4/4, Ruff 540 and mypy 222. Full disposable gate/evaluation next. Fifteen owner-priority tasks accepted before first evaluation (cap reached).
-- T-137..T-141: telemetry GET/live/ingest reads and writes moved to typed repository/router with seeded characterization. T-141 updated stale test schema import. Full isolated backend now passes 117 tests, zero failures/skips/xfails; live acceptance passes login, simulator, MongoDB, WebSocket, pits, standings, DBMS and generated races. Ruff 573, mypy 248. Next Phase 2 task: characterize pit strategy before splitting its oversized handler.
-- T-142 pit-strategy seeded historical read contract passed 1/1 without fixture mutation, Ruff 573. T-143 extracts bounded Mongo pit telemetry read into pit_repository while preserving live/historical decisions.
-- T-143 moved bounded latest packets and stop-history aggregation to typed pit_repository; seeded historical and live unit tests passed 2/2, Ruff 573/mypy 248. Full isolated gate pending after next pit-strategy split.
-- T-144..T-155 split pit strategy and generated-race boundaries. T-156/T-157 moved auth routes into APIRouter. T-158..T-160 characterized membership API, moved SQL to typed repository and handlers to APIRouter; focused 2/2 after T-160, full disposable backend 120/0/0 and live acceptance passed. Ruff 543, mypy 222. T-161 characterized session lifecycle; owner override caps Phase 2 after accepted auth and membership splits. T-162 strict F-ACE01 tests: 1 pass/3 xfail; --runxfail 3 missing-429 failures. T-163 focused 4/4; full isolated red 90 pass/35 fail because successful logins count toward limit. T-168 strict success regression accepted (4 pass/2 xfail); T-169 repair passed 6/6; full isolated 127/0/0 and live acceptance. T-170 restored mypy strict 222 and Ruff 543; F-ACE01 closed. F-E02 audit/upgrade next; F-E02/DOM-04/05 and evaluation follow.
+## Baseline and risks
+- Plan section0 records Ruff540, format23 files, mypy222, frontend lint2 errors, npm audit7 high/2 moderate; these are documented inputs, not fresh measurements this session.
+- Previous score omitted Ruff/mypy/audit from Functional; T-314 adds F-7..F-9 and hard F-2. Do not report old100 as current.
+- Plan tasks larger than three files/150 lines must be split into atomic packets before dispatch. Worker-owned test/config work must respect W1/W2/W3 boundaries.
+- Plan conflicts pending ADR-007: light palette, permitted zero-blur shadows, multiple accent tokens/textures, font/display leading, CI/gate expansion. No gate changed yet.
 
-## Orchestrator direct edits and Taste review
-- 2026-10-23: retired four T-166 strict xfail markers and unused pytest import (5 test lines) after T-175; focused unmarked 4/4. No product source edited.
-- 2026-10-23: retired T-173 strict xfail marker and unused pytest import (2 test lines) after T-174, and clarified older retry in docs/contracts.md. No product source edited.
-- 2026-10-23: removed four test lines (three strict telemetry xfail markers and unused pytest import) after T-165, and updated docs/contracts.md for ADR-005. No product source edited.
-- 2026-10-23: retired three accepted F-ACE01 xfail decorators and sorted the test import (4 test lines); focused 4/4, full gate exposed success-count defect. No product source edited. Retired two T-168 xfails (3 test lines); focused 6/6 and full isolated 127/0/0.
-- Product: one `frontend/package.json` build-script line switched Next build to webpack (e854d9b). No other product-source edits.
-- Removed accepted G11 xfail marker lines in backend/browser tests after focused verification; each corresponding isolated backend/browser suite was rerun. Corrected signed-out login mock (one test line), live WS fixture (19 test lines), and logout test breakpoint (one line, 768→700) to match CSS. Removed F-DOM-01/03/02 guard and steward UI xfail markers; full backend/browser gates passed. Removed one T-081 provisional xfail marker after T-082 acceptance; full isolated gate passed 90/0/0. Taste after T-080/T-084: no new focal, palette, clutter or bloat defect; existing large-file/spacing debt remains queued. Retired lease markers T-108/110/113/115/117/119/121/123 after their focused/full backend gates; last full backend count 112. T-125 test fixture needed a generated-ID correction and one line to keep cleanup defined if creation fails; worker socket was blocked, orchestrator reran on apexgrid-test.
+## Orchestrator direct edits
+- T-300: two requested models.env profile lines; state/packet/envelope documentation only. Zero frontend/backend edits.

@@ -1,49 +1,27 @@
 # NEXT_STATE
-updated_at: 2026-10-23T08:25:00Z
-loop_iteration: 0 of 8
+updated_at: 2026-10-23
+phase: 0 architecture amendment
 
-## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-(Queue empty; all gates and evaluation dimensions 100% verified)
+## Queue
+### T-300 — branch and harness boot
+- worker: O | priority: P0 | origin: overhaul-plan section3 Phase0
+- target_files: .agent/models.env, .claude/settings.json, docs/overhaul-plan.md
+- contract: branch overhaul/neo-brutal from perfection-loop; caller-selected harness; Codex gpt-6.1-sol; preserve owner-supplied settings/plan and worker/cap/context settings
+- verify: HARNESS=codex bash -c 'source .agent/models.env && bash scripts/agent/boot.sh'
+### T-301 — ADR-007 architecture amendment
+- worker: O | priority: P0 | after: T-300
+- target_files: .agent/ARCHITECT.md, .agent/adr/ADR-007-neo-brutal-motorsport-light-overhaul.md
+- contract: amend A.4/A.5/B.5; focused five-lens review and relock; no product or gate edits
+- verify: bash scripts/agent/verify-lock.sh
+### T-302 — explicit owner approval
+- worker: O | priority: P0 | after: T-301
+- target_files: .agent/CURRENT_STATE.md, .agent/NEXT_STATE.md
+- contract: post ADR summary and wait for owner message approved before frontend/backend edits or product dispatch
+- verify: owner message
 
 ## Blocked
-- T-019: frontend runner lacks source; test in builder stage.
-- T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
+- T-310 onward: ADR-007 owner approval required.
+- T-440 reserved only for a concrete missing plan task; none added.
 
-## Done this iteration (recent; older accepted evidence in git/LOOP.md)
-- T-213 ✓ e9f0627; recorded E-1 passed in edge.json (Edge 100%, aggregate 100.00%, presentable).
-- T-212 ✓ 4c649bf; delivered E-1 applicability matrix, 25/25 states-matrix E2E tests, and fixed globals.css layout offset regression.
-- T-211 ✓ 1509e3a; recorded P-1 and P-2 passed in performance.json from real 16/16 route mobile Lighthouse audit (Performance 100%).
-- T-210 ✓ 17c3c47; recorded P-5 passed in performance.json (Performance 100%, aggregate 95.38%, presentable).
-- T-209 ✓ d2dbbec; added perf-fps.spec.ts verifying 600-frame animation timing (p95 <= 16.7ms) and heap growth (<= 1MB).
-- T-208 ✓ 21a1eca; recorded A-3 passed in aesthetic.json (Aesthetic 100%).
-- T-207 ✓ 67788d7; added palette.spec.ts verifying colour discipline across all 16 routes at 1440px.
-- T-206 ✓ d29bab2; recorded A-1 passed in aesthetic.json based on lint-spacing.sh exiting 0 with zero violations.
-- T-205 ✓ 3b0b796; normalized spacing and converted borders to logical properties in globals.css (lines 701-1445).
-- T-204 ✓ 2fa5f47; normalized spacing and converted borders to logical properties in globals.css (lines 1-700).
-- T-203 ✓ f714ae0; recorded A-4 passed in aesthetic.json based on data-primary.spec.ts passing 80/80 tests.
-- T-202 ✓ 9504c52; added data-primary to special-pages and home page; added E2E test data-primary.spec.ts.
-- T-201 ✓ d8b6dca; added data-primary prop support to Button, ReloadButton, and AddButton.
-- T-200 ✓ 7601b99; recorded E-2 passed in edge.json based on Lens 5 tests in responsive and edge-resilience.
-- T-199 ✓ 4f094b4; added Lens 5 edge tests in edge-resilience.spec.ts.
-- T-198 ✓ 6cbe188; added verify-bundle-size.py and verified P-3 route initial JS <= 170 KB gzip.
-- T-197 ✓ a24c8d2; recorded E-4 and E-5 passed in edge.json based on edge-resilience.spec.ts.
-- T-196 ✓ ff1bd91; added E2E tests for E-4 (rapid input spam) and E-5 (offline-to-online recovery) in edge-resilience.spec.ts.
-- T-195 ✓ abc1f13; recorded F-4 passed in functional.json; 0 failed hard gates.
-- T-194 ✓ 27bf192; implemented explicit primary job and heading assertions for all 16 A.2 deliverables in routes.spec.ts.
-- T-193 ✓ 7d17eb9; asserted expect(results.violations).toEqual([]) in accessibility.spec.ts.
-- T-192 ✓ 7b8619f; recorded A-5, A-6, and A-7 as passed in aesthetic.json based on Taste review and reducedMotion E2E.
-- T-191 ✓ bb2e164; recorded P-4 passed from 136/136 backend unit tests and 82% coverage under coverage replay.
-- T-190 ✓ cd6317c; added prefers-reduced-motion E2E test in accessibility.spec.ts verifying disabled animations.
-- T-189 ✓ 2597b1d; added console.error tracking and offline api mock in routes.spec.ts; 16/16 routes pass with zero errors.
-- T-188 ✓ 5b90310; typed TableDataResponse columns, plan nodes, and overview in dbms-workspace.tsx; typecheck 0 errors.
-- T-187 ✓ 2874cc0; typed RaceSnapshot, drivers, timing, and DataTable rows in race-database.tsx.
-- T-186 ✓ 81cadea; typed NavItem and NavGroup in shell.tsx eliminating string | LucideIcon ambiguity.
-- T-185 ✓ 74b9811; added APP_ENV='local' to backend coverage invocation; 136/136 tests pass at 82% coverage.
-- T-184 ✓ 0218106; eliminated 25 explicit any in special-pages.tsx; zero eslint errors/warnings.
-- T-183 ✓ 6aa0756; eliminated 9 explicit any in dbms-workspace.tsx.
-- T-182 ✓ 8f5f73e; eliminated 6 explicit any in shell.tsx and race-database.tsx.
-- T-181 ✓ 63e1125; eliminated 5 explicit any in lib/api.ts.
-- T-180 ✓ c7f2d45; scored edge dimension E-1..E-5; responsive 320/5120 passes, other checks open.
-- T-179 ✓ 5a9941a; scored performance dimension P-1..P-6; Lighthouse not installed (NOT_RUN), bundle/invariants/axe open.
-- T-178 ✓ d1e4d57; scored aesthetic dimension A-1..A-7; spacing lint 154 hits, banned/motion clean, palette/focal/motion open.
-- T-177 ✓ d7e7385; recorded functional F-1..F-6 results; typecheck and build pass, lint and coverage replay open.
+## Done
+- none in overhaul branch yet.
