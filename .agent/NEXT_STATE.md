@@ -3,16 +3,16 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-451 — test imports and unused loop variable
-- worker: W3 | priority: P1 | origin: T-311 subdivision
-- target_files: backend/tests/test_api.py
-- contract: import sorting and unused tick rename only; no assertions or fixture changes
-- verify: .venv/bin/ruff check --select I,B007 backend/tests/test_api.py
+### T-452 — database test format slice
+- worker: W3 | priority: P1 | origin: bounded T-311 subdivision
+- target_files: backend/tests/test_database.py
+- contract: format400-480 only; exact AST preserved; <=150 changed lines
+- verify: .venv/bin/ruff format --check --range 400-480 backend/tests/test_database.py && .venv/bin/python -c 'import ast,pathlib,subprocess; p="backend/tests/test_database.py"; assert ast.dump(ast.parse(pathlib.Path(p).read_text())) == ast.dump(ast.parse(subprocess.check_output(["git","show","HEAD:"+p],text=True)))'
 ### T-448 — bounded Phase1 cleanup
 - worker: W2 | priority: P1 | origin: T-310/311 atomic subdivision
-- target_files: backend/app/pit_repository.py, backend/app/telemetry_repository.py, backend/app/race_archive.py
-- contract: Atomic T-310 subdivision: Ruff-clean and format these three files without behavior changes, <=150 changed lines. Preserve every SQL/JSON/archive shape. Split long SQL/string literals with implicit concatenation preserving exact runtime strings. race_archive random.Random is intentionally deterministic non-security race simulation; a single inline noqa:S311 with that specific justification is permitted, never blanket suppression. No other rule suppression.
-- verify: .venv/bin/ruff check backend/app/pit_repository.py backend/app/telemetry_repository.py backend/app/race_archive.py && .venv/bin/ruff format --check backend/app/pit_repository.py backend/app/telemetry_repository.py backend/app/race_archive.py
+- target_files: backend/app/pit_repository.py, backend/app/race_archive.py
+- contract: Atomic T-310 subdivision: Ruff-clean and format these two files without behavior changes, <=150 changed lines. Preserve every SQL/JSON/archive shape. Split long SQL/string literals with implicit concatenation preserving exact runtime strings. race_archive random.Random is intentionally deterministic non-security race simulation; a single inline noqa:S311 with that specific justification is permitted, never blanket suppression. No other rule suppression.
+- verify: .venv/bin/ruff check backend/app/pit_repository.py backend/app/race_archive.py && .venv/bin/ruff format --check backend/app/pit_repository.py backend/app/race_archive.py
 
 ## Blocked
 - T-310/T-311 remain open until full parent Ruff/format/frontend-lint commands exit0; no intermediate count is a parent pass.
@@ -20,6 +20,7 @@ phase: 1 honest green baseline
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-451 accepteddc1a36f; test imports and unused counter lint0.
 - T-449 acceptedc728e2a; AST preserved, range200-300 format0 after one scope repair.
 - T-447 accepted9731af5; range-format0/exact AST unchanged.
 - T-446 acceptedc9ab8a1; three routers Ruff/format0 and unchanged OpenAPI.
