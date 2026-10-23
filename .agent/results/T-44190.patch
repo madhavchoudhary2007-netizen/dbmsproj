@@ -1,0 +1,157 @@
+diff --git a/backend/app/api/dbms_mongo.py b/backend/app/api/dbms_mongo.py
+index ef9bd5c..c731314 100644
+--- a/backend/app/api/dbms_mongo.py
++++ b/backend/app/api/dbms_mongo.py
+@@ -1,5 +1,5 @@
+ from collections.abc import Callable
+-from datetime import UTC, datetime
++from datetime import UTC, datetime, timedelta
+ from typing import Any
+ 
+ from fastapi import APIRouter, HTTPException, Query
+@@ -8,6 +8,8 @@ from pymongo.collection import Collection
+ from pymongo.database import Database
+ from pymongo.errors import PyMongoError
+ 
++from ..database import DatabaseRow
++
+ 
+ def create_dbms_mongo_router(
+     fetch_one: Callable[..., Any],
+@@ -16,6 +18,7 @@ def create_dbms_mongo_router(
+     admin_dependency: Any,
+     mongo_database_ready: Callable[[], Database[dict[str, Any]]],
+     mongodb_database_name: str,
++    fetch_all: Callable[..., list[DatabaseRow]],
+ ) -> tuple[APIRouter, dict[str, Callable[..., Any]]]:
+     router = APIRouter()
+ 
+@@ -71,9 +74,62 @@ def create_dbms_mongo_router(
+     handlers.update(
+         _register_document_handlers(router, admin_dependency, mongo_database_ready, jsonable)
+     )
++    handlers.update(
++        _register_polyglot_handler(router, admin_dependency, jsonable, mongo_ready, fetch_all)
++    )
+     return router, handlers
+ 
+ 
++def _register_polyglot_handler(
++    router: APIRouter,
++    admin_dependency: Any,
++    jsonable: Callable[[Any], Any],
++    mongo_ready: Callable[[], Collection[dict[str, Any]]],
++    fetch_all: Callable[..., list[DatabaseRow]],
++) -> dict[str, Callable[..., Any]]:
++    @router.get("/api/dbms/polyglot")
++    def dbms_polyglot(user=admin_dependency):
++        sql = """SELECT s.id AS session_id,s.state,d.id AS driver_id,u.full_name
++      FROM race_sessions s JOIN (
++        SELECT session_id,driver_id FROM session_results
++        UNION SELECT session_id,driver_id FROM demo_race_entries
++      ) entry ON entry.session_id=s.id
++      JOIN drivers d ON d.id=entry.driver_id JOIN users u ON u.id=d.user_id
++      ORDER BY s.scheduled_at DESC LIMIT 50"""
++        rows = jsonable(fetch_all(sql))
++        col = mongo_ready()
++        grouped = {}
++        recent_cutoff = datetime.now(UTC) - timedelta(days=30)
++        pipeline = [
++            {"$match": {"ts": {"$gte": recent_cutoff}}},
++            {"$sort": {"ts": -1}},
++            {"$limit": 5000},
++            {
++                "$group": {
++                    "_id": {"session_id": "$session_id", "driver_id": "$driver_id"},
++                    "samples": {"$sum": 1},
++                    "latest": {"$max": "$ts"},
++                }
++            },
++        ]
++        for doc in col.aggregate(pipeline):
++            grouped[(doc["_id"]["session_id"], doc["_id"]["driver_id"])] = doc
++        return {
++            "relational_rows": len(rows),
++            "rows": [
++                {
++                    **r,
++                    "telemetry": grouped.get(
++                        (str(r["session_id"]), str(r["driver_id"])), {"samples": 0}
++                    ),
++                }
++                for r in rows
++            ],
++        }
++
++    return {"dbms_polyglot": dbms_polyglot}
++
++
+ def _register_collection_handlers(
+     router: APIRouter,
+     admin_dependency: Any,
+diff --git a/backend/app/main.py b/backend/app/main.py
+index a971273..86b5bce 100644
+--- a/backend/app/main.py
++++ b/backend/app/main.py
+@@ -1815,11 +1815,13 @@ dbms_mongo_router, dbms_mongo_handlers = create_dbms_mongo_router(
+     admin_dependency,
+     lambda: mongo_database_ready(),
+     MONGODB_DATABASE,
++    lambda *a, **kw: fetch_all(*a, **kw),
+ )
+ dbms_overview = dbms_mongo_handlers["dbms_overview"]
+ dbms_telemetry = dbms_mongo_handlers["dbms_telemetry"]
+ dbms_mongo_collections = dbms_mongo_handlers["dbms_mongo_collections"]
+ dbms_mongo_collection_documents = dbms_mongo_handlers["dbms_mongo_collection_documents"]
++dbms_polyglot = dbms_mongo_handlers["dbms_polyglot"]
+ app.include_router(dbms_mongo_router)
+ 
+ 
+@@ -2072,47 +2074,6 @@ def mongo_database_ready():
+     return mongo_client[MONGODB_DATABASE]
+ 
+ 
+-@app.get("/api/dbms/polyglot")
+-def dbms_polyglot(user=admin_dependency):
+-    sql = """SELECT s.id AS session_id,s.state,d.id AS driver_id,u.full_name
+-      FROM race_sessions s JOIN (
+-        SELECT session_id,driver_id FROM session_results
+-        UNION SELECT session_id,driver_id FROM demo_race_entries
+-      ) entry ON entry.session_id=s.id
+-      JOIN drivers d ON d.id=entry.driver_id JOIN users u ON u.id=d.user_id
+-      ORDER BY s.scheduled_at DESC LIMIT 50"""
+-    rows = jsonable(fetch_all(sql))
+-    col = mongo_ready()
+-    grouped = {}
+-    recent_cutoff = datetime.now(UTC) - timedelta(days=30)
+-    pipeline = [
+-        {"$match": {"ts": {"$gte": recent_cutoff}}},
+-        {"$sort": {"ts": -1}},
+-        {"$limit": 5000},
+-        {
+-            "$group": {
+-                "_id": {"session_id": "$session_id", "driver_id": "$driver_id"},
+-                "samples": {"$sum": 1},
+-                "latest": {"$max": "$ts"},
+-            }
+-        },
+-    ]
+-    for doc in col.aggregate(pipeline):
+-        grouped[(doc["_id"]["session_id"], doc["_id"]["driver_id"])] = doc
+-    return {
+-        "relational_rows": len(rows),
+-        "rows": [
+-            {
+-                **r,
+-                "telemetry": grouped.get(
+-                    (str(r["session_id"]), str(r["driver_id"])), {"samples": 0}
+-                ),
+-            }
+-            for r in rows
+-        ],
+-    }
+-
+-
+ lock_demo_guard = threading.Lock()
+ 
+ 

@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 2ad337f
+git_head: c0781f9
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -50,4 +50,8 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 
 - T-360 accepted2ad337f: Closed accepted lint/palette setup; global legacy10neo/3motion and actual light-palette failure remain recorded for redesign, no skips or widened gates. Verify0.
 
-- Duplicate route correction7eeb81d passes11snapshot/runtime tests after red3343d87; full216test rerun active. Staticshadow utility3c10f63 accepted. Root212+ tests must remain green; no false claim all phases complete.
+- Duplicate route correction7eeb81d passes11snapshot/runtime tests after red3343d87; full216PASS0skip/livePASS. Staticshadow utility3c10f63 accepted. Root212+ tests must remain green; no false claim all phases complete.
+
+- T-362 acceptedc0781f9: Added approved Space Grotesk/Mono variables and functional first-focus skip link with real main-content landmarks; existing auth/nav behavior retained. Verify0.
+
+- T362c0781f9 fonts/real skipmain landmarks accepted offline; root hostbuild and85axe/keyboard checks pending beforeT363. Taste: one existing primary unchanged, yellow44pxskip no shadow/motion, no newclutter; legacy giantfiles remain planned cleanup.

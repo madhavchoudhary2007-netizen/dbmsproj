@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query
@@ -7,6 +7,8 @@ from pymongo import DESCENDING
 from pymongo.collection import Collection
 from pymongo.database import Database
 from pymongo.errors import PyMongoError
+
+from ..database import DatabaseRow
 
 
 def create_dbms_mongo_router(
@@ -16,6 +18,7 @@ def create_dbms_mongo_router(
     admin_dependency: Any,
     mongo_database_ready: Callable[[], Database[dict[str, Any]]],
     mongodb_database_name: str,
+    fetch_all: Callable[..., list[DatabaseRow]],
 ) -> tuple[APIRouter, dict[str, Callable[..., Any]]]:
     router = APIRouter()
 
@@ -71,7 +74,60 @@ def create_dbms_mongo_router(
     handlers.update(
         _register_document_handlers(router, admin_dependency, mongo_database_ready, jsonable)
     )
+    handlers.update(
+        _register_polyglot_handler(router, admin_dependency, jsonable, mongo_ready, fetch_all)
+    )
     return router, handlers
+
+
+def _register_polyglot_handler(
+    router: APIRouter,
+    admin_dependency: Any,
+    jsonable: Callable[[Any], Any],
+    mongo_ready: Callable[[], Collection[dict[str, Any]]],
+    fetch_all: Callable[..., list[DatabaseRow]],
+) -> dict[str, Callable[..., Any]]:
+    @router.get("/api/dbms/polyglot")
+    def dbms_polyglot(user=admin_dependency):
+        sql = """SELECT s.id AS session_id,s.state,d.id AS driver_id,u.full_name
+      FROM race_sessions s JOIN (
+        SELECT session_id,driver_id FROM session_results
+        UNION SELECT session_id,driver_id FROM demo_race_entries
+      ) entry ON entry.session_id=s.id
+      JOIN drivers d ON d.id=entry.driver_id JOIN users u ON u.id=d.user_id
+      ORDER BY s.scheduled_at DESC LIMIT 50"""
+        rows = jsonable(fetch_all(sql))
+        col = mongo_ready()
+        grouped = {}
+        recent_cutoff = datetime.now(UTC) - timedelta(days=30)
+        pipeline = [
+            {"$match": {"ts": {"$gte": recent_cutoff}}},
+            {"$sort": {"ts": -1}},
+            {"$limit": 5000},
+            {
+                "$group": {
+                    "_id": {"session_id": "$session_id", "driver_id": "$driver_id"},
+                    "samples": {"$sum": 1},
+                    "latest": {"$max": "$ts"},
+                }
+            },
+        ]
+        for doc in col.aggregate(pipeline):
+            grouped[(doc["_id"]["session_id"], doc["_id"]["driver_id"])] = doc
+        return {
+            "relational_rows": len(rows),
+            "rows": [
+                {
+                    **r,
+                    "telemetry": grouped.get(
+                        (str(r["session_id"]), str(r["driver_id"])), {"samples": 0}
+                    ),
+                }
+                for r in rows
+            ],
+        }
+
+    return {"dbms_polyglot": dbms_polyglot}
 
 
 def _register_collection_handlers(
