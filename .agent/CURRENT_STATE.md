@@ -1,14 +1,14 @@
 # CURRENT_STATE
-updated_at: 2026-10-23T06:35:00Z
-git_head: b22e591
+updated_at: 2026-10-23T06:45:00Z
+git_head: 6b41dd9
 branch: perfection-loop
-architect_sha256: 12c12221b65b1ee38a63e3efda98f460535368fea1b19740befec706e626a868
+architect_sha256: 0dbd38b2c32d662bc2d5aaa31178ba23a93b28d1f8a6dfd23a8322e5bf229cda
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
 last_eval_score: NOT_RUN (quality gates and role journeys remain open)
 
 ## Verified setup and contracts
 - Boot and architecture lock pass (ADR-004 relock 07954ad). Work stays on `perfection-loop`. Disposable databases use only Compose project `apexgrid-test`, ports 15432/27018. Never touch running databases, secrets or master.
-- PostgreSQL owns official race data; MongoDB owns telemetry. ADR-001/002 authorize additive migrations, finding-backed contract changes, and cookie/CSRF browser auth. Existing routes/data are preserved. ADR-005 permits only F-DOM-04 ingest 409 plus exact-retry 202; implementation pending.
+- PostgreSQL owns official race data; MongoDB owns telemetry. ADR-001/002 permit additive migrations, finding-backed contracts and cookie/CSRF browser auth. ADR-005 ingest ordering is verified. ADR-006 permits nullable demo-race seed migration for deterministic replay; implementation pending.
 - Host venv Python 3.14/Node 26 differs from backend container Python 3.12/frontend container Node 22. Runtime parity gate remains open.
 
 ## Verified gates and components

@@ -1,5 +1,5 @@
 # NEXT_STATE
-updated_at: 2026-10-23T06:20:00Z
+updated_at: 2026-10-23T06:45:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
@@ -10,8 +10,13 @@ loop_iteration: 0 of 8
 - verify: APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_simulation_replay.py
 ### T-167 — F-DOM-05 persisted simulation seed
 - worker: W2 | priority: P2 | after: T-166
-- target_files: backend/app/main.py, backend/app/simulation_core.py, backend/migrations/003_simulation_seed.sql
-- contract: additive seed persistence on disposable stack and per-session RNG; replay same race after restart without changing prior rows
+- target_files: backend/app/demo_race_repository.py, backend/migrations/003_simulation_seed.sql
+- contract: additive nullable seed persistence; generated grid choices use dedicated seeded RNG, legacy rows untouched
+- verify: APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q --runxfail backend/tests/test_simulation_replay.py
+### T-175 — F-DOM-05 seeded simulator and restore
+- worker: W2 | priority: P2 | after: T-167
+- target_files: backend/app/main.py, backend/app/simulation_core.py
+- contract: new generated race passes/persists seed, restore loads seed, sector RNG stable by seed+driver+progress; explicit RNG wins
 - verify: APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q --runxfail backend/tests/test_simulation_replay.py
 
 ## Blocked
