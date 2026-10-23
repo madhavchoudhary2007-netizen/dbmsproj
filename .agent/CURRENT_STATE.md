@@ -1,5 +1,5 @@
 # CURRENT_STATE
-updated_at: 2026-10-23T05:10:29Z
+updated_at: 2026-10-23T05:14:17Z
 git_head: 8573293
 branch: perfection-loop
 architect_sha256: c9780b9cd1ffe91fcb0fbf369b4b136205eb5c1ffb82e8cf199e42cca18c69c5
@@ -18,7 +18,7 @@ last_eval_score: NOT_RUN (quality gates and role journeys remain open)
 - Frontend typecheck and webpack production build passed at last run. Phase 0 CI/full-gates harness accepted; `.agent/commands.env` has real E2E and zero-warning lint commands.
 
 ## Ratchet and open risks
-- Ruff 641 baseline -> 561 after T-144; mypy strict 311 baseline -> 248 after T-140; frontend strict lint 45 explicit-any errors. Ruff format 7 files at baseline. Coverage overall 72% isolated baseline; domain/service 90% target, overall 80% target remain open. Frontend npm audit had 7 high/2 moderate dev-tool findings; safe upgrade path open.
+- Ruff 641 baseline -> 561 after T-144; mypy strict 311 baseline -> 248 after T-140; frontend strict lint 45 explicit-any errors. Ruff format 7 files at baseline. Coverage overall 72% isolated baseline; domain/service 90% target, overall 80% target remain open. Frontend safe npm audit fix upgraded Next and eslint-config-next 16.3.8→16.4.2; critical 1→0, high 7/moderate 2 remain because only breaking Tailwind/eslint migrations are offered. Typecheck/build pass; strict lint stays 45.
 - F-ACE01 P2: login has no attempt throttling. T-006 twice failed: five-state fixtures need a route-specific applicability matrix before T-026..028. Role journeys, permissions matrix, simulator invariants, frontend visual states, docs, performance and evaluation score remain open in NEXT_STATE/queue.
 - Phase 1 A/C/E P0/P1 findings closed after T-088. Phase 2 structure active: CRUD, analytics, pit, user and telemetry repositories; auth/operations/telemetry/competition/simulation schemas; analytics, pit read, user and telemetry APIRouters. ADR-004 single-process lease guards accepted; F-STRUCT-01/02 closed. ADR-003 full enforcement and P2 findings remain.
 - T-133..T-136: F-STRUCT-03 psycopg pool could not reopen across app lifespans; strict regression reproduced it, W2 recreated the pool, test fixture updated without weaker assertions. Full isolated backend and live acceptance passed; finding closed.
