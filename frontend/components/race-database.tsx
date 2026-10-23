@@ -16,7 +16,7 @@ export function RaceDatabase({selectedRace = "", onSelectRace, refreshToken = 0}
   const selectedRef = useRef(selectedRace);
   const selectedRaceRef = useRef(selectedRace);
   const onSelectRaceRef = useRef(onSelectRace);
-  const [snapshot, setSnapshot] = useState<any>();
+  const [snapshot, setSnapshot] = useState<Record<string, unknown> | null>(null);
   const [snapshotError, setSnapshotError] = useState("");
   const [archiveLaps, setArchiveLaps] = useState<Row[]>([]);
   const [lapLoading, setLapLoading] = useState(false);
@@ -74,7 +74,7 @@ export function RaceDatabase({selectedRace = "", onSelectRace, refreshToken = 0}
     let disposed = false, timer: ReturnType<typeof setTimeout>;
     const load = async () => {
       try {
-        const value = await api(`/dbms/races/${selected}?include_laps=false`);
+        const value = await api<{ session?: { state?: string } } & Record<string, unknown>>(`/dbms/races/${selected}?include_laps=false`);
         if (disposed) return;
         setSnapshot(value);
         setSnapshotError("");
@@ -90,7 +90,7 @@ export function RaceDatabase({selectedRace = "", onSelectRace, refreshToken = 0}
     return () => { disposed = true; clearTimeout(timer); };
   }, [selected, revision, refreshToken]);
   useEffect(() => {
-    setSnapshot(undefined);
+    setSnapshot(null);
     setSnapshotError("");
     setArchiveLaps([]);
     setLapLoading(false);
@@ -107,7 +107,7 @@ export function RaceDatabase({selectedRace = "", onSelectRace, refreshToken = 0}
     const load = async () => {
       if (!hasLoaded) setLapLoading(true);
       try {
-        const value = await api(`/dbms/races/${selected}/laps`);
+        const value = await api<{ laps?: Row[] } & Record<string, unknown>>(`/dbms/races/${selected}/laps`);
         if (disposed) return;
         setArchiveLaps(asArray(value?.laps ?? value));
         setLapError("");
@@ -131,19 +131,32 @@ export function RaceDatabase({selectedRace = "", onSelectRace, refreshToken = 0}
   const b = right || String(drivers[1]?.id || drivers[0]?.id || "");
   const name = (id: string) => String(drivers.find((d) => String(d.id) === id)?.driver_name || id || "Unknown driver");
   const comparisons = useMemo(() => {
-    const map = new Map<number, any>();
-    for (const lap of archiveLaps as any[]) {
-      if (![a, b].includes(lap.driver_id)) continue;
-      const row = map.get(lap.lap) || { lap: lap.lap };
+    interface ComparisonRow {
+      lap: number;
+      a?: number | null;
+      b?: number | null;
+      sector_a?: unknown;
+      sector_b?: unknown;
+      delta_seconds?: number | null;
+    }
+    const map = new Map<number, ComparisonRow>();
+    for (const lap of archiveLaps) {
+      const driverId = String(lap.driver_id ?? "");
+      if (![a, b].includes(driverId)) continue;
+      const lapNum = Number(lap.lap ?? 0);
+      const row: ComparisonRow = map.get(lapNum) || { lap: lapNum };
       const seconds = Number(lap.lap_time_ms) / 1000;
       if (a === b) {
         row.a = seconds; row.b = seconds;
         row.sector_a = lap.sector_ms; row.sector_b = lap.sector_ms;
+      } else if (driverId === a) {
+        row.a = seconds;
+        row.sector_a = lap.sector_ms;
       } else {
-        row[lap.driver_id === a ? "a" : "b"] = seconds;
-        row[lap.driver_id === a ? "sector_a" : "sector_b"] = lap.sector_ms;
+        row.b = seconds;
+        row.sector_b = lap.sector_ms;
       }
-      map.set(lap.lap, row);
+      map.set(lapNum, row);
     }
     return [...map.values()].sort((x, y) => x.lap - y.lap).map((row) => ({ ...row,
       delta_seconds: row.a != null && row.b != null ? Number((row.a - row.b).toFixed(3)) : null }));
@@ -187,10 +200,10 @@ const positions: Record<string, [number,number]> = {
   teams:[20,560],team_memberships:[285,560],driver_standings:[550,560],penalty_points:[815,560],
 };
 export function EerDiagram() {
-  const [schema,setSchema] = useState<any>(), [selected,setSelected] = useState("race_sessions"), [error,setError] = useState("");
+  const [schema, setSchema] = useState<{ columns?: Row[]; relationships?: Row[] } | null>(null), [selected, setSelected] = useState("race_sessions"), [error, setError] = useState("");
   useEffect(() => {
     let disposed = false;
-    const load = () => api("/dbms/eer").then((value) => { if (!disposed) { setSchema(value); setError(""); } })
+    const load = () => api<{ columns?: Row[]; relationships?: Row[] }>("/dbms/eer").then((value) => { if (!disposed) { setSchema(value); setError(""); } })
       .catch((e) => { if (!disposed) setError(e.message); });
     void load();
     const timer = setInterval(load, 15000);

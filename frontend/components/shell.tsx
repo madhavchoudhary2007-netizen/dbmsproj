@@ -115,9 +115,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 <div className="nav-label">{g.name}</div>
                 {g.items
                   .filter(
-                    ([href]: any) => href !== "/users" || user.role === "ADMIN",
+                    ([href]) => href !== "/users" || user.role === "ADMIN",
                   )
-                  .map(([href, name, Icon]: any) => (
+                  .map(([href, name, Icon]) => (
                     <Link
                       onClick={() => setOpen(false)}
                       href={href}
