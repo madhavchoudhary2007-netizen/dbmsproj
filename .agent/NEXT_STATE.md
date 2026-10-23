@@ -3,10 +3,15 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-44113 W2 — OPEN
+### T-440 O — IN_REVIEW
+- target_files: docs/overhaul-plan.md
+- contract: catalogue respects locked owner100–300ms and display48px limits.
+- verify: .venv/bin/python -c "from pathlib import Path; s=Path('docs/overhaul-plan.md').read_text(); assert 'clamp(3rem, 1.944rem + 4.507vw, 6rem)' in s; assert all(x not in s for x in ('30s loop','600ms steps','blink, 1s','900ms linear','800ms linear')); assert 'T-440 reconciliation:' in s"
+
+### T-44114 W2 — OPEN
 - target_files: backend/app/main.py
-- contract: share equivalent principal own-team authorization guard, preserve order/errors.
-- verify: .venv/bin/python -c "import ast,subprocess; p='backend/app/main.py'; s=open(p).read(); n=next(n for n in ast.parse(s).body if isinstance(n,ast.FunctionDef) and n.name=='reserve_pit_auto'); subprocess.run(['.venv/bin/ruff','check','--select','C901','--stdin-filename',p,'-'],input=ast.get_source_segment(s,n),text=True,check=True)" && .venv/bin/ruff format --check backend/app/main.py
+- contract: cohesive simulation start extraction preserving behavior; C901 strictly decreases.
+- verify: .venv/bin/python -c "import json,subprocess; r=subprocess.run(['.venv/bin/ruff','check','--select','C901','--output-format','json','backend/app/main.py'],capture_output=True,text=True); d=json.loads(r.stdout); assert all('control_simulation' not in x['message'] or int(x['message'].split('(')[1].split()[0])<24 for x in d); assert all(not x['message'].startswith(chr(96)+'_start_session_simulation') for x in d)" && .venv/bin/ruff format --check backend/app/main.py
 
 ## Blocked
 - T-310 remains open until full app Ruff/format exit0; T-311 accepted8570e58; no intermediate count is a parent pass.
@@ -14,6 +19,7 @@ phase: 1 honest green baseline
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-44113 accepted11595ad; verify0.
 - T-44111 acceptedb069dab; verify0.
 - T-44112 accepted518b4b4; verify0.
 - T-44110 acceptedfd42784; verify0.

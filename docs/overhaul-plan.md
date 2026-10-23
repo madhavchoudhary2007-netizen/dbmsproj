@@ -88,7 +88,7 @@ Banned: grays (`gray|slate|zinc|neutral|stone` utilities, any `#xxxxxx` with R=G
 
 | Role | Token | clamp() | line-height |
 |---|---|---|---|
-| Display (hero, ≥ 48px) | `--fs-display` | `clamp(2.5rem, 1.268rem + 5.258vw, 6rem)` | 1.0 (ADR-007 exception for display only) |
+| Display (hero, ≥ 48px) | `--fs-display` | `clamp(3rem, 1.944rem + 4.507vw, 6rem)` | 1.0 (ADR-007 exception for display only) |
 | H1 page title | `--fs-h1` | `clamp(2rem, 1.472rem + 2.254vw, 3.5rem)` | 1.1 |
 | H2 | `--fs-h2` | `clamp(1.75rem, 1.31rem + 1.878vw, 3rem)` | 1.2 |
 | H3 | `--fs-h3` | `clamp(1.25rem, 1.074rem + 0.751vw, 1.75rem)` | 1.2 |
@@ -179,12 +179,12 @@ All motion uses only `transform`, `opacity` or `background-color`, with named pr
 | M1 | Page enter | `<main>` children | translateY(8px) + opacity 0 → 0/1, 200ms ease-out, 40ms stagger, max 6 items | instant |
 | M2 | Lift/push | buttons, nav items, clickable cards | plinth, 120ms (2.5) | no transition; press still shows the flush state |
 | M3 | Sticker wiggle | empty-state sticker, season sticker on hover | rotate ±2deg, 2 × 150ms | none |
-| M4 | Marquee | top-bar race-control ticker, standings ticker, login | `translateX(0 → -50%)` linear, 30s loop on a duplicated track; pauses on hover/focus-within | static wrapped list, no duplicate (duplicate also `aria-hidden`) |
+| M4 | Marquee | top-bar race-control ticker, standings ticker, login | static wrapped feed; newly changed content reveals with opacity over 200ms, no duplicated track or automatic scrolling | static wrapped list, no duplicate (duplicate also `aria-hidden`) |
 | M5 | Live row reorder (FLIP) | live timing tower, standings after recalculation | measure → invert translateY → play 300ms ease-out | instant reorder |
-| M6 | Cell update flash | gap/interval/lap-time cells on change | background-color yellow → transparent, 600ms steps(3) | none (value still updates) |
-| M7 | LIVE dot | LIVE sticker, WS connected | opacity 1/0.3 blink, 1s `steps(2)` | solid dot |
-| M8 | Loading skeleton | every loading state | 45° ink/paper hard-stripe block; an overlay pseudo-element translates X, 900ms linear | static stripes |
-| M9 | Spinner replacement | inline busy buttons | rotating square/star, 800ms linear (replaces `@keyframes spin` ring) | static star + "Working…" text |
+| M6 | Cell update flash | gap/interval/lap-time cells on change | one background-color highlight settling over 200ms; coalesce rapid updates to avoid repeated flashing | none (value still updates) |
+| M7 | LIVE dot | LIVE sticker, WS connected | solid dot; opacity transition over 200ms only when connection state changes, no blinking loop | solid dot |
+| M8 | Loading skeleton | every loading state | static 45° ink/paper hard-stripe block; opacity reveal over 200ms, no repeating overlay motion | static stripes |
+| M9 | Spinner replacement | inline busy buttons | static square/star with 200ms opacity entry (replaces `@keyframes spin` ring without a repeating rotation) | static star + "Working…" text |
 | M10 | Modal | `Modal` | scrim opacity 150ms; panel translateY(16px) → 0 + opacity, 200ms ease-out | instant |
 | M11 | Mobile drawer | shell | translateX(-100%) → 0, 200ms ease-out | instant |
 | M12 | Toast/notice | action success/error | slide translateY(-8px) + opacity, 150ms | instant |
@@ -192,6 +192,7 @@ All motion uses only `transform`, `opacity` or `background-color`, with named pr
 | M14 | Podium rise | standings top 3 | translateY(16px) → 0, 250ms, staggered | instant |
 
 Implementation rules:
+- T-440 reconciliation: the owner's 100–300ms limit takes precedence over the former long-loop catalogue. M4/M7/M8/M9 use static ongoing content with event-triggered entry or state transitions, preserving data and busy/status meaning without rapid repeating motion. Display minimum is 48px wherever leading is 1.0.
 - `frontend/lib/use-reduced-motion.ts`: a 10-line `matchMedia` hook (W2 owns it).
 - Every JS-driven motion (M5, M13) reads the hook.
 - CSS motion lives in `@layer components` with one global `@media (prefers-reduced-motion: reduce)` block that sets durations to 0.
@@ -377,7 +378,7 @@ Order:
 
 | ID | Route | Design |
 |---|---|---|
-| T-380 | `/login` | 60/40 split (stacks at < 1000px, art panel first but shorter, 240px):<br>• **Left (60%):** cream with `.tx-grid`; giant "APEXGRID" display word with an outlined `aria-hidden` duplicate offset 8px behind it; `CheckerStrip` across the bottom; a slow marquee "RACE CONTROL · TELEMETRY · STEWARDS · PIT WALL · STANDINGS"; a yellow `StarBurst` sticker "DBMS EDITION".<br>• **Right (40%):** paper `NbCard` shadow-nb-12, eyebrow "AUTHENTICATED ACCESS", title "Sign in to ApexGrid" (verbatim), `NbField`s, a full-width primary button (`data-primary`), and an error block using the error state with the current 401 copy. Loading: button busy (M9) with fields disabled. |
+| T-380 | `/login` | 60/40 split (stacks at < 1000px, art panel first but shorter, 240px):<br>• **Left (60%):** cream with `.tx-grid`; giant "APEXGRID" display word with an outlined `aria-hidden` duplicate offset 8px behind it; `CheckerStrip` across the bottom; a static M4 feed "RACE CONTROL · TELEMETRY · STEWARDS · PIT WALL · STANDINGS"; a yellow `StarBurst` sticker "DBMS EDITION".<br>• **Right (40%):** paper `NbCard` shadow-nb-12, eyebrow "AUTHENTICATED ACCESS", title "Sign in to ApexGrid" (verbatim), `NbField`s, a full-width primary button (`data-primary`), and an error block using the error state with the current 401 copy. Loading: button busy (M9) with fields disabled. |
 | T-381 | `/dashboard` | • Hero row (60/40):<br>&nbsp;&nbsp;– left: label "CURRENT CONTEXT", display "RACE OPERATIONS" (the real h1 text stays "Race operations"; CSS uppercase) plus the stroke duplicate, and a "Race weekend" card for the active event (circuit, session, status badge, CTA "Open live timing" as `data-primary`);<br>&nbsp;&nbsp;– right: a violet "SERVICE HEALTH / Platform status" card with Postgres/Mongo/WS/lease rows, each a mint/red block + text.<br>• KPI row: 4 `NbStat` tiles (active_sessions red, scheduled_events yellow, open_incidents violet, drivers mint) with Space Mono 48px numbers; sticker tilt alternates.<br>• Below: "Next up" event list and "Latest incidents" mini-table. |
 | T-382 | Resource pages: `/championships`, `/events`, `/circuits`, `/teams`, `/drivers`, `/users` via `resource-page.tsx` | • Header: eyebrow + h1 + count sticker + Add (primary, `data-primary`) + Reload (secondary).<br>• Toolbar: `SearchBox` as `NbInput` with a search icon (44px), result count, and "Showing 1–50 of N".<br>• `NbTable` with row actions (Edit/Delete as 44px icon buttons with `aria-label`).<br>• Pagination: Previous/Next blocks plus a "Page x / y" mono label.<br>• `ResourceEditor` in `NbModal` with `NbField`s, inline validation and a disabled-while-saving primary.<br>• Delete confirm modal with a red danger button.<br>• Team memberships modal: two columns (current roster / add driver).<br>• Drivers table shows an eligibility badge.<br>• Users table shows a role badge and is admin only.<br>Keep `pageSize = 50`, the user-role filter, the drivers `user_id` uniqueness message and `actionError`. |
 | T-383 | `/live` part A: header, demo controls, race list | • Header: h1 "Live session" + LIVE sticker (M7, red pill) + connection pill.<br>• "LIVE DEMO / Put a full grid on track" as a yellow `NbCard` with the create-race primary (`data-primary`).<br>• "GENERATED SESSIONS / Live race demos" list as paper cards with status badge, lap counter "L 12/56" mono, and Select/Delete; "Show recent races" toggle. Delete modal "Delete generated race?" with "Keep race" kept verbatim. |

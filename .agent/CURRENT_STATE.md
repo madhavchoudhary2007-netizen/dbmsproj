@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: b069dab
+git_head: 11595ad
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -9,8 +9,8 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 
 ## Phase and verified facts
 - Phase0 complete T-300e465e89/T-30113e6100/T-30259a180e; owner approved in chat, ADR007 activated and lock9010959b/boot0. Codex harness/profile and cap verified; owner Claude433000 settings preserved.
-- Phase1 T-311 accepted8570e58: backend-tests Ruff and strict frontend lint0; scripts/eval Ruff separately0. T-310 OPEN: only main.py remaining, last26 findings beforeT-44110 (C9015,S6082,SIM1172 plus cleanup rules). All other backend files Ruff+format0.
-- T-44110 acceptedfd42784: explicit existing exception suppression preserves classes/order; health degraded contract retained, pit409 cause explicit, UP034 cleaned, non-security lock-demo RNG narrowly justified. Remaining expected9 findings(C9015/S6082/SIM1172); full gate PASS136,0 skips and live flows PASS; no leaked listener.
+- Phase1 T-311 accepted8570e58: backend-tests Ruff and strict frontend lint0; scripts/eval Ruff separately0. T-310 OPEN: only main.py remaining, 3 C901 findings remaining (simulation_loop16, control_simulation24, dbms_lock_demo16). All other backend files Ruff+format0.
+- T-44110 acceptedfd42784: explicit existing exception suppression preserves classes/order; health degraded contract retained, pit409 cause explicit, UP034 cleaned, non-security lock-demo RNG narrowly justified. After T-44111/T-44113 only3 C901 findings remain; full gate PASS136,0 skips and live flows PASS; no leaked listener.
 - Main and demo entire formatting completeT-4410119620dd; test_api full formatting/E501 completeT-44106c6e5749. All formatting/literal children verified exact AST/SQL/unchanged directives (or canonical content), <=150 changed lines each.
 - T-44108a893c67 uses UTC alias: normalized AST proves no other change,2 focused simulation tests passed. T-44109d9258cb extracts2Cursor fixture factories: exact class/assertion AST/counts preserved,3 focused tests pass; test_api full Ruff/format0.
 - T-441072429939 demo/config Ruff+format0; non-import AST and parsed TOML identical. Public local-only fallback and JWT guard values unchanged, no secret values printed. Narrow seeded-RNG/S105 reasons only, no global rule change.
@@ -67,4 +67,8 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 
 - T-44111 acceptedb069dab: Composed CRUD and session action SQL with psycopg.sql; used static action SET fragments and reused CRUD 404 checks while preserving action flow. Verify exit0; 62 changed lines.
 
-- T-44111 worker envelope counts27/23 corrected from git numstat35/27 before acceptance; actual62lines in scope, verify0. Full isolated rerun pending.
+- T-44111 worker envelope counts27/23 corrected from git numstat35/27 before acceptance; actual62lines in scope, verify0. Full isolated rerun PASS136,0 skips, all live flows PASS; no18000listener.
+
+- T-44113 accepted11595ad: Extracted the principal team authorization guard into one helper called by both reservation handlers. Verify exit0; 17 changed lines.
+
+- T-44113 principal guard inlining proves whole AST equivalent; API SHA unchanged. Latest full gate T-44111.full.raw.log136PASS +all live flowsPASS.
