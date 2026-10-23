@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-23T07:10:00Z
-git_head: a992b66
+updated_at: 2026-10-23T07:25:00Z
+git_head: 5133a25
 branch: perfection-loop
 architect_sha256: 0dbd38b2c32d662bc2d5aaa31178ba23a93b28d1f8a6dfd23a8322e5bf229cda
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -22,13 +22,14 @@ last_eval_score: NOT_RUN (quality gates and role journeys remain open)
 - F-ACE01 closed by T-170. T-006 twice failed: five-state fixtures need a route-specific applicability matrix before T-026..028. Role journeys, permissions matrix, simulator invariants, frontend visual states, docs, performance and evaluation score remain open in NEXT_STATE/queue.
 - Phase 1 A/C/E P0/P1 findings closed after T-088. Phase 2 structure active: CRUD, analytics, pit, user and telemetry repositories; auth/operations/telemetry/competition/simulation schemas; analytics, pit read, user and telemetry APIRouters. ADR-004 single-process lease guards accepted; F-STRUCT-01/02 closed. ADR-003 full enforcement and P2 findings remain.
 - T-133..T-136: F-STRUCT-03 psycopg pool could not reopen across app lifespans; strict regression reproduced it, W2 recreated the pool, test fixture updated without weaker assertions. Full isolated backend and live acceptance passed; finding closed.
-- F-DOM-04 closed: focused 5/5, disposable backend 132/0/0/0 and live acceptance. ADR-006 relocked 0dbd38b2; T-166 four strict old-code xfails. T-167 migration/repository seed persistence and repeatable grid focused 2/2; Ruff 543→540, mypy 222. Engine/restore T-175 next. Thirteen owner-priority tasks before evaluation.
+- F-DOM-04 closed: disposable backend 132/0/0/0 and live acceptance. ADR-006 relocked 0dbd38b2; T-166 test-first xfails, T-167 migration/repository, T-175 engine/create/restore focused 4/4 after marker retirement. Mypy 222 unchanged; Ruff 540→542 from two new deterministic `random.Random` S311 hits. T-176 ratchet repair before full isolated gate/evaluation. Fourteen owner-priority tasks before first evaluation.
 - T-137..T-141: telemetry GET/live/ingest reads and writes moved to typed repository/router with seeded characterization. T-141 updated stale test schema import. Full isolated backend now passes 117 tests, zero failures/skips/xfails; live acceptance passes login, simulator, MongoDB, WebSocket, pits, standings, DBMS and generated races. Ruff 573, mypy 248. Next Phase 2 task: characterize pit strategy before splitting its oversized handler.
 - T-142 pit-strategy seeded historical read contract passed 1/1 without fixture mutation, Ruff 573. T-143 extracts bounded Mongo pit telemetry read into pit_repository while preserving live/historical decisions.
 - T-143 moved bounded latest packets and stop-history aggregation to typed pit_repository; seeded historical and live unit tests passed 2/2, Ruff 573/mypy 248. Full isolated gate pending after next pit-strategy split.
 - T-144..T-155 split pit strategy and generated-race boundaries. T-156/T-157 moved auth routes into APIRouter. T-158..T-160 characterized membership API, moved SQL to typed repository and handlers to APIRouter; focused 2/2 after T-160, full disposable backend 120/0/0 and live acceptance passed. Ruff 543, mypy 222. T-161 characterized session lifecycle; owner override caps Phase 2 after accepted auth and membership splits. T-162 strict F-ACE01 tests: 1 pass/3 xfail; --runxfail 3 missing-429 failures. T-163 focused 4/4; full isolated red 90 pass/35 fail because successful logins count toward limit. T-168 strict success regression accepted (4 pass/2 xfail); T-169 repair passed 6/6; full isolated 127/0/0 and live acceptance. T-170 restored mypy strict 222 and Ruff 543; F-ACE01 closed. F-E02 audit/upgrade next; F-E02/DOM-04/05 and evaluation follow.
 
 ## Orchestrator direct edits and Taste review
+- 2026-10-23: retired four T-166 strict xfail markers and unused pytest import (5 test lines) after T-175; focused unmarked 4/4. No product source edited.
 - 2026-10-23: retired T-173 strict xfail marker and unused pytest import (2 test lines) after T-174, and clarified older retry in docs/contracts.md. No product source edited.
 - 2026-10-23: removed four test lines (three strict telemetry xfail markers and unused pytest import) after T-165, and updated docs/contracts.md for ADR-005. No product source edited.
 - 2026-10-23: retired three accepted F-ACE01 xfail decorators and sorted the test import (4 test lines); focused 4/4, full gate exposed success-count defect. No product source edited. Retired two T-168 xfails (3 test lines); focused 6/6 and full isolated 127/0/0.
