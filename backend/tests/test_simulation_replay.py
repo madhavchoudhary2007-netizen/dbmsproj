@@ -5,7 +5,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid4
 
-import pytest
 from app import demo_race_repository as repository
 from app import main
 from app.simulation_core import Simulation
@@ -13,7 +12,6 @@ from app.simulation_core import Simulation
 ROOT = Path(__file__).resolve().parents[1]
 
 
-@pytest.mark.xfail(strict=True, reason="F-DOM-05 requires additive seed migration 003")
 def test_f_dom_05_migration_adds_idempotent_nullable_seed():
     migrations = list((ROOT / "migrations").glob("003*.sql"))
     assert migrations
@@ -24,7 +22,6 @@ def test_f_dom_05_migration_adds_idempotent_nullable_seed():
     )
 
 
-@pytest.mark.xfail(strict=True, reason="F-DOM-05 must persist and use the supplied seed")
 def test_f_dom_05_repository_persists_seed_and_generates_repeatable_grid(monkeypatch):  # noqa: C901
     class Cursor:
         def __init__(self):
@@ -88,7 +85,6 @@ def test_f_dom_05_repository_persists_seed_and_generates_repeatable_grid(monkeyp
     assert actual == expected
 
 
-@pytest.mark.xfail(strict=True, reason="F-DOM-05 requires seed-scoped deterministic telemetry")
 def test_f_dom_05_seeded_packets_ignore_global_random_draws():
     timestamp = datetime(2026, 10, 23, 12, tzinfo=UTC)
     drivers = [{"id": "driver-a", "number": 7}, {"id": "driver-b", "number": 22}]
@@ -118,7 +114,6 @@ def test_f_dom_05_seeded_packets_ignore_global_random_draws():
         random.setstate(state)
 
 
-@pytest.mark.xfail(strict=True, reason="F-DOM-05 must restore the persisted active-race seed")
 def test_f_dom_05_active_generated_race_restores_stored_seed(monkeypatch):
     session_id = uuid4()
     active = [{"id": session_id, "total_laps": 50, "auto_repeat": True, "simulation_seed": 456}]
