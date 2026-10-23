@@ -1526,16 +1526,33 @@ async def simulation_loop(sim: Simulation):
                         best_lap_ms = best_laps.get(driver_id, packet["last_lap_ms"])
                         pole = driver_id == pole_driver_id
                         fastest_lap = driver_id == fastest_driver_id
-                        cur.execute("INSERT INTO session_results(session_id,driver_id,position,lap_time_ms,pole,fastest_lap,classified) VALUES (%s,%s,%s,%s,%s,%s,TRUE) ON CONFLICT(session_id,driver_id) DO UPDATE SET position=excluded.position,lap_time_ms=excluded.lap_time_ms,pole=excluded.pole,fastest_lap=excluded.fastest_lap,classified=TRUE", (sim.session_id,driver_id,position,best_lap_ms,pole,fastest_lap))
-                        rows.append({"driver_id":driver_id,"position":position,"lap_time_ms":best_lap_ms,"pole":pole,"fastest_lap":fastest_lap,"classified":True})
-                    cur.execute("UPDATE race_sessions SET state='COMPLETED',ended_at=%s WHERE id=%s AND state='ACTIVE' RETURNING *", (datetime.now(UTC),sim.session_id))
+                        cur.execute(
+                            "INSERT INTO session_results(session_id,driver_id,position,lap_time_ms,pole,fastest_lap,classified) VALUES (%s,%s,%s,%s,%s,%s,TRUE) ON CONFLICT(session_id,driver_id) DO UPDATE SET position=excluded.position,lap_time_ms=excluded.lap_time_ms,pole=excluded.pole,fastest_lap=excluded.fastest_lap,classified=TRUE",
+                            (sim.session_id, driver_id, position, best_lap_ms, pole, fastest_lap),
+                        )
+                        rows.append(
+                            {
+                                "driver_id": driver_id,
+                                "position": position,
+                                "lap_time_ms": best_lap_ms,
+                                "pole": pole,
+                                "fastest_lap": fastest_lap,
+                                "classified": True,
+                            }
+                        )
+                    cur.execute(
+                        "UPDATE race_sessions SET state='COMPLETED',ended_at=%s WHERE id=%s AND state='ACTIVE' RETURNING *",
+                        (datetime.now(UTC), sim.session_id),
+                    )
                     completed = cur.fetchone()
                     if completed:
-                        cur.execute("SELECT recalculate_standings(%s)", (session["championship_id"],))
+                        cur.execute(
+                            "SELECT recalculate_standings(%s)", (session["championship_id"],)
+                        )
                 sim.status = "stopped"
-                publish(sim.session_id,"timing.update",rows)
+                publish(sim.session_id, "timing.update", rows)
                 if completed:
-                    publish(sim.session_id,"session.state",completed)
+                    publish(sim.session_id, "session.state", completed)
                 sim.runs_completed += 1
                 cancel_automatic_pit_reservations(sim.session_id)
                 if not sim.auto_repeat or not completed:
@@ -1557,36 +1574,53 @@ async def simulation_loop(sim: Simulation):
 
 
 @app.post("/api/sessions/{session_id}/simulate")
-async def control_simulation(session_id: UUID, body: SimulationControl, user=admin_steward_dependency):
+async def control_simulation(
+    session_id: UUID, body: SimulationControl, user=admin_steward_dependency
+):
     if mongo_ready() is None:
         raise HTTPException(503, "MongoDB telemetry store is unavailable")
     sim = simulations.get(str(session_id))
     if body.action == "start":
         if sim and sim.status in {"running", "paused"}:
             raise HTTPException(409, "Simulation is already running")
-        session = fetch_one("SELECT state,total_laps,scheduled_at FROM race_sessions WHERE id=%s", (session_id,))
-        if not session: raise HTTPException(404, "Session not found")
-        if session["state"] != "ACTIVE": raise HTTPException(409, "Session must be active before simulation starts")
+        session = fetch_one(
+            "SELECT state,total_laps,scheduled_at FROM race_sessions WHERE id=%s", (session_id,)
+        )
+        if not session:
+            raise HTTPException(404, "Session not found")
+        if session["state"] != "ACTIVE":
+            raise HTTPException(409, "Session must be active before simulation starts")
         if sim and sim.status == "stopped":
             if sim.task and not sim.task.done():
                 sim.task.cancel()
                 await asyncio.gather(sim.task, return_exceptions=True)
             clear_session_measurements(session_id)
-        generated_entries = fetch_all("""SELECT d.id,d.number,de.pace_offset_ms,tm.team_id,t.name AS team_name
+        generated_entries = fetch_all(
+            """SELECT d.id,d.number,de.pace_offset_ms,tm.team_id,t.name AS team_name
             FROM demo_race_entries de JOIN drivers d ON d.id=de.driver_id
             JOIN team_memberships tm ON tm.driver_id=d.id
               AND tm.start_date<=%s::date AND (tm.end_date IS NULL OR tm.end_date>=%s::date)
             JOIN teams t ON t.id=tm.team_id WHERE de.session_id=%s ORDER BY d.number""",
-            (session["scheduled_at"], session["scheduled_at"], session_id))
-        drivers = generated_entries or fetch_all("""SELECT d.id,d.number,tm.team_id,t.name AS team_name
+            (session["scheduled_at"], session["scheduled_at"], session_id),
+        )
+        drivers = generated_entries or fetch_all(
+            """SELECT d.id,d.number,tm.team_id,t.name AS team_name
             FROM drivers d JOIN team_memberships tm ON tm.driver_id=d.id
               AND tm.start_date<=%s::date AND (tm.end_date IS NULL OR tm.end_date>=%s::date)
             JOIN teams t ON t.id=tm.team_id WHERE d.eligibility='ACTIVE' ORDER BY d.number LIMIT %s""",
-            (session["scheduled_at"], session["scheduled_at"], body.cars or 10))
-        if not drivers: raise HTTPException(409, "No eligible drivers are available")
-        if body.cars and len(drivers) < body.cars: raise HTTPException(422, "Requested car count exceeds eligible drivers")
-        sim = Simulation(session_id, drivers, body.rate_hz or 2.0, total_laps=session["total_laps"] or MAX_SESSION_LAPS)
-        sim.pace_offsets_ms = {str(d["id"]):d["pace_offset_ms"] for d in generated_entries}
+            (session["scheduled_at"], session["scheduled_at"], body.cars or 10),
+        )
+        if not drivers:
+            raise HTTPException(409, "No eligible drivers are available")
+        if body.cars and len(drivers) < body.cars:
+            raise HTTPException(422, "Requested car count exceeds eligible drivers")
+        sim = Simulation(
+            session_id,
+            drivers,
+            body.rate_hz or 2.0,
+            total_laps=session["total_laps"] or MAX_SESSION_LAPS,
+        )
+        sim.pace_offsets_ms = {str(d["id"]): d["pace_offset_ms"] for d in generated_entries}
         sim.is_generated = bool(generated_entries)
         marker = fetch_one("SELECT auto_repeat FROM demo_races WHERE session_id=%s", (session_id,))
         sim.auto_repeat = bool(marker and marker["auto_repeat"])
@@ -1597,13 +1631,16 @@ async def control_simulation(session_id: UUID, body: SimulationControl, user=adm
         sim.task = asyncio.create_task(simulation_loop(sim))
         sim.status = "running"
     elif body.action == "pause":
-        if not sim or sim.status != "running": raise HTTPException(409, "Simulation is not running")
+        if not sim or sim.status != "running":
+            raise HTTPException(409, "Simulation is not running")
         sim.status = "paused"
     elif body.action == "resume":
-        if not sim or sim.status != "paused": raise HTTPException(409, "Simulation is not paused")
+        if not sim or sim.status != "paused":
+            raise HTTPException(409, "Simulation is not paused")
         sim.status = "running"
     elif body.action == "stop":
-        if not sim: raise HTTPException(409, "Simulation has not started")
+        if not sim:
+            raise HTTPException(409, "Simulation has not started")
         sim.status = "stopped"
         if sim.task and not sim.task.done():
             sim.task.cancel()
@@ -1612,19 +1649,25 @@ async def control_simulation(session_id: UUID, body: SimulationControl, user=adm
         sim.pit_reservations_by_driver.clear()
     elif body.action == "reset":
         session = fetch_one("SELECT state FROM race_sessions WHERE id=%s", (session_id,))
-        if not session: raise HTTPException(404, "Session not found")
+        if not session:
+            raise HTTPException(404, "Session not found")
         if session["state"] != "PAUSED":
             raise HTTPException(409, "Pause the session before resetting its simulation")
         ensure_session_reset_allowed(session_id)
         if sim:
-            sync_simulation_lifecycle(session_id,"reset")
+            sync_simulation_lifecycle(session_id, "reset")
             if sim.task and not sim.task.done():
                 await asyncio.gather(sim.task, return_exceptions=True)
         clear_session_measurements(session_id)
         if not sim:
             sim = Simulation(session_id, [], body.rate_hz or 2.0)
             simulations[str(session_id)] = sim
-    return {"session_id": str(session_id), "state": sim.status, "cars": len(sim.drivers), "rate_hz": sim.rate_hz}
+    return {
+        "session_id": str(session_id),
+        "state": sim.status,
+        "cars": len(sim.drivers),
+        "rate_hz": sim.rate_hz,
+    }
 
 
 async def _check_ws_runtime_lease(ws: WebSocket) -> bool:
@@ -1636,18 +1679,13 @@ async def _check_ws_runtime_lease(ws: WebSocket) -> bool:
     except RuntimeError:
         await ws.close(
             code=1011,
-            reason=(
-                "Runtime ownership was lost; restart the backend "
-                "after PostgreSQL recovery."
-            ),
+            reason=("Runtime ownership was lost; restart the backend after PostgreSQL recovery."),
         )
         return False
     return True
 
 
-async def _wait_for_ws_event(
-    ws: WebSocket, queue: asyncio.Queue[Any]
-) -> dict[str, Any] | None:
+async def _wait_for_ws_event(ws: WebSocket, queue: asyncio.Queue[Any]) -> dict[str, Any] | None:
     while True:
         try:
             return await asyncio.wait_for(queue.get(), timeout=0.5)
@@ -1704,16 +1742,26 @@ app.include_router(create_analytics_router(current_user, jsonable))
 
 @app.get("/api/health")
 def health():
-    state={"postgres":"down","mongodb":"down"}
-    try: fetch_one("SELECT 1 AS ok"); state["postgres"]="up"
-    except Exception: pass
+    state = {"postgres": "down", "mongodb": "down"}
     try:
-        if mongo_client: mongo_client.admin.command("ping"); state["mongodb"]="up"
-    except Exception: pass
-    return {"status":"ok" if all(v=="up" for v in state.values()) else "degraded","services":state}
+        fetch_one("SELECT 1 AS ok")
+        state["postgres"] = "up"
+    except Exception:
+        pass
+    try:
+        if mongo_client:
+            mongo_client.admin.command("ping")
+            state["mongodb"] = "up"
+    except Exception:
+        pass
+    return {
+        "status": "ok" if all(v == "up" for v in state.values()) else "degraded",
+        "services": state,
+    }
 
 
-def admin(user=admin_role_dependency): return user
+def admin(user=admin_role_dependency):
+    return user
 
 
 admin_dependency = Depends(admin)
@@ -1721,7 +1769,11 @@ admin_dependency = Depends(admin)
 
 @app.get("/api/dbms/schema")
 def dbms_schema(user=admin_dependency):
-    return jsonable(fetch_all("SELECT table_name,column_name,data_type,is_nullable FROM information_schema.columns WHERE table_schema='public' ORDER BY table_name,ordinal_position"))
+    return jsonable(
+        fetch_all(
+            "SELECT table_name,column_name,data_type,is_nullable FROM information_schema.columns WHERE table_schema='public' ORDER BY table_name,ordinal_position"
+        )
+    )
 
 
 @app.get("/api/dbms/overview")
@@ -1739,13 +1791,23 @@ def dbms_overview(user=admin_dependency):
     except (HTTPException, PyMongoError):
         telemetry_samples = None
         mongo_status = "down"
-    return jsonable({**counts, "telemetry_samples": telemetry_samples,
-      "postgres": "up", "mongodb": mongo_status, "updated_at": datetime.now(UTC)})
+    return jsonable(
+        {
+            **counts,
+            "telemetry_samples": telemetry_samples,
+            "postgres": "up",
+            "mongodb": mongo_status,
+            "updated_at": datetime.now(UTC),
+        }
+    )
 
 
 def public_dbms_tables():
-    return [row["table_name"] for row in fetch_all("""SELECT table_name FROM information_schema.tables
-      WHERE table_schema='public' AND table_type='BASE TABLE' ORDER BY table_name""")]
+    return [
+        row["table_name"]
+        for row in fetch_all("""SELECT table_name FROM information_schema.tables
+      WHERE table_schema='public' AND table_type='BASE TABLE' ORDER BY table_name""")
+    ]
 
 
 @app.get("/api/dbms/tables")
