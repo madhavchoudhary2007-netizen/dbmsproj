@@ -3,7 +3,12 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-44102 — canonical formatting progress
+### T-44103 — main long literal/comment cleanup
+- worker: W2 | priority: P1 | origin: bounded T-310 subdivision
+- target_files: backend/app/main.py
+- contract: unchanged AST/SQL/directives, strictly less E501, <=150 lines
+- verify: .venv/bin/python .agent/check-lint-progress.py backend/app/main.py E501
+### T-44104 — canonical formatting progress
 - worker: W3 | priority: P1 | origin: bounded T-310/311 subdivision
 - target_files: backend/tests/test_api.py
 - contract: <=150 changed lines, identical AST/canonical content, strict format progress
@@ -14,6 +19,7 @@ phase: 1 honest green baseline
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-44102 accepted111241c; verify0.
 - T-44101 accepted19620dd; verify0.
 - T-44100 accepted121a209; verify0.
 - T-4499 accepted73599b2; verify0.

@@ -1777,12 +1777,20 @@ def database_api_client():
 @pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
 def test_session_action_route_characterization(database_api_client):
     client = database_api_client
-    admin = client.post("/api/auth/login", json={
-        "email": "admin@apexgrid.test", "password": "ApexGrid2026!",
-    })
-    driver = client.post("/api/auth/login", json={
-        "email": "driver01@apexgrid.test", "password": "ApexGrid2026!",
-    })
+    admin = client.post(
+        "/api/auth/login",
+        json={
+            "email": "admin@apexgrid.test",
+            "password": "ApexGrid2026!",
+        },
+    )
+    driver = client.post(
+        "/api/auth/login",
+        json={
+            "email": "driver01@apexgrid.test",
+            "password": "ApexGrid2026!",
+        },
+    )
     assert admin.status_code == driver.status_code == 200
     admin_headers = {"Authorization": "Bearer " + admin.json()["access_token"]}
     driver_headers = {"Authorization": "Bearer " + driver.json()["access_token"]}
@@ -1844,7 +1852,8 @@ def test_session_action_route_characterization(database_api_client):
 
         missing = client.post(
             "/api/sessions/00000000-0000-4000-8000-000000000000/action",
-            headers=admin_headers, json={"action": "start"},
+            headers=admin_headers,
+            json={"action": "start"},
         )
         assert missing.status_code == 404
         assert missing.json() == {"detail": "Session not found"}
@@ -1858,12 +1867,20 @@ def test_session_action_route_characterization(database_api_client):
 @pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
 def test_membership_route_characterization(database_api_client):
     client = database_api_client
-    admin = client.post("/api/auth/login", json={
-        "email": "admin@apexgrid.test", "password": "ApexGrid2026!",
-    })
-    driver_login = client.post("/api/auth/login", json={
-        "email": "driver01@apexgrid.test", "password": "ApexGrid2026!",
-    })
+    admin = client.post(
+        "/api/auth/login",
+        json={
+            "email": "admin@apexgrid.test",
+            "password": "ApexGrid2026!",
+        },
+    )
+    driver_login = client.post(
+        "/api/auth/login",
+        json={
+            "email": "driver01@apexgrid.test",
+            "password": "ApexGrid2026!",
+        },
+    )
     assert admin.status_code == driver_login.status_code == 200
     admin_headers = {"Authorization": "Bearer " + admin.json()["access_token"]}
     driver_headers = {"Authorization": "Bearer " + driver_login.json()["access_token"]}
@@ -1879,10 +1896,13 @@ def test_membership_route_characterization(database_api_client):
                 (driver_id, licence, int(driver_id.hex[:3], 16) % 999 + 1),
             )
         create_payloads = [
-            {"driver_id": str(driver_id), "team_id": str(team_id),
-             "start_date": "2024-01-01", "end_date": "2024-01-31"},
-            {"driver_id": str(driver_id), "team_id": str(team_id),
-             "start_date": "2024-02-01"},
+            {
+                "driver_id": str(driver_id),
+                "team_id": str(team_id),
+                "start_date": "2024-01-01",
+                "end_date": "2024-01-31",
+            },
+            {"driver_id": str(driver_id), "team_id": str(team_id), "start_date": "2024-02-01"},
         ]
         client.cookies.clear()
         anonymous = client.post("/api/team-memberships", json=create_payloads[0])
@@ -1895,8 +1915,10 @@ def test_membership_route_characterization(database_api_client):
         assert rejected.status_code == 403
         assert rejected.json() == {"detail": "Insufficient role"}
 
-        created = [client.post("/api/team-memberships", json=payload, headers=admin_headers)
-                   for payload in create_payloads]
+        created = [
+            client.post("/api/team-memberships", json=payload, headers=admin_headers)
+            for payload in create_payloads
+        ]
         assert [response.status_code for response in created] == [201, 201]
         older_id, newer_id = [response.json()["id"] for response in created]
         membership_keys = {"id", "driver_id", "team_id", "start_date", "end_date"}
@@ -1938,37 +1960,54 @@ def test_membership_route_characterization(database_api_client):
         assert patched.json()["end_date"] == patch_body["end_date"]
         missing = client.patch(
             "/api/team-memberships/00000000-0000-4000-8000-000000000000",
-            json=patch_body, headers=admin_headers,
+            json=patch_body,
+            headers=admin_headers,
         )
         assert missing.status_code == 404
     finally:
         with main_module.connection() as conn, conn.cursor() as cur:
-            cur.execute("DELETE FROM team_memberships WHERE driver_id=%s AND team_id=%s",
-                        (driver_id, team_id))
+            cur.execute(
+                "DELETE FROM team_memberships WHERE driver_id=%s AND team_id=%s",
+                (driver_id, team_id),
+            )
             cur.execute("DELETE FROM drivers WHERE id=%s", (driver_id,))
             cur.execute("DELETE FROM teams WHERE id=%s", (team_id,))
 
 
 @pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
-@pytest.mark.parametrize(("resource", "required_keys"), [
-    ("championships", {"id", "name", "season"}),
-    ("circuits", {"id", "name", "country", "length_km"}),
-    ("teams", {"id", "name", "principal_user_id"}),
-    ("drivers", {"id", "user_id", "licence_number", "number"}),
-    ("events", {"id", "championship_id", "circuit_id", "round_number", "name", "start_date"}),
-    ("sessions", {"id", "event_id", "session_type", "scheduled_at", "total_laps", "safety_car"}),
-])
+@pytest.mark.parametrize(
+    ("resource", "required_keys"),
+    [
+        ("championships", {"id", "name", "season"}),
+        ("circuits", {"id", "name", "country", "length_km"}),
+        ("teams", {"id", "name", "principal_user_id"}),
+        ("drivers", {"id", "user_id", "licence_number", "number"}),
+        ("events", {"id", "championship_id", "circuit_id", "round_number", "name", "start_date"}),
+        (
+            "sessions",
+            {"id", "event_id", "session_type", "scheduled_at", "total_laps", "safety_car"},
+        ),
+    ],
+)
 def test_crud_read_characterization(database_api_client, resource, required_keys):
     client = database_api_client
-    admin_login = client.post("/api/auth/login", json={
-        "email": "admin@apexgrid.test", "password": "ApexGrid2026!",
-    })
+    admin_login = client.post(
+        "/api/auth/login",
+        json={
+            "email": "admin@apexgrid.test",
+            "password": "ApexGrid2026!",
+        },
+    )
     assert admin_login.status_code == 200, admin_login.text
     admin_headers = {"Authorization": "Bearer " + admin_login.json()["access_token"]}
 
-    driver_login = client.post("/api/auth/login", json={
-        "email": "driver01@apexgrid.test", "password": "ApexGrid2026!",
-    })
+    driver_login = client.post(
+        "/api/auth/login",
+        json={
+            "email": "driver01@apexgrid.test",
+            "password": "ApexGrid2026!",
+        },
+    )
     assert driver_login.status_code == 200, driver_login.text
     driver_headers = {"Authorization": "Bearer " + driver_login.json()["access_token"]}
 
@@ -2389,21 +2428,40 @@ def test_generated_demo_race_create_list_and_scoped_delete(database_api_client):
         assert race["car_count"] == 6 and 45 <= race["total_laps"] <= 75
         assert all(11 <= driver["number"] <= 99 for driver in simulations[session_id].drivers)
         assert race["state"] == "ACTIVE" and race["simulation_state"] == "running"
-        assert any(row["session_id"] == session_id for row in client.get("/api/demo-races", headers=headers).json())
+        assert any(
+            row["session_id"] == session_id
+            for row in client.get("/api/demo-races", headers=headers).json()
+        )
         live = client.get(f"/api/sessions/{session_id}/live", headers=headers)
         assert live.status_code == 200
         assert len(live.json()["drivers"]) == 6
         assert all(driver["full_name"] for driver in live.json()["drivers"])
         from backend.app.database import fetch_one
+
         unrelated = fetch_one("SELECT id FROM drivers WHERE licence_number='AG-0001'")
-        invalid_incident = {"session_id": session_id, "driver_id": str(unrelated["id"]), "lap": 1, "description": "Unrelated driver"}
-        assert client.post("/api/incidents", headers=headers, json=invalid_incident).status_code == 422
+        invalid_incident = {
+            "session_id": session_id,
+            "driver_id": str(unrelated["id"]),
+            "lap": 1,
+            "description": "Unrelated driver",
+        }
+        assert (
+            client.post("/api/incidents", headers=headers, json=invalid_incident).status_code == 422
+        )
         invalid_incident["driver_id"] = live.json()["drivers"][0]["id"]
         invalid_incident["lap"] = race["total_laps"] + 1
-        assert client.post("/api/incidents", headers=headers, json=invalid_incident).status_code == 422
+        assert (
+            client.post("/api/incidents", headers=headers, json=invalid_incident).status_code == 422
+        )
         from backend.app.main import mongo_ready
-        assert mongo_ready().count_documents({"session_id":session_id}) >= 1
-        assert client.delete("/api/demo-races/00000000-0000-4000-8000-000000000000", headers=headers).status_code == 404
+
+        assert mongo_ready().count_documents({"session_id": session_id}) >= 1
+        assert (
+            client.delete(
+                "/api/demo-races/00000000-0000-4000-8000-000000000000", headers=headers
+            ).status_code
+            == 404
+        )
         from backend.app.database import fetch_one
         assert fetch_one("SELECT count(*) AS count FROM pit_boxes WHERE event_id=%s", (event_id,))["count"] == 4
     finally:
