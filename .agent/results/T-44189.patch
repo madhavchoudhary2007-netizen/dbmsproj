@@ -1,0 +1,76 @@
+diff --git a/backend/tests/test_route_registration.py b/backend/tests/test_route_registration.py
+new file mode 100644
+index 0000000..2ef1f2d
+--- /dev/null
++++ b/backend/tests/test_route_registration.py
+@@ -0,0 +1,70 @@
++import sys
++from collections import Counter
++from pathlib import Path
++
++import pytest
++from fastapi import APIRouter
++from fastapi.routing import APIRoute, _IncludedRouter
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
++
++
++def _flatten_routes(routes):
++    for route in routes:
++        if isinstance(route, _IncludedRouter):
++            yield from _flatten_routes(route.original_router.routes)
++        elif hasattr(route, "routes"):
++            yield from _flatten_routes(route.routes)
++        else:
++            yield route
++
++
++def _route_registrations(routes):
++    for route in _flatten_routes(routes):
++        if isinstance(route, APIRoute):
++            for method in route.methods or ():
++                yield (route.path, method), route.endpoint
++
++
++def _assert_unique_route_registrations(routes):
++    registrations = [key for key, _ in _route_registrations(routes)]
++    duplicates = [key for key, count in Counter(registrations).items() if count > 1]
++    assert not duplicates, f"duplicate runtime route registrations: {duplicates}"
++
++
++def test_runtime_route_registrations_are_unique_and_mongo_handlers_are_mapped():
++    from backend.app.main import app, dbms_mongo_collection_documents, dbms_mongo_collections
++
++    routes = list(_flatten_routes(app.routes))
++    _assert_unique_route_registrations(routes)
++
++    registrations = list(_route_registrations(routes))
++    expected = {
++        ("/api/dbms/mongo/collections", "GET"): dbms_mongo_collections,
++        ("/api/dbms/mongo/collections/{collection_name}", "GET"): dbms_mongo_collection_documents,
++    }
++    for route_key, endpoint in expected.items():
++        matches = [
++            registered_endpoint for key, registered_endpoint in registrations if key == route_key
++        ]
++        assert matches == [endpoint], (
++            f"{route_key} must register exactly once to its intended handler"
++        )
++
++
++def test_duplicate_route_checker_rejects_same_method_but_accepts_distinct_methods():
++    router = APIRouter()
++
++    def get_item():
++        return {"method": "get"}
++
++    def post_item():
++        return {"method": "post"}
++
++    router.add_api_route("/items", get_item, methods=["GET"])
++    router.add_api_route("/items", post_item, methods=["POST"])
++    _assert_unique_route_registrations(router.routes)
++
++    router.add_api_route("/items", get_item, methods=["GET"])
++    with pytest.raises(AssertionError, match="duplicate runtime route registrations"):
++        _assert_unique_route_registrations(router.routes)
