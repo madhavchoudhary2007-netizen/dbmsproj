@@ -1,11 +1,12 @@
 from collections.abc import Callable
 from contextlib import AbstractContextManager
+from datetime import UTC, datetime
 from typing import Any, Literal
 
 from fastapi import APIRouter, HTTPException
-from psycopg import Connection
+from psycopg import Connection, sql
 from psycopg.errors import CheckViolation
-from psycopg.rows import tuple_row
+from psycopg.rows import dict_row, tuple_row
 
 from ..database import DatabaseRow
 
@@ -71,11 +72,34 @@ def _register_demo_handlers(
     return {"constraint_demo": constraint_demo, "transaction_demo": transaction_demo}
 
 
+def _register_table_handlers(
+    router: APIRouter,
+    admin_dependency: Any,
+    connection: Callable[[], AbstractContextManager[Connection[DatabaseRow]]],
+    jsonable: Callable[[Any], Any],
+    public_dbms_tables: Callable[[], list[str]],
+) -> dict[str, Callable[..., Any]]:
+    @router.get("/api/dbms/tables")
+    def dbms_tables(user=admin_dependency):
+        names = public_dbms_tables()
+        with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
+            rows = []
+            for name in names:
+                cur.execute(
+                    sql.SQL("SELECT count(*) AS count FROM public.{}").format(sql.Identifier(name))
+                )
+                rows.append({"table_name": name, "row_count": cur.fetchone()["count"]})
+        return jsonable({"tables": rows, "updated_at": datetime.now(UTC)})
+
+    return {"dbms_tables": dbms_tables}
+
+
 def create_dbms_sql_router(
     fetch_all: Callable[..., Any],
     jsonable: Callable[[Any], Any],
     admin_dependency: Any,
     connection: Callable[[], AbstractContextManager[Connection[DatabaseRow]]],
+    public_dbms_tables: Callable[[], list[str]],
 ) -> tuple[APIRouter, dict[str, Callable[..., Any]]]:
     router = APIRouter()
 
@@ -167,6 +191,9 @@ def create_dbms_sql_router(
         )
 
     demo_handlers = _register_demo_handlers(router, admin_dependency, connection)
+    table_handlers = _register_table_handlers(
+        router, admin_dependency, connection, jsonable, public_dbms_tables
+    )
 
     return router, {
         "dbms_schema": dbms_schema,
@@ -176,4 +203,5 @@ def create_dbms_sql_router(
         "dbms_explain": dbms_explain,
         "dbms_races": dbms_races,
         **demo_handlers,
+        **table_handlers,
     }

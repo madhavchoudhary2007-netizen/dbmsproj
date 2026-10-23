@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: c0781f9
+git_head: cdd4ad2
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -31,27 +31,8 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - Architecture/ADRs/docs/state/packets/envelopes/orchestration helpers and root-owned planned dependency installs only. Zero authored product lines; integrating worker patches is not product authorship. Canonical lock operation bypassed autoGit tail only to honor accept-only; independently verified.
 
 ## Recent acceptance / review
-- Health/SQL pure moves through7c6c086 preserve AST/main aliases. Full214PASS0skip/livePASS through EXPLAIN; latest Mongo move full214PASS0skip/livePASS. Ruff0/mypy216errors17/44files after typed Collection boundary. Typed temporary factory helpers required by C901; T332 replaces them.
-- T360 shadow66c4550/contrastd0e50ef/wiringb549015/motionc64e793 accepted with regression repairs. Shared neo actual10legacyCSSviolations; motionwrapper86e0b47 accepted. No thresholds weakened. Counts/static boundary not delivery proof.
-- Root corrected FastAPI included-router probe, mypy namespace, and underestimated C901 (typed helper retained after observed11>10). Worker placeholder Verify formats normalized then exact command rerun.
-
-- Recent commits: Mongo20466aa/9977cdf, race list008414f, motionwrapper86e0b47, palettecoref385ea8/browser030459a. Every Verify0/rootfull214PASS0skip/livePASS; root now found duplicate decorator below, so these runs are insufficient to claim all routes correct.
-- Worker counts/placeholder Verify formatting repaired before exact rerun. Root accidentally printed one101-line range, no secrets; subsequent ranges capped80. Root authored0 productlines.
-
-- T44186 rootreview caught stale list-route decorator left on document handler: duplicate GET /api/dbms/mongo/collections. Snapshot/full214 missed it; OpenAPI can conceal duplicate registrations. T44188 candidate incorrectly preserves duplicate via delegating wrapper; rejected. T44189 W3 regression first, then repair original intended one-list/one-named route; no API intent change.
-- T44187 rejected beforeaccept for important-class bypass and desktop-only variant falsepositive; repair1 requested, isolatedclone.
-- Palette actual dashboard1440 fails shares[1,0,0], PNG/JSON attached; sourcegate80casescollect, no skips. Types/lint/spacing/banned0; motion3/neo10legacyhits.
-
-- T-44189 accepted3343d87: Added failing-first runtime route uniqueness/alias regression; recorded duplicate Mongo list decorator with1real assertion failure, no product check called green. Verify0.
-
-- T-44187 accepted3c10f63: Extended shadow gate to JSX utilities/conditional classes, important variants and mobile-aware caps with regression controls. Verify0.
-
-- T-44188 accepted7eeb81d: Moved exact Mongo document handler; removed stale duplicate list decorator and unneeded wrapper.11 contract/runtime registration tests pass. Verify0.
-
-- T-360 accepted2ad337f: Closed accepted lint/palette setup; global legacy10neo/3motion and actual light-palette failure remain recorded for redesign, no skips or widened gates. Verify0.
-
-- Duplicate route correction7eeb81d passes11snapshot/runtime tests after red3343d87; full216PASS0skip/livePASS. Staticshadow utility3c10f63 accepted. Root212+ tests must remain green; no false claim all phases complete.
-
-- T-362 acceptedc0781f9: Added approved Space Grotesk/Mono variables and functional first-focus skip link with real main-content landmarks; existing auth/nav behavior retained. Verify0.
-
-- T362c0781f9 fonts/real skipmain landmarks accepted offline; root hostbuild and85axe/keyboard checks pending beforeT363. Taste: one existing primary unchanged, yellow44pxskip no shadow/motion, no newclutter; legacy giantfiles remain planned cleanup.
+- T3602ad337f setup accepted (all seven style families, shadow utilities/mobile variants, motion plinth, actual1440pixelroles). Root actual dashboardFAIL shares[1,0,0]; neo10/motion3 legacyhits, spacing/banned/types/lint0. No skipped/widened gates; computed cascade/motion proof laterT366/T413.
+- W3red3343d87 exposed duplicate Mongo list decorator left by9977cdf. Corrected7eeb81d; new runtime uniqueness/alias regression permanent. Full216PASS0skip/livePASS afterfix. Old214green runs missed bug and are not complete route proof.
+- Polyglotcdd4ad2 exactAST/alias+11snapshot/runtimePASS; rootfullrerun pending. Mypy216 latest beforepolyglot, strictzeroT339. Precise Collection/Connection/Database callbacks; transitional factory/helpers are T332 debt, C901 unchanged.
+- T362c0781f9 fonts+44px yellow first-focus skiplink+realmain landmarks accepted offline; root hostbuild/85axe/keyboard pending beforeT363. Taste: existingprimary unchanged, no newclutter/motion/shadow. Legacy giantfiles plannedcleanup.
+- Root corrected included-router probe/mypy namespace/C901estimate; worker placeholder Verify/count formats fixed before exact rerun. One accidental101-line display (no secrets), subsequent ranges capped80. Root authored0productlines.

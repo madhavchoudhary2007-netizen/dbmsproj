@@ -1796,7 +1796,9 @@ dbms_sql_router, dbms_sql_handlers = create_dbms_sql_router(
     lambda v: jsonable(v),
     admin_dependency,
     lambda: connection(),
+    lambda: public_dbms_tables(),
 )
+dbms_tables = dbms_sql_handlers["dbms_tables"]
 dbms_schema = dbms_sql_handlers["dbms_schema"]
 dbms_indexes = dbms_sql_handlers["dbms_indexes"]
 dbms_locks = dbms_sql_handlers["dbms_locks"]
@@ -1831,19 +1833,6 @@ def public_dbms_tables():
         for row in fetch_all("""SELECT table_name FROM information_schema.tables
       WHERE table_schema='public' AND table_type='BASE TABLE' ORDER BY table_name""")
     ]
-
-
-@app.get("/api/dbms/tables")
-def dbms_tables(user=admin_dependency):
-    names = public_dbms_tables()
-    with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-        rows = []
-        for name in names:
-            cur.execute(
-                sql.SQL("SELECT count(*) AS count FROM public.{}").format(sql.Identifier(name))
-            )
-            rows.append({"table_name": name, "row_count": cur.fetchone()["count"]})
-    return jsonable({"tables": rows, "updated_at": datetime.now(UTC)})
 
 
 @app.get("/api/dbms/tables/{table_name}")
