@@ -1,13 +1,8 @@
 # NEXT_STATE
-updated_at: 2026-10-23T05:04:42Z
+updated_at: 2026-10-23T05:06:20Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-168 — F-ACE01 successful-login regression
-- worker: W3 | priority: P2 | origin: full isolated gate after T-163
-- target_files: backend/tests/test_login_throttle.py
-- contract: strict xfail proving repeated valid logins and shared-source valid users remain allowed; preserve prior throttle assertions
-- verify: APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_login_throttle.py
 ### T-169 — F-ACE01 count failed attempts only
 - worker: W2 | priority: P2 | after: T-168
 - target_files: backend/app/auth_router.py, backend/app/login_limiter.py
@@ -41,6 +36,7 @@ loop_iteration: 0 of 8
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-168 ✓ 098a9c2; 4 pass/2 strict xfail, --runxfail exposed successful-login 429.
 - T-163 ✓ 2bb95f8; focused 4/4, full isolated 90 pass/35 fail from counting successful logins; repair T-168/169.
 - T-162 ✓ 6963b4f; 1 pass/3 strict xfails; --runxfail proved 3 missing-429 failures.
 - T-161 ✓ 97c7268; session action characterization passed.
