@@ -3,11 +3,11 @@ updated_at: 2026-10-23T08:25:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-196 — add edge resilience tests in edge-resilience.spec.ts
+### T-197 — record E-4 and E-5 passed in edge.json
 - worker: W3 | priority: P1 | origin: EVAL score E-4/E-5
-- target_files: frontend/e2e/edge-resilience.spec.ts
-- contract: add automated tests for E-4 (rapid input spam) and E-5 (offline-to-online recovery)
-- verify: PLAYWRIGHT_PORT=32145 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts edge-resilience.spec.ts --project=desktop-1440 && git checkout -- frontend/next-env.d.ts frontend/AGENTS.md
+- target_files: .agent/eval/edge.json
+- contract: record E-4 and E-5 passed based on passing edge-resilience.spec.ts tests
+- verify: python3 -c "import json; d=json.load(open('.agent/eval/edge.json')); assert any(c['id']=='E-4' and c['passed'] for c in d['checks']) and any(c['id']=='E-5' and c['passed'] for c in d['checks'])"
 
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
@@ -16,6 +16,7 @@ loop_iteration: 0 of 8
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-196 ✓ ff1bd91; added E2E tests for E-4 (rapid input spam) and E-5 (offline-to-online recovery) in edge-resilience.spec.ts.
 - T-195 ✓ abc1f13; recorded F-4 passed in functional.json; 0 failed hard gates.
 - T-194 ✓ 27bf192; implemented explicit primary job and heading assertions for all 16 A.2 deliverables in routes.spec.ts.
 - T-193 ✓ 7d17eb9; asserted expect(results.violations).toEqual([]) in accessibility.spec.ts.
