@@ -4,7 +4,7 @@ git_head: 03e4839
 branch: perfection-loop
 architect_sha256: 0dbd38b2c32d662bc2d5aaa31178ba23a93b28d1f8a6dfd23a8322e5bf229cda
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
-last_eval_score: NOT_RUN (quality gates and role journeys remain open)
+last_eval_score: 15.41 (functional 30, aesthetic 13.33, performance 0, edge 15.38; failed gates: F-3, F-4, P-6)
 
 ## Verified setup and contracts
 - Boot and architecture lock pass (ADR-004 relock 07954ad). Work stays on `perfection-loop`. Disposable databases use only Compose project `apexgrid-test`, ports 15432/27018. Never touch running databases, secrets or master.
