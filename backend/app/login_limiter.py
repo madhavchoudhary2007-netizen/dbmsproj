@@ -39,8 +39,8 @@ class LoginLimiter:
             cutoff = now - self.window_seconds
             self._expire(self._accounts, cutoff)
             self._expire(self._sources, cutoff)
-            account_attempts = self._accounts.get(account, ())
-            source_attempts = self._sources.get(source, ())
+            account_attempts = self._accounts.get(account, deque())
+            source_attempts = self._sources.get(source, deque())
             retry_at = now
             limited = False
             for attempts in (account_attempts, source_attempts):

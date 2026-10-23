@@ -1,0 +1,7 @@
+{
+  "task_id": "T-170", "status": "PASSED",
+  "files_modified": [{ "path": "backend/app/login_limiter.py", "lines_added": 2, "lines_removed": 2 }],
+  "diff_summary": "Changed the empty defaults for account and source lookups from tuples to deques, matching the counter types without changing limiter behavior.",
+  "verification": { "command": ".venv/bin/mypy --strict backend/app/login_limiter.py", "exit_code": 0, "tests_passed": 0, "tests_failed": 0, "duration_ms": 200, "typecheck_errors": 0 },
+  "unresolved_blockers": []
+}
