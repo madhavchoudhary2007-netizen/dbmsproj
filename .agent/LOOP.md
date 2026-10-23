@@ -11,6 +11,7 @@ phase: 2 — structure, in progress
 cycle: 0 of 8
 score: NOT_RUN
 
+- T-162 accepted: offline login limiter reproduction, 1 ordinary pass/3 strict xfails; --runxfail fails three sixth-attempt 429 checks on old code. F-ACE01 remains open until fix and full isolated suite.
 - 2026-10-23 owner decision: auth routes and membership router/repository splits are already accepted (T-156..T-160). Phase 2 is capped here; session and remaining structural splits are deferred in `.agent/backlog.md`. T-161 is characterization only. Next: F-ACE01, F-E02, F-DOM-04, F-DOM-05 in that order, then first full evaluation within 15 tasks.
 
 ## Phase 0 baseline

@@ -1,13 +1,8 @@
 # NEXT_STATE
-updated_at: 2026-10-23T04:59:30Z
+updated_at: 2026-10-23T05:01:33Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-162 — F-ACE01 login throttling reproduction
-- worker: W3 | priority: P2
-- target_files: backend/tests/test_login_throttle.py
-- contract: strict expected-failure tests for per-account and per-source limits, unknown account parity and recovery window; preserve current auth assertions
-- verify: APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_login_throttle.py
 ### T-163 — F-ACE01 enforced login throttling
 - worker: W2 | priority: P2 | after: T-162
 - target_files: backend/app/auth_router.py, backend/app/login_limiter.py
@@ -41,5 +36,6 @@ loop_iteration: 0 of 8
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-162 ✓ 6963b4f; 1 pass/3 strict xfails; --runxfail proved 3 missing-429 failures.
 - T-161 ✓ 97c7268; session action characterization passed.
 - T-160 ✓ 8b60194; membership router/repository split accepted, full isolated backend 120/0/0.
