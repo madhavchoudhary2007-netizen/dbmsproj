@@ -1,5 +1,6 @@
 """Database independent contract tests for login attempt throttling."""
 
+import pytest
 from app.auth_router import create_auth_router
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -102,3 +103,53 @@ def test_unknown_accounts_are_limited_and_recover_after_window(monkeypatch):
     now[0] += 61
     recovered = _login(client, "missing@example.test")
     assert recovered.status_code == 401
+
+
+@pytest.mark.xfail(reason="F-ACE01", strict=True)
+def test_repeated_successful_logins_do_not_consume_account_limit(monkeypatch):
+    email = "known@example.test"
+    user = {
+        "id": 7,
+        "email": email,
+        "password_hash": "unused",
+        "full_name": "Known User",
+        "role": "DRIVER",
+    }
+    client = _client(monkeypatch, users={email: user})
+    monkeypatch.setattr("app.auth_router.bcrypt.checkpw", lambda *_: True)
+
+    for _ in range(6):
+        response = _login(client, email)
+        assert response.status_code == 200
+        assert set(response.json()) == {"access_token", "token_type", "user"}
+        assert response.json()["user"] == {
+            "id": 7,
+            "email": email,
+            "full_name": "Known User",
+            "role": "DRIVER",
+        }
+        assert "access_token" in response.json()
+        assert "set-cookie" in response.headers
+
+
+@pytest.mark.xfail(reason="F-ACE01", strict=True)
+def test_distinct_successful_accounts_do_not_consume_source_limit(monkeypatch):
+    users = {
+        f"person{index}@example.test": {
+            "id": index,
+            "email": f"person{index}@example.test",
+            "password_hash": "unused",
+            "full_name": f"Person {index}",
+            "role": "DRIVER",
+        }
+        for index in range(6)
+    }
+    client = _client(monkeypatch, users=users)
+    monkeypatch.setattr("app.auth_router.bcrypt.checkpw", lambda *_: True)
+
+    for email in users:
+        response = _login(client, email)
+        assert response.status_code == 200
+        assert response.json()["user"]["email"] == email
+        assert set(response.json()) == {"access_token", "token_type", "user"}
+        assert "set-cookie" in response.headers
