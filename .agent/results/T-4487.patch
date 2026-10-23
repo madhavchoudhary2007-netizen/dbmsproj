@@ -1,0 +1,227 @@
+diff --git a/backend/tests/test_api.py b/backend/tests/test_api.py
+index 56cee5f..c7559fb 100644
+--- a/backend/tests/test_api.py
++++ b/backend/tests/test_api.py
+@@ -400,34 +400,70 @@ def test_cookie_auth_login_sets_secure_cookies_outside_local_mode(
+ 
+ def archive_provisional_response(monkeypatch, penalties):
+     session_id, driver_id = uuid4(), uuid4()
+-    result = {"driver_id": driver_id, "position": 1, "lap_time_ms": 85000,
+-              "driver_name": "Test Driver", "number": 7, "licence_number": "TEST-7"}
+-    monkeypatch.setitem(main_module.app.dependency_overrides, main_module.admin, lambda: {"role": "ADMIN"})
+-    monkeypatch.setattr(main_module, "fetch_one", lambda *_: {"id": session_id, "state": "COMPLETED"})
++    result = {
++        "driver_id": driver_id,
++        "position": 1,
++        "lap_time_ms": 85000,
++        "driver_name": "Test Driver",
++        "number": 7,
++        "licence_number": "TEST-7",
++    }
++    monkeypatch.setitem(
++        main_module.app.dependency_overrides, main_module.admin, lambda: {"role": "ADMIN"}
++    )
++    monkeypatch.setattr(
++        main_module, "fetch_one", lambda *_: {"id": session_id, "state": "COMPLETED"}
++    )
+ 
+     def fetch_all(query, _params=()):
+         if "FROM session_results" in query:
+             return [result]
+         if "FROM drivers d" in query:
+-            return [{"id": driver_id, "number": 7, "licence_number": "TEST-7", "driver_name": "Test Driver"}]
++            return [
++                {
++                    "id": driver_id,
++                    "number": 7,
++                    "licence_number": "TEST-7",
++                    "driver_name": "Test Driver",
++                }
++            ]
+         if "FROM penalties" in query:
+             return penalties
+         return []
+ 
+     class Collection:
+-        def distinct(self, *_args): return []
+-        def find_one(self, *_args, **_kwargs): return None
+-        def aggregate(self, *_args): return []
+-        def count_documents(self, *_args): return 0
++        def distinct(self, *_args):
++            return []
++
++        def find_one(self, *_args, **_kwargs):
++            return None
++
++        def aggregate(self, *_args):
++            return []
++
++        def count_documents(self, *_args):
++            return 0
+ 
+     monkeypatch.setattr(main_module, "fetch_all", fetch_all)
+     monkeypatch.setattr(main_module, "mongo_ready", Collection)
+     response = TestClient(app).get(f"/api/dbms/races/{session_id}?include_laps=false")
+     assert response.status_code == 200
+     body = response.json()
+-    assert set(body) == {"session", "results", "incidents", "penalties", "pit_reservations",
+-                         "drivers", "laps", "laps_included", "completed_driver_laps", "latest",
+-                         "telemetry_count", "updated_at", "lap_source"}
++    assert set(body) == {
++        "session",
++        "results",
++        "incidents",
++        "penalties",
++        "pit_reservations",
++        "drivers",
++        "laps",
++        "laps_included",
++        "completed_driver_laps",
++        "latest",
++        "telemetry_count",
++        "updated_at",
++        "lap_source",
++    }
+     return body
+ 
+ 
+@@ -445,7 +481,8 @@ def test_historical_archive_fills_missing_laps_without_replacing_recorded_data()
+     session_id = uuid4()
+     first_driver, second_driver = uuid4(), uuid4()
+     session = {
+-        "id": session_id, "total_laps": 2,
++        "id": session_id,
++        "total_laps": 2,
+         "started_at": datetime(2026, 10, 5, 10, tzinfo=timezone.utc),
+     }
+     results = [
+@@ -493,18 +530,29 @@ def test_historical_archive_fills_missing_laps_without_replacing_recorded_data()
+     seed_historical_laps(Connection(), collection)
+ 
+     assert len(collection.inserted) == 3
+-    assert all((doc["driver_id"], doc["lap"]) != (str(first_driver), 1) for doc in collection.inserted)
++    assert all(
++        (doc["driver_id"], doc["lap"]) != (str(first_driver), 1) for doc in collection.inserted
++    )
+     assert {(doc["driver_id"], doc["lap"]) for doc in collection.inserted} == {
+-        (str(first_driver), 2), (str(second_driver), 1), (str(second_driver), 2),
++        (str(first_driver), 2),
++        (str(second_driver), 1),
++        (str(second_driver), 2),
+     }
+-    first_driver_lap_2 = next(doc for doc in collection.inserted
+-                              if doc["driver_id"] == str(first_driver) and doc["lap"] == 2)
++    first_driver_lap_2 = next(
++        doc
++        for doc in collection.inserted
++        if doc["driver_id"] == str(first_driver) and doc["lap"] == 2
++    )
+     rng = random.Random(str(session_id) + str(first_driver))  # noqa: S311 -- seeded RNG makes historical simulation replay deterministic
+-    rng.randint(-45, 45)  # lap 1's generated fallback is consumed even though telemetry has that lap.
++    rng.randint(
++        -45, 45
++    )  # lap 1's generated fallback is consumed even though telemetry has that lap.
+     generated_lap_2 = results[0]["lap_time_ms"] or (85000 + 1 * 140 + rng.randint(-45, 45) + 2 * 3)
+     expected_elapsed = 123456 + generated_lap_2
+     assert first_driver_lap_2["elapsed_ms"] == expected_elapsed
+-    assert first_driver_lap_2["ts"] == session["started_at"] + timedelta(milliseconds=expected_elapsed)
++    assert first_driver_lap_2["ts"] == session["started_at"] + timedelta(
++        milliseconds=expected_elapsed
++    )
+     assert recorded["lap_time_ms"] == 123456
+ 
+ 
+@@ -570,9 +618,11 @@ def test_simulation_stop_clears_pending_pit_reservations(monkeypatch):
+     monkeypatch.setattr(main_module, "mongo_ready", lambda: object())
+     monkeypatch.setattr(main_module, "cancel_automatic_pit_reservations", lambda *_: None)
+     try:
+-        result = asyncio.run(main_module.control_simulation(
+-            session_id, main_module.SimulationControl(action="stop"), user={"role": "ADMIN"}
+-        ))
++        result = asyncio.run(
++            main_module.control_simulation(
++                session_id, main_module.SimulationControl(action="stop"), user={"role": "ADMIN"}
++            )
++        )
+         assert result["state"] == sim.status == "stopped"
+         assert sim.pit_reservations_by_driver == {}
+     finally:
+@@ -581,22 +631,26 @@ def test_simulation_stop_clears_pending_pit_reservations(monkeypatch):
+ 
+ def test_reservation_requires_timezone_and_status_endpoint_exists():
+     with pytest.raises(ValidationError):
+-        ReservationIn.model_validate({
+-            "pit_box_id": "a2100000-0000-4000-8000-000000000001",
+-            "session_id": "a2100000-0000-4000-8000-000000000002",
+-            "team_id": "a2100000-0000-4000-8000-000000000003",
+-            "starts_at": "2026-10-05T10:00:00",
+-            "ends_at": "2026-10-05T11:00:00Z",
+-        })
++        ReservationIn.model_validate(
++            {
++                "pit_box_id": "a2100000-0000-4000-8000-000000000001",
++                "session_id": "a2100000-0000-4000-8000-000000000002",
++                "team_id": "a2100000-0000-4000-8000-000000000003",
++                "starts_at": "2026-10-05T10:00:00",
++                "ends_at": "2026-10-05T11:00:00Z",
++            }
++        )
+     paths = set(app.openapi()["paths"])
+     assert "/api/pit-reservations/{reservation_id}" in paths
+     assert "/api/pit-reservations/auto" in paths
+     with pytest.raises(ValidationError):
+-        AutoReservationIn.model_validate({
+-            "session_id": "a2100000-0000-4000-8000-000000000001",
+-            "team_id": "a2100000-0000-4000-8000-000000000002",
+-            "pit_box_id": "a2100000-0000-4000-8000-000000000003",
+-        })
++        AutoReservationIn.model_validate(
++            {
++                "session_id": "a2100000-0000-4000-8000-000000000001",
++                "team_id": "a2100000-0000-4000-8000-000000000002",
++                "pit_box_id": "a2100000-0000-4000-8000-000000000003",
++            }
++        )
+ 
+ 
+ def test_reservation_status_transition_closes_only_reserved_booking(monkeypatch):
+@@ -608,19 +662,33 @@ def test_reservation_status_transition_closes_only_reserved_booking(monkeypatch)
+         def __init__(self, status):
+             self.status = status
+             self.row = None
+-        def __enter__(self): return self
+-        def __exit__(self, *_): pass
++
++        def __enter__(self):
++            return self
++
++        def __exit__(self, *_):
++            pass
++
+         def execute(self, sql, params):
+             if sql.lstrip().startswith("SELECT"):
+-                self.row = {"status": self.status, "principal_user_id": "principal-1", "session_id": "session-1"}
++                self.row = {
++                    "status": self.status,
++                    "principal_user_id": "principal-1",
++                    "session_id": "session-1",
++                }
+             else:
+                 self.status = params[0]
+                 self.row = {"id": "reservation-1", "status": self.status, "session_id": "session-1"}
+-        def fetchone(self): return self.row
++
++        def fetchone(self):
++            return self.row
+ 
+     class Connection:
+-        def __init__(self, status): self.cursor_instance = Cursor(status)
+-        def cursor(self, **_): return self.cursor_instance
++        def __init__(self, status):
++            self.cursor_instance = Cursor(status)
++
++        def cursor(self, **_):
++            return self.cursor_instance
+ 
+     cursor_conn = Connection("RESERVED")
+     @contextmanager
