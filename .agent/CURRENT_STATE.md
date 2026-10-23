@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: caf033f
+git_head: 31e5494
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -52,3 +52,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T44134 requiredoneimportpathrepairafterrecorderexposedcollectionerror; corrected123lines,2PASS4expectedFAIL0errors/skips. T44133red12collected1PASS11expectedFAIL; T321CORS3PASS/ruff/format0. T44129healthimplementationrunning; T44135repo unittestredqueued.
 
 - T44129FAILED5PASS1testexpectationbug: missing_lease503 expectedallservicesup contraryADR011down. Productdiff36linesheldinclone; W3T44136correctsexpectation(noassertionweakening) beforehealthreverify.
+
+- T-44136 accepted31e5494: Mapped missing_lease to runtime_lease=down in the expected readiness services; retained all cases and assertions. Verify exit0; 2 changed lines.

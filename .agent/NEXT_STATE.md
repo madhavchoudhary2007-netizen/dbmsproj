@@ -3,11 +3,6 @@ updated_at: 2026-10-23
 phase: 2 security (Phase1 complete; baseline score51.2974)
 
 ## Queue
-### T-44136 W3 — OPEN
-- target_files: backend/tests/test_security_headers.py
-- contract: Correct the new readiness test's missing_lease expectation only. Current parameter 'missing_lease' isn't servicekey, so expectedstatus503 butallservicesup contradictADR011. Map missing_lease to runtime_lease then markthatservice down. Preserve every assertion and allothercases. T44129 productimplementationstaysunacceptedinownclone untilthisfix.
-- verify: .venv/bin/ruff check backend/tests/test_security_headers.py && .venv/bin/ruff format --check backend/tests/test_security_headers.py && .venv/bin/python .agent/check-red-tests.py T-44136 backend/tests/test_security_headers.py
-
 ### T-44135 W3 — OPEN
 - target_files: backend/tests/test_token_revocation.py
 - contract: Add failing-first offline repository tests for ADR008 mapping/SQL and outage, as bounded childT323. New module not yetexists; import dynamically inside eachtest and assert find_spec notNone, so red failures are assertions, notcollectionerrors. Mock database calls entirely. Cover opaquejti +UUIDform deterministicuuid5mapping, parameterized select ofunexpired revocation, insertboundkey+expiryONCONFLICT, purgeonlyexpired, errorspropagatenotfalse. <=140lines.
@@ -22,6 +17,7 @@ phase: 2 security (Phase1 complete; baseline score51.2974)
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44136 accepted31e5494; verify0.
 - T-321 acceptedcaf033f; verify0.
 - T-44134 accepted749f9c5; verify0.
 - T-44133 accepted091e4de; verify0.
