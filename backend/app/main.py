@@ -14,7 +14,7 @@ from concurrent.futures import Future, ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeout
 from contextlib import asynccontextmanager, suppress
 from datetime import UTC, datetime, timedelta
-from typing import Any, Literal
+from typing import Any, Literal, TypedDict
 from uuid import UUID, uuid4
 
 import jwt
@@ -1871,9 +1871,17 @@ async def session_ws(ws: WebSocket, session_id: UUID):
 app.include_router(create_analytics_router(current_user, jsonable))
 
 
-@app.get("/api/health")
-def health():
-    state = {"postgres": "down", "mongodb": "down"}
+class HealthReport(TypedDict):
+    status: Literal["ok", "degraded"]
+    services: dict[str, Literal["up", "down"]]
+
+
+@app.get("/api/health", response_model=None)
+def health() -> HealthReport:
+    state: dict[str, Literal["up", "down"]] = {
+        "postgres": "down",
+        "mongodb": "down",
+    }
     with suppress(Exception):
         fetch_one("SELECT 1 AS ok")
         state["postgres"] = "up"

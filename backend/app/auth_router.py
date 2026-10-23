@@ -16,7 +16,9 @@ from .login_limiter import LoginLimiter
 from .schemas_auth import Login
 
 
-def _purge_revocations(limiter: LoginLimiter, account: str, source: str, token: str) -> None:
+def _purge_revocations(
+    limiter: LoginLimiter, account: str, source: str, token: object | None
+) -> None:
     try:
         token_revocation.purge_expired_revocations()
     except Exception:
