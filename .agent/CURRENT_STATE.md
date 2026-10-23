@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 2429939
+git_head: fd42784
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -8,18 +8,18 @@ archetype: Neo-Brutal Motorsport (light), ADR-007 approved
 last_eval_score: no verified overhaul score; historical100 omits new gates
 
 ## Phase and verified facts
-- Phase0 complete T-300e465e89/T-30113e6100/T-30259a180e; owner "ok approved continue"/"dont stop you have all permissions". ADR007 activation locked9010959b; boot/lock0. Caller-default harness and actual Codex ORCH_MODEL set; worker bindings/cap unchanged; owner Claude433000 settings preserved.
-- Phase1 T-311 accepted8570e58:full backend-tests Ruff and strict frontend lint0; scripts/eval Python Ruff separately0. T-310 remains OPEN until full app Ruff/format0; atomic children are not parent passes. T-312 typing/T-313CI thenT-314 scorer follow per dependency graph.
-- Latest complete Ruff baseline330(main213,test_api98,demo15,config4), before T-4482/4483. Initial542/format25files/frontend2any. Fresh mypy222 in14files/31checked. Audit7high2moderate remains prior documented until rerun.
-- Database tests entire file Ruff+format0, AST unchanged, acceptedT-46012e8ea1 after bounded formatting packets.
-- Routers/bootstrap/schemas/CRUD/telemetry/pit/archive scoped Ruff+format0. T-458fe83d11 safely quotes SQL identifiers with psycopg composables and bound values; precise count_documents Protocol. Telemetry/archive formatting AST identical.
-- T-453301a40c main dependency bindings; T-45772973d1 UTC/annotations/local/zip modernisation; T-4595601bbd bootstrap format; T-4482a20f2a0 reusable payload+record guards C901<=10. Entire OpenAPI remains identical SHA60d831ab5cc96051d2fa2caa9b4a2f25d89a6444c05c2a5ceed0aaf8c660346b, last checked afterT-4482.
-- T-44812cf7b01 demo deletion guard formatting/literals: entire AST+SQL content unchanged. T-4483bfad8d0 narrow seeded RNG/JWT validation fixture lint exceptions, unchanged AST; pyproject comments document reasons, no rule/threshold relaxation.
-- Frontend lint/typecheck0 after T-4436cca3aa (two explicit-any replacements); spacing/banned/motion0. Neo lint NOT_RUN untilT-360. Existing FPS17.0ms must tighten to16.7 atT-413; no performance pass claimed.
-- Full disposable backend/live gates repeatedly pass136tests,0 failed/skipped/xfailed; login/session/simulation/Mongo/WS/pits/trigger/results/standings/DBMS/generated races PASS. Latest afterT-458/T-4480: .agent/results/T-4480-T-458.retry.full.raw.log exit0.
-- T-44804a3ab7f fixes verifier API launch with exec, so cleanup waits actual API PID. After full gate, listener18000 check exit1 confirms none. Previous T-442/T-458 lease failures104passed/32failed came from orphaned disposable API children (ports15432/27018/18000 only, PPID1), not product assertions. PID79496 gracefully terminated; PID11698 self-exited before TERM attempt.
-- T-4482 full disposable gate exit0:136passed,0skips, all live acceptance PASS; no API listener afterward (exit1). Repeated-run cleanup defect resolved. Formatting continues in isolated clones.
-- T-449 initial formatter188>150 and T-448 initial152>150 rejected/reverted; each repair narrowed scope and passed, parent gates unchanged. T-460 reported3 static checks as tests; corrected to0 collected tests before saving.
+- Phase0 complete T-300e465e89/T-30113e6100/T-30259a180e; owner approved in chat, ADR007 activated and lock9010959b/boot0. Codex harness/profile and cap verified; owner Claude433000 settings preserved.
+- Phase1 T-311 accepted8570e58: backend-tests Ruff and strict frontend lint0; scripts/eval Ruff separately0. T-310 OPEN: only main.py remaining, last26 findings beforeT-44110 (C9015,S6082,SIM1172 plus cleanup rules). All other backend files Ruff+format0.
+- T-44110 acceptedfd42784: explicit existing exception suppression preserves classes/order; health degraded contract retained, pit409 cause explicit, UP034 cleaned, non-security lock-demo RNG narrowly justified. Remaining expected9 findings(C9015/S6082/SIM1172); full gate running .agent/results/T-44110.full.raw.log.
+- Main and demo entire formatting completeT-4410119620dd; test_api full formatting/E501 completeT-44106c6e5749. All formatting/literal children verified exact AST/SQL/unchanged directives (or canonical content), <=150 changed lines each.
+- T-44108a893c67 uses UTC alias: normalized AST proves no other change,2 focused simulation tests passed. T-44109d9258cb extracts2Cursor fixture factories: exact class/assertion AST/counts preserved,3 focused tests pass; test_api full Ruff/format0.
+- T-441072429939 demo/config Ruff+format0; non-import AST and parsed TOML identical. Public local-only fallback and JWT guard values unchanged, no secret values printed. Narrow seeded-RNG/S105 reasons only, no global rule change.
+- CRUD safe identifiers T-458fe83d11 and reusable guards T-4482a20f2a0 accepted. Main dependencies T-453301a40c and UTC/local modernisation accepted. OpenAPI SHA remains60d831ab5cc96051d2fa2caa9b4a2f25d89a6444c05c2a5ceed0aaf8c660346b, last checked afterT-44110.
+- Full isolated backend/live gates repeatedly pass136 tests,0failed/skipped/xfailed. All login/session/simulation/Mongo/WS/pit/trigger/results/standings/DBMS/generated-race flows PASS. Latest completed afterT-4482 includes CRUD guards, T-44110 rerun pending.
+- Verifier cleanup defect fixedT-44804a3ab7f: exec makes API_PID actual API, cleanup waits it. Two subsequent full runs leave no18000listener(exit1). Prior orphan lease failures104pass/32failed were disposable API children, not product assertions; no real DB touched.
+- Frontend lint/typecheck and existing spacing/banned/motion0. Neo lint NOT_RUN untilT-360; FPS17.0ms must tighten to16.7 atT-413; no performance/overhaul score claimed.
+- Fresh strict mypy baseline222 in14/31files (main171); T-312 follows T-310. Prior audit7high2moderate unrefreshed. T-313CI thenT-314F7/F8/F9 scorer follow graph.
+- Rejected cap overruns T-449188,T-448152,T-44110212 were reverted in clones and scope split repairs passed. T-44110 SIM117 merges deferredT-44112. T-460 static3checks misreported as tests corrected to0; T-4490 expanded initial28lines to140 for efficiency.
 
 ## Execution and contracts
 - Only overhaul/neo-brutal, no merges/history rewrites. Only accept.sh commits. Preserve all routes/features/copy/hooks/aria/stateclasses/hash routes. API additions need own ADR and owner approval; no existing shape/path changes.
@@ -29,8 +29,6 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 - Root scripts/agent/lock.sh auto-commits; canonical lock banner reproduced without Git tail then verify-lock/accept only. Script preserved.
 
 ## Deferred gaps
-- T-440 before motion: align plan2.3 display min40 vs leading>=48 and2.7 durations with hard100–300ms.
-- T-441 before palette: real heading contrast<=1 currently filtered; regression must retain4.5 threshold and omit only decorative aria-hidden duplicates. Bands50–70/20–40/5–15 unchanged.
 - T-325 is test-only W3 despite plan W2 label. Oversized plan rows split into bounded packets.
 
 ## Orchestrator direct edits
@@ -52,27 +50,15 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 
 
 
-- Formatting children T-4484..T-44100 accepted via accept.sh, exact AST/canonical contents retained, <=150 per packet. Current formatter debt main43/test_api331. Latest full Ruff119(main64/test_api36/demo15/config4), down from542. No current score claimed.
 
-- T-44101 accepted19620dd: Completed main and demo repository canonical formatting preserving both ASTs and contents. Verify exit0; 103 changed lines.
-- Added .agent/check-lint-progress.py: bounded literal/comment cleanup requires unchanged AST/directives, strict selected-rule count decrease and format0. Parent all-rules zero gate remains mandatory. Main+demo full formatting completedT-44101; main61 findings remain, demo13/config4, before literal cleanup.
 
-- T-44102 accepted111241c: Advanced148 lines of canonical API-test formatting with identical AST and canonical contents. Verify exit0; 148 changed lines.
 
-- T-44104 accepted639e5a9: Advanced142 lines of canonical API-test formatting with identical AST and canonical contents. Verify exit0; 142 changed lines.
-- Formatter moved four existing test RNG noqa pragmas away from offending call lines; narrow S311 findings resurfaced without behavior/AST change. T-44106 restores precise pragma placement while finishing format/E501; no new ignored rule.
 
-- T-44103 accepted307771a: Resolved26 main E501 findings preserving AST and directives; format remains green. Verify exit0; 150 changed lines.
 
-- T-44106 acceptedc6e5749: Completed API-test formatting and E501 cleanup; restored exact RNG pragma locations with unchanged AST. Verify exit0; 63 changed lines.
 
-- T-44108 accepteda893c67: Used equivalent UTC aliases and preserved all other test AST; two focused simulation tests pass. Verify exit0; 28 changed lines.
 
-- T-44105 accepted41a5b46: Resolved all remaining15 main E501 findings preserving AST and directives. Verify exit0; 62 changed lines.
 
-- T-44109 acceptedd9258cb: Extracted two exact Cursor fixture classes; full API-test Ruff/format and3 focused tests pass. Verify exit0; 41 changed lines.
 
 - T-311 accepted8570e58: Full backend-test and strict frontend lint milestone passes without source changes. Verify exit0; 0 changed lines.
 
-- T-44107 accepted2429939: Cleaned demo/config lint preserving non-import AST and parsed TOML; narrow documented exceptions only. Verify exit0; 59 changed lines.
-- T-44110 first FAILED:212 changed lines exceeded150 despite selected checks0. Clone reverted; repair1 defers SIM117 context merges, retains exact scopes. No root product diff from failed attempt.
+

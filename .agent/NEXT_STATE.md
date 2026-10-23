@@ -3,17 +3,18 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-44110 — explicit best-effort cleanup constructs
-- worker: W2 | priority: P1 | origin: bounded T-310 subdivision
+### T-44112 — equivalent lock-demo context merge
+- worker: W2 | priority: P1 | origin: deferred T-44110 scope split
 - target_files: backend/app/main.py
-- contract: exact exception scopes/order, with equivalence, pit409 cause, specific demo RNG justification
-- verify: .venv/bin/ruff check --select SIM105,S110,B904,S311,UP034 backend/app/main.py && .venv/bin/ruff format --check backend/app/main.py
+- contract: identical context order and normalized AST; <=150 lines
+- verify: .venv/bin/ruff check --select SIM117 backend/app/main.py && .venv/bin/ruff format --check backend/app/main.py
 ## Blocked
 - T-310 remains open until full app Ruff/format exit0; T-311 accepted8570e58; no intermediate count is a parent pass.
 - T-440 (O, before motion packets): align plan2.3/2.7 with owner100–300ms and display>=48px leading limits; those conflicting catalogue specifications are missing a correction task.
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-44110 acceptedfd42784; verify0.
 - T-44107 accepted2429939; verify0.
 - T-311 accepted8570e58; verify0.
 - T-44109 acceptedd9258cb; verify0.

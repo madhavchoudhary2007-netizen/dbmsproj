@@ -1,0 +1,151 @@
+diff --git a/backend/app/main.py b/backend/app/main.py
+index 431d4c1..e96f64f 100644
+--- a/backend/app/main.py
++++ b/backend/app/main.py
+@@ -2392,78 +2392,76 @@ def dbms_lock_demo(user=admin_dependency):
+         worker = ThreadPoolExecutor(max_workers=1, thread_name_prefix="apexgrid-lock-demo")
+ 
+         def competing_reservation():
+-            with connection() as conn:
+-                with conn.transaction():
+-                    conn.execute("SET LOCAL lock_timeout='8s'")
+-                    pid = conn.execute("SELECT pg_backend_pid() AS pid").fetchone()["pid"]
+-                    competitor["pid"] = pid
+-                    ready.set()
+-                    started = time.perf_counter()
+-                    try:
+-                        row = conn.execute(
+-                            "SELECT reserve_pit_box(%s,%s,%s,%s,%s) AS id",
+-                            (
+-                                target["pit_box_id"],
+-                                target["session_id"],
+-                                target["team_id"],
+-                                starts_at,
+-                                ends_at,
+-                            ),
+-                        ).fetchone()
+-                        return {
+-                            "outcome": "reserved",
+-                            "reservation_id": row["id"],
+-                            "sqlstate": None,
+-                            "wait_ms": round((time.perf_counter() - started) * 1000, 2),
+-                            "pid": pid,
+-                        }
+-                    except ExclusionViolation as exc:
+-                        return {
+-                            "outcome": "rejected",
+-                            "reservation_id": None,
+-                            "sqlstate": exc.sqlstate,
+-                            "wait_ms": round((time.perf_counter() - started) * 1000, 2),
+-                            "pid": pid,
+-                        }
+-                    except Exception as exc:
+-                        return {
+-                            "outcome": "error",
+-                            "reservation_id": None,
+-                            "sqlstate": getattr(exc, "sqlstate", None),
+-                            "wait_ms": round((time.perf_counter() - started) * 1000, 2),
+-                            "pid": pid,
+-                            "error": type(exc).__name__,
+-                        }
++            with connection() as conn, conn.transaction():
++                conn.execute("SET LOCAL lock_timeout='8s'")
++                pid = conn.execute("SELECT pg_backend_pid() AS pid").fetchone()["pid"]
++                competitor["pid"] = pid
++                ready.set()
++                started = time.perf_counter()
++                try:
++                    row = conn.execute(
++                        "SELECT reserve_pit_box(%s,%s,%s,%s,%s) AS id",
++                        (
++                            target["pit_box_id"],
++                            target["session_id"],
++                            target["team_id"],
++                            starts_at,
++                            ends_at,
++                        ),
++                    ).fetchone()
++                    return {
++                        "outcome": "reserved",
++                        "reservation_id": row["id"],
++                        "sqlstate": None,
++                        "wait_ms": round((time.perf_counter() - started) * 1000, 2),
++                        "pid": pid,
++                    }
++                except ExclusionViolation as exc:
++                    return {
++                        "outcome": "rejected",
++                        "reservation_id": None,
++                        "sqlstate": exc.sqlstate,
++                        "wait_ms": round((time.perf_counter() - started) * 1000, 2),
++                        "pid": pid,
++                    }
++                except Exception as exc:
++                    return {
++                        "outcome": "error",
++                        "reservation_id": None,
++                        "sqlstate": getattr(exc, "sqlstate", None),
++                        "wait_ms": round((time.perf_counter() - started) * 1000, 2),
++                        "pid": pid,
++                        "error": type(exc).__name__,
++                    }
+ 
+         wait_observed = False
+-        with connection() as owner:
+-            with owner.transaction():
+-                owner.execute("SET LOCAL lock_timeout='8s'")
+-                first_reservation_id = owner.execute(
+-                    "SELECT reserve_pit_box(%s,%s,%s,%s,%s) AS id",
+-                    (
+-                        target["pit_box_id"],
+-                        target["session_id"],
+-                        target["team_id"],
+-                        starts_at,
+-                        ends_at,
+-                    ),
+-                ).fetchone()["id"]
+-                future = worker.submit(competing_reservation)
+-                if not ready.wait(timeout=2):
+-                    raise HTTPException(503, "Second database connection did not become ready")
+-                # The worker publishes its backend PID just before it issues the blocking function.
+-                # Observe the database wait itself before committing the first reservation.
+-                deadline = time.monotonic() + 3
+-                while time.monotonic() < deadline:
+-                    lock_row = owner.execute(
+-                        "SELECT wait_event_type FROM pg_stat_activity WHERE pid=%s",
+-                        (competitor["pid"],),
+-                    ).fetchone()
+-                    if lock_row and lock_row["wait_event_type"] == "Lock":
+-                        wait_observed = True
+-                        break
+-                    time.sleep(0.025)
++        with connection() as owner, owner.transaction():
++            owner.execute("SET LOCAL lock_timeout='8s'")
++            first_reservation_id = owner.execute(
++                "SELECT reserve_pit_box(%s,%s,%s,%s,%s) AS id",
++                (
++                    target["pit_box_id"],
++                    target["session_id"],
++                    target["team_id"],
++                    starts_at,
++                    ends_at,
++                ),
++            ).fetchone()["id"]
++            future = worker.submit(competing_reservation)
++            if not ready.wait(timeout=2):
++                raise HTTPException(503, "Second database connection did not become ready")
++            # The worker publishes its backend PID just before it issues the blocking function.
++            # Observe the database wait itself before committing the first reservation.
++            deadline = time.monotonic() + 3
++            while time.monotonic() < deadline:
++                lock_row = owner.execute(
++                    "SELECT wait_event_type FROM pg_stat_activity WHERE pid=%s",
++                    (competitor["pid"],),
++                ).fetchone()
++                if lock_row and lock_row["wait_event_type"] == "Lock":
++                    wait_observed = True
++                    break
++                time.sleep(0.025)
+         try:
+             outcome = future.result(timeout=9) if future else None
+         except FutureTimeout as exc:
