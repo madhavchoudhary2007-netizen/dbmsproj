@@ -73,7 +73,13 @@ def packet(**overrides):
 
 
 @pytest.fixture
-def auth_characterization_client():
+def auth_characterization_client(monkeypatch):
+    from backend.app import token_revocation
+
+    revoked = set()
+    monkeypatch.setattr(token_revocation, "is_revoked", lambda jti: jti in revoked)
+    monkeypatch.setattr(token_revocation, "revoke_token", lambda jti, _expires_at: revoked.add(jti))
+    monkeypatch.setattr(token_revocation, "purge_expired_revocations", lambda: None)
     return TestClient(app)
 
 

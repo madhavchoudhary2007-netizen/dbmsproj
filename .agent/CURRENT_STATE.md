@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 4b6a0fd
+git_head: a12bc68
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -31,32 +31,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - P3legacytoolreturns0butcountsroot+pageonly; shared/layoutassets omitted, do notclaimbudgetuntilT44132fix. LighthouseCLIabsent(P1/P2NOT_RUN). FPS17ms checkdoesnotprove16.7msuntilT413.
 - Ownacceptanceboundaryerrors fromgeneratednext-env andprematureparallelpatch application were reconciled by restoringonlyowngenerateddiff/deferringsecondpatch; workeroutputsinscope.
 
-- T-44123 acceptedfd18bfd: Recorded fresh functional evidence for F-1 through F-9 with the required IDs and weights; retained the F-4 and F-8 failures and disclosed npm moderate vulnerabilities. Verify exit0; 58 changed lines.
-
-- T-44124 accepted1d5cb48: Recorded fresh aesthetic evidence for A-1 through A-7 with exact rubric weights; preserved A-5 and A-6 judgments. Verify exit0; 46 changed lines.
-
-- T-44125 accepted4eed78c: Recorded all six performance checks with their specified weights and evidence-based results; artifact is 40 lines. Verify exit0; 40 changed lines.
-
-- T-44126 acceptedc2eb8d2: Recorded fresh edge-check evidence from the current E2E specs and full rerun; E-1 and E-2 remain false because coverage is incomplete. Verify exit0; 34 changed lines.
-
-- T-44130 acceptedce4b44b: Recorded additive health ADR011 and early health dependency slice with focused architecture review and lock. Verify exit0; 37 changed lines.
-
-- T44134 firstresultFAILED because orchestrator-created redrecorder was not yet committed into clone. Product/testdiffinscope; infrastructure-only failure. Root linked read-only helper into bothsecuritytestclones, willrerun exactverify ratherthan re-dispatch (packets failed-result rule).
-
-- T-44133 accepted091e4de: Added failing-first tests for CORS defaults and wildcard rejection, security headers and HSTS, and liveness/readiness probes. The red recorder confirmed 11 expected failures, 1 pass, 0 errors, and 0 skips. Verify exit0; 148 changed lines.
-
-- T-44134 accepted749f9c5: Added the workspace root to sys.path inside the fixture before importing the app. The recorder captured the expected offline red baseline: 2 passed, 4 failed, 0 errors, 0 skipped. Verify exit0; 123 changed lines.
-
-- T-321 acceptedcaf033f: Default CORS allow-list now includes localhost and loopback origins. Config import raises a clear CORS_ORIGINS error if the allow-list contains '*'. Verify exit0; 6 changed lines.
-
-- T44134 requiredoneimportpathrepairafterrecorderexposedcollectionerror; corrected123lines,2PASS4expectedFAIL0errors/skips. T44133red12collected1PASS11expectedFAIL; T321CORS3PASS/ruff/format0. T44129healthimplementationrunning; T44135repo unittestredqueued.
-
-- T44129FAILED5PASS1testexpectationbug: missing_lease503 expectedallservicesup contraryADR011down. Productdiff36linesheldinclone; W3T44136correctsexpectation(noassertionweakening) beforehealthreverify.
-
-- T-44136 accepted31e5494: Mapped missing_lease to runtime_lease=down in the expected readiness services; retained all cases and assertions. Verify exit0; 2 changed lines.
-
-- T-44129 accepteda3c0554: Added typed liveness and readiness endpoints, with an exact-path lease middleware bypass. Readiness reuses health() and reports missing or invalid leases as down; liveness returns no-store. Verify exit0; 36 changed lines.
-
-- T-44135 accepted7afadff: Added five offline, failing-first repository tests for deterministic jti mapping, bound lookup and write SQL, expired-only purge, and database error propagation. The red-test recorder confirmed five assertion failures with no errors or skips. Verify exit0; 115 changed lines.
-
-- T-44137 accepted4b6a0fd: Added deterministic JWT revocation keys, parameterized lookup/insert/purge operations, and idempotent table and expiry-index DDL. Verify exit0; 37 changed lines.
+- Phase1 fresh dimension artifactsT44123..26 accepted; historical commit detail in git. ADR011T44130/lockdb26; only2newhealthpaths acceptedT44129a3c0554 with6PASS and exactexistingOpenAPI preservation. T44136 fixed missingleaseexpecteddown testbug beforeacceptance.
+- Phase2 T44133/T44134 redtests accepted; T321CORS3PASS; T44135repo5red thenT44137repository/migration37lines5PASS/mypy0. T322all12header/CORS/healthPASS,mypy0. Migration004notyetapplied. No authoredorchestratorproductlines.

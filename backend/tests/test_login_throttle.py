@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 def _client(monkeypatch, *, users=None, host="192.0.2.1"):
     users = users or {}
     monkeypatch.setattr("app.auth_router.bcrypt.checkpw", lambda *_: False)
+    monkeypatch.setattr("app.token_revocation.purge_expired_revocations", lambda: None)
 
     def fetch_one(_query, params=()):
         return users.get(params[0].lower())

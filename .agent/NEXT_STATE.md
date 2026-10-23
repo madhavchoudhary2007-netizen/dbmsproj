@@ -3,15 +3,21 @@ updated_at: 2026-10-23
 phase: 2 security (Phase1 complete; baseline score51.2974)
 
 ## Queue
-### T-322 W2 — OPEN
-- target_files: backend/app/security_headers.py, backend/app/main.py
-- contract: Implement pureASGI security headers perT322, newmodule andmainregistration. AllHTTPresponses including404 and middleware503 getheaders. Preserve existingCORS/auth/lease. HSTS enabled only os.getenv('COOKIE_SECURE')=='1'; do notchange existingsecurecookiebehavior (separateexistingproductionflag). No HSTS withflagabsent/0.
-- verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/pytest -q backend/tests/test_security_headers.py && .venv/bin/ruff check backend/app/security_headers.py backend/app/main.py && .venv/bin/ruff format --check backend/app/security_headers.py backend/app/main.py && .venv/bin/mypy --strict backend/app/security_headers.py
+### T-44139 W3 — OPEN
+- target_files: backend/tests/test_api.py, backend/tests/test_login_throttle.py
+- contract: Keep existing database-independent auth tests offline when ADR008 adds repositorycalls. Patch auth_characterization_client fixture toper-test in-memoryrevokedset using backend.app.token_revocation dynamicfunctions, and _client loginthrottle helper tostub app.token_revocation.purge_expired_revocations. No assertionsremoved/changed; no databaseintegrationfixturespatched. Preserve logoutreuse behavior tests alreadyexpectunauthorized.
+- verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/pytest -q backend/tests/test_api.py -k 'auth_characterization or cookie_auth' backend/tests/test_login_throttle.py && .venv/bin/ruff check backend/tests/test_api.py backend/tests/test_login_throttle.py && .venv/bin/ruff format --check backend/tests/test_api.py backend/tests/test_login_throttle.py
+
+### T-44138 W2 — OPEN
+- target_files: backend/app/main.py, backend/app/auth_router.py
+- contract: Wire ADR008 repository into HTTP authentication, logout/login and WS handshake. Keep everyAPIwire/path/method unchanged. This completes T323runtime slice; allnewrevocationunitassertionsgreen. <=150changedlines.
+- verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/pytest -q backend/tests/test_logout_revocation.py backend/tests/test_token_revocation.py backend/tests/test_security_headers.py && .venv/bin/ruff check backend/app/main.py backend/app/auth_router.py && .venv/bin/ruff format --check backend/app/main.py backend/app/auth_router.py
 
 ## Blocked
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-322 accepteda12bc68; verify0.
 - T-44137 accepted4b6a0fd; verify0.
 - T-44135 accepted7afadff; verify0.
 - T-44129 accepteda3c0554; verify0.
