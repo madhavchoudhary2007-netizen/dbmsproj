@@ -106,3 +106,53 @@ test("E-5 offline to online recovery passes with retry", async ({ page, context 
   await expect(errorAlert).not.toBeVisible({ timeout: 5000 });
   await expect(page.getByText("scheduled events")).toBeVisible();
 });
+
+test("E-2 Lens 5 navigation mid-request aborts cleanly without errors", async ({ page }) => {
+  const failures: string[] = [];
+  page.on("pageerror", (err) => failures.push(`pageerror: ${err.message}`));
+  page.on("console", (msg) => {
+    if (msg.type() === "error") failures.push(`console: ${msg.text()}`);
+  });
+
+  await page.route("**/api/**", async (route) => {
+    const pathname = new URL(route.request().url()).pathname;
+    if (pathname === "/api/auth/me") {
+      await route.fulfill({ status: 200, json: adminUser });
+      return;
+    }
+    await new Promise((r) => setTimeout(r, 1000));
+    await route.fulfill({ status: 200, json: {} });
+  });
+
+  void page.goto("/dashboard");
+  await page.waitForTimeout(50);
+  await page.goto("/sessions", { waitUntil: "domcontentloaded" });
+  await expect(page.getByRole("heading", { name: "Sessions" })).toBeVisible();
+
+  expect(failures).toEqual([]);
+});
+
+test("E-2 Lens 5 long unbroken string wraps without horizontal overflow", async ({ page }) => {
+  const longString = "A".repeat(140);
+  await page.route("**/api/**", async (route) => {
+    const pathname = new URL(route.request().url()).pathname;
+    if (pathname === "/api/auth/me") {
+      await route.fulfill({ status: 200, json: adminUser });
+      return;
+    }
+    if (pathname === "/api/championships") {
+      await route.fulfill({ status: 200, json: [{ id: 1, name: longString, season: 2026 }] });
+      return;
+    }
+    await route.fulfill({ status: 200, json: [] });
+  });
+
+  await page.goto("/championships", { waitUntil: "domcontentloaded" });
+  await expect(page.getByText(longString)).toBeVisible();
+
+  const extent = await page.evaluate(() => ({
+    document: document.documentElement.scrollWidth,
+    viewport: document.documentElement.clientWidth,
+  }));
+  expect(extent.document).toBeLessThanOrEqual(extent.viewport + 1);
+});

@@ -3,11 +3,11 @@ updated_at: 2026-10-23T08:25:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-198 — verify P-3 route initial JS <= 170 KB gzip
-- worker: W3 | priority: P1 | origin: EVAL score P-3
-- target_files: scripts/eval/verify-bundle-size.py
-- contract: verify all routes have initial JS <= 170 KB gzip
-- verify: python3 scripts/eval/verify-bundle-size.py && python3 -c "import json; d=json.load(open('.agent/eval/performance.json')); assert any(c['id']=='P-3' and c['passed'] for c in d['checks'])"
+### T-199 — add Lens 5 edge tests in edge-resilience.spec.ts
+- worker: W3 | priority: P1 | origin: EVAL score E-2
+- target_files: frontend/e2e/edge-resilience.spec.ts
+- contract: add Lens 5 tests for navigation mid-request and long unbroken string wrapping without overflow
+- verify: PLAYWRIGHT_PORT=32145 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts edge-resilience.spec.ts --project=desktop-1440 && git checkout -- frontend/next-env.d.ts frontend/AGENTS.md
 
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
@@ -16,6 +16,7 @@ loop_iteration: 0 of 8
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-198 ✓ 6cbe188; added verify-bundle-size.py and verified P-3 route initial JS <= 170 KB gzip.
 - T-197 ✓ a24c8d2; recorded E-4 and E-5 passed in edge.json based on edge-resilience.spec.ts.
 - T-196 ✓ ff1bd91; added E2E tests for E-4 (rapid input spam) and E-5 (offline-to-online recovery) in edge-resilience.spec.ts.
 - T-195 ✓ abc1f13; recorded F-4 passed in functional.json; 0 failed hard gates.
