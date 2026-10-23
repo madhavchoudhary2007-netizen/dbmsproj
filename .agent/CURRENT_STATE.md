@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 5e9584b
+git_head: 12edd4e
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -35,3 +35,7 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - Phase2 T44133/T44134 redtests accepted; T321CORS3PASS; T44135repo5red thenT44137repository/migration37lines5PASS/mypy0. T322all12header/CORS/healthPASS,mypy0. Migration004notyetapplied. No authoredorchestratorproductlines.
 
 - T-44139 accepted5e9584b: Added per-test in-memory token revocation stubs for auth characterization tests and stubbed expired-revocation cleanup in the login-throttle client. Verify exit0; 9 changed lines.
+
+- T-44138 accepted12edd4e: Wired revocation checks into HTTP authentication and WebSocket handshakes; stored validated claims for logout; added logout revocation and login cleanup with PostgreSQL 503 handling. Verify exit0; 61 changed lines.
+
+- T44138 wiredrevocation accepted12edd4e23PASS; isolated004bootstrap0; fullbackendrunning. Freshmypy220 vs218 exposes2newannotations, T44142 fixesratchet beforephaseclose. T324clonebuild/lint/types0; rootacceptance+browserpending.
