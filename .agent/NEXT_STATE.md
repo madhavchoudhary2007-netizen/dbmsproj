@@ -8,16 +8,12 @@ phase: 1 honest green baseline
 - contract: heading contrast1 mustfail AA4.5; decorativeariahiddenexcluded, transparentancestorsresolved.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
-### T-44115 W2 — OPEN
-- target_files: backend/app/main.py
-- contract: preserve reset/pause/resume behavior, C901zero forhandler/helper.
-- verify: .venv/bin/python -c "import ast,subprocess; p='backend/app/main.py';s=open(p).read(); ns=[n for n in ast.parse(s).body if isinstance(n,(ast.FunctionDef,ast.AsyncFunctionDef)) and n.name in ('control_simulation','_reset_session_simulation')];assert len(ns)==2;subprocess.run(['.venv/bin/ruff','check','--select','C901','--stdin-filename',p,'-'],input=chr(10).join(ast.get_source_segment(s,n) for n in ns),text=True,check=True)" && .venv/bin/ruff format --check backend/app/main.py
-
 ## Blocked
 - T-310 remains open until full app Ruff/format exit0; T-311 accepted8570e58; no intermediate count is a parent pass.
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-44115 accepted0224127; verify0.
 - T-44114 accepted8969b47; verify0.
 - T-440 accepted5248d21; catalogue alignment verify0.
 - T-44113 accepted11595ad; verify0.

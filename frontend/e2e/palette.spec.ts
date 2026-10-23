@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { measurePalette } from "./palette-measure";
 
 const adminUser = {
   id: 999,
@@ -68,54 +69,14 @@ for (const [id, route] of routes) {
 
     await page.goto(route, { waitUntil: "domcontentloaded" });
 
-    const result = await page.evaluate(() => {
-      function parseRgb(colorStr: string): [number, number, number] {
-        const match = colorStr.match(/\d+/g);
-        if (!match || match.length < 3) return [0, 0, 0];
-        return [parseInt(match[0], 10), parseInt(match[1], 10), parseInt(match[2], 10)];
-      }
-
-      function getLuminance(rgb: [number, number, number]): number {
-        const [r, g, b] = rgb.map((c) => {
-          const s = c / 255;
-          return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
-        });
-        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-      }
-
-      function getContrastRatio(l1: number, l2: number): number {
-        const lighter = Math.max(l1, l2);
-        const darker = Math.min(l1, l2);
-        return (lighter + 0.05) / (darker + 0.05);
-      }
-
-      const bodyBg = window.getComputedStyle(document.body).backgroundColor;
-      const bodyBgRgb = parseRgb(bodyBg);
-      const bgLum = getLuminance(bodyBgRgb);
-
-      // Sample headings
-      const headings = Array.from(document.querySelectorAll("h1, h2, h3"));
-      const headingContrasts = headings.map((h) => {
-        const style = window.getComputedStyle(h);
-        const color = parseRgb(style.color);
-        const parentBg = parseRgb(window.getComputedStyle(h.parentElement ?? document.body).backgroundColor);
-        return getContrastRatio(getLuminance(color), getLuminance(parentBg));
-      });
-
-      return {
-        bgLum,
-        headingContrasts,
-      };
-    });
+    const result = await page.evaluate(measurePalette);
 
     // Dark archetype: background luminance <= 0.12
     expect(result.bgLum).toBeLessThanOrEqual(0.12);
 
     // Headings pass AA (>= 4.5:1) against parent when present
     for (const contrast of result.headingContrasts) {
-      if (contrast > 1) {
-        expect(contrast).toBeGreaterThanOrEqual(4.5);
-      }
+      expect(contrast).toBeGreaterThanOrEqual(4.5);
     }
   });
 }
