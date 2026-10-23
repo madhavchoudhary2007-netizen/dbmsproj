@@ -3,11 +3,11 @@ updated_at: 2026-10-23T08:25:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-203 — record A-4 passed in aesthetic.json
-- worker: Orchestrator | priority: P1 | origin: EVAL score A-4
-- target_files: .agent/eval/aesthetic.json
-- contract: record A-4 passed based on data-primary.spec.ts passing 80/80 tests across 16 routes and 5 viewports
-- verify: PLAYWRIGHT_PORT=32145 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts data-primary.spec.ts --project=desktop-1440 && git checkout -- frontend/next-env.d.ts frontend/AGENTS.md
+### T-204 — normalize spacing in globals.css lines 1-700
+- worker: W1 | priority: P1 | origin: EVAL score A-1
+- target_files: frontend/app/globals.css
+- contract: normalize non-scale pixel spacing and convert borders to logical properties in globals.css lines 1-700
+- verify: npm --prefix frontend run lint && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh
 
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
