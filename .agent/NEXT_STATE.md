@@ -3,11 +3,6 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-440 O — IN_REVIEW
-- target_files: docs/overhaul-plan.md
-- contract: catalogue respects locked owner100–300ms and display48px limits.
-- verify: .venv/bin/python -c "from pathlib import Path; s=Path('docs/overhaul-plan.md').read_text(); assert 'clamp(3rem, 1.944rem + 4.507vw, 6rem)' in s; assert all(x not in s for x in ('30s loop','600ms steps','blink, 1s','900ms linear','800ms linear')); assert 'T-440 reconciliation:' in s"
-
 ### T-44114 W2 — OPEN
 - target_files: backend/app/main.py
 - contract: cohesive simulation start extraction preserving behavior; C901 strictly decreases.
@@ -15,10 +10,10 @@ phase: 1 honest green baseline
 
 ## Blocked
 - T-310 remains open until full app Ruff/format exit0; T-311 accepted8570e58; no intermediate count is a parent pass.
-- T-440 (O, before motion packets): align plan2.3/2.7 with owner100–300ms and display>=48px leading limits; those conflicting catalogue specifications are missing a correction task.
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-440 accepted5248d21; catalogue alignment verify0.
 - T-44113 accepted11595ad; verify0.
 - T-44111 acceptedb069dab; verify0.
 - T-44112 accepted518b4b4; verify0.

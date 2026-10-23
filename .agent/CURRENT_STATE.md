@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 11595ad
+git_head: 5248d21
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -72,3 +72,5 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 - T-44113 accepted11595ad: Extracted the principal team authorization guard into one helper called by both reservation handlers. Verify exit0; 17 changed lines.
 
 - T-44113 principal guard inlining proves whole AST equivalent; API SHA unchanged. Latest full gate T-44111.full.raw.log136PASS +all live flowsPASS.
+
+- T-440 accepted5248d21: catalogue now respects48px display/100–300ms; long repeating motion replaced by static ongoing content and event-triggered200ms. Doc-only15lines, no gate changes; existing architecture already requires these limits.
