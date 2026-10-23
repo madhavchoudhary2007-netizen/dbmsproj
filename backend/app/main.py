@@ -42,6 +42,7 @@ from pymongo.collection import Collection
 from pymongo.errors import PyMongoError
 from starlette.middleware.base import RequestResponseEndpoint
 
+from . import token_revocation
 from .analytics_router import create_analytics_router
 from .auth_cookie import verify_csrf_token
 from .auth_router import create_auth_router
@@ -260,6 +261,20 @@ def require_allowed_origin(request: Request):
 bearer_dependency = Depends(bearer)
 
 
+def _token_is_revoked(claims: dict[str, Any], *, fail_closed: bool = False) -> bool:
+    if "jti" not in claims:
+        return False
+    jti = claims["jti"]
+    if not isinstance(jti, str) or not jti:
+        raise ValueError()
+    try:
+        return token_revocation.is_revoked(jti)
+    except Exception:
+        if not fail_closed:
+            raise
+        raise HTTPException(503, "PostgreSQL is unavailable") from None
+
+
 def current_user(
     request: Request,
     credentials: HTTPAuthorizationCredentials | None = bearer_dependency,
@@ -271,6 +286,8 @@ def current_user(
         raise HTTPException(401, "Authentication required", headers={"WWW-Authenticate": "Bearer"})
     try:
         claims = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        if _token_is_revoked(claims, fail_closed=True):
+            raise ValueError()
         user_id = claims.get("sub")
         if not user_id:
             raise ValueError()
@@ -296,6 +313,7 @@ def current_user(
         user = None
     if not user:
         raise HTTPException(401, "Invalid or expired token", headers={"WWW-Authenticate": "Bearer"})
+    request.state.auth_claims = claims
     return jsonable(user)
 
 
@@ -1801,6 +1819,17 @@ async def _wait_for_ws_event(ws: WebSocket, queue: asyncio.Queue[Any]) -> dict[s
                 return None
 
 
+def _websocket_authenticated_user(token: str) -> Any:
+    claims = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    if _token_is_revoked(claims):
+        return None
+    return (
+        fetch_one("SELECT id FROM users WHERE id=%s", (claims.get("sub"),))
+        if claims.get("sub")
+        else None
+    )
+
+
 @app.websocket("/api/ws/sessions/{session_id}")
 async def session_ws(ws: WebSocket, session_id: UUID):
     if not await _check_ws_runtime_lease(ws):
@@ -1817,12 +1846,7 @@ async def session_ws(ws: WebSocket, session_id: UUID):
         await ws.close(code=4401, reason="Expected apexgrid.jwt subprotocol and bearer token")
         return
     try:
-        claims = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        user = (
-            fetch_one("SELECT id FROM users WHERE id=%s", (claims.get("sub"),))
-            if claims.get("sub")
-            else None
-        )
+        user = _websocket_authenticated_user(token)
     except Exception:
         user = None
     if not user:

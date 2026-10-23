@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: a12bc68
+git_head: 5e9584b
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -33,3 +33,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 
 - Phase1 fresh dimension artifactsT44123..26 accepted; historical commit detail in git. ADR011T44130/lockdb26; only2newhealthpaths acceptedT44129a3c0554 with6PASS and exactexistingOpenAPI preservation. T44136 fixed missingleaseexpecteddown testbug beforeacceptance.
 - Phase2 T44133/T44134 redtests accepted; T321CORS3PASS; T44135repo5red thenT44137repository/migration37lines5PASS/mypy0. T322all12header/CORS/healthPASS,mypy0. Migration004notyetapplied. No authoredorchestratorproductlines.
+
+- T-44139 accepted5e9584b: Added per-test in-memory token revocation stubs for auth characterization tests and stubbed expired-revocation cleanup in the login-throttle client. Verify exit0; 9 changed lines.

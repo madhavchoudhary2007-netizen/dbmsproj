@@ -9,10 +9,29 @@ import bcrypt
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 
+from . import token_revocation
 from .auth_cookie import clear_auth_cookies, create_csrf_token, set_auth_cookies
 from .config import JWT_ALGORITHM, JWT_MINUTES, JWT_SECRET
 from .login_limiter import LoginLimiter
 from .schemas_auth import Login
+
+
+def _purge_revocations(limiter: LoginLimiter, account: str, source: str, token: str) -> None:
+    try:
+        token_revocation.purge_expired_revocations()
+    except Exception:
+        limiter.release(account, source, token)
+        raise HTTPException(503, "PostgreSQL is unavailable") from None
+
+
+def _revoke_claims(claims: dict[str, Any]) -> None:
+    if "jti" not in claims:
+        return
+    try:
+        expiry = datetime.fromtimestamp(claims["exp"], UTC)
+        token_revocation.revoke_token(claims["jti"], expiry)
+    except Exception:
+        raise HTTPException(503, "PostgreSQL is unavailable") from None
 
 
 def create_auth_router(
@@ -55,6 +74,7 @@ def create_auth_router(
             valid_password = False
         if not valid_password:
             raise HTTPException(401, "Invalid email or password")
+        _purge_revocations(limiter, account, source, admission.token)
         limiter.release(account, source, admission.token)
         expiry = datetime.now(UTC) + timedelta(minutes=JWT_MINUTES)
         session_id = secrets.token_urlsafe(32)
@@ -75,7 +95,10 @@ def create_auth_router(
         return user
 
     @router.post("/api/auth/logout")
-    def logout(response: Response, user: Any = current_user_dep) -> dict[str, str]:
+    def logout(
+        request: Request, response: Response, user: Any = current_user_dep
+    ) -> dict[str, str]:
+        _revoke_claims(request.state.auth_claims)
         clear_auth_cookies(response, secure=secure_cookies())
         return {"detail": "Logged out"}
 

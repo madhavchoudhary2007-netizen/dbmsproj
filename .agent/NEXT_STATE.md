@@ -3,10 +3,10 @@ updated_at: 2026-10-23
 phase: 2 security (Phase1 complete; baseline score51.2974)
 
 ## Queue
-### T-44139 W3 — OPEN
-- target_files: backend/tests/test_api.py, backend/tests/test_login_throttle.py
-- contract: Keep existing database-independent auth tests offline when ADR008 adds repositorycalls. Patch auth_characterization_client fixture toper-test in-memoryrevokedset using backend.app.token_revocation dynamicfunctions, and _client loginthrottle helper tostub app.token_revocation.purge_expired_revocations. No assertionsremoved/changed; no databaseintegrationfixturespatched. Preserve logoutreuse behavior tests alreadyexpectunauthorized.
-- verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/pytest -q backend/tests/test_api.py -k 'auth_characterization or cookie_auth' backend/tests/test_login_throttle.py && .venv/bin/ruff check backend/tests/test_api.py backend/tests/test_login_throttle.py && .venv/bin/ruff format --check backend/tests/test_api.py backend/tests/test_login_throttle.py
+### T-324 W1 — OPEN
+- target_files: frontend/next.config.ts
+- contract: Add Next.js security responseheaders perplanT324 inconfig only. Keep allscreensandbehavior unchanged. No dependency/newUI. Rootwillrunbrowseraxeafteracceptance; workerbuildoffline/noports.
+- verify: npm --prefix frontend run build && npm --prefix frontend run lint && npm --prefix frontend run typecheck
 
 ### T-44138 W2 — OPEN
 - target_files: backend/app/main.py, backend/app/auth_router.py
@@ -17,6 +17,7 @@ phase: 2 security (Phase1 complete; baseline score51.2974)
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44139 accepted5e9584b; verify0.
 - T-322 accepteda12bc68; verify0.
 - T-44137 accepted4b6a0fd; verify0.
 - T-44135 accepted7afadff; verify0.
