@@ -11,6 +11,8 @@ phase: 2 — structure, in progress
 cycle: 0 of 8
 score: NOT_RUN
 
+- 2026-10-23 owner decision: auth routes and membership router/repository splits are already accepted (T-156..T-160). Phase 2 is capped here; session and remaining structural splits are deferred in `.agent/backlog.md`. T-161 is characterization only. Next: F-ACE01, F-E02, F-DOM-04, F-DOM-05 in that order, then first full evaluation within 15 tasks.
+
 ## Phase 0 baseline
 - Architecture lock passed at boot, then ADR-002 cookie/CSRF contract was relocked at `8753bfed50769fe28099f5f400bf3f7a42223fc98bebddda0db16eb7d0ece31b` after focused five-lens review. Implementation remains open.
 - Isolated `apexgrid-test` run (2026-10-21): 57 passed, 0 failed, 0 skipped; live acceptance passed against loopback API on port 18000. T-002 paginated `/events` to find the seeded round 3 event.
