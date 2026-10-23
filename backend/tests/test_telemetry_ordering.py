@@ -3,6 +3,7 @@
 from contextlib import contextmanager
 from uuid import UUID
 
+import pytest
 from app import telemetry_repository
 from app.telemetry_router import create_telemetry_router
 from bson import ObjectId
@@ -121,6 +122,18 @@ def test_exact_retry_returns_original_response_without_insert_or_publish(monkeyp
     assert retry.status_code == 202
     assert retry.json() == first.json()
     assert len(collection.documents) == len(events) == 1
+
+
+@pytest.mark.xfail(strict=True, reason="F-DOM-04: retry of an older persisted packet is rejected")
+def test_retry_of_older_persisted_packet_returns_original_without_side_effects(monkeypatch):
+    client, collection, events = setup_api(monkeypatch)
+    original_body = packet()
+    original = client.post("/api/telemetry/ingest", json=original_body)
+    advanced = client.post("/api/telemetry/ingest", json=packet(sector=2, elapsed=2000))
+    retry = client.post("/api/telemetry/ingest", json=original_body)
+    assert original.status_code == advanced.status_code == retry.status_code == 202
+    assert retry.json() == original.json()
+    assert len(collection.documents) == len(events) == 2
 
 
 def test_older_and_conflicting_packets_are_rejected_without_side_effects(monkeypatch):
