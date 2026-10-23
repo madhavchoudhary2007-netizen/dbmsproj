@@ -3,15 +3,26 @@ updated_at: 2026-10-23
 phase: 3 T331 extraction; Phase5 T360/T361accepted, T362 next (Phases0–2 complete; baseline51.2974)
 
 ## Queue
-### T-44198 W2 — OPEN
-- target_files: backend/app/main.py, backend/app/api/dbms_sql.py
-- contract: T331 relocate the remaining public SQL table provider into the SQL API registration without changing SQL or route behavior.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,importlib,subprocess; old=ast.parse(subprocess.check_output(["git","show","dc48751:backend/app/main.py"],text=True)); a=next(n for n in old.body if isinstance(n,ast.FunctionDef) and n.name=="public_dbms_tables"); new=ast.parse(open("backend/app/api/dbms_sql.py").read()); b=next(n for n in ast.walk(new) if isinstance(n,ast.FunctionDef) and n.name==a.name); assert ast.dump(ast.Module(body=a.body,type_ignores=[]))==ast.dump(ast.Module(body=b.body,type_ignores=[])); m=importlib.import_module("backend.app.main"); m.fetch_all=lambda *a,**kw:[{"table_name":"fixture_table"}]; assert m.public_dbms_tables()==["fixture_table"]; print("PASS exact provider body and late-bound fetch")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app/main.py backend/app/api/dbms_sql.py && .venv/bin/ruff format --check backend/app/main.py backend/app/api/dbms_sql.py
+### T-44202 W1 — OPEN
+- target_files: frontend/app/globals.css
+- contract: TASTE accessibility finding: restore AA text contrast for dashboard stat helper labels and login visual footer after gradient removal.
+- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
+### T-44201 W2 — OPEN
+- target_files: backend/app/main.py, backend/app/api/stewards.py
+- contract: T331 move unchanged incident-list endpoint into API stewards module.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,importlib,inspect,subprocess; old=ast.parse(subprocess.check_output(["git","show","5898b4f:backend/app/main.py"],text=True)); a=next(n for n in old.body if isinstance(n,ast.FunctionDef) and n.name=="get_incidents"); a.decorator_list=[]; mod=importlib.import_module("backend.app.api.stewards"); b=next(n for n in ast.walk(ast.parse(inspect.getsource(mod))) if isinstance(n,ast.FunctionDef) and n.name==a.name); b.decorator_list=[]; assert ast.dump(a)==ast.dump(b); m=importlib.import_module("backend.app.main"); routes=[r for outer in m.app.routes for r in (outer.original_router.routes if hasattr(outer,"original_router") else [outer])]; assert sum(getattr(r,"endpoint",None) is m.get_incidents for r in routes)==1; print("PASS exact incident list and alias")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app/main.py backend/app/api/stewards.py && .venv/bin/ruff format --check backend/app/main.py backend/app/api/stewards.py
+
+### T-44199 W2 — OPEN
+- target_files: frontend/lib/cn.ts, frontend/lib/use-reduced-motion.ts
+- contract: T364 first foundations: dependency-free class join helper and SSR-safe reduced-motion subscription.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Deferred
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44198 accepted5898b4f; verify0.
 - T-44197 accepted8c03959; verify0.
 - T-44196 acceptedd0bb56a; verify0.
 - T-44194 accepteddc48751; verify0.

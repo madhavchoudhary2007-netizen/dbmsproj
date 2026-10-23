@@ -1,0 +1,39 @@
+diff --git a/frontend/lib/cn.ts b/frontend/lib/cn.ts
+new file mode 100644
+index 0000000..12f9bed
+--- /dev/null
++++ b/frontend/lib/cn.ts
+@@ -0,0 +1,3 @@
++export function cn(...values: (string | false | null | undefined)[]): string {
++  return values.filter(Boolean).join(" ");
++}
+diff --git a/frontend/lib/use-reduced-motion.ts b/frontend/lib/use-reduced-motion.ts
+new file mode 100644
+index 0000000..860dae2
+--- /dev/null
++++ b/frontend/lib/use-reduced-motion.ts
+@@ -0,0 +1,24 @@
++import { useSyncExternalStore } from "react";
++
++const query = "(prefers-reduced-motion: reduce)";
++
++function subscribe(onChange: () => void): () => void {
++  if (typeof window === "undefined") return () => {};
++
++  const mediaQuery = window.matchMedia(query);
++  mediaQuery.addEventListener("change", onChange);
++  return () => mediaQuery.removeEventListener("change", onChange);
++}
++
++function getSnapshot(): boolean {
++  if (typeof window === "undefined") return true;
++  return window.matchMedia(query).matches;
++}
++
++function getServerSnapshot(): boolean {
++  return true;
++}
++
++export function useReducedMotion(): boolean {
++  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
++}
