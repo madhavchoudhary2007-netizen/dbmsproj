@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 6c04161
+git_head: 20e9e21
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -39,3 +39,7 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T-44170 accepted31a3bd4: Moved legacy health handler into API module with live getter/callback bindings and original normalized body.21 tests/route identity proof pass. Verify0.
 
 - T-44167 accepted6c04161: Gradient rule with exact allowed path, solid-utility controls and24selftestcases. Verify0.
+
+- T-44169 accepted20e9e21: Fontweight900 rule with31selftestcases, repaired prose/lineheight false positives and conditional classes. Verify0.
+
+- T44171first FAILED on root Verify namespace resolution (not product/scanner defect): multi-file mypy duplicated source_text. Root confirmed --explicit-package-bases strict0 acrossall5files, updated Verify, restored only clone target and requested repair1. No type rule suppressed.
