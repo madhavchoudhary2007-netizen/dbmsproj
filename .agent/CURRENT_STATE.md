@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 34dbb99
+git_head: ad19d48
 branch: overhaul/neo-brutal
 architect_sha256: c05eeb0c03461c7292c04802ce8f4814efccd0a3ec78e84cba0ab993c10b3d24
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -9,15 +9,15 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 
 ## Phase and verified facts
 - Phase0 completeT300e465e89/T30113e6100/T30259a180e. ADR007 activated after owner approval; lock9010959b verifies, boot0. Work through all12phases per owner's latest instruction.
-- Phase1 T31035578c9/T3118570e58 accepted: WHOLEapp/testsRuff0 and43filesformatted; no remainingC901. T312e0f7adf selected3filesmypy0; freshglobal227 ->218 belowplan222. T3134089fb6 CIvalidator0; hostedCI NOT_RUN. T314 scoring update next.
-- T44114/15 extracted coherent start/reset operations; pause/resume map preserves status/errors. T44114 exactAST proof differed only SQL indentation whitespace; full136+livePASS, no exact-AST identity claim. T44116 finalization domain extraction preserves SQL/publish/lifecycle order; fullrerun136/livePASS. T44122 lockworker/cleanup bodiesASTidentical(SQLwhitespacenormalized), full136/livePASS. T312 typedvalidationfullrerun running.
-- Latest completed fullisolated baseline afterT44115:136passed,0failed/skipped/xfailed; login/session/simulator/Mongo/WS/pitconflict/trigger-ban/results/standings/DBMS/generatedrace flowsPASS, no18000listener. Cleanup fixT44804a3ab7f usesexec for realAPIpid and waits; prior orphan lease failures resolved without realDB changes.
-- Fresh entireformat check Ruff0.17.1 found11files(7app/4tests) despite earlier partial claims; log phase1.format-current.raw.log. Canonical-onlyT44117 onward queued, no parentpass until actual fullzero.
+- Phase1 T31035578c9/T3118570e58 accepted: WHOLEapp/testsRuff0 and43filesformatted; no remainingC901. T312e0f7adf selected3filesmypy0; freshglobal227 ->218 belowplan222. T3134089fb6 CIvalidator0; hostedCI NOT_RUN. T314c0c8061 scorer accepted;8regressionsPASS, F7/F8/F9+hardF2, missing/duplicate/unknown/reweighted/null evidence blocks delivery. Four dimension refreshes inprogress.
+- T44114/15 extracted coherent start/reset operations; pause/resume map preserves status/errors. T44114 exactAST proof differed only SQL indentation whitespace; full136+livePASS, no exact-AST identity claim. T44116 finalization domain extraction preserves SQL/publish/lifecycle order; fullrerun136/livePASS. T44122 lockworker/cleanup bodiesASTidentical(SQLwhitespacenormalized), full136/livePASS. T312/T314 fullrerunsPASS; latest144tests0skips+allliveflows.
+- Latest completed fullisolated baseline afterT314:144passed,0failed/skipped/xfailed; login/session/simulator/Mongo/WS/pitconflict/trigger-ban/results/standings/DBMS/generatedrace flowsPASS, no18000listener. Cleanup fixT44804a3ab7f usesexec for realAPIpid and waits; prior orphan lease failures resolved without realDB changes.
+- Fresh entireformat check exposed11leftovers, correctedT44117..21; now44app/testfilesformatted andallRuff0, including newscorer tests.
 - Formatting/literal children in git preserve AST/runtimeSQL/directives/canonicalcontents and <=150lines. SQL psycopg safecomposition/CRUD guardsT458/T4482/T44111 accepted; principal guardT4411311595ad normalized-inlineAST identical.
 - OpenAPI SHA unchanged60d831ab5cc96051d2fa2caa9b4a2f25d89a6444c05c2a5ceed0aaf8c660346b, lastchecked afterT44115; root computes withoutlifespan using APP_ENV=local. No deployed secret bypass.
 - T4405248d21 doc-only catalogue alignment: displayminimum48px leading1, allmotion100–300ms; longloops replaced bystaticongoing content/event-triggered200ms, reducedmotion retained. No architecture/gate change.
 - T441a49641c shared palette measurement includescontrast1 and excludesonlyariahidden decorativeduplicates; transparentancestorsresolved. RootChromium regression3PASS withoutapp/server, typecheck/lint0, spacing/banned/motion0. Neo lint NOT_RUN untilT360. FPS17ms musttighten16.7 atT413.
-- Strictmypy218errors11/31files remain forT339; nozero claim. Npm/pip audits nowrunning. Productionbuildexit0 phase1.build.raw.log; generatednext-env diff restored. CItemporarymypyfailureexplicituntilT339, allotherchecksrequired.
+- Strictmypy218errors11/31files remain forT339; nozero claim. Pip audit0(no vulnerabilities); npm high-audit0(3moderate,0high/critical). Productionbuildexit0 phase1.build.raw.log; generatednext-env diff restored. CItemporarymypyfailureexplicituntilT339, allotherchecksrequired.
 
 ## Execution contracts
 - Only overhaul/neo-brutal; no merge/force/historyrewrite. Only accept.sh commits; rerun every Verify. <=3files/150changedlines perpacket. Atmost2 packet-only customworkers in ignoredsharedclones .agent/workspaces, dependency symlinks; workers nevercommit. Integrate sequentially, updatestate everyaccept.
@@ -32,26 +32,7 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 ## Orchestrator direct edits
 - Requested modelprofilelines; architecture/ADR/docs/state/packets/envelopes/orchestrationhelpers only. T440 docs15lines. No authored productcode; integrating workerpatches is not bulkcode authorship.
 
-- T-44117 accepted7789fde: Applied Ruff canonical formatting to all three target files; 133 changed lines total. AST and canonical-content proofs passed for each file. Verify exit0; 133 changed lines.
-
-- Orchestrator integration boundary failure: own productionbuild regenerated next-env.d.ts; restored onlygenerateddiff, deferred T44118patch untilT44117accepted. Workeroutputs wereinscope; firstacceptfailures were orchestrator overlap, now repaired. Buildexit0.
-
-- T-44118 acceptedebb3b8f: Applied Ruff formatting only; 139 changed lines total. AST and canonical-content checks passed for all three files. Verify exit0; 139 changed lines.
-
-- T-44119 accepted64ae141: Applied Ruff canonical formatting to three Python files; 48 changed lines total. AST and canonical-content checks passed for each file. Verify exit0; 48 changed lines.
-
-- T-44120 acceptedcd970ca: Ruff formatting only; exact diff numstat 29 added, 8 removed. AST and canonical contents unchanged; format distance 37 -> 0. Verify exit0; 37 changed lines.
-
-- T-44121 accepted0aafbee: Extracted the typed simulation tick persistence helper, consolidated session state checks, and canonicalized login_limiter.py formatting without changing its AST. Verify exit0; 47 changed lines.
-
-- T-44122 accepted024f663: Extracted the competing reservation and cleanup into typed helpers with explicit worker arguments; preserved cleanup and guard release order. Verify exit0; 133 changed lines.
-
-- T-310 accepted35578c9: Closed aggregate backend lint and format gate from accepted W2 subdivisions; no additional product edits. Verify exit0; 0 changed lines.
-
-- T-312 acceptede0f7adf: Added precise Response and validator annotations; validation bodies and schema behavior are unchanged. Verify exit0; 20 changed lines.
-
-- T-313 accepted4089fb6: Included backend/app and backend/tests in both Ruff checks, clarified the temporary mypy allowance, and preserved the remaining CI gates. Verify exit0; 75 changed lines.
-
-- T-314 acceptedc0c8061: Validated expected IDs and weights, including unknown IDs with null weights; updated hard gate and NOT_RUN behavior. Added isolated scorer regressions with exit-code checks. Total diff: 106 added and 14 removed lines. Verify exit0; 120 changed lines.
-
-- T-44127 accepted34dbb99: Recorded ADR008 revocation compatibility, focused architecture review and canonical lock; no runtime changes. Verify exit0; 44 changed lines.
+- T44128ad19d48 fixes2hardcoded API mock origins withoutassertionchanges. Initialbrowser980PASS/25mock-originfail, focusedrepair25PASS, fullrerun1005PASS(3.1m) across5projects. Productionrebuild0; own generatednext-env diff restored.
+- ADR00834dbb99 accepted forplannedT323: keep existingopaquejti/CSRF, maptoUUIDrevocationkey, additive004onlydisposablestack, no-jticompatibility. Currentlockc05eeb0c. Realbackendcontainer hasno sourcebindmount, so editingrepo cannotautoreloaditsdatabase.
+- P3legacytoolreturns0butcountsroot+pageonly; shared/layoutassets omitted, do notclaimbudgetuntilT44132fix. LighthouseCLIabsent(P1/P2NOT_RUN). FPS17ms checkdoesnotprove16.7msuntilT413.
+- Ownacceptanceboundaryerrors fromgeneratednext-env andprematureparallelpatch application were reconciled by restoringonlyowngenerateddiff/deferringsecondpatch; workeroutputsinscope.

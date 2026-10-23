@@ -1,0 +1,92 @@
+{
+  "git_head": "ad19d48",
+  "commands": {
+    "F-1": {
+      "exit_code": 0,
+      "log": "T-44128.accept.raw.log"
+    },
+    "F-2": {
+      "exit_code": 0,
+      "log": "T-44128.accept.raw.log"
+    },
+    "F-3": {
+      "exit_code": 0,
+      "log": "T-314.full.raw.log",
+      "passed": 144,
+      "failed": 0,
+      "skipped": 0,
+      "xfailed": 0
+    },
+    "F-5": {
+      "exit_code": 0,
+      "log": "phase1.build-final.raw.log"
+    },
+    "F-7": {
+      "exit_code": 0,
+      "log": "phase1.ruff.raw.log",
+      "formatted_files": 44
+    },
+    "F-8": {
+      "exit_code": 1,
+      "log": "T-312.global-before-accept.raw.log",
+      "remaining_errors": 218
+    },
+    "F-9": {
+      "pip_exit_code": 0,
+      "npm_exit_code": 0,
+      "pip_log": "phase1.pip-audit.raw.log",
+      "npm_log": "phase1.npm-audit.raw.json",
+      "npm_moderate": 3,
+      "npm_high": 0,
+      "npm_critical": 0
+    },
+    "A-1": {
+      "exit_code": 0,
+      "log": "phase1.lint-spacing.raw.log"
+    },
+    "A-2": {
+      "exit_code": 0,
+      "log": "phase1.lint-banned.raw.log"
+    },
+    "A-7-static": {
+      "exit_code": 0,
+      "log": "phase1.lint-motion.raw.log"
+    },
+    "P-3-tool": {
+      "exit_code": 0,
+      "log": "phase1.bundle.raw.log",
+      "detail": "Reports18routes <=170KB, but source counts only rootMainFiles+pagechunk and omits layout/shared dependencies. Not sufficient proof of totalinitialJS; pending corrected checker."
+    },
+    "P-1/P-2-tool": {
+      "installed": false,
+      "detail": "Lighthouse CLI is not installed; current audit-lighthouse-all.mjs cannot establish Lighthouse mobile metrics without its external tool."
+    }
+  },
+  "browser": {
+    "initial_log": "phase1.e2e.raw.log",
+    "passed": 980,
+    "failed": 25,
+    "failed_cases": "only4auth-cookie+1live-cookie-ws across5projects, fixedmockorigins T44128",
+    "focused_log": "T-44128.focused-browser.raw.log",
+    "focused_passed": 25,
+    "focused_exit": 0,
+    "full_rerun_log": "phase1.e2e-rerun.raw.log",
+    "full_rerun_status": "PASSED",
+    "full_rerun_exit": 0,
+    "full_rerun_passed": 1005,
+    "full_rerun_failed": 0
+  },
+  "judgment": {
+    "A-5": {
+      "passed": false,
+      "detail": "Approved light neo-brutal identity not implemented; current dark/Arial presentation and giant mixed files remain (T360 onward)."
+    },
+    "A-6": {
+      "passed": false,
+      "detail": "New cohesive simulator/lock domain helpers currently have one production callsite; final abstraction review is pending T331. No clean claim."
+    }
+  },
+  "scope": {
+    "F-4": "Mocked route success does not prove planned T411 real-stack journey; keep incomplete until that gate exists."
+  }
+}

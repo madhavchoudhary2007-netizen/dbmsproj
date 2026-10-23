@@ -3,14 +3,21 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-44128 W3 — OPEN
-- target_files: frontend/e2e/auth-cookie.spec.ts, frontend/e2e/live-cookie-ws.spec.ts
-- contract: mockAPIorigin configurable; preserve allassertions/cookiechecks.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+### T-44124 W3 — OPEN
+- target_files: .agent/eval/aesthetic.json
+- contract: honest aesthetic baseline, no stale100/unsupportedpasses.
+- verify: .venv/bin/python -c "import json;d=json.load(open('.agent/eval/aesthetic.json'));e={'A-1': 2, 'A-2': 2, 'A-3': 2, 'A-4': 2, 'A-5': 3, 'A-6': 2, 'A-7': 2};assert len(d['checks'])==len(e);assert {c['id']:c['weight'] for c in d['checks']}==e;assert all((c['passed'] is None or isinstance(c['passed'],bool)) and isinstance(c['detail'],str) and c['detail'] for c in d['checks'])"
+
+### T-44123 W3 — OPEN
+- target_files: .agent/eval/functional.json
+- contract: honest functional baseline, no stale100/unsupportedpasses.
+- verify: .venv/bin/python -c "import json;d=json.load(open('.agent/eval/functional.json'));e={'F-1': 3, 'F-2': 2, 'F-3': 4, 'F-4': 6, 'F-5': 3, 'F-6': 2, 'F-7': 2, 'F-8': 2, 'F-9': 1};assert len(d['checks'])==len(e);assert {c['id']:c['weight'] for c in d['checks']}==e;assert all((c['passed'] is None or isinstance(c['passed'],bool)) and isinstance(c['detail'],str) and c['detail'] for c in d['checks'])"
 
 ## Blocked
+- T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44128 acceptedad19d48; verify0.
 - T-44127 accepted34dbb99; verify0.
 - T-314 acceptedc0c8061; verify0.
 - T-313 accepted4089fb6; verify0.
