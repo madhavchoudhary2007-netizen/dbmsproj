@@ -22,5 +22,9 @@ elif (
 JWT_ALGORITHM = "HS256"
 JWT_MINUTES = int(os.getenv("JWT_MINUTES", "720"))
 CORS_ORIGINS = [
-    x.strip() for x in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",") if x.strip()
+    x.strip()
+    for x in os.getenv("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(",")
+    if x.strip()
 ]
+if "*" in CORS_ORIGINS:
+    raise ValueError("CORS_ORIGINS must not contain '*'")

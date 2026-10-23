@@ -8,15 +8,11 @@ phase: 2 security (Phase1 complete; baseline score51.2974)
 - contract: Implement only plan T321 CORS allow-list default both local origins, reject any '*' entry at config import with clear CORS_ORIGINS error; preserve all other configuration.
 - verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/pytest -q backend/tests/test_security_headers.py -k cors && .venv/bin/ruff check backend/app/config.py && .venv/bin/ruff format --check backend/app/config.py
 
-### T-44134 W3 — OPEN
-- target_files: backend/tests/test_logout_revocation.py
-- contract: testfirstmissingsecurityfeatures, actualassertionfailures0errors/skips; neverlabelproductchecksPASS.
-- verify: .venv/bin/ruff check backend/tests/test_logout_revocation.py && .venv/bin/ruff format --check --output-format concise backend/tests/test_logout_revocation.py && .venv/bin/python .agent/check-red-tests.py T-44134 backend/tests/test_logout_revocation.py
-
 ## Blocked
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44134 accepted749f9c5; verify0.
 - T-44133 accepted091e4de; verify0.
 - T-44130 acceptedce4b44b; verify0.
 - T-44126 acceptedc2eb8d2; verify0.
