@@ -1,0 +1,26 @@
+diff --git a/frontend/e2e/auth-cookie.spec.ts b/frontend/e2e/auth-cookie.spec.ts
+index d3ea96d..4d486ed 100644
+--- a/frontend/e2e/auth-cookie.spec.ts
++++ b/frontend/e2e/auth-cookie.spec.ts
+@@ -6,7 +6,7 @@ const user = {
+   full_name: "Race Operator",
+   role: "admin",
+ };
+-const apiPattern = "http://localhost:8000/api/**";
++const apiPattern = "**/api/**";
+ 
+ async function openNavigationForMobile(page: import("@playwright/test").Page) {
+   if ((page.viewportSize()?.width ?? 1024) > 700) return;
+diff --git a/frontend/e2e/live-cookie-ws.spec.ts b/frontend/e2e/live-cookie-ws.spec.ts
+index 3458deb..b050a1f 100644
+--- a/frontend/e2e/live-cookie-ws.spec.ts
++++ b/frontend/e2e/live-cookie-ws.spec.ts
+@@ -11,7 +11,7 @@ const user = {
+ const sessionId = "cookie-live-session";
+ 
+ test("G11 cookie-only live session opens WebSocket without JWT protocols", async ({ page }) => {
+-  await page.route("http://localhost:8000/api/**", async (route) => {
++  await page.route("**/api/**", async (route) => {
+     const path = new URL(route.request().url()).pathname;
+     if (path === "/api/auth/me") {
+       await route.fulfill({ status: 200, json: user });

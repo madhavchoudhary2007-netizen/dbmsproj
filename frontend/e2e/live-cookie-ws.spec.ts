@@ -11,7 +11,7 @@ const user = {
 const sessionId = "cookie-live-session";
 
 test("G11 cookie-only live session opens WebSocket without JWT protocols", async ({ page }) => {
-  await page.route("http://localhost:8000/api/**", async (route) => {
+  await page.route("**/api/**", async (route) => {
     const path = new URL(route.request().url()).pathname;
     if (path === "/api/auth/me") {
       await route.fulfill({ status: 200, json: user });

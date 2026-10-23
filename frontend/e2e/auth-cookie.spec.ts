@@ -6,7 +6,7 @@ const user = {
   full_name: "Race Operator",
   role: "admin",
 };
-const apiPattern = "http://localhost:8000/api/**";
+const apiPattern = "**/api/**";
 
 async function openNavigationForMobile(page: import("@playwright/test").Page) {
   if ((page.viewportSize()?.width ?? 1024) > 700) return;

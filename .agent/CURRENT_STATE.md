@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: c0c8061
+git_head: 34dbb99
 branch: overhaul/neo-brutal
 architect_sha256: c05eeb0c03461c7292c04802ce8f4814efccd0a3ec78e84cba0ab993c10b3d24
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -53,3 +53,5 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 - T-313 accepted4089fb6: Included backend/app and backend/tests in both Ruff checks, clarified the temporary mypy allowance, and preserved the remaining CI gates. Verify exit0; 75 changed lines.
 
 - T-314 acceptedc0c8061: Validated expected IDs and weights, including unknown IDs with null weights; updated hard gate and NOT_RUN behavior. Added isolated scorer regressions with exit-code checks. Total diff: 106 added and 14 removed lines. Verify exit0; 120 changed lines.
+
+- T-44127 accepted34dbb99: Recorded ADR008 revocation compatibility, focused architecture review and canonical lock; no runtime changes. Verify exit0; 44 changed lines.

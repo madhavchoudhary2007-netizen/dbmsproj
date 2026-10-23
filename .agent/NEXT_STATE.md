@@ -3,14 +3,15 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-44127 O — IN_REVIEW
-- target_files: .agent/adr/ADR-008-jwt-revocation.md, .agent/ARCHITECT.md, DECISIONS.md
-- contract: preserveopaquejti, plannedrevocationonly, focusedC/canonicallock.
-- verify: bash scripts/agent/verify-lock.sh && bash scripts/agent/budget.sh
+### T-44128 W3 — OPEN
+- target_files: frontend/e2e/auth-cookie.spec.ts, frontend/e2e/live-cookie-ws.spec.ts
+- contract: mockAPIorigin configurable; preserve allassertions/cookiechecks.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Blocked
 
 ## Done
+- T-44127 accepted34dbb99; verify0.
 - T-314 acceptedc0c8061; verify0.
 - T-313 accepted4089fb6; verify0.
 - T-312 acceptede0f7adf; verify0.
