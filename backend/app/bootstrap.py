@@ -1,9 +1,12 @@
 """Apply relational schema and seed once before the API starts."""
+
 from pathlib import Path
+
 import psycopg
-from .config import DATABASE_URL, APP_ENV, MONGODB_URL, MONGODB_DATABASE, SEED_DEMO_DATA
 from psycopg.rows import dict_row
 from pymongo import MongoClient
+
+from .config import APP_ENV, DATABASE_URL, MONGODB_DATABASE, MONGODB_URL, SEED_DEMO_DATA
 from .race_archive import seed_historical_laps
 
 
@@ -22,9 +25,13 @@ def main():
         if SEED_DEMO_DATA and seed.exists():
             conn.execute(seed.read_text())
     if SEED_DEMO_DATA and APP_ENV == "local":
-        with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn, MongoClient(MONGODB_URL, serverSelectionTimeoutMS=5000) as mongo:
+        with (
+            psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn,
+            MongoClient(MONGODB_URL, serverSelectionTimeoutMS=5000) as mongo,
+        ):
             seed_historical_laps(conn, mongo[MONGODB_DATABASE]["telemetry"])
-    print("Database migration complete" + (" and seed complete" if SEED_DEMO_DATA else "; demo seeding skipped"))
+    seed_status = " and seed complete" if SEED_DEMO_DATA else "; demo seeding skipped"
+    print("Database migration complete" + seed_status)
 
 
 if __name__ == "__main__":

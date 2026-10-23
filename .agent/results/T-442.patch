@@ -1,0 +1,82 @@
+diff --git a/backend/app/bootstrap.py b/backend/app/bootstrap.py
+index 03d07e3..657cf06 100644
+--- a/backend/app/bootstrap.py
++++ b/backend/app/bootstrap.py
+@@ -1,9 +1,12 @@
+ """Apply relational schema and seed once before the API starts."""
++
+ from pathlib import Path
++
+ import psycopg
+-from .config import DATABASE_URL, APP_ENV, MONGODB_URL, MONGODB_DATABASE, SEED_DEMO_DATA
+ from psycopg.rows import dict_row
+ from pymongo import MongoClient
++
++from .config import APP_ENV, DATABASE_URL, MONGODB_DATABASE, MONGODB_URL, SEED_DEMO_DATA
+ from .race_archive import seed_historical_laps
+ 
+ 
+@@ -22,9 +25,13 @@ def main():
+         if SEED_DEMO_DATA and seed.exists():
+             conn.execute(seed.read_text())
+     if SEED_DEMO_DATA and APP_ENV == "local":
+-        with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn, MongoClient(MONGODB_URL, serverSelectionTimeoutMS=5000) as mongo:
++        with (
++            psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn,
++            MongoClient(MONGODB_URL, serverSelectionTimeoutMS=5000) as mongo,
++        ):
+             seed_historical_laps(conn, mongo[MONGODB_DATABASE]["telemetry"])
+-    print("Database migration complete" + (" and seed complete" if SEED_DEMO_DATA else "; demo seeding skipped"))
++    seed_status = " and seed complete" if SEED_DEMO_DATA else "; demo seeding skipped"
++    print("Database migration complete" + seed_status)
+ 
+ 
+ if __name__ == "__main__":
+diff --git a/backend/app/schemas_operations.py b/backend/app/schemas_operations.py
+index 195ca08..e6bc197 100644
+--- a/backend/app/schemas_operations.py
++++ b/backend/app/schemas_operations.py
+@@ -1,6 +1,6 @@
+ from __future__ import annotations
+ 
+-from datetime import datetime, timezone
++from datetime import UTC, datetime
+ from typing import Literal
+ from uuid import UUID
+ 
+@@ -50,7 +50,7 @@ class ReservationIn(BaseModel):
+     def utc_timestamp(cls, value: datetime) -> datetime:
+         if value.tzinfo is None or value.utcoffset() is None:
+             raise ValueError("Timestamps must include a UTC offset")
+-        return value.astimezone(timezone.utc)
++        return value.astimezone(UTC)
+ 
+     @model_validator(mode="after")
+     def ordered(self) -> ReservationIn:
+diff --git a/backend/app/schemas_telemetry.py b/backend/app/schemas_telemetry.py
+index a448970..190ef32 100644
+--- a/backend/app/schemas_telemetry.py
++++ b/backend/app/schemas_telemetry.py
+@@ -1,6 +1,6 @@
+ from __future__ import annotations
+ 
+-from datetime import datetime, timezone
++from datetime import UTC, datetime
+ from typing import Literal
+ from uuid import UUID
+ 
+@@ -39,7 +39,7 @@ class Telemetry(BaseModel):
+     def utc_timestamp(cls, value):
+         if value.tzinfo is None or value.utcoffset() is None:
+             raise ValueError("Timestamp must include a UTC offset")
+-        return value.astimezone(timezone.utc)
++        return value.astimezone(UTC)
+ 
+     @field_validator("pit_starts_at", "pit_ends_at")
+     @classmethod
+@@ -48,4 +48,4 @@ class Telemetry(BaseModel):
+             return value
+         if value.tzinfo is None or value.utcoffset() is None:
+             raise ValueError("Pit timestamps must include a UTC offset")
+-        return value.astimezone(timezone.utc)
++        return value.astimezone(UTC)
