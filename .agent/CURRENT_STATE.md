@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 3c10f63
+git_head: 7eeb81d
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -45,3 +45,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T-44189 accepted3343d87: Added failing-first runtime route uniqueness/alias regression; recorded duplicate Mongo list decorator with1real assertion failure, no product check called green. Verify0.
 
 - T-44187 accepted3c10f63: Extended shadow gate to JSX utilities/conditional classes, important variants and mobile-aware caps with regression controls. Verify0.
+
+- T-44188 accepted7eeb81d: Moved exact Mongo document handler; removed stale duplicate list decorator and unneeded wrapper.11 contract/runtime registration tests pass. Verify0.
