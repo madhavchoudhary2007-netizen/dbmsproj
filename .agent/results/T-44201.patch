@@ -1,0 +1,95 @@
+diff --git a/backend/app/main.py b/backend/app/main.py
+index beb5bdd..9c25fa6 100644
+--- a/backend/app/main.py
++++ b/backend/app/main.py
+@@ -48,6 +48,7 @@ from .api.health import health_live as health_live
+ from .api.health import legacy_router as legacy_health_router
+ from .api.health import register_legacy_health, register_readiness
+ from .api.health import router as health_router
++from .api.stewards import create_stewards_router
+ from .auth_cookie import verify_csrf_token
+ from .auth_router import create_auth_router
+ from .config import (
+@@ -610,28 +611,14 @@ def standings(championship_id: UUID, user=authenticated_user_dependency):
+     )
+ 
+ 
+-@app.get("/api/incidents")
+-def get_incidents(
+-    state: str | None = None,
+-    limit: int = Query(50, ge=1, le=200),
+-    offset: int = Query(0, ge=0),
+-    user=authenticated_user_dependency,
+-):
+-    sql = (
+-        "SELECT i.*,u.full_name AS driver_name,d.number,s.session_type,e.name AS event_name"
+-        " FROM incident_reports i JOIN drivers d ON d.id=i.driver_id JOIN users u ON u.id=d"
+-        ".user_id JOIN race_sessions s ON s.id=i.session_id JOIN race_events e ON e.id=s.ev"
+-        "ent_id"
+-    )
+-    params: list[Any] = []
+-    if state:
+-        if state not in {"OPEN", "APPROVED", "REJECTED"}:
+-            raise HTTPException(422, "Invalid incident state")
+-        sql += " WHERE i.state=%s"
+-        params.append(state)
+-    sql += " ORDER BY i.reported_at DESC LIMIT %s OFFSET %s"
+-    params.extend(limit_offset(limit, offset))
+-    return jsonable(fetch_all(sql, params))
++stewards_router, stewards_handlers = create_stewards_router(
++    lambda *a, **kw: fetch_all(*a, **kw),
++    lambda value: jsonable(value),
++    lambda limit, offset: limit_offset(limit, offset),
++    authenticated_user_dependency,
++)
++get_incidents = stewards_handlers["get_incidents"]
++app.include_router(stewards_router)
+ 
+ 
+ @app.post("/api/incidents", status_code=201)
+diff --git a/backend/app/api/stewards.py b/backend/app/api/stewards.py
+new file mode 100644
+index 0000000..b4a37d4
+--- /dev/null
++++ b/backend/app/api/stewards.py
+@@ -0,0 +1,40 @@
++from collections.abc import Callable
++from typing import Any
++
++from fastapi import APIRouter, HTTPException, Query
++
++from ..database import DatabaseRow
++
++
++def create_stewards_router(
++    fetch_all: Callable[..., list[DatabaseRow]],
++    jsonable: Callable[[Any], Any],
++    limit_offset: Callable[[int, int], tuple[int, int]],
++    authenticated_user_dependency: Any,
++) -> tuple[APIRouter, dict[str, Callable[..., Any]]]:
++    router = APIRouter()
++
++    @router.get("/api/incidents")
++    def get_incidents(
++        state: str | None = None,
++        limit: int = Query(50, ge=1, le=200),
++        offset: int = Query(0, ge=0),
++        user=authenticated_user_dependency,
++    ):
++        sql = (
++            "SELECT i.*,u.full_name AS driver_name,d.number,s.session_type,e.name AS event_name"
++            " FROM incident_reports i JOIN drivers d ON d.id=i.driver_id JOIN users u ON u.id=d"
++            ".user_id JOIN race_sessions s ON s.id=i.session_id JOIN race_events e"
++            " ON e.id=s.event_id"
++        )
++        params: list[Any] = []
++        if state:
++            if state not in {"OPEN", "APPROVED", "REJECTED"}:
++                raise HTTPException(422, "Invalid incident state")
++            sql += " WHERE i.state=%s"
++            params.append(state)
++        sql += " ORDER BY i.reported_at DESC LIMIT %s OFFSET %s"
++        params.extend(limit_offset(limit, offset))
++        return jsonable(fetch_all(sql, params))
++
++    return router, {"get_incidents": get_incidents}
