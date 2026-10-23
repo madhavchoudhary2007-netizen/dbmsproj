@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 301a40c
+git_head: 72973d1
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -43,3 +43,4 @@ last_eval_score: no verified overhaul score; historical100 excludes new gates
 - T-452 accepted8504aea:40 test-format lines, exact AST unchanged, range400-480 green. No additional DB rerun needed for AST-identical formatting; next behavior-affecting batch reruns full suite.
 - T-454 accepted0df18c1:82 test-format lines, exact AST preserved. T-453 OpenAPI comparison unchanged60d831ab; full gate follows integration.
 - T-453 accepted301a40c:95 dependency-default lines, B0080/OpenAPI unchanged. Full disposable gate running in T-453.full.raw.log.
+- T-457 accepted72973d1:43 main lines, UTC/annotation/local/semicolon modernisation, explicit shortest zip. Selected lint0/OpenAPI unchanged. Fresh strict mypy remains222 errors in14files/31checked beforeT-312.

@@ -344,18 +344,26 @@ def test_incident_laps_stay_within_session_distance(db):
     cur.execute("SELECT id FROM drivers ORDER BY number LIMIT 1")
     driver_id = cur.fetchone()[0]
 
-    cur.execute("INSERT INTO incident_reports(session_id,driver_id,lap,description) VALUES (%s,%s,%s,'valid boundary')",
-                (session_id, driver_id, total_laps))
+    cur.execute(
+        "INSERT INTO incident_reports(session_id,driver_id,lap,description) VALUES (%s,%s,%s,'valid boundary')",
+        (session_id, driver_id, total_laps),
+    )
     with pytest.raises(Exception) as exc:
-        cur.execute("INSERT INTO incident_reports(session_id,driver_id,lap,description) VALUES (%s,%s,%s,'past distance')",
-                    (session_id, driver_id, total_laps + 1))
+        cur.execute(
+            "INSERT INTO incident_reports(session_id,driver_id,lap,description) VALUES (%s,%s,%s,'past distance')",
+            (session_id, driver_id, total_laps + 1),
+        )
     assert _sqlstate(exc.value) == "23514"
     with pytest.raises(Exception) as exc:
-        cur.execute("INSERT INTO incident_reports(session_id,driver_id,lap,description) VALUES (%s,%s,73,'hard cap')",
-                    (session_id, driver_id))
+        cur.execute(
+            "INSERT INTO incident_reports(session_id,driver_id,lap,description) VALUES (%s,%s,73,'hard cap')",
+            (session_id, driver_id),
+        )
     assert _sqlstate(exc.value) == "23514"
     with pytest.raises(Exception) as exc:
-        cur.execute("UPDATE race_sessions SET total_laps=%s WHERE id=%s", (total_laps - 1, session_id))
+        cur.execute(
+            "UPDATE race_sessions SET total_laps=%s WHERE id=%s", (total_laps - 1, session_id)
+        )
     assert _sqlstate(exc.value) == "23514"
 
 
@@ -369,33 +377,47 @@ def test_seed_has_scheduled_third_round_race(db):
 
 def test_seed_does_not_write_historical_data_to_user_created_race(db):
     _, cur = db
-    cur.execute("SELECT e.id,e.start_date,d.id FROM race_events e CROSS JOIN drivers d WHERE e.round_number=1 AND d.number=1")
+    cur.execute(
+        "SELECT e.id,e.start_date,d.id FROM race_events e CROSS JOIN drivers d WHERE e.round_number=1 AND d.number=1"
+    )
     event_id, start_date, driver_id = cur.fetchone()
-    cur.execute("""INSERT INTO race_sessions(event_id,session_type,state,scheduled_at,started_at,total_laps)
+    cur.execute(
+        """INSERT INTO race_sessions(event_id,session_type,state,scheduled_at,started_at,total_laps)
                     VALUES (%s,'RACE','ACTIVE',%s,%s,25) RETURNING id""",
-                (event_id, start_date, start_date))
+        (event_id, start_date, start_date),
+    )
     session_id = cur.fetchone()[0]
-    cur.execute("""INSERT INTO session_results(session_id,driver_id,position,lap_time_ms)
-                    VALUES (%s,%s,1,90000)""", (session_id, driver_id))
+    cur.execute(
+        """INSERT INTO session_results(session_id,driver_id,position,lap_time_ms)
+                    VALUES (%s,%s,1,90000)""",
+        (session_id, driver_id),
+    )
 
     cur.execute((ROOT / "db/seed.sql").read_text())
 
     cur.execute("SELECT count(*) FROM session_results WHERE session_id=%s", (session_id,))
     assert cur.fetchone()[0] == 1
-    cur.execute("""SELECT count(*) FROM incident_reports
-                    WHERE session_id=%s AND description='Unsafe rejoin after leaving the circuit'""", (session_id,))
+    cur.execute(
+        """SELECT count(*) FROM incident_reports
+                    WHERE session_id=%s AND description='Unsafe rejoin after leaving the circuit'""",
+        (session_id,),
+    )
     assert cur.fetchone()[0] == 0
 
 
 def test_seed_skips_generated_demo_championship_events(db):
     _, cur = db
-    cur.execute("INSERT INTO championships(name,season) VALUES ('ApexGrid Live Demo',2026) RETURNING id")
+    cur.execute(
+        "INSERT INTO championships(name,season) VALUES ('ApexGrid Live Demo',2026) RETURNING id"
+    )
     championship_id = cur.fetchone()[0]
     cur.execute("SELECT id FROM circuits WHERE name='Harbor Ring'")
     circuit_id = cur.fetchone()[0]
-    cur.execute("""INSERT INTO race_events(championship_id,circuit_id,round_number,name,start_date)
+    cur.execute(
+        """INSERT INTO race_events(championship_id,circuit_id,round_number,name,start_date)
                     VALUES (%s,%s,1,'ApexGrid Live Demo','2026-10-05 12:00+00') RETURNING id""",
-                (championship_id, circuit_id))
+        (championship_id, circuit_id),
+    )
     event_id = cur.fetchone()[0]
 
     cur.execute((ROOT / "db/seed.sql").read_text())
@@ -498,8 +520,10 @@ def test_concurrent_overlapping_pit_reservations_allow_only_one(db):
             cursor = conn_b.cursor()
             b_started.set()
             try:
-                cursor.execute("SELECT reserve_pit_box(%s,%s,%s,%s,%s)",
-                               (box_id, session_id, team_id, "2026-06-01 08:30+00", "2026-06-01 09:30+00"))
+                cursor.execute(
+                    "SELECT reserve_pit_box(%s,%s,%s,%s,%s)",
+                    (box_id, session_id, team_id, "2026-06-01 08:30+00", "2026-06-01 09:30+00"),
+                )
                 conn_b.commit()
                 errors.append(("unexpected-success", None))
             except Exception as exc:
@@ -518,7 +542,10 @@ def test_concurrent_overlapping_pit_reservations_allow_only_one(db):
         assert not worker.is_alive(), "second reservation hung past its statement timeout"
         assert errors == [("error", "23P01")]
 
-        cur.execute("SELECT count(*) FROM pit_reservations WHERE pit_box_id=%s AND status='RESERVED'", (box_id,))
+        cur.execute(
+            "SELECT count(*) FROM pit_reservations WHERE pit_box_id=%s AND status='RESERVED'",
+            (box_id,),
+        )
         assert cur.fetchone()[0] == 1
     finally:
         conn_a.rollback()
@@ -533,18 +560,38 @@ def test_reserved_pit_driver_is_unique_per_session(db):
     assert drivers
     cur.execute("SELECT id FROM pit_boxes WHERE event_id=%s ORDER BY number LIMIT 1", (event_id,))
     first_box = cur.fetchone()[0]
-    cur.execute("SELECT id FROM pit_boxes WHERE event_id=%s ORDER BY number OFFSET 1 LIMIT 1", (event_id,))
+    cur.execute(
+        "SELECT id FROM pit_boxes WHERE event_id=%s ORDER BY number OFFSET 1 LIMIT 1", (event_id,)
+    )
     second_box = cur.fetchone()[0]
-    cur.execute("""INSERT INTO pit_reservations(
+    cur.execute(
+        """INSERT INTO pit_reservations(
         pit_box_id,session_id,team_id,driver_id,starts_at,ends_at
     ) VALUES (%s,%s,%s,%s,%s,%s)""",
-        (first_box, session_id, team_id, drivers[0], now, now + __import__('datetime').timedelta(minutes=5)))
+        (
+            first_box,
+            session_id,
+            team_id,
+            drivers[0],
+            now,
+            now + __import__("datetime").timedelta(minutes=5),
+        ),
+    )
 
     with pytest.raises(Exception) as exc:
-        cur.execute("""INSERT INTO pit_reservations(
+        cur.execute(
+            """INSERT INTO pit_reservations(
             pit_box_id,session_id,team_id,driver_id,starts_at,ends_at
         ) VALUES (%s,%s,%s,%s,%s,%s)""",
-            (second_box, session_id, team_id, drivers[0], now, now + __import__('datetime').timedelta(minutes=5)))
+            (
+                second_box,
+                session_id,
+                team_id,
+                drivers[0],
+                now,
+                now + __import__("datetime").timedelta(minutes=5),
+            ),
+        )
     assert _sqlstate(exc.value) == "23505"
 
     # Releasing a reservation makes its driver available for another stop.
