@@ -45,9 +45,7 @@ def create_membership(membership: MembershipIn) -> dict[str, Any]:
     return cast(dict[str, Any], row)
 
 
-def update_membership(
-    membership_id: UUID, patch: MembershipPatch
-) -> dict[str, Any] | None:
+def update_membership(membership_id: UUID, patch: MembershipPatch) -> dict[str, Any] | None:
     values = patch.model_dump(exclude_unset=True)
     columns = {"team_id": "team_id", "start_date": "start_date", "end_date": "end_date"}
     fields = list(values)

@@ -1,0 +1,238 @@
+diff --git a/backend/tests/test_telemetry_ingest_contract.py b/backend/tests/test_telemetry_ingest_contract.py
+index 96f156e..ec9574f 100644
+--- a/backend/tests/test_telemetry_ingest_contract.py
++++ b/backend/tests/test_telemetry_ingest_contract.py
+@@ -29,26 +29,30 @@ def _packet(session_id, driver_id, latest_packet):
+     lap_time_ms = 90123
+     latest_ts = datetime.fromisoformat(latest_packet["ts"].replace("Z", "+00:00"))
+     return {
+-        "session_id": session_id, "driver_id": driver_id,
++        "session_id": session_id,
++        "driver_id": driver_id,
+         "ts": (latest_ts + timedelta(milliseconds=lap_time_ms)).isoformat().replace("+00:00", "Z"),
+-        "lap": latest_packet["lap"] + 1, "sector": 0,
+-        "elapsed_ms": latest_packet["elapsed_ms"] + lap_time_ms, "lap_time_ms": lap_time_ms,
+-        "sector_ms": [30100, 30000, 30023], "position": 1,
+-        "speed_kph": 210.5, "throttle_pct": 82.0, "brake_pct": 3.0,
+-        "tire_compound": "MEDIUM", "tire_age_laps": 2,
+-        "tire_wear_pct": 4.5, "tire_temp_c": [80.0, 82.0, 79.0, 81.0],
++        "lap": latest_packet["lap"] + 1,
++        "sector": 0,
++        "elapsed_ms": latest_packet["elapsed_ms"] + lap_time_ms,
++        "lap_time_ms": lap_time_ms,
++        "sector_ms": [30100, 30000, 30023],
++        "position": 1,
++        "speed_kph": 210.5,
++        "throttle_pct": 82.0,
++        "brake_pct": 3.0,
++        "tire_compound": "MEDIUM",
++        "tire_age_laps": 2,
++        "tire_wear_pct": 4.5,
++        "tire_temp_c": [80.0, 82.0, 79.0, 81.0],
+         "pit_state": "TRACK",
+     }
+ 
+ 
+ def _latest_packet(client, admin, session_id, driver_id):
+-    current = client.get(
+-        f"/api/telemetry?session_id={session_id}", headers=admin
+-    )
++    current = client.get(f"/api/telemetry?session_id={session_id}", headers=admin)
+     assert current.status_code == 200, current.text
+-    driver_packets = [
+-        row for row in current.json() if row["driver_id"] == driver_id
+-    ]
++    driver_packets = [row for row in current.json() if row["driver_id"] == driver_id]
+     assert driver_packets, "generated race should have current driver telemetry"
+     return max(
+         driver_packets,
+@@ -57,11 +61,30 @@ def _latest_packet(client, admin, session_id, driver_id):
+ 
+ 
+ PACKET_KEYS = {
+-    "id", "session_id", "driver_id", "ts", "lap", "sector", "elapsed_ms",
+-    "lap_time_ms", "last_lap_ms", "sector_ms", "position", "speed_kph",
+-    "throttle_pct", "brake_pct", "tire_compound", "tire_age_laps",
+-    "tire_wear_pct", "tire_temp_c", "pit_state", "pit_reservation_id",
+-    "pit_box_number", "pit_team_id", "pit_starts_at", "pit_ends_at",
++    "id",
++    "session_id",
++    "driver_id",
++    "ts",
++    "lap",
++    "sector",
++    "elapsed_ms",
++    "lap_time_ms",
++    "last_lap_ms",
++    "sector_ms",
++    "position",
++    "speed_kph",
++    "throttle_pct",
++    "brake_pct",
++    "tire_compound",
++    "tire_age_laps",
++    "tire_wear_pct",
++    "tire_temp_c",
++    "pit_state",
++    "pit_reservation_id",
++    "pit_box_number",
++    "pit_team_id",
++    "pit_starts_at",
++    "pit_ends_at",
+ }
+ 
+ 
+@@ -85,9 +108,7 @@ def _assert_persisted_and_readable(client, admin, collection, packet, response,
+     assert stored["lap"] == packet["lap"]
+     assert stored["elapsed_ms"] == packet["elapsed_ms"]
+ 
+-    listed = client.get(
+-        f"/api/telemetry?session_id={packet['session_id']}", headers=admin
+-    )
++    listed = client.get(f"/api/telemetry?session_id={packet['session_id']}", headers=admin)
+     assert listed.status_code == 200, listed.text
+     matching = [row for row in listed.json() if row["id"] == str(inserted_id)]
+     assert len(matching) == 1
+@@ -101,7 +122,8 @@ def _assert_inactive_rejected(client, admin, packet):
+     inactive = next((row for row in sessions.json() if row["state"] != "ACTIVE"), None)
+     if inactive:
+         rejected = client.post(
+-            "/api/telemetry/ingest", headers=admin,
++            "/api/telemetry/ingest",
++            headers=admin,
+             json={**packet, "session_id": inactive["id"]},
+         )
+         assert rejected.status_code == 409
+@@ -134,9 +156,7 @@ def test_seeded_telemetry_ingest_write_contract(database_api_client):
+         accepted = client.post("/api/telemetry/ingest", headers=admin, json=packet)
+         assert accepted.status_code == 202, accepted.text
+         inserted_id = ObjectId(accepted.json()["packet"]["id"])
+-        _assert_persisted_and_readable(
+-            client, admin, collection, packet, accepted, inserted_id
+-        )
++        _assert_persisted_and_readable(client, admin, collection, packet, accepted, inserted_id)
+         _assert_inactive_rejected(client, admin, packet)
+     finally:
+         if collection is not None and inserted_id is not None:
+diff --git a/backend/tests/test_telemetry_ordering.py b/backend/tests/test_telemetry_ordering.py
+index e093f35..be23f40 100644
+--- a/backend/tests/test_telemetry_ordering.py
++++ b/backend/tests/test_telemetry_ordering.py
+@@ -41,7 +41,8 @@ class FakeCollection:
+ 
+     def find(self, query):
+         return FakeCursor(
+-            row for row in self.documents
++            row
++            for row in self.documents
+             if all(row.get(key) == value for key, value in query.items())
+         )
+ 
+@@ -86,9 +87,7 @@ def setup_api(monkeypatch):
+             jsonable=lambda value: value,
+             mongo_ready=lambda: collection,
+             roles=lambda *_roles: lambda: "ADMIN",
+-            telemetry_ws_payload=lambda document, packet_id: {
+-                **document, "id": str(packet_id)
+-            },
++            telemetry_ws_payload=lambda document, packet_id: {**document, "id": str(packet_id)},
+             publish=lambda *event: events.append(event),
+         )
+     )
+@@ -97,11 +96,20 @@ def setup_api(monkeypatch):
+ 
+ def packet(driver=DRIVER_A, lap=1, sector=1, elapsed=1000, speed=200):
+     return {
+-        "session_id": str(SESSION), "driver_id": str(driver),
+-        "ts": "2026-10-23T12:00:00Z", "lap": lap, "sector": sector,
+-        "elapsed_ms": elapsed, "speed_kph": speed, "throttle_pct": 80,
+-        "brake_pct": 0, "tire_compound": "MEDIUM", "tire_age_laps": 1,
+-        "tire_wear_pct": 2, "tire_temp_c": [80], "pit_state": "TRACK",
++        "session_id": str(SESSION),
++        "driver_id": str(driver),
++        "ts": "2026-10-23T12:00:00Z",
++        "lap": lap,
++        "sector": sector,
++        "elapsed_ms": elapsed,
++        "speed_kph": speed,
++        "throttle_pct": 80,
++        "brake_pct": 0,
++        "tire_compound": "MEDIUM",
++        "tire_age_laps": 1,
++        "tire_wear_pct": 2,
++        "tire_temp_c": [80],
++        "pit_state": "TRACK",
+     }
+ 
+ 
+@@ -147,10 +155,12 @@ def test_older_and_conflicting_packets_are_rejected_without_side_effects(monkeyp
+ def test_driver_streams_advance_independently_and_publish_once_per_new_packet(monkeypatch):
+     client, collection, events = setup_api(monkeypatch)
+     assert client.post("/api/telemetry/ingest", json=packet()).status_code == 202
+-    assert client.post(
+-        "/api/telemetry/ingest", json=packet(DRIVER_B, lap=0, elapsed=50)
+-    ).status_code == 202
+-    assert client.post(
+-        "/api/telemetry/ingest", json=packet(DRIVER_B, lap=0, elapsed=40)
+-    ).status_code == 409
++    assert (
++        client.post("/api/telemetry/ingest", json=packet(DRIVER_B, lap=0, elapsed=50)).status_code
++        == 202
++    )
++    assert (
++        client.post("/api/telemetry/ingest", json=packet(DRIVER_B, lap=0, elapsed=40)).status_code
++        == 409
++    )
+     assert len(collection.documents) == len(events) == 2
+diff --git a/backend/tests/test_telemetry_router_contract.py b/backend/tests/test_telemetry_router_contract.py
+index 21dd88a..679d73d 100644
+--- a/backend/tests/test_telemetry_router_contract.py
++++ b/backend/tests/test_telemetry_router_contract.py
+@@ -50,10 +50,24 @@ def test_seeded_telemetry_and_live_read_contract(database_api_client):
+     inserted_ids = []
+     base = datetime(9998, 1, 1, tzinfo=UTC)
+     packet_keys = {
+-        "id", "session_id", "driver_id", "ts", "lap", "sector", "elapsed_ms",
+-        "lap_time_ms", "sector_ms", "position", "speed_kph", "throttle_pct",
+-        "brake_pct", "tire_compound", "tire_age_laps", "tire_wear_pct",
+-        "tire_temp_c", "pit_state",
++        "id",
++        "session_id",
++        "driver_id",
++        "ts",
++        "lap",
++        "sector",
++        "elapsed_ms",
++        "lap_time_ms",
++        "sector_ms",
++        "position",
++        "speed_kph",
++        "throttle_pct",
++        "brake_pct",
++        "tire_compound",
++        "tire_age_laps",
++        "tire_wear_pct",
++        "tire_temp_c",
++        "pit_state",
+     }
+     samples = [
+         (driver_ids[0], 1),
+@@ -97,15 +111,14 @@ def test_seeded_telemetry_and_live_read_contract(database_api_client):
+             assert limited.status_code == 200
+             assert limited.json()[0]["id"] == str(inserted_ids[-1])
+ 
+-            filtered = client.get(
+-                f"{telemetry_url}&driver_id={driver_ids[0]}", headers=headers
+-            )
++            filtered = client.get(f"{telemetry_url}&driver_id={driver_ids[0]}", headers=headers)
+             assert filtered.status_code == 200
+             tagged_filtered = [
+                 row for row in filtered.json() if row["id"] in {str(i) for i in inserted_ids}
+             ]
+             assert [row["id"] for row in tagged_filtered] == [
+-                str(inserted_ids[2]), str(inserted_ids[0])
++                str(inserted_ids[2]),
++                str(inserted_ids[0]),
+             ]
+ 
+             live = client.get(live_url, headers=headers)

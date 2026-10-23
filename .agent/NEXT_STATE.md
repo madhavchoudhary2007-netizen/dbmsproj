@@ -3,15 +3,21 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-44116 W2 — OPEN
-- target_files: backend/app/main.py
-- contract: preserve finalizationdomain and event/SQLordering; C901strictdecrease.
-- verify: .venv/bin/python -c "import json,subprocess; r=subprocess.run(['.venv/bin/ruff','check','--select','C901','--output-format','json','backend/app/main.py'],capture_output=True,text=True);d=json.loads(r.stdout);assert all('simulation_loop' not in x['message'] or int(x['message'].split('(')[1].split()[0])<16 for x in d);assert all('_finalize_simulation_results' not in x['message'] for x in d)" && .venv/bin/ruff format --check backend/app/main.py
+### T-44118 W3 — OPEN
+- target_files: backend/tests/test_telemetry_ingest_contract.py, backend/tests/test_telemetry_ordering.py, backend/tests/test_telemetry_router_contract.py
+- contract: canonical format only, exactAST preserved, <=150lines.
+- verify: .venv/bin/ruff check backend/tests/test_telemetry_ingest_contract.py backend/tests/test_telemetry_ordering.py backend/tests/test_telemetry_router_contract.py && .venv/bin/ruff format --check --output-format concise backend/tests/test_telemetry_ingest_contract.py backend/tests/test_telemetry_ordering.py backend/tests/test_telemetry_router_contract.py && .venv/bin/python .agent/check-format-progress.py backend/tests/test_telemetry_ingest_contract.py && .venv/bin/python .agent/check-format-progress.py backend/tests/test_telemetry_ordering.py && .venv/bin/python .agent/check-format-progress.py backend/tests/test_telemetry_router_contract.py
+
+### T-44117 W2 — OPEN
+- target_files: backend/app/pit_strategy_service.py, backend/app/membership_repository.py, backend/app/user_repository.py
+- contract: canonical format only, exactAST preserved, <=150lines.
+- verify: .venv/bin/ruff check backend/app/pit_strategy_service.py backend/app/membership_repository.py backend/app/user_repository.py && .venv/bin/ruff format --check --output-format concise backend/app/pit_strategy_service.py backend/app/membership_repository.py backend/app/user_repository.py && .venv/bin/python .agent/check-format-progress.py backend/app/pit_strategy_service.py && .venv/bin/python .agent/check-format-progress.py backend/app/membership_repository.py && .venv/bin/python .agent/check-format-progress.py backend/app/user_repository.py
 
 ## Blocked
 - T-310 remains open until full app Ruff/format exit0; T-311 accepted8570e58; no intermediate count is a parent pass.
 
 ## Done
+- T-44116 accepted265c60d; verify0.
 - T-441 accepteda49641c; verify0.
 - T-44115 accepted0224127; verify0.
 - T-44114 accepted8969b47; verify0.

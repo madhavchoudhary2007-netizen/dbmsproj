@@ -23,9 +23,7 @@ UserDeleteResult = Literal["deleted", "not_found", "referenced"]
 
 
 def create_user(user: UserCreate) -> dict[str, Any]:
-    password_hash = bcrypt.hashpw(
-        user.password.encode("utf-8"), bcrypt.gensalt()
-    ).decode("utf-8")
+    password_hash = bcrypt.hashpw(user.password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
     with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
             "INSERT INTO users(email,password_hash,full_name,role) "
@@ -38,8 +36,7 @@ def create_user(user: UserCreate) -> dict[str, Any]:
 
 def list_users(limit: int, offset: int) -> list[dict[str, Any]]:
     return fetch_all(
-        "SELECT id,email,full_name,role FROM users "
-        "ORDER BY full_name,email LIMIT %s OFFSET %s",
+        "SELECT id,email,full_name,role FROM users ORDER BY full_name,email LIMIT %s OFFSET %s",
         (limit, offset),
     )
 
@@ -63,9 +60,9 @@ def update_user(user_id: UUID, patch: UserPatch) -> dict[str, Any] | None:
         password = values.pop("password")
         if password is None:
             raise UserPatchError("Password cannot be null")
-        values["password_hash"] = bcrypt.hashpw(
-            password.encode("utf-8"), bcrypt.gensalt()
-        ).decode("utf-8")
+        values["password_hash"] = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode(
+            "utf-8"
+        )
     if "email" in values:
         if values["email"] is None:
             raise UserPatchError("Email cannot be null")
@@ -88,8 +85,7 @@ def update_user(user_id: UUID, patch: UserPatch) -> dict[str, Any] | None:
         cur.execute(
             sql.SQL("UPDATE users SET {} WHERE id=%s RETURNING id,email,full_name,role").format(
                 sql.SQL(",").join(
-                    sql.SQL("{}=%s").format(sql.Identifier(columns[field]))
-                    for field in fields
+                    sql.SQL("{}=%s").format(sql.Identifier(columns[field])) for field in fields
                 )
             ),
             [values[field] for field in fields] + [user_id],
