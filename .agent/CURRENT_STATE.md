@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: b886991
+git_head: 7c6c086
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -51,3 +51,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T44179 motion candidate rejected: seconds/important false positives, unknown timing/10s delay and no-preference bypass. Repair1 adds exact probes; patch stays isolated.
 
 - T44180repair1 Verify failed C90111>10, contradicting root estimate. Repair2 allows fully typed helper as temporary complexity boundary with precise Connection callback; no gate relaxed.
+
+- T-44180 accepted7c6c086: Moved unchanged constraint/transaction handlers into fully typed helper required by C901; precise connection and mainaliases preserved. Verify0.

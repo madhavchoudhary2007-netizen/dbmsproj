@@ -1,0 +1,5 @@
+/* transition: all 1s; prose and comments are ignored */
+.nb-plinth::before { transform: translate(4px, 4px); }
+.nb-plinth > .nb-face { transition: transform 120ms ease-out; }
+@media (prefers-reduced-motion: reduce) { .nb-plinth > .nb-face { transition: none; } }
+.status { transition: opacity 200ms linear, background-color 300ms; } .fast { transition: opacity .2s ease-out; } .off { transition: none!important; }

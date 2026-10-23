@@ -1,0 +1,5 @@
+.bad { transition: all 180ms ease; }
+.other { transition: box-shadow 120ms; }
+.nb-plinth::before { transition: transform 120ms ease-out; }
+@media (prefers-reduced-motion: no-preference) { .x { transition: none; } }
+.extra { transition: opacity 120ms banana; transition: opacity 120ms 10s; }
