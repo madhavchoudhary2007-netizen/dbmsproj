@@ -13,15 +13,11 @@ phase: 3 T331 extraction; Phase5 T360/T361accepted, T362 next (Phases0–2 compl
 - contract: T363 decorative texture foundation: approved static texture classes and skeleton texture token, no screen redesign.
 - verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && node -e 'require("./frontend/node_modules/postcss").parse(require("node:fs").readFileSync("frontend/app/styles/textures.css","utf8")); console.log("PASS texture CSS syntax")'
 
-### T-44194 W2 — OPEN
-- target_files: backend/app/api/dbms_sql.py, backend/app/main.py
-- contract: T331 move unchanged SQL paged row-browser handler into typed SQL API registration.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,importlib,inspect,subprocess; old=ast.parse(subprocess.check_output(["git","show","9efac10:backend/app/main.py"],text=True)); a=next(n for n in old.body if isinstance(n,ast.FunctionDef) and n.name=="dbms_table_rows"); a.decorator_list=[]; module=importlib.import_module("backend.app.api.dbms_sql"); b=next(n for n in ast.walk(ast.parse(inspect.getsource(module))) if isinstance(n,ast.FunctionDef) and n.name=="dbms_table_rows"); b.decorator_list=[]; assert ast.dump(a)==ast.dump(b); main=importlib.import_module("backend.app.main"); routes=[r for outer in main.app.routes for r in (outer.original_router.routes if hasattr(outer,"original_router") else [outer])]; assert sum(getattr(r,"endpoint",None) is main.dbms_table_rows for r in routes)==1; print("PASS exact SQL row browser and alias")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app/main.py backend/app/api/dbms_sql.py && .venv/bin/ruff format --check backend/app/main.py backend/app/api/dbms_sql.py
-
 ## Deferred
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44194 accepteddc48751; verify0.
 - T-44195 accepted2ff639d; verify0.
 - T-44193 accepted2c78430; verify0.
 - T-44191 accepted9efac10; verify0.

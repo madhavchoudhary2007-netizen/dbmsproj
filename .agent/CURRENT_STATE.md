@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 2ff639d
+git_head: dc48751
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -35,3 +35,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T44189 3343d87 exposed duplicate Mongo route left by9977cdf; fixed7eeb81d. Runtime uniqueness/alias regression permanent. Old214suite missed it; later216suite0skip/livePASS. Polyglotcdd4ad2 andtablemetadata2e9106e extracted exact bodies; transitional registration factories becomeT332 debt.
 - T44191 9efac10 required-input regressions9cleanRED+2controls; T44193 2c78430 helperfix now27focusedPASS. Rootfull227PASS0skip/livePASS (T-44193.full.raw.log). Responsechecksunchanged; onlyrequired-input additions covered, not all inputconstraints. Rootwrongtestfilename caused one failedworkercheck, corrected/re-dispatched ownfileonly.
 - T44194 rowbrowser ready pending integration; T44196textures/T44197componentsCSS fresh packet-only W1 workers running in disjointclones, cap2. Texture mustlandfirst. Roothostbuild/browser afterboth. Rootauthor0productlines.
+
+- T-44194 accepteddc48751: Moved unchanged SQL row browser into typed registration, preserving pagination, password exclusion, identifiers, mainalias and11 contract/runtime checks. Verify0.
