@@ -1330,6 +1330,82 @@ def database_api_client():
 
 
 @pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
+def test_session_action_route_characterization(database_api_client):
+    client = database_api_client
+    admin = client.post("/api/auth/login", json={
+        "email": "admin@apexgrid.test", "password": "ApexGrid2026!",
+    })
+    driver = client.post("/api/auth/login", json={
+        "email": "driver01@apexgrid.test", "password": "ApexGrid2026!",
+    })
+    assert admin.status_code == driver.status_code == 200
+    admin_headers = {"Authorization": "Bearer " + admin.json()["access_token"]}
+    driver_headers = {"Authorization": "Bearer " + driver.json()["access_token"]}
+    session_id = None
+    try:
+        events = client.get("/api/events", headers=admin_headers)
+        assert events.status_code == 200 and events.json()
+        created = client.post("/api/sessions", headers=admin_headers, json={
+            "event_id": events.json()[0]["id"], "session_type": "PRACTICE",
+            "scheduled_at": "2027-01-01T12:00:00Z",
+        })
+        assert created.status_code == 201, created.text
+        session_id = created.json()["id"]
+        assert created.json()["state"] == "SCHEDULED"
+        assert created.json()["started_at"] is None
+        assert created.json()["ended_at"] is None
+        path = f"/api/sessions/{session_id}/action"
+
+        client.cookies.clear()
+        anonymous = client.post(path, json={"action": "start"})
+        assert anonymous.status_code == 401
+        assert anonymous.json() == {"detail": "Authentication required"}
+        rejected_driver = client.post(path, headers=driver_headers, json={"action": "start"})
+        assert rejected_driver.status_code == 403
+        assert rejected_driver.json() == {"detail": "Insufficient role"}
+
+        def action(name, state, started, ended):
+            response = client.post(path, headers=admin_headers, json={"action": name})
+            assert response.status_code == 200, response.text
+            body = response.json()
+            assert body["state"] == state
+            for key, expected in (("started_at", started), ("ended_at", ended)):
+                if expected == "timestamp":
+                    assert isinstance(body[key], str)
+                    parsed = datetime.fromisoformat(body[key].replace("Z", "+00:00"))
+                    assert parsed.tzinfo is not None
+                else:
+                    assert body[key] == expected
+            return body
+
+        started = action("start", "ACTIVE", "timestamp", None)
+        start_time = datetime.fromisoformat(started["started_at"].replace("Z", "+00:00"))
+        started_at = started["started_at"]
+        repeated = client.post(path, headers=admin_headers, json={"action": "start"})
+        assert repeated.status_code == 409
+        assert repeated.json() == {"detail": "Invalid session state transition"}
+        action("pause", "PAUSED", started_at, None)
+        action("resume", "ACTIVE", started_at, None)
+        finished = action("finish", "COMPLETED", started_at, "timestamp")
+        ended_time = datetime.fromisoformat(finished["ended_at"].replace("Z", "+00:00"))
+        assert ended_time >= start_time
+        reset = action("reset", "SCHEDULED", None, None)
+        assert reset["started_at"] is reset["ended_at"] is None
+
+        missing = client.post(
+            "/api/sessions/00000000-0000-4000-8000-000000000000/action",
+            headers=admin_headers, json={"action": "start"},
+        )
+        assert missing.status_code == 404
+        assert missing.json() == {"detail": "Session not found"}
+    finally:
+        if session_id:
+            simulations.pop(session_id, None)
+            with main_module.connection() as conn, conn.cursor() as cur:
+                cur.execute("DELETE FROM race_sessions WHERE id=%s", (session_id,))
+
+
+@pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
 def test_membership_route_characterization(database_api_client):
     client = database_api_client
     admin = client.post("/api/auth/login", json={
