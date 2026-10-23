@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 41a5b46
+git_head: d9258cb
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -69,3 +69,5 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 - T-44108 accepteda893c67: Used equivalent UTC aliases and preserved all other test AST; two focused simulation tests pass. Verify exit0; 28 changed lines.
 
 - T-44105 accepted41a5b46: Resolved all remaining15 main E501 findings preserving AST and directives. Verify exit0; 62 changed lines.
+
+- T-44109 acceptedd9258cb: Extracted two exact Cursor fixture classes; full API-test Ruff/format and3 focused tests pass. Verify exit0; 41 changed lines.

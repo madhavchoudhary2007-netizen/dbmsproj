@@ -3,17 +3,23 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-44109 — scoped test fixture complexity
-- worker: W3 | priority: P1 | origin: bounded T-311 subdivision
-- target_files: backend/tests/test_api.py
-- contract: move two Cursor fixtures into factories, identical class/assert AST; <=150
-- verify: .venv/bin/ruff check backend/tests/test_api.py && .venv/bin/ruff format --check backend/tests/test_api.py && .venv/bin/pytest -q backend/tests/test_api.py -k 'mongo_collection_browser_lists_real_collections or demo_delete_waits_for_simulator'
+### T-311 — full test/frontend lint milestone
+- worker: W3 | priority: P1 | origin: plan3 Phase1
+- target_files: backend/tests/test_api.py, backend/tests/test_database.py, scripts/eval/verify-bundle-size.py
+- contract: verify-only, no edits; full plan lint command0
+- verify: .venv/bin/ruff check backend/tests && npm --prefix frontend run lint -- --max-warnings 0
+### T-44107 — demo/config lint cleanup
+- worker: W2 | priority: P1 | origin: bounded T-310 subdivision
+- target_files: backend/app/demo_race_repository.py, backend/app/config.py, pyproject.toml
+- contract: preserve all defaults/guards/SQL; narrow false-positive comments only, <=150
+- verify: .venv/bin/ruff check backend/app/demo_race_repository.py backend/app/config.py && .venv/bin/ruff format --check backend/app/demo_race_repository.py backend/app/config.py
 ## Blocked
 - T-310/T-311 remain open until full parent Ruff/format/frontend-lint commands exit0; no intermediate count is a parent pass.
 - T-440 (O, before motion packets): align plan2.3/2.7 with owner100–300ms and display>=48px leading limits; those conflicting catalogue specifications are missing a correction task.
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-44109 acceptedd9258cb; verify0.
 - T-44105 accepted41a5b46; verify0.
 - T-44108 accepteda893c67; verify0.
 - T-44106 acceptedc6e5749; verify0.
