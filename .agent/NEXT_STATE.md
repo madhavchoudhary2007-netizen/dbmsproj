@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-23T05:25:00Z
+updated_at: 2026-10-23T05:40:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-165 — F-DOM-04 ingest ordering fix
-- worker: W2 | priority: P2 | after: T-164
-- target_files: backend/app/telemetry_repository.py, backend/app/telemetry_router.py
-- contract: reject or idempotently ignore duplicate/older packets before Mongo insert and WebSocket publish; preserve wire shape unless ADR
-- verify: APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q --runxfail backend/tests/test_telemetry_ordering.py
+### T-172 — align seeded ingest fixture with live race progression
+- worker: W3 | priority: P2 | after: T-165
+- target_files: backend/tests/test_telemetry_ingest_contract.py
+- contract: generate a forward, plausible packet against the active race; keep status/body/Mongo/role/inactive assertions unchanged
+- verify: .venv/bin/ruff check backend/tests/test_telemetry_ingest_contract.py
 ### T-166 — F-DOM-05 replay seed reproduction
 - worker: W3 | priority: P2 | after: T-165
 - target_files: backend/tests/test_simulation_replay.py
@@ -26,6 +26,7 @@ loop_iteration: 0 of 8
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-165 ✓ f4c3e6e; focused --runxfail 4/4, Ruff 543/mypy 222; full isolated 130 pass/1 old fixture failure, T-172 queued.
 - T-164 ✓ 80a2bc9; 1 ordinary pass/3 strict xfails; --runxfail 3 failures on old code.
 - T-171 ✓ safe npm audit fix: Next/eslint 16.4.2; critical 0, high 7/moderate 2 deferred major-only; typecheck/build and isolated 127/0/0 pass.
 - T-170 ✓ 8573293; mypy strict 222 baseline restored; Ruff 543, login 6/6.
