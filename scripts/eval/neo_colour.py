@@ -16,6 +16,12 @@ UTILITY = re.compile(
     r"(?:-[\w./%]+|\[[^\]\s]*\])?(?![\w-])"
 )
 HEX = re.compile(r"#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{4}|[0-9a-fA-F]{3})(?![\w])")
+STYLE_HEX = re.compile(
+    r"(?<![\w$])(?:(?P<quote>['\"])(?:color|backgroundColor|borderColor)(?P=quote)|"
+    r"(?:color|backgroundColor|borderColor))\s*:\s*(?P<value_quote>['\"])(?P<hex>"
+    r"#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{4}|[0-9a-fA-F]{3})"
+    r")(?P=value_quote)(?=\s*[,}])"
+)
 APPROVED = {"fffdf5", "ffffff", "000000", "ff6b6b", "ffd93d", "c4b5fd", "7cf5b0", "7cc4ff"}
 
 
@@ -61,7 +67,19 @@ def check_gray(text: str, css: bool = False) -> list[tuple[int, str]]:
             continue
         if arbitrary or (css and _css_value(clean, match.start())):
             hits.append((match.start(), "neutral hex colour"))
+        if not css and _js_style_value(clean, match.start()):
+            hits.append((match.start(), "neutral hex colour"))
     return sorted(set(hits))
+
+
+def _js_style_value(text: str, offset: int) -> bool:
+    for match in STYLE_HEX.finditer(text):
+        if match.start("hex") != offset:
+            continue
+        prefix = text[max(0, match.start() - 100) : match.start()]
+        if re.search(r"(?:^|[{,])\s*$", prefix) and not _in_string(text, match.start()):
+            return True
+    return False
 
 
 def _self_test() -> int:
@@ -100,6 +118,14 @@ def _self_test() -> int:
         (".x{color:#8888}", True),
         (".x{color:#888888}", True),
         (".x{color:#88888888}", True),
+        (
+            "const style = { color: '#888', backgroundColor: '#808080', borderColor: '#999' };",
+            False,
+        ),
+        (
+            "const s = {'color':'#888',\"backgroundColor\":'#808080',borderColor:'#999'};",
+            False,
+        ),
     ]
     for sample, is_css in cases:
         require(bool(check_gray(sample, css=is_css)), f"expected gray violation: {sample}")
@@ -111,14 +137,18 @@ def _self_test() -> int:
     require(not check_gray(clean, css=True), "comments, palette and URL fragments pass")
     control = "identifier-gray-500 #888 .x{content:'#888';color:#123456}"
     require(not check_gray(control, css=True), "identifiers, strings and chromatic hex pass")
+    js_control = (
+        'const id = "#888"; const url = "https://host/#888"; const copy = "{color:\'#888\'}";'
+    )
+    require(not check_gray(js_control), "ordinary strings and URL fragments pass")
     offset_sample = "/* #888 */\n.x { color: #888; }"
     expected = offset_sample.index("#888", offset_sample.index("*/"))
     require(
         check_gray(offset_sample, css=True) == [(expected, "neutral hex colour")],
         "offset preserved",
     )
-    print(f"self-test assertions passed: {len(cases) + 5}")
-    return len(cases) + 5
+    print(f"self-test assertions passed: {len(cases) + 6}")
+    return len(cases) + 6
 
 
 if __name__ == "__main__":

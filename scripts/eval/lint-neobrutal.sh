@@ -15,6 +15,7 @@ fi
 python3 - "$@" <<'PY'
 import os, re, sys
 from pathlib import Path
+from scripts.eval.neo_colour import _self_test as gray_self_test, check_gray
 from scripts.eval.source_text import mask_comments
 
 allowed = re.compile(r"^(?:0(?:px)?|9999px|var\(--radius-(?:none|full)\))$", re.I)
@@ -25,7 +26,7 @@ extensions = {".css", ".scss", ".sass", ".js", ".jsx", ".ts", ".tsx", ".html", "
 skip = {"node_modules", ".next", "dist", "build", "vendor", "coverage", "generated"}
 
 def check(text, css=False):
-    clean = mask_comments(text, css=css); hits = []
+    clean = mask_comments(text, css=css); hits = check_gray(text, css=css)
     for m in css_radius.finditer(clean):
         vals = re.split(r"\s+", m.group(1).strip())
         if not vals or any(not allowed.fullmatch(v.strip("'\"")) for v in vals): hits.append((m.start(), "CSS radius"))
@@ -51,7 +52,11 @@ if sys.argv[1] == "--self-test":
     controls_text = "const x = { borderTopWidth: 4 }; const r = 'https://host';\n/*a\n b*/\n.el { border-radius: 8px; }"
     if not self_test(Path(sys.argv[2]), Path(sys.argv[3])):
         print("SELF-TEST FAILED: radius controls or comment line positions are wrong", file=sys.stderr); raise SystemExit(1)
-    print("SELF-TEST PASSED: fixtures, CSS, Tailwind, JS values, comments and URLs")
+    try:
+        gray_self_test()
+    except AssertionError as error:
+        print(f"SELF-TEST FAILED: gray checker: {error}", file=sys.stderr); raise SystemExit(1)
+    print("SELF-TEST PASSED: fixtures, gray, CSS, Tailwind, JS values, comments and URLs")
     raise SystemExit(0)
 
 if sys.argv[1] != "--scan": raise SystemExit(2)
@@ -70,7 +75,11 @@ for p in paths:
     try: text = p.read_text(errors="replace")
     except OSError as e: print(f"LINT ERROR: cannot read {p}: {e}", file=sys.stderr); raise SystemExit(2)
     for pos, rule in check(text, css=p.suffix.lower() in {".css", ".scss", ".sass"}):
-        print(f"{p}:{1 + text.count(chr(10), 0, pos)}: {rule} must use 0, 9999px, var(--radius-none), or var(--radius-full)")
+        line = 1 + text.count(chr(10), 0, pos)
+        if rule in {"CSS radius", "JS radius", "Tailwind radius"}:
+            print(f"{p}:{line}: {rule} must use 0, 9999px, var(--radius-none), or var(--radius-full)")
+        else:
+            print(f"{p}:{line}: {rule} is forbidden; use the ADR-007 palette")
         bad = 1
 raise SystemExit(bad)
 PY
