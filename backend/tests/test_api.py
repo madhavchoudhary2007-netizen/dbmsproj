@@ -1330,6 +1330,100 @@ def database_api_client():
 
 
 @pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
+def test_membership_route_characterization(database_api_client):
+    client = database_api_client
+    admin = client.post("/api/auth/login", json={
+        "email": "admin@apexgrid.test", "password": "ApexGrid2026!",
+    })
+    driver_login = client.post("/api/auth/login", json={
+        "email": "driver01@apexgrid.test", "password": "ApexGrid2026!",
+    })
+    assert admin.status_code == driver_login.status_code == 200
+    admin_headers = {"Authorization": "Bearer " + admin.json()["access_token"]}
+    driver_headers = {"Authorization": "Bearer " + driver_login.json()["access_token"]}
+    team_id, driver_id = uuid4(), uuid4()
+    team_name = f"membership-test-{team_id.hex}"
+    licence = f"QA-{driver_id.hex}"
+    newer_id = None
+    try:
+        with main_module.connection() as conn, conn.cursor() as cur:
+            cur.execute("INSERT INTO teams(id,name) VALUES (%s,%s)", (team_id, team_name))
+            cur.execute(
+                "INSERT INTO drivers(id,licence_number,number) VALUES (%s,%s,%s)",
+                (driver_id, licence, int(driver_id.hex[:3], 16) % 999 + 1),
+            )
+        create_payloads = [
+            {"driver_id": str(driver_id), "team_id": str(team_id),
+             "start_date": "2024-01-01", "end_date": "2024-01-31"},
+            {"driver_id": str(driver_id), "team_id": str(team_id),
+             "start_date": "2024-02-01"},
+        ]
+        client.cookies.clear()
+        anonymous = client.post("/api/team-memberships", json=create_payloads[0])
+        assert anonymous.status_code == 401
+        assert anonymous.json() == {"detail": "Authentication required"}
+        assert anonymous.headers["www-authenticate"] == "Bearer"
+        rejected = client.post(
+            "/api/team-memberships", json=create_payloads[0], headers=driver_headers
+        )
+        assert rejected.status_code == 403
+        assert rejected.json() == {"detail": "Insufficient role"}
+
+        created = [client.post("/api/team-memberships", json=payload, headers=admin_headers)
+                   for payload in create_payloads]
+        assert [response.status_code for response in created] == [201, 201]
+        older_id, newer_id = [response.json()["id"] for response in created]
+        membership_keys = {"id", "driver_id", "team_id", "start_date", "end_date"}
+        for response, payload in zip(created, create_payloads, strict=True):
+            assert membership_keys <= response.json().keys()
+            assert {key: response.json()[key] for key in payload} == payload
+
+        client.cookies.clear()
+        for path, lookup in (
+            (f"/api/drivers/{driver_id}/memberships", "team_name"),
+            (f"/api/teams/{team_id}/memberships", "driver_name"),
+        ):
+            result = client.get(path, headers=driver_headers)
+            assert result.status_code == 200, result.text
+            rows = result.json()
+            assert [row["id"] for row in rows] == [newer_id, older_id]
+            assert all(membership_keys | {lookup} <= row.keys() for row in rows)
+            if lookup == "team_name":
+                assert [row[lookup] for row in rows] == [team_name, team_name]
+            else:
+                assert [row[lookup] for row in rows] == [None, None]
+                assert all({"number", "licence_number"} <= row.keys() for row in rows)
+
+        patch_path = f"/api/team-memberships/{newer_id}"
+        patch_body = {"end_date": "2024-02-29"}
+        for headers, status, detail in (
+            ({}, 401, "Authentication required"),
+            (driver_headers, 403, "Insufficient role"),
+        ):
+            rejected = client.patch(patch_path, json=patch_body, headers=headers)
+            assert rejected.status_code == status
+            assert rejected.json() == {"detail": detail}
+        empty = client.patch(patch_path, json={}, headers=admin_headers)
+        assert empty.status_code == 422
+        patched = client.patch(patch_path, json=patch_body, headers=admin_headers)
+        assert patched.status_code == 200, patched.text
+        assert membership_keys <= patched.json().keys()
+        assert patched.json()["id"] == newer_id
+        assert patched.json()["end_date"] == patch_body["end_date"]
+        missing = client.patch(
+            "/api/team-memberships/00000000-0000-4000-8000-000000000000",
+            json=patch_body, headers=admin_headers,
+        )
+        assert missing.status_code == 404
+    finally:
+        with main_module.connection() as conn, conn.cursor() as cur:
+            cur.execute("DELETE FROM team_memberships WHERE driver_id=%s AND team_id=%s",
+                        (driver_id, team_id))
+            cur.execute("DELETE FROM drivers WHERE id=%s", (driver_id,))
+            cur.execute("DELETE FROM teams WHERE id=%s", (team_id,))
+
+
+@pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
 @pytest.mark.parametrize(("resource", "required_keys"), [
     ("championships", {"id", "name", "season"}),
     ("circuits", {"id", "name", "country", "length_km"}),
