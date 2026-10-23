@@ -3,7 +3,7 @@ from contextlib import AbstractContextManager
 from datetime import UTC, datetime
 from typing import Any, Literal
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from psycopg import Connection, sql
 from psycopg.errors import CheckViolation
 from psycopg.rows import dict_row, tuple_row
@@ -94,8 +94,73 @@ def _register_table_handlers(
     return {"dbms_tables": dbms_tables}
 
 
+def _register_table_row_handler(
+    router: APIRouter,
+    admin_dependency: Any,
+    connection: Callable[[], AbstractContextManager[Connection[DatabaseRow]]],
+    jsonable: Callable[[Any], Any],
+    public_dbms_tables: Callable[[], list[str]],
+    fetch_all: Callable[..., list[DatabaseRow]],
+) -> dict[str, Callable[..., Any]]:
+    @router.get("/api/dbms/tables/{table_name}")
+    def dbms_table_rows(
+        table_name: str,
+        limit: int = Query(50, ge=1, le=100),
+        offset: int = Query(0, ge=0),
+        user=admin_dependency,
+    ):
+        if table_name not in public_dbms_tables():
+            raise HTTPException(404, "Database table not found")
+        columns = fetch_all(
+            """SELECT column_name FROM information_schema.columns
+      WHERE table_schema='public' AND table_name=%s ORDER BY ordinal_position""",
+            (table_name,),
+        )
+        visible_columns = [
+            row["column_name"] for row in columns if row["column_name"] not in {"password_hash"}
+        ]
+        primary_keys = fetch_all(
+            """SELECT k.column_name FROM information_schema.table_constraints t
+      JOIN information_schema.key_column_usage k ON k.constraint_name=t.constraint_name
+        AND k.constraint_schema=t.constraint_schema AND k.table_name=t.table_name
+      WHERE t.table_schema='public' AND t.table_name=%s AND t.constraint_type='PRIMARY KEY'
+      ORDER BY k.ordinal_position""",
+            (table_name,),
+        )
+        order_columns = [row["column_name"] for row in primary_keys] or visible_columns[:1]
+        with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
+            cur.execute(
+                sql.SQL("SELECT {} FROM public.{} ORDER BY {} LIMIT %s OFFSET %s").format(
+                    sql.SQL(",").join(map(sql.Identifier, visible_columns)),
+                    sql.Identifier(table_name),
+                    sql.SQL(",").join(map(sql.Identifier, order_columns)),
+                ),
+                (limit, offset),
+            )
+            rows = cur.fetchall()
+            cur.execute(
+                sql.SQL("SELECT count(*) AS count FROM public.{}").format(
+                    sql.Identifier(table_name)
+                )
+            )
+            count = cur.fetchone()["count"]
+        return jsonable(
+            {
+                "table_name": table_name,
+                "columns": visible_columns,
+                "rows": rows,
+                "total": count,
+                "limit": limit,
+                "offset": offset,
+                "updated_at": datetime.now(UTC),
+            }
+        )
+
+    return {"dbms_table_rows": dbms_table_rows}
+
+
 def create_dbms_sql_router(
-    fetch_all: Callable[..., Any],
+    fetch_all: Callable[..., list[DatabaseRow]],
     jsonable: Callable[[Any], Any],
     admin_dependency: Any,
     connection: Callable[[], AbstractContextManager[Connection[DatabaseRow]]],
@@ -194,6 +259,9 @@ def create_dbms_sql_router(
     table_handlers = _register_table_handlers(
         router, admin_dependency, connection, jsonable, public_dbms_tables
     )
+    table_row_handlers = _register_table_row_handler(
+        router, admin_dependency, connection, jsonable, public_dbms_tables, fetch_all
+    )
 
     return router, {
         "dbms_schema": dbms_schema,
@@ -204,4 +272,5 @@ def create_dbms_sql_router(
         "dbms_races": dbms_races,
         **demo_handlers,
         **table_handlers,
+        **table_row_handlers,
     }

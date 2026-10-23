@@ -1807,6 +1807,7 @@ dbms_explain = dbms_sql_handlers["dbms_explain"]
 dbms_races = dbms_sql_handlers["dbms_races"]
 constraint_demo = dbms_sql_handlers["constraint_demo"]
 transaction_demo = dbms_sql_handlers["transaction_demo"]
+dbms_table_rows = dbms_sql_handlers["dbms_table_rows"]
 app.include_router(dbms_sql_router)
 
 
@@ -1833,59 +1834,6 @@ def public_dbms_tables():
         for row in fetch_all("""SELECT table_name FROM information_schema.tables
       WHERE table_schema='public' AND table_type='BASE TABLE' ORDER BY table_name""")
     ]
-
-
-@app.get("/api/dbms/tables/{table_name}")
-def dbms_table_rows(
-    table_name: str,
-    limit: int = Query(50, ge=1, le=100),
-    offset: int = Query(0, ge=0),
-    user=admin_dependency,
-):
-    if table_name not in public_dbms_tables():
-        raise HTTPException(404, "Database table not found")
-    columns = fetch_all(
-        """SELECT column_name FROM information_schema.columns
-      WHERE table_schema='public' AND table_name=%s ORDER BY ordinal_position""",
-        (table_name,),
-    )
-    visible_columns = [
-        row["column_name"] for row in columns if row["column_name"] not in {"password_hash"}
-    ]
-    primary_keys = fetch_all(
-        """SELECT k.column_name FROM information_schema.table_constraints t
-      JOIN information_schema.key_column_usage k ON k.constraint_name=t.constraint_name
-        AND k.constraint_schema=t.constraint_schema AND k.table_name=t.table_name
-      WHERE t.table_schema='public' AND t.table_name=%s AND t.constraint_type='PRIMARY KEY'
-      ORDER BY k.ordinal_position""",
-        (table_name,),
-    )
-    order_columns = [row["column_name"] for row in primary_keys] or visible_columns[:1]
-    with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-        cur.execute(
-            sql.SQL("SELECT {} FROM public.{} ORDER BY {} LIMIT %s OFFSET %s").format(
-                sql.SQL(",").join(map(sql.Identifier, visible_columns)),
-                sql.Identifier(table_name),
-                sql.SQL(",").join(map(sql.Identifier, order_columns)),
-            ),
-            (limit, offset),
-        )
-        rows = cur.fetchall()
-        cur.execute(
-            sql.SQL("SELECT count(*) AS count FROM public.{}").format(sql.Identifier(table_name))
-        )
-        count = cur.fetchone()["count"]
-    return jsonable(
-        {
-            "table_name": table_name,
-            "columns": visible_columns,
-            "rows": rows,
-            "total": count,
-            "limit": limit,
-            "offset": offset,
-            "updated_at": datetime.now(UTC),
-        }
-    )
 
 
 @app.get("/api/dbms/races/{session_id}")

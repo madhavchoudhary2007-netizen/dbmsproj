@@ -3,10 +3,15 @@ updated_at: 2026-10-23
 phase: 3 T331 extraction; Phase5 T360/T361accepted, T362 next (Phases0–2 complete; baseline51.2974)
 
 ## Queue
-### T-44195 W1 — OPEN
-- target_files: frontend/app/globals.css
-- contract: T360 baseline gaps prerequisite for T363: normalize13 legacy CSS rule violations to unchanged approved radius/shadow/gradient/weight/motion gates, preserving every feature and selector.
-- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+### T-44197 W1 — OPEN
+- target_files: frontend/app/styles/components.css, frontend/app/globals.css
+- contract: T363 component CSS foundation and ordered imports: plinth, stickers, static marquee, stroke, skeleton, caution and focus/reduced motion.
+- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && node -e 'require("./frontend/node_modules/postcss").parse(require("node:fs").readFileSync("frontend/app/styles/components.css","utf8")); console.log("PASS component CSS syntax")'
+
+### T-44196 W1 — OPEN
+- target_files: frontend/app/styles/textures.css
+- contract: T363 decorative texture foundation: approved static texture classes and skeleton texture token, no screen redesign.
+- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && node -e 'require("./frontend/node_modules/postcss").parse(require("node:fs").readFileSync("frontend/app/styles/textures.css","utf8")); console.log("PASS texture CSS syntax")'
 
 ### T-44194 W2 — OPEN
 - target_files: backend/app/api/dbms_sql.py, backend/app/main.py
@@ -17,6 +22,7 @@ phase: 3 T331 extraction; Phase5 T360/T361accepted, T362 next (Phases0–2 compl
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44195 accepted2ff639d; verify0.
 - T-44193 accepted2c78430; verify0.
 - T-44191 accepted9efac10; verify0.
 - T-44192 accepted2e9106e; verify0.
