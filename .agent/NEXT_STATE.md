@@ -3,15 +3,16 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-44121 W2 — OPEN
-- target_files: backend/app/main.py, backend/app/login_limiter.py
-- contract: preservetick/stateflow, C901loopzero; loginformatterexactAST.
-- verify: .venv/bin/python -c "import ast,subprocess; p='backend/app/main.py';s=open(p).read();ns=[n for n in ast.parse(s).body if isinstance(n,(ast.FunctionDef,ast.AsyncFunctionDef)) and n.name in ('simulation_loop','_persist_simulation_tick')];assert len(ns)==2;subprocess.run(['.venv/bin/ruff','check','--select','C901','--stdin-filename',p,'-'],input=chr(10).join(ast.get_source_segment(s,n) for n in ns),text=True,check=True)" && .venv/bin/ruff check backend/app/login_limiter.py && .venv/bin/ruff format --check --output-format concise backend/app/main.py backend/app/login_limiter.py && .venv/bin/python .agent/check-format-progress.py backend/app/login_limiter.py
+### T-44122 W2 — OPEN
+- target_files: backend/app/main.py
+- contract: preserve lockcontention andcleanup guarantees, fullappRuff/formatzero.
+- verify: .venv/bin/ruff check backend/app && .venv/bin/ruff format --check --output-format concise backend/app backend/tests
 
 ## Blocked
 - T-310 remains open until full app Ruff/format exit0; T-311 accepted8570e58; no intermediate count is a parent pass.
 
 ## Done
+- T-44121 accepted0aafbee; verify0.
 - T-44120 acceptedcd970ca; verify0.
 - T-44119 accepted64ae141; verify0.
 - T-44118 acceptedebb3b8f; verify0.

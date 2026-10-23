@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: cd970ca
+git_head: 0aafbee
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -41,3 +41,5 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 - T-44119 accepted64ae141: Applied Ruff canonical formatting to three Python files; 48 changed lines total. AST and canonical-content checks passed for each file. Verify exit0; 48 changed lines.
 
 - T-44120 acceptedcd970ca: Ruff formatting only; exact diff numstat 29 added, 8 removed. AST and canonical contents unchanged; format distance 37 -> 0. Verify exit0; 37 changed lines.
+
+- T-44121 accepted0aafbee: Extracted the typed simulation tick persistence helper, consolidated session state checks, and canonicalized login_limiter.py formatting without changing its AST. Verify exit0; 47 changed lines.
