@@ -1,0 +1,97 @@
+diff --git a/backend/tests/test_api.py b/backend/tests/test_api.py
+index 93c053d..cec80e3 100644
+--- a/backend/tests/test_api.py
++++ b/backend/tests/test_api.py
+@@ -466,7 +466,7 @@ def test_historical_archive_fills_missing_laps_without_replacing_recorded_data()
+     }
+     first_driver_lap_2 = next(doc for doc in collection.inserted
+                               if doc["driver_id"] == str(first_driver) and doc["lap"] == 2)
+-    rng = random.Random(str(session_id) + str(first_driver))
++    rng = random.Random(str(session_id) + str(first_driver))  # noqa: S311 -- seeded RNG makes historical simulation replay deterministic
+     rng.randint(-45, 45)  # lap 1's generated fallback is consumed even though telemetry has that lap.
+     generated_lap_2 = results[0]["lap_time_ms"] or (85000 + 1 * 140 + rng.randint(-45, 45) + 2 * 3)
+     expected_elapsed = 123456 + generated_lap_2
+@@ -501,7 +501,7 @@ def test_session_lap_limits_and_simulation_never_exceeds_72():
+     emitted = []
+     for tick in range(10 * 73):
+         packets, _ = advance_simulation_tick(
+-            sim, datetime(2026, 10, 5, 10, 0, tzinfo=timezone.utc), random.Random(tick),
++            sim, datetime(2026, 10, 5, 10, 0, tzinfo=timezone.utc), random.Random(tick),  # noqa: S311 -- tick-seeded RNG produces reproducible non-security simulation packets
+         )
+         emitted.append(packets[0])
+     assert max(packet["lap"] for packet in emitted) == 72
+@@ -1000,7 +1000,7 @@ def test_simulation_keeps_sector_lap_elapsed_and_tire_state_coherent():
+         session_id="a2100000-0000-4000-8000-000000000003",
+         drivers=[{"id": "driver-1", "number": 7}], rate_hz=2,
+     )
+-    rng = random.Random(42)
++    rng = random.Random(42)  # noqa: S311 -- seeded RNG verifies deterministic simulated telemetry state
+     samples = []
+     for tick in range(12):
+         packets, timing = advance_simulation_tick(
+@@ -1022,7 +1022,7 @@ def test_simulation_keeps_sector_lap_elapsed_and_tire_state_coherent():
+ def test_drivers_progress_sectors_on_individual_pace_clocks():
+     sim = Simulation("race", [{"id": "fast", "number": 1}, {"id": "slow", "number": 2}], 2)
+     sim.pace_offsets_ms = {"fast": -6000, "slow": 6000}
+-    rng = random.Random(17)
++    rng = random.Random(17)  # noqa: S311 -- seeded RNG verifies repeatable relative driver pacing
+     states = []
+     completed = {"fast": [], "slow": []}
+     for _tick in range(40):
+@@ -1043,9 +1043,9 @@ def test_safety_car_slowdown_and_reserved_pit_state_are_applied():
+     driver = {"id": "driver-1", "number": 7}
+     normal = Simulation("session-1", [driver], 2)
+     safety = Simulation("session-1", [driver], 2)
+-    normal_packets, _ = advance_simulation_tick(normal, datetime.now(timezone.utc), random.Random(4))
++    normal_packets, _ = advance_simulation_tick(normal, datetime.now(timezone.utc), random.Random(4))  # noqa: S311 -- seeded RNG makes paired safety-car simulation deterministic
+     safety_packets, timing = advance_simulation_tick(
+-        safety, datetime.now(timezone.utc), random.Random(4), safety_car=True,
++        safety, datetime.now(timezone.utc), random.Random(4), safety_car=True,  # noqa: S311 -- seeded RNG keeps safety-car comparison on the same simulation path
+         pit_driver_ids={"driver-1"},
+     )
+     assert safety_packets[0]["sector_ms"][0] > normal_packets[0]["sector_ms"][0]
+@@ -1066,7 +1066,7 @@ def test_assigned_pit_metadata_is_scoped_to_the_assigned_driver():
+                   "team_id": team_id, "starts_at": start - timedelta(seconds=1),
+                   "ends_at": start + timedelta(seconds=2)}
+     packets, timing = advance_simulation_tick(
+-        sim, start, random.Random(9), pit_assignments={"driver-1": assignment},
++        sim, start, random.Random(9), pit_assignments={"driver-1": assignment},  # noqa: S311 -- seeded RNG makes assigned-pit simulation repeatable
+     )
+     by_driver = {packet["driver_id"]: packet for packet in packets}
+     assert by_driver["driver-1"]["pit_state"] == "IN_PIT"
+@@ -1282,11 +1282,11 @@ def test_dbms_mongo_collection_browser_lists_real_collections_and_pages_filtered
+ 
+ def test_jwt_secret_fails_closed_outside_local_demo():
+     root=Path(__file__).resolve().parents[2]
+-    env=dict(os.environ,APP_ENV="production",JWT_SECRET="dev-change-me")
++    env=dict(os.environ,APP_ENV="production",JWT_SECRET="dev-change-me")  # noqa: S106 -- deliberately weak JWT fixture exercises fail-closed validation
+     weak=subprocess.run([sys.executable,"-c","from backend.app.config import JWT_SECRET"],cwd=root,env=env,capture_output=True,text=True)
+     assert weak.returncode != 0
+     assert "JWT_SECRET" in weak.stderr
+-    env["JWT_SECRET"]="a-unique-production-signing-secret-with-at-least-32-bytes"
++    env["JWT_SECRET"]="a-unique-production-signing-secret-with-at-least-32-bytes"  # noqa: S105 -- deliberately strong JWT fixture exercises accepted local validation
+     strong=subprocess.run([sys.executable,"-c","from backend.app.config import JWT_SECRET"],cwd=root,env=env,capture_output=True,text=True)
+     assert strong.returncode == 0, strong.stderr
+ 
+@@ -1795,7 +1795,7 @@ def test_admin_user_management_and_protected_driver_session_fields(database_api_
+         assert old_login.status_code==401
+         assert new_login.status_code==200
+ 
+-        created_driver=client.post("/api/drivers",headers=admin_headers,json={"user_id":user_id,"licence_number":f"TEST-{suffix}","number":900+random.randrange(100),"eligibility":"RACE_BANNED"})
++        created_driver=client.post("/api/drivers",headers=admin_headers,json={"user_id":user_id,"licence_number":f"TEST-{suffix}","number":900+random.randrange(100),"eligibility":"RACE_BANNED"})  # noqa: S311 -- seeded pseudo-random driver number is non-security API test data
+         assert created_driver.status_code==201,created_driver.text
+         driver=created_driver.json(); driver_id=driver["id"]
+         assert driver["eligibility"]=="ACTIVE"
+diff --git a/pyproject.toml b/pyproject.toml
+index bfcaad5..adeb3d5 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -3,6 +3,8 @@ target-version = "py312"
+ line-length = 100
+ 
+ [tool.ruff.lint]
++# S311 inline exceptions cover only seeded, non-security simulation fixtures.
++# S105/S106 inline exceptions cover only intentional JWT rejection/acceptance fixtures.
+ select = ["E", "F", "I", "B", "UP", "S", "SIM", "C90"]
+ 
+ [tool.ruff.lint.mccabe]

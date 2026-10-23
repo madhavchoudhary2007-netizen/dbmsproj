@@ -3,6 +3,8 @@ target-version = "py312"
 line-length = 100
 
 [tool.ruff.lint]
+# S311 inline exceptions cover only seeded, non-security simulation fixtures.
+# S105/S106 inline exceptions cover only intentional JWT rejection/acceptance fixtures.
 select = ["E", "F", "I", "B", "UP", "S", "SIM", "C90"]
 
 [tool.ruff.lint.mccabe]
