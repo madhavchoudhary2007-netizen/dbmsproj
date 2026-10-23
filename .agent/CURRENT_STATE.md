@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 2cc09da
+git_head: e2d86a7
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -18,7 +18,7 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 - Frontend lint/typecheck0 after T-4436cca3aa (two explicit-any replacements); spacing/banned/motion0. Neo lint NOT_RUN untilT-360. Existing FPS17.0ms must tighten to16.7 atT-413; no performance pass claimed.
 - Full disposable backend/live gates repeatedly pass136tests,0 failed/skipped/xfailed; login/session/simulation/Mongo/WS/pits/trigger/results/standings/DBMS/generated races PASS. Latest afterT-458/T-4480: .agent/results/T-4480-T-458.retry.full.raw.log exit0.
 - T-44804a3ab7f fixes verifier API launch with exec, so cleanup waits actual API PID. After full gate, listener18000 check exit1 confirms none. Previous T-442/T-458 lease failures104passed/32failed came from orphaned disposable API children (ports15432/27018/18000 only, PPID1), not product assertions. PID79496 gracefully terminated; PID11698 self-exited before TERM attempt.
-- Next full disposable gate must include T-4482 CRUD guards. Formatting can continue in isolated clones.
+- T-4482 full disposable gate exit0:136passed,0skips, all live acceptance PASS; no API listener afterward (exit1). Repeated-run cleanup defect resolved. Formatting continues in isolated clones.
 - T-449 initial formatter188>150 and T-448 initial152>150 rejected/reverted; each repair narrowed scope and passed, parent gates unchanged. T-460 reported3 static checks as tests; corrected to0 collected tests before saving.
 
 ## Execution and contracts
@@ -37,3 +37,5 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 - Requested two model-profile lines; architecture/ADR/state/packet/envelope/orchestration helper only. No authored frontend/backend product lines. Patch integration is worker output, not bulk source authorship.
 
 - T-4484 accepted2cc09da: Advanced145 lines of canonical main formatting with identical AST and canonical contents. Verify exit0; 145 changed lines.
+
+- T-4485 acceptede2d86a7: Advanced141 lines of canonical API-test formatting with identical AST and canonical contents. Verify exit0; 141 changed lines.
