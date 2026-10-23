@@ -119,7 +119,7 @@ def create_demo_race_records(
     seed: int | None = None,
 ) -> tuple[list[dict[str, Any]], int]:
     generated: list[dict[str, Any]] = []
-    rng = random.Random(seed) if seed is not None else random
+    rng = random.Random(seed) if seed is not None else random  # noqa: S311 -- deterministic simulation, not security
     with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
             "SELECT id FROM championships WHERE name='ApexGrid Live Demo' "
@@ -128,7 +128,8 @@ def create_demo_race_records(
         championship = cur.fetchone()
         if not championship:
             cur.execute(
-                "INSERT INTO championships(name,season) VALUES ('ApexGrid Live Demo',extract(year from current_date)::int) RETURNING id"
+                "INSERT INTO championships(name,season) VALUES ('ApexGrid Live Demo',"
+                "extract(year from current_date)::int) RETURNING id"
             )
             championship = cur.fetchone()
         cur.execute("SELECT id,name FROM circuits ORDER BY name")
@@ -139,28 +140,37 @@ def create_demo_race_records(
             raise DemoRaceSetupError("Demo race requires at least one circuit and one team")
         cur.execute("SELECT pg_advisory_xact_lock(hashtext('apexgrid-demo-race-create'))")
         cur.execute(
-            "SELECT COALESCE(max(round_number),0)+1 AS round FROM race_events WHERE championship_id=%s",
+            "SELECT COALESCE(max(round_number),0)+1 AS round "
+            "FROM race_events WHERE championship_id=%s",
             (championship["id"],),
         )
         round_number = cur.fetchone()["round"]
         numbers = rng.sample(range(11, 100), len(names))
         circuit = rng.choice(circuits)
-        event_name = f"{circuit['name']} Grand Prix — {rng.choice(['Sprint Weekend', 'Night Race', 'Coastal Classic', 'Autumn Round'])}"
+        event_name = (
+            f"{circuit['name']} Grand Prix — "
+            f"{rng.choice(['Sprint Weekend', 'Night Race', 'Coastal Classic', 'Autumn Round'])}"
+        )
         total_laps = rng.randint(45, MAX_SESSION_LAPS)
         cur.execute(
-            "INSERT INTO race_events(id,championship_id,circuit_id,round_number,name,start_date) VALUES (%s,%s,%s,%s,%s,%s)",
+            "INSERT INTO race_events(id,championship_id,circuit_id,round_number,"
+            "name,start_date) VALUES (%s,%s,%s,%s,%s,%s)",
             (event_id, championship["id"], circuit["id"], round_number, event_name, now),
         )
         cur.execute(
-            "INSERT INTO race_sessions(id,event_id,session_type,state,scheduled_at,started_at,total_laps) VALUES (%s,%s,'RACE','ACTIVE',%s,%s,%s)",
+            "INSERT INTO race_sessions(id,event_id,session_type,state,scheduled_at,"
+            "started_at,total_laps) "
+            "VALUES (%s,%s,'RACE','ACTIVE',%s,%s,%s)",
             (session_id, event_id, now, now, total_laps),
         )
         cur.execute(
-            "INSERT INTO demo_races(session_id,event_id,auto_repeat,simulation_seed) VALUES (%s,%s,%s,%s)",
+            "INSERT INTO demo_races(session_id,event_id,auto_repeat,simulation_seed) "
+            "VALUES (%s,%s,%s,%s)",
             (session_id, event_id, auto_repeat, seed),
         )
         cur.execute(
-            "INSERT INTO pit_boxes(event_id,number) SELECT %s,n FROM generate_series(1,4) AS n ON CONFLICT(event_id,number) DO NOTHING",
+            "INSERT INTO pit_boxes(event_id,number) SELECT %s,n FROM generate_series(1,4) AS n "
+            "ON CONFLICT(event_id,number) DO NOTHING",
             (event_id,),
         )
         for idx, full_name in enumerate(names):
@@ -170,7 +180,8 @@ def create_demo_race_records(
             secret = secrets.token_urlsafe(40)
             password_hash = bcrypt.hashpw(secret.encode(), bcrypt.gensalt(rounds=10)).decode()
             cur.execute(
-                "INSERT INTO users(id,email,password_hash,full_name,role) VALUES (%s,%s,%s,%s,'DRIVER')",
+                "INSERT INTO users(id,email,password_hash,full_name,role) "
+                "VALUES (%s,%s,%s,%s,'DRIVER')",
                 (user_id, email, password_hash, full_name),
             )
             cur.execute(
@@ -184,7 +195,8 @@ def create_demo_race_records(
             )
             offset = rng.randint(-1200, 1600)
             cur.execute(
-                "INSERT INTO demo_race_entries(session_id,driver_id,pace_offset_ms) VALUES (%s,%s,%s)",
+                "INSERT INTO demo_race_entries(session_id,driver_id,pace_offset_ms) "
+                "VALUES (%s,%s,%s)",
                 (session_id, driver_id, offset),
             )
             generated.append(
@@ -203,10 +215,14 @@ def get_demo_race_row(session_id: UUID | str) -> dict[str, Any] | None:
     return cast(
         dict[str, Any] | None,
         fetch_one(
-            """SELECT s.id AS session_id,e.id AS event_id,e.name AS event_name,c.name AS circuit_name,
-            s.state,s.total_laps,(SELECT count(*) FROM demo_race_entries de WHERE de.session_id=s.id)::int AS car_count,
-            d.created_at FROM demo_races d JOIN race_sessions s ON s.id=d.session_id
-            JOIN race_events e ON e.id=d.event_id JOIN circuits c ON c.id=e.circuit_id WHERE s.id=%s""",
+            "SELECT s.id AS session_id,e.id AS event_id,e.name AS event_name,"
+            "c.name AS circuit_name,\n"
+            "            s.state,s.total_laps,(SELECT count(*) FROM "
+            "demo_race_entries de WHERE de.session_id=s.id)::int AS car_count,\n"
+            "            d.created_at FROM demo_races d JOIN race_sessions s "
+            "ON s.id=d.session_id\n"
+            "            JOIN race_events e ON e.id=d.event_id JOIN circuits c "
+            "ON c.id=e.circuit_id WHERE s.id=%s",
             (session_id,),
         ),
     )

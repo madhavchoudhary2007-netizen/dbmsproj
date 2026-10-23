@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: d9258cb
+git_head: 8570e58
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -9,7 +9,7 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 
 ## Phase and verified facts
 - Phase0 complete T-300e465e89/T-30113e6100/T-30259a180e; owner "ok approved continue"/"dont stop you have all permissions". ADR007 activation locked9010959b; boot/lock0. Caller-default harness and actual Codex ORCH_MODEL set; worker bindings/cap unchanged; owner Claude433000 settings preserved.
-- Phase1 T-310/T-311 remain OPEN until full Ruff/format gates0; atomic child successes never count as parent pass. T-312 typing/T-313CI thenT-314 scorer follow per dependency graph.
+- Phase1 T-311 accepted8570e58:full backend-tests Ruff and strict frontend lint0; scripts/eval Python Ruff separately0. T-310 remains OPEN until full app Ruff/format0; atomic children are not parent passes. T-312 typing/T-313CI thenT-314 scorer follow per dependency graph.
 - Latest complete Ruff baseline330(main213,test_api98,demo15,config4), before T-4482/4483. Initial542/format25files/frontend2any. Fresh mypy222 in14files/31checked. Audit7high2moderate remains prior documented until rerun.
 - Database tests entire file Ruff+format0, AST unchanged, acceptedT-46012e8ea1 after bounded formatting packets.
 - Routers/bootstrap/schemas/CRUD/telemetry/pit/archive scoped Ruff+format0. T-458fe83d11 safely quotes SQL identifiers with psycopg composables and bound values; precise count_documents Protocol. Telemetry/archive formatting AST identical.
@@ -71,3 +71,5 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 - T-44105 accepted41a5b46: Resolved all remaining15 main E501 findings preserving AST and directives. Verify exit0; 62 changed lines.
 
 - T-44109 acceptedd9258cb: Extracted two exact Cursor fixture classes; full API-test Ruff/format and3 focused tests pass. Verify exit0; 41 changed lines.
+
+- T-311 accepted8570e58: Full backend-test and strict frontend lint milestone passes without source changes. Verify exit0; 0 changed lines.

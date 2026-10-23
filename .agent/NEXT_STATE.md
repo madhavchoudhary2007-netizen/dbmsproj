@@ -3,22 +3,23 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-311 — full test/frontend lint milestone
-- worker: W3 | priority: P1 | origin: plan3 Phase1
-- target_files: backend/tests/test_api.py, backend/tests/test_database.py, scripts/eval/verify-bundle-size.py
-- contract: verify-only, no edits; full plan lint command0
-- verify: .venv/bin/ruff check backend/tests && npm --prefix frontend run lint -- --max-warnings 0
+### T-44110 — explicit best-effort cleanup constructs
+- worker: W2 | priority: P1 | origin: bounded T-310 subdivision
+- target_files: backend/app/main.py
+- contract: exact exception scopes/order, with equivalence, pit409 cause, specific demo RNG justification
+- verify: .venv/bin/ruff check --select SIM105,S110,SIM117,B904,S311,UP034 backend/app/main.py && .venv/bin/ruff format --check backend/app/main.py
 ### T-44107 — demo/config lint cleanup
 - worker: W2 | priority: P1 | origin: bounded T-310 subdivision
 - target_files: backend/app/demo_race_repository.py, backend/app/config.py, pyproject.toml
 - contract: preserve all defaults/guards/SQL; narrow false-positive comments only, <=150
 - verify: .venv/bin/ruff check backend/app/demo_race_repository.py backend/app/config.py && .venv/bin/ruff format --check backend/app/demo_race_repository.py backend/app/config.py
 ## Blocked
-- T-310/T-311 remain open until full parent Ruff/format/frontend-lint commands exit0; no intermediate count is a parent pass.
+- T-310 remains open until full app Ruff/format exit0; T-311 accepted8570e58; no intermediate count is a parent pass.
 - T-440 (O, before motion packets): align plan2.3/2.7 with owner100–300ms and display>=48px leading limits; those conflicting catalogue specifications are missing a correction task.
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-311 accepted8570e58; verify0.
 - T-44109 acceptedd9258cb; verify0.
 - T-44105 accepted41a5b46; verify0.
 - T-44108 accepteda893c67; verify0.

@@ -1,0 +1,155 @@
+diff --git a/backend/app/config.py b/backend/app/config.py
+index 39e01ee..71b8c89 100644
+--- a/backend/app/config.py
++++ b/backend/app/config.py
+@@ -1,13 +1,12 @@
+ import os
+ 
+-
+ APP_ENV = os.getenv("APP_ENV", "production").strip().lower()
+ DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://apexgrid:apexgrid@localhost:5432/apexgrid")
+ MONGODB_URL = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
+ MONGODB_DATABASE = os.getenv("MONGODB_DATABASE", "apexgrid")
+ AUTO_DEMO_RACE = os.getenv("AUTO_DEMO_RACE", "0").strip() == "1" and APP_ENV == "local"
+ SEED_DEMO_DATA = os.getenv("SEED_DEMO_DATA", "1").strip() == "1"
+-_LOCAL_DEMO_SECRET = "local-development-secret-change-me"
++_LOCAL_DEMO_SECRET = "local-development-secret-change-me"  # noqa: S105 -- public local-only fallback rejected outside local mode
+ _WEAK_SECRETS = {
+     "dev-change-me",
+     "local-development-secret-change-me",
+@@ -16,8 +15,12 @@ _WEAK_SECRETS = {
+ JWT_SECRET = os.getenv("JWT_SECRET", "").strip()
+ if APP_ENV == "local":
+     JWT_SECRET = JWT_SECRET or _LOCAL_DEMO_SECRET
+-elif not JWT_SECRET or JWT_SECRET.casefold() in _WEAK_SECRETS or len(JWT_SECRET.encode("utf-8")) < 32:
++elif (
++    not JWT_SECRET or JWT_SECRET.casefold() in _WEAK_SECRETS or len(JWT_SECRET.encode("utf-8")) < 32
++):
+     raise RuntimeError("Set a unique JWT_SECRET of at least 32 bytes outside APP_ENV=local")
+ JWT_ALGORITHM = "HS256"
+ JWT_MINUTES = int(os.getenv("JWT_MINUTES", "720"))
+-CORS_ORIGINS = [x.strip() for x in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",") if x.strip()]
++CORS_ORIGINS = [
++    x.strip() for x in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",") if x.strip()
++]
+diff --git a/backend/app/demo_race_repository.py b/backend/app/demo_race_repository.py
+index 6adadef..21cc4bc 100644
+--- a/backend/app/demo_race_repository.py
++++ b/backend/app/demo_race_repository.py
+@@ -119,7 +119,7 @@ def create_demo_race_records(
+     seed: int | None = None,
+ ) -> tuple[list[dict[str, Any]], int]:
+     generated: list[dict[str, Any]] = []
+-    rng = random.Random(seed) if seed is not None else random
++    rng = random.Random(seed) if seed is not None else random  # noqa: S311 -- deterministic simulation, not security
+     with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
+         cur.execute(
+             "SELECT id FROM championships WHERE name='ApexGrid Live Demo' "
+@@ -128,7 +128,8 @@ def create_demo_race_records(
+         championship = cur.fetchone()
+         if not championship:
+             cur.execute(
+-                "INSERT INTO championships(name,season) VALUES ('ApexGrid Live Demo',extract(year from current_date)::int) RETURNING id"
++                "INSERT INTO championships(name,season) VALUES ('ApexGrid Live Demo',"
++                "extract(year from current_date)::int) RETURNING id"
+             )
+             championship = cur.fetchone()
+         cur.execute("SELECT id,name FROM circuits ORDER BY name")
+@@ -139,28 +140,37 @@ def create_demo_race_records(
+             raise DemoRaceSetupError("Demo race requires at least one circuit and one team")
+         cur.execute("SELECT pg_advisory_xact_lock(hashtext('apexgrid-demo-race-create'))")
+         cur.execute(
+-            "SELECT COALESCE(max(round_number),0)+1 AS round FROM race_events WHERE championship_id=%s",
++            "SELECT COALESCE(max(round_number),0)+1 AS round "
++            "FROM race_events WHERE championship_id=%s",
+             (championship["id"],),
+         )
+         round_number = cur.fetchone()["round"]
+         numbers = rng.sample(range(11, 100), len(names))
+         circuit = rng.choice(circuits)
+-        event_name = f"{circuit['name']} Grand Prix — {rng.choice(['Sprint Weekend', 'Night Race', 'Coastal Classic', 'Autumn Round'])}"
++        event_name = (
++            f"{circuit['name']} Grand Prix — "
++            f"{rng.choice(['Sprint Weekend', 'Night Race', 'Coastal Classic', 'Autumn Round'])}"
++        )
+         total_laps = rng.randint(45, MAX_SESSION_LAPS)
+         cur.execute(
+-            "INSERT INTO race_events(id,championship_id,circuit_id,round_number,name,start_date) VALUES (%s,%s,%s,%s,%s,%s)",
++            "INSERT INTO race_events(id,championship_id,circuit_id,round_number,"
++            "name,start_date) VALUES (%s,%s,%s,%s,%s,%s)",
+             (event_id, championship["id"], circuit["id"], round_number, event_name, now),
+         )
+         cur.execute(
+-            "INSERT INTO race_sessions(id,event_id,session_type,state,scheduled_at,started_at,total_laps) VALUES (%s,%s,'RACE','ACTIVE',%s,%s,%s)",
++            "INSERT INTO race_sessions(id,event_id,session_type,state,scheduled_at,"
++            "started_at,total_laps) "
++            "VALUES (%s,%s,'RACE','ACTIVE',%s,%s,%s)",
+             (session_id, event_id, now, now, total_laps),
+         )
+         cur.execute(
+-            "INSERT INTO demo_races(session_id,event_id,auto_repeat,simulation_seed) VALUES (%s,%s,%s,%s)",
++            "INSERT INTO demo_races(session_id,event_id,auto_repeat,simulation_seed) "
++            "VALUES (%s,%s,%s,%s)",
+             (session_id, event_id, auto_repeat, seed),
+         )
+         cur.execute(
+-            "INSERT INTO pit_boxes(event_id,number) SELECT %s,n FROM generate_series(1,4) AS n ON CONFLICT(event_id,number) DO NOTHING",
++            "INSERT INTO pit_boxes(event_id,number) SELECT %s,n FROM generate_series(1,4) AS n "
++            "ON CONFLICT(event_id,number) DO NOTHING",
+             (event_id,),
+         )
+         for idx, full_name in enumerate(names):
+@@ -170,7 +180,8 @@ def create_demo_race_records(
+             secret = secrets.token_urlsafe(40)
+             password_hash = bcrypt.hashpw(secret.encode(), bcrypt.gensalt(rounds=10)).decode()
+             cur.execute(
+-                "INSERT INTO users(id,email,password_hash,full_name,role) VALUES (%s,%s,%s,%s,'DRIVER')",
++                "INSERT INTO users(id,email,password_hash,full_name,role) "
++                "VALUES (%s,%s,%s,%s,'DRIVER')",
+                 (user_id, email, password_hash, full_name),
+             )
+             cur.execute(
+@@ -184,7 +195,8 @@ def create_demo_race_records(
+             )
+             offset = rng.randint(-1200, 1600)
+             cur.execute(
+-                "INSERT INTO demo_race_entries(session_id,driver_id,pace_offset_ms) VALUES (%s,%s,%s)",
++                "INSERT INTO demo_race_entries(session_id,driver_id,pace_offset_ms) "
++                "VALUES (%s,%s,%s)",
+                 (session_id, driver_id, offset),
+             )
+             generated.append(
+@@ -203,10 +215,14 @@ def get_demo_race_row(session_id: UUID | str) -> dict[str, Any] | None:
+     return cast(
+         dict[str, Any] | None,
+         fetch_one(
+-            """SELECT s.id AS session_id,e.id AS event_id,e.name AS event_name,c.name AS circuit_name,
+-            s.state,s.total_laps,(SELECT count(*) FROM demo_race_entries de WHERE de.session_id=s.id)::int AS car_count,
+-            d.created_at FROM demo_races d JOIN race_sessions s ON s.id=d.session_id
+-            JOIN race_events e ON e.id=d.event_id JOIN circuits c ON c.id=e.circuit_id WHERE s.id=%s""",
++            "SELECT s.id AS session_id,e.id AS event_id,e.name AS event_name,"
++            "c.name AS circuit_name,\n"
++            "            s.state,s.total_laps,(SELECT count(*) FROM "
++            "demo_race_entries de WHERE de.session_id=s.id)::int AS car_count,\n"
++            "            d.created_at FROM demo_races d JOIN race_sessions s "
++            "ON s.id=d.session_id\n"
++            "            JOIN race_events e ON e.id=d.event_id JOIN circuits c "
++            "ON c.id=e.circuit_id WHERE s.id=%s",
+             (session_id,),
+         ),
+     )
+diff --git a/pyproject.toml b/pyproject.toml
+index adeb3d5..4869b3f 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -3,8 +3,8 @@ target-version = "py312"
+ line-length = 100
+ 
+ [tool.ruff.lint]
+-# S311 inline exceptions cover only seeded, non-security simulation fixtures.
+-# S105/S106 inline exceptions cover only intentional JWT rejection/acceptance fixtures.
++# S311 inline exception covers seeded demo randomness used for deterministic simulation, not security.
++# S105 inline exception covers the public local-only JWT fallback rejected outside local mode.
+ select = ["E", "F", "I", "B", "UP", "S", "SIM", "C90"]
+ 
+ [tool.ruff.lint.mccabe]
