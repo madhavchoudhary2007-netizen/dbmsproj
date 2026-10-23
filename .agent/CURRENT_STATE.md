@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 2cf7b01
+git_head: bfad8d0
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -56,3 +56,5 @@ last_eval_score: no verified overhaul score; historical100 excludes new gates
 
 - T-4481 accepted2cf7b01: Formatted demo deletion guards preserving exact whole-file AST and SQL text. Verify exit0; 57 changed lines.
 - T-4480/T-458 retry full gate exit0:136passed,0skips; live acceptance PASS; post-run listener exit1 means no API on18000. Added .agent/check-format-progress.py for <=150-line partial formatting: strict AST+canonical-content equivalence and decreasing formatter distance. This is an atomic-child check; full parent zero-lint/format gates unchanged.
+
+- T-4483 acceptedbfad8d0: Documented narrow seeded-RNG and intentional JWT validation fixture lint exceptions; AST unchanged. Verify exit0; 22 changed lines.

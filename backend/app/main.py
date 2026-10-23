@@ -332,6 +332,19 @@ def validate_session_laps(table: str, values: dict[str, Any]):
         raise HTTPException(422, f"total_laps must be an integer between 0 and {MAX_SESSION_LAPS}")
 
 
+def _crud_write_payload(payload: dict[str, Any], cols: tuple[str, ...]) -> dict[str, Any]:
+    clean = {k: v for k, v in payload.items() if k in cols and k != "id"}
+    if not clean:
+        raise HTTPException(422, "At least one writable field is required")
+    return clean
+
+
+def _require_crud_record(record: Any, detail: str) -> Any:
+    if not record:
+        raise HTTPException(404, detail)
+    return record
+
+
 def crud_routes(resource: str, table: str, cols: tuple[str, ...], joins: str = "", select: str | None = None):
     # Names here are hard-coded contract identifiers, never user supplied SQL.
     projection = select or f"{table}.*"
@@ -346,24 +359,18 @@ def crud_routes(resource: str, table: str, cols: tuple[str, ...], joins: str = "
     @app.get(prefix + "/{item_id}")
     def get_item(item_id: UUID, user=authenticated_user_dependency):
         result = get_crud_row(base, table, item_id)
-        if not result:
-            raise HTTPException(404, f"{resource[:-1].capitalize()} not found")
-        return jsonable(result)
+        return jsonable(_require_crud_record(result, f"{resource[:-1].capitalize()} not found"))
 
     @app.post(prefix, status_code=201)
     def create_item(payload: dict[str, Any], user=admin_role_dependency):
-        clean = {k: v for k, v in payload.items() if k in cols and k != "id"}
-        if not clean:
-            raise HTTPException(422, "At least one writable field is required")
+        clean = _crud_write_payload(payload, cols)
         validate_session_laps(table, clean)
         row = create_crud_row(table, clean)
         return jsonable(row)
 
     @app.patch(prefix + "/{item_id}")
     def update_item(item_id: UUID, payload: dict[str, Any], user=admin_role_dependency):
-        clean = {k: v for k, v in payload.items() if k in cols and k != "id"}
-        if not clean:
-            raise HTTPException(422, "At least one writable field is required")
+        clean = _crud_write_payload(payload, cols)
         validate_session_laps(table, clean)
         if table == "race_sessions":
             existing = fetch_one("SELECT state FROM race_sessions WHERE id=%s", (item_id,))
@@ -372,9 +379,7 @@ def crud_routes(resource: str, table: str, cols: tuple[str, ...], joins: str = "
             if existing["state"] != "SCHEDULED" and set(clean) & {"event_id", "session_type", "scheduled_at", "total_laps"}:
                 raise HTTPException(409, "Session context and lap count cannot change after a session starts")
         row = update_crud_row(table, item_id, clean)
-        if not row:
-            raise HTTPException(404, f"{resource[:-1].capitalize()} not found")
-        return jsonable(row)
+        return jsonable(_require_crud_record(row, f"{resource[:-1].capitalize()} not found"))
 
     @app.delete(prefix + "/{item_id}", status_code=204)
     def delete_item(item_id: UUID, user=admin_role_dependency):

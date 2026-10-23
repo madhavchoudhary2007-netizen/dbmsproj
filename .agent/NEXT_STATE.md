@@ -3,11 +3,6 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-4483 — precise test-fixture lint exceptions
-- worker: W3 | priority: P1 | origin: bounded T-311 subdivision
-- target_files: backend/tests/test_api.py, pyproject.toml
-- contract: inline specific false positives only, unchanged AST/assertions, config comments only
-- verify: .venv/bin/ruff check --select S311,S105,S106 backend/tests/test_api.py
 ### T-4482 — CRUD factory complexity
 - worker: W2 | priority: P1 | origin: bounded T-310 subdivision
 - target_files: backend/app/main.py
@@ -19,6 +14,7 @@ phase: 1 honest green baseline
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-4483 acceptedbfad8d0; verify0.
 - T-4481 accepted2cf7b01; verify0.
 - T-4480 accepted4a3ab7f; verify0.
 - Phase0 T-300/T-301/T-302 accepted; ADR007 activated.
