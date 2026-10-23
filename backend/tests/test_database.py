@@ -404,11 +404,17 @@ def test_seed_skips_generated_demo_championship_events(db):
     assert cur.fetchone()[0] == 0
     cur.execute("SELECT count(*) FROM pit_boxes WHERE event_id=%s", (event_id,))
     assert cur.fetchone()[0] == 0
-    cur.execute("""SELECT count(*) FROM session_results r JOIN race_sessions s ON s.id=r.session_id
-                    WHERE s.event_id=%s""", (event_id,))
+    cur.execute(
+        """SELECT count(*) FROM session_results r JOIN race_sessions s ON s.id=r.session_id
+                    WHERE s.event_id=%s""",
+        (event_id,),
+    )
     assert cur.fetchone()[0] == 0
-    cur.execute("""SELECT count(*) FROM incident_reports i JOIN race_sessions s ON s.id=i.session_id
-                    WHERE s.event_id=%s""", (event_id,))
+    cur.execute(
+        """SELECT count(*) FROM incident_reports i JOIN race_sessions s ON s.id=i.session_id
+                    WHERE s.event_id=%s""",
+        (event_id,),
+    )
     assert cur.fetchone()[0] == 0
 
 
@@ -426,19 +432,27 @@ def test_seed_does_not_assign_fixture_team_to_new_driver(db):
 
 def test_migration_backfills_four_pit_boxes_for_generated_event(db):
     _, cur = db
-    cur.execute("INSERT INTO championships(name,season) VALUES ('ApexGrid Live Demo',2026) RETURNING id")
+    cur.execute(
+        "INSERT INTO championships(name,season) VALUES ('ApexGrid Live Demo',2026) RETURNING id"
+    )
     championship_id = cur.fetchone()[0]
     cur.execute("SELECT id FROM circuits WHERE name='Harbor Ring'")
     circuit_id = cur.fetchone()[0]
-    cur.execute("""INSERT INTO race_events(championship_id,circuit_id,round_number,name,start_date)
+    cur.execute(
+        """INSERT INTO race_events(championship_id,circuit_id,round_number,name,start_date)
                     VALUES (%s,%s,1,'Generated pit fixture','2026-10-05 12:00+00') RETURNING id""",
-                (championship_id, circuit_id))
+        (championship_id, circuit_id),
+    )
     event_id = cur.fetchone()[0]
-    cur.execute("""INSERT INTO race_sessions(event_id,session_type,state,scheduled_at,started_at,total_laps)
+    cur.execute(
+        """INSERT INTO race_sessions(event_id,session_type,state,scheduled_at,started_at,total_laps)
                     VALUES (%s,'RACE','ACTIVE','2026-10-05 12:00+00','2026-10-05 12:00+00',20) RETURNING id""",
-                (event_id,))
+        (event_id,),
+    )
     session_id = cur.fetchone()[0]
-    cur.execute("INSERT INTO demo_races(session_id,event_id) VALUES (%s,%s)", (session_id,event_id))
+    cur.execute(
+        "INSERT INTO demo_races(session_id,event_id) VALUES (%s,%s)", (session_id, event_id)
+    )
 
     cur.execute((ROOT / "migrations/001_initial.sql").read_text())
 
@@ -475,8 +489,10 @@ def test_concurrent_overlapping_pit_reservations_allow_only_one(db):
             setup.close()
 
         cur_a = conn_a.cursor()
-        cur_a.execute("SELECT reserve_pit_box(%s,%s,%s,%s,%s)",
-                      (box_id, session_id, team_id, "2026-06-01 08:00+00", "2026-06-01 09:00+00"))
+        cur_a.execute(
+            "SELECT reserve_pit_box(%s,%s,%s,%s,%s)",
+            (box_id, session_id, team_id, "2026-06-01 08:00+00", "2026-06-01 09:00+00"),
+        )
 
         def reserve_from_b():
             cursor = conn_b.cursor()

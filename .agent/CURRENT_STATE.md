@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: dc1a36f
+git_head: 4d16cea
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -39,3 +39,4 @@ last_eval_score: no verified overhaul score; historical100 excludes new gates
 
 ## Orchestrator direct edits
 - T-300 requested two model profile lines; otherwise architecture/ADR/state/packets/envelopes and patch integration only. Zero authored frontend/backend product lines.
+- T-448 repair accepted4d16cea:130 changed lines in pit/archive; exact AST unchanged, full scoped Ruff/format0. Deterministic RNG has one justified S311 inline suppression.
