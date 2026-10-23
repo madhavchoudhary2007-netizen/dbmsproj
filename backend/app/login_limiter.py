@@ -23,9 +23,7 @@ class LoginLimiter:
         self._sources: dict[str, deque[tuple[float, object]]] = {}
         self._lock = threading.Lock()
 
-    def _expire(
-        self, counters: dict[str, deque[tuple[float, object]]], cutoff: float
-    ) -> None:
+    def _expire(self, counters: dict[str, deque[tuple[float, object]]], cutoff: float) -> None:
         for key, attempts in tuple(counters.items()):
             while attempts and attempts[0][0] <= cutoff:
                 attempts.popleft()

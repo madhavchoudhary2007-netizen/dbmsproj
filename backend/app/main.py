@@ -37,6 +37,7 @@ from psycopg.rows import dict_row, tuple_row
 from psycopg_pool import PoolClosed, PoolTimeout
 from pydantic import BaseModel
 from pymongo import DESCENDING, MongoClient
+from pymongo.collection import Collection
 from pymongo.errors import PyMongoError
 from starlette.middleware.base import RequestResponseEndpoint
 
@@ -1562,6 +1563,24 @@ async def _finalize_simulation_results(
     simulations.pop(str(sim.session_id), None)
 
 
+def _persist_simulation_tick(
+    col: Collection[dict[str, Any]],
+    sim: Simulation,
+    packets: list[dict[str, Any]],
+    timing: dict[str, Any],
+) -> None:
+    for packet in packets:
+        inserted = col.insert_one(dict(packet))
+        publish(
+            sim.session_id,
+            "telemetry.sample",
+            telemetry_ws_payload(packet, inserted.inserted_id),
+        )
+    publish(sim.session_id, "timing.update", timing)
+    schedule_simulation_pit_stops(sim, packets)
+    record_simulated_incidents(sim, packets)
+
+
 async def simulation_loop(sim: Simulation):
     if not _simulation_lease_is_valid(sim):
         return
@@ -1578,30 +1597,18 @@ async def simulation_loop(sim: Simulation):
                 FROM race_sessions s JOIN race_events e ON e.id=s.event_id WHERE s.id=%s""",
                 (sim.session_id,),
             )
-            if not session:
-                sim.status = "error"
-                return
-            if session["state"] == "PAUSED":
-                sim.status = "paused"
-                continue
-            if session["state"] != "ACTIVE":
-                sim.status = "stopped"
+            if not session or session["state"] != "ACTIVE":
+                if session and session["state"] == "PAUSED":
+                    sim.status = "paused"
+                    continue
+                sim.status = "error" if not session else "stopped"
                 return
             timestamp = datetime.now(UTC)
             pit_assignments = refresh_simulation_pit_state(sim, timestamp)
             packets, timing = advance_simulation_tick(
                 sim, timestamp, safety_car=session["safety_car"], pit_assignments=pit_assignments
             )
-            for packet in packets:
-                inserted = col.insert_one(dict(packet))
-                publish(
-                    sim.session_id,
-                    "telemetry.sample",
-                    telemetry_ws_payload(packet, inserted.inserted_id),
-                )
-            publish(sim.session_id, "timing.update", timing)
-            schedule_simulation_pit_stops(sim, packets)
-            record_simulated_incidents(sim, packets)
+            _persist_simulation_tick(col, sim, packets, timing)
             completion_lap = min(sim.total_laps or MAX_SESSION_LAPS, MAX_SESSION_LAPS)
             if all(packet["lap"] == completion_lap and packet["sector"] == 3 for packet in packets):
                 ordered = sorted(packets, key=lambda packet: packet["elapsed_ms"])
