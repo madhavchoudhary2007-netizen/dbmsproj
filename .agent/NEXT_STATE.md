@@ -1,13 +1,8 @@
 # NEXT_STATE
 updated_at: 2026-10-23
-phase: 0 architecture amendment
+phase: 0 paused at T-302 owner approval
 
 ## Queue
-### T-301 — ADR-007 architecture amendment
-- worker: O | priority: P0 | after: T-300
-- target_files: .agent/ARCHITECT.md, .agent/adr/ADR-007-neo-brutal-motorsport-light-overhaul.md
-- contract: amend A.4/A.5/B.5; focused five-lens review and relock; no product or gate edits
-- verify: bash scripts/agent/verify-lock.sh
 ### T-302 — explicit owner approval
 - worker: O | priority: P0 | after: T-301
 - target_files: .agent/CURRENT_STATE.md, .agent/NEXT_STATE.md
@@ -21,3 +16,8 @@ phase: 0 architecture amendment
 
 ## Done
 - T-300 accepted e465e89; boot exit0, lock/budgets pass, boot OK.
+- T-301 accepted13e6100; ADR-007 proposed, focused five-lens review, lock80f8ab50 verified; no product/gate edits.
+### T-301 — completed architecture amendment; state checkpoint
+- target_files: .agent/ARCHITECT.md, .agent/adr/ADR-007-neo-brutal-motorsport-light-overhaul.md
+- verify: bash scripts/agent/verify-lock.sh
+- status: ACCEPTED13e6100; retain target declaration for accept.sh-only state checkpoint.

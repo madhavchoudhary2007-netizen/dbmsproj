@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: e465e89
+git_head: 13e6100
 branch: overhaul/neo-brutal
 architect_sha256: 80f8ab5074bfe238e9467f3eabde3df685f801fce2a1f667c8bd6f3d533ed421
 harness: codex
@@ -9,7 +9,7 @@ last_eval_score: historical 100 claim is not a verified baseline for this overha
 
 ## Active work
 - Owner's neo-brutal overhaul replaces the prior perfection-loop task queue. Source of tasks: docs/overhaul-plan.md sections 0,1,3-6. Product changes wait for explicit ADR-007 approval at T-302.
-- T-300 accepted e465e89: boot exit0/boot OK; branch based on perfection-loop1acf8e1. T-301 ADR-007 draft amends A.4/A.5/B.5; focused five-lens pass2 yielded zero new amendments; relock/verify exit0, awaiting accept.sh.
+- T-300 accepted e465e89: boot exit0/boot OK; branch based on perfection-loop1acf8e1. T-301 accepted13e6100 via accept.sh: ADR-007 draft amends A.4/A.5/B.5; five-lens pass2 yielded zero new amendments; relock/verify exit0. Phase0 paused at T-302 pending owner approved.
 - H=codex; models.env defaults HARNESS via caller and uses gpt-6.1-sol/medium for Codex orchestrator. Worker models/efforts/cap and context windows preserved. Claude 433000 context settings were owner-supplied edits and are preserved.
 - T-300 accepted by accept.sh, commit e465e89. Owner-supplied docs/overhaul-plan.md and .claude/settings.json were recorded unchanged; both were explicitly listed because accept.sh stages all changes.
 
@@ -29,3 +29,4 @@ last_eval_score: historical 100 claim is not a verified baseline for this overha
 
 ## Orchestrator direct edits
 - T-300: two requested models.env profile lines. T-301: architecture, ADR, lock banner and state/packet/envelope documentation only. Zero frontend/backend/gate edits; no workers dispatched.
+- State checkpoint accept initially rejected because completed T-301 target declaration had been removed from NEXT_STATE; restored the completed declaration and reran unchanged lock verification. No product/test/gate changes.
