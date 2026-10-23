@@ -10,7 +10,10 @@ from pymongo.errors import PyMongoError
 from .database import connection, fetch_all, fetch_one
 
 TelemetryIngestOutcome = Literal[
-    "session_not_found", "session_inactive", "driver_not_found", "write_failed",
+    "session_not_found",
+    "session_inactive",
+    "driver_not_found",
+    "write_failed",
     "out_of_order",
 ]
 
@@ -57,7 +60,8 @@ def insert_telemetry(
             latest = max(
                 existing,
                 key=lambda row: (
-                    row.get("lap", -1), row.get("sector", -1),
+                    row.get("lap", -1),
+                    row.get("sector", -1),
                     row.get("elapsed_ms", -1),
                 ),
                 default=None,
@@ -65,15 +69,12 @@ def insert_telemetry(
             if latest is not None:
                 previous_position = (latest.get("lap", -1), latest.get("sector", -1))
                 incoming_position = (document["lap"], document["sector"])
-                if (
-                    incoming_position <= previous_position
-                    or document["elapsed_ms"] <= latest.get("elapsed_ms", -1)
+                if incoming_position <= previous_position or document["elapsed_ms"] <= latest.get(
+                    "elapsed_ms", -1
                 ):
                     raise TelemetryIngestError("out_of_order")
             result = collection.insert_one(document)
-            return TelemetryIngestResult(
-                {**document, "_id": result.inserted_id}, True
-            )
+            return TelemetryIngestResult({**document, "_id": result.inserted_id}, True)
         except TelemetryIngestError:
             raise
         except PyMongoError as exc:
@@ -113,9 +114,7 @@ def get_live_telemetry(
     scheduled_at: datetime,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     latest = list(
-        collection.find({"session_id": str(session_id)})
-        .sort("ts", DESCENDING)
-        .limit(100)
+        collection.find({"session_id": str(session_id)}).sort("ts", DESCENDING).limit(100)
     )
     latest.reverse()
     driver_ids = {str(doc["driver_id"]) for doc in latest if doc.get("driver_id")}
@@ -134,7 +133,8 @@ def get_live_telemetry(
             LEFT JOIN LATERAL (SELECT team_id FROM team_memberships m WHERE m.driver_id=d.id
               AND m.start_date<=%s::date AND (m.end_date IS NULL OR m.end_date>=%s::date)
               ORDER BY m.start_date DESC LIMIT 1) membership ON true
-            LEFT JOIN teams t ON t.id=membership.team_id WHERE d.id=ANY(%s::uuid[]) ORDER BY d.number""",
+            LEFT JOIN teams t ON t.id=membership.team_id """
+            """WHERE d.id=ANY(%s::uuid[]) ORDER BY d.number""",
             (scheduled_at, scheduled_at, list(driver_ids)),
         )
         if driver_ids

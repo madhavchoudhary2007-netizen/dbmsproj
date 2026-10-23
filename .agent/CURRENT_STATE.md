@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: c457b0d
+git_head: 6f866cc
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -46,3 +46,4 @@ last_eval_score: no verified overhaul score; historical100 excludes new gates
 - T-457 accepted72973d1:43 main lines, UTC/annotation/local/semicolon modernisation, explicit shortest zip. Selected lint0/OpenAPI unchanged. Fresh strict mypy remains222 errors in14files/31checked beforeT-312.
 - T-455 acceptedc457b0d:97 test-format lines, exact whole-file AST, middle format0.
 - T-453 full disposable rerun exit0:136 passed,0 failed/skipped/xfailed; all live acceptance flows PASS.
+- T-456 accepted6f866cc:132 test-format lines, full database-test format0 and exact AST unchanged; full lint still has long literal debt.

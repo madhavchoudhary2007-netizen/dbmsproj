@@ -1,0 +1,190 @@
+diff --git a/backend/app/crud_repository.py b/backend/app/crud_repository.py
+index d8ccc5a..4284c5f 100644
+--- a/backend/app/crud_repository.py
++++ b/backend/app/crud_repository.py
+@@ -1,9 +1,10 @@
+-from typing import Any, cast
++from typing import Any, Protocol, cast
+ from uuid import UUID
+ 
+ from psycopg.rows import dict_row
++from psycopg.sql import SQL, Composable, Identifier
+ 
+-from .database import DatabaseRow, connection, fetch_all, fetch_one
++from .database import DatabaseRow, connection, fetch_all
+ 
+ 
+ class CrudDeleteError(Exception):
+@@ -15,6 +16,10 @@ class CrudDeleteError(Exception):
+         self.detail = detail
+ 
+ 
++class CountDocumentsCollection(Protocol):
++    def count_documents(self, filter: dict[str, str], limit: int = 0) -> int: ...
++
++
+ def list_crud_rows(base: str, limit: int, offset: int) -> list[DatabaseRow]:
+     """Return a page of CRUD rows using the route's existing projection."""
+     return fetch_all(base + " ORDER BY 1 LIMIT %s OFFSET %s", (limit, offset))
+@@ -22,15 +27,21 @@ def list_crud_rows(base: str, limit: int, offset: int) -> list[DatabaseRow]:
+ 
+ def get_crud_row(base: str, table: str, item_id: UUID) -> DatabaseRow | None:
+     """Return one CRUD row by identifier, if it exists."""
+-    return cast(DatabaseRow | None, fetch_one(base + " WHERE " + table + ".id=%s", (item_id,)))
++    with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
++        cur.execute(
++            SQL("{} WHERE {}.id=%s").format(SQL(base), Identifier(table)),
++            (item_id,),
++        )
++        return cast(DatabaseRow | None, cur.fetchone())
+ 
+ 
+ def create_crud_row(table: str, values: dict[str, object]) -> DatabaseRow:
+     """Insert one CRUD row and create default pit boxes for a race event."""
+     keys = list(values)
+-    sql = (
+-        f"INSERT INTO {table} ({','.join(keys)}) "
+-        f"VALUES ({','.join(['%s'] * len(keys))}) RETURNING *"
++    sql = SQL("INSERT INTO {} ({}) VALUES ({}) RETURNING *").format(
++        Identifier(table),
++        SQL(",").join(map(Identifier, keys)),
++        SQL(",").join(SQL("%s") for _ in keys),
+     )
+     with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
+         cur.execute(sql, [values[key] for key in keys])
+@@ -47,21 +58,24 @@ def create_crud_row(table: str, values: dict[str, object]) -> DatabaseRow:
+ def update_crud_row(table: str, item_id: UUID, values: dict[str, object]) -> DatabaseRow | None:
+     """Update one CRUD row by identifier, returning the updated row when present."""
+     keys = list(values)
+-    sql = (
+-        f"UPDATE {table} SET " + ",".join(f"{key}=%s" for key in keys) + " WHERE id=%s RETURNING *"
++    sql = SQL("UPDATE {} SET {} WHERE id=%s RETURNING *").format(
++        Identifier(table),
++        SQL(",").join(SQL("{}=%s").format(Identifier(key)) for key in keys),
+     )
+     with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
+         cur.execute(sql, [values[key] for key in keys] + [item_id])
+         return cast(DatabaseRow | None, cur.fetchone())
+ 
+ 
+-def _ensure_no_reference(cur: Any, query: str, params: tuple[UUID, ...]) -> None:
++def _ensure_no_reference(cur: Any, query: Composable | str, params: tuple[UUID, ...]) -> None:
+     cur.execute(query, params)
+     if cur.fetchone():
+         raise CrudDeleteError(409, "Resource is referenced by official records")
+ 
+ 
+-def _check_session_delete(cur: Any, item_id: UUID, telemetry_collection: object | None) -> None:
++def _check_session_delete(
++    cur: Any, item_id: UUID, telemetry_collection: CountDocumentsCollection | None
++) -> None:
+     cur.execute("SELECT state FROM race_sessions WHERE id=%s", (item_id,))
+     existing = cur.fetchone()
+     if existing and existing["state"] in ("ACTIVE", "PAUSED"):
+@@ -71,8 +85,7 @@ def _check_session_delete(cur: Any, item_id: UUID, telemetry_collection: object
+         raise CrudDeleteError(409, "Generated races must be removed through the demo-race endpoint")
+     if telemetry_collection is None:
+         raise CrudDeleteError(503, "MongoDB telemetry store is unavailable")
+-    count_documents = getattr(telemetry_collection, "count_documents")
+-    if count_documents({"session_id": str(item_id)}, limit=1):
++    if telemetry_collection.count_documents({"session_id": str(item_id)}, limit=1):
+         raise CrudDeleteError(409, "Session has telemetry records and cannot be deleted")
+     _ensure_no_reference(
+         cur,
+@@ -102,7 +115,10 @@ def _check_special_delete_reference(cur: Any, table: str, item_id: UUID) -> None
+ 
+ 
+ def delete_crud_row(
+-    table: str, resource: str, item_id: UUID, telemetry_collection: object | None
++    table: str,
++    resource: str,
++    item_id: UUID,
++    telemetry_collection: CountDocumentsCollection | None,
+ ) -> None:
+     """Delete one CRUD row after checking its official and runtime dependencies."""
+     dependencies = {
+@@ -119,7 +135,9 @@ def delete_crud_row(
+             child_table, foreign_key = child
+             _ensure_no_reference(
+                 cur,
+-                f"SELECT 1 FROM {child_table} WHERE {foreign_key}=%s LIMIT 1",
++                SQL("SELECT 1 FROM {} WHERE {}=%s LIMIT 1").format(
++                    Identifier(child_table), Identifier(foreign_key)
++                ),
+                 (item_id,),
+             )
+         if table == "race_sessions":
+@@ -128,6 +146,6 @@ def delete_crud_row(
+             _check_special_delete_reference(cur, table, item_id)
+         if table == "race_events":
+             cur.execute("DELETE FROM pit_boxes WHERE event_id=%s", (item_id,))
+-        cur.execute(f"DELETE FROM {table} WHERE id=%s", (item_id,))
++        cur.execute(SQL("DELETE FROM {} WHERE id=%s").format(Identifier(table)), (item_id,))
+         if cur.rowcount == 0:
+             raise CrudDeleteError(404, f"{resource[:-1].capitalize()} not found")
+diff --git a/backend/app/telemetry_repository.py b/backend/app/telemetry_repository.py
+index 302c903..fd35c60 100644
+--- a/backend/app/telemetry_repository.py
++++ b/backend/app/telemetry_repository.py
+@@ -10,7 +10,10 @@ from pymongo.errors import PyMongoError
+ from .database import connection, fetch_all, fetch_one
+ 
+ TelemetryIngestOutcome = Literal[
+-    "session_not_found", "session_inactive", "driver_not_found", "write_failed",
++    "session_not_found",
++    "session_inactive",
++    "driver_not_found",
++    "write_failed",
+     "out_of_order",
+ ]
+ 
+@@ -57,7 +60,8 @@ def insert_telemetry(
+             latest = max(
+                 existing,
+                 key=lambda row: (
+-                    row.get("lap", -1), row.get("sector", -1),
++                    row.get("lap", -1),
++                    row.get("sector", -1),
+                     row.get("elapsed_ms", -1),
+                 ),
+                 default=None,
+@@ -65,15 +69,12 @@ def insert_telemetry(
+             if latest is not None:
+                 previous_position = (latest.get("lap", -1), latest.get("sector", -1))
+                 incoming_position = (document["lap"], document["sector"])
+-                if (
+-                    incoming_position <= previous_position
+-                    or document["elapsed_ms"] <= latest.get("elapsed_ms", -1)
++                if incoming_position <= previous_position or document["elapsed_ms"] <= latest.get(
++                    "elapsed_ms", -1
+                 ):
+                     raise TelemetryIngestError("out_of_order")
+             result = collection.insert_one(document)
+-            return TelemetryIngestResult(
+-                {**document, "_id": result.inserted_id}, True
+-            )
++            return TelemetryIngestResult({**document, "_id": result.inserted_id}, True)
+         except TelemetryIngestError:
+             raise
+         except PyMongoError as exc:
+@@ -113,9 +114,7 @@ def get_live_telemetry(
+     scheduled_at: datetime,
+ ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+     latest = list(
+-        collection.find({"session_id": str(session_id)})
+-        .sort("ts", DESCENDING)
+-        .limit(100)
++        collection.find({"session_id": str(session_id)}).sort("ts", DESCENDING).limit(100)
+     )
+     latest.reverse()
+     driver_ids = {str(doc["driver_id"]) for doc in latest if doc.get("driver_id")}
+@@ -134,7 +133,8 @@ def get_live_telemetry(
+             LEFT JOIN LATERAL (SELECT team_id FROM team_memberships m WHERE m.driver_id=d.id
+               AND m.start_date<=%s::date AND (m.end_date IS NULL OR m.end_date>=%s::date)
+               ORDER BY m.start_date DESC LIMIT 1) membership ON true
+-            LEFT JOIN teams t ON t.id=membership.team_id WHERE d.id=ANY(%s::uuid[]) ORDER BY d.number""",
++            LEFT JOIN teams t ON t.id=membership.team_id """
++            """WHERE d.id=ANY(%s::uuid[]) ORDER BY d.number""",
+             (scheduled_at, scheduled_at, list(driver_ids)),
+         )
+         if driver_ids

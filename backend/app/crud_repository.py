@@ -1,9 +1,10 @@
-from typing import Any, cast
+from typing import Any, Protocol, cast
 from uuid import UUID
 
 from psycopg.rows import dict_row
+from psycopg.sql import SQL, Composable, Identifier
 
-from .database import DatabaseRow, connection, fetch_all, fetch_one
+from .database import DatabaseRow, connection, fetch_all
 
 
 class CrudDeleteError(Exception):
@@ -15,6 +16,10 @@ class CrudDeleteError(Exception):
         self.detail = detail
 
 
+class CountDocumentsCollection(Protocol):
+    def count_documents(self, filter: dict[str, str], limit: int = 0) -> int: ...
+
+
 def list_crud_rows(base: str, limit: int, offset: int) -> list[DatabaseRow]:
     """Return a page of CRUD rows using the route's existing projection."""
     return fetch_all(base + " ORDER BY 1 LIMIT %s OFFSET %s", (limit, offset))
@@ -22,15 +27,21 @@ def list_crud_rows(base: str, limit: int, offset: int) -> list[DatabaseRow]:
 
 def get_crud_row(base: str, table: str, item_id: UUID) -> DatabaseRow | None:
     """Return one CRUD row by identifier, if it exists."""
-    return cast(DatabaseRow | None, fetch_one(base + " WHERE " + table + ".id=%s", (item_id,)))
+    with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            SQL("{} WHERE {}.id=%s").format(SQL(base), Identifier(table)),
+            (item_id,),
+        )
+        return cast(DatabaseRow | None, cur.fetchone())
 
 
 def create_crud_row(table: str, values: dict[str, object]) -> DatabaseRow:
     """Insert one CRUD row and create default pit boxes for a race event."""
     keys = list(values)
-    sql = (
-        f"INSERT INTO {table} ({','.join(keys)}) "
-        f"VALUES ({','.join(['%s'] * len(keys))}) RETURNING *"
+    sql = SQL("INSERT INTO {} ({}) VALUES ({}) RETURNING *").format(
+        Identifier(table),
+        SQL(",").join(map(Identifier, keys)),
+        SQL(",").join(SQL("%s") for _ in keys),
     )
     with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
         cur.execute(sql, [values[key] for key in keys])
@@ -47,21 +58,24 @@ def create_crud_row(table: str, values: dict[str, object]) -> DatabaseRow:
 def update_crud_row(table: str, item_id: UUID, values: dict[str, object]) -> DatabaseRow | None:
     """Update one CRUD row by identifier, returning the updated row when present."""
     keys = list(values)
-    sql = (
-        f"UPDATE {table} SET " + ",".join(f"{key}=%s" for key in keys) + " WHERE id=%s RETURNING *"
+    sql = SQL("UPDATE {} SET {} WHERE id=%s RETURNING *").format(
+        Identifier(table),
+        SQL(",").join(SQL("{}=%s").format(Identifier(key)) for key in keys),
     )
     with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
         cur.execute(sql, [values[key] for key in keys] + [item_id])
         return cast(DatabaseRow | None, cur.fetchone())
 
 
-def _ensure_no_reference(cur: Any, query: str, params: tuple[UUID, ...]) -> None:
+def _ensure_no_reference(cur: Any, query: Composable | str, params: tuple[UUID, ...]) -> None:
     cur.execute(query, params)
     if cur.fetchone():
         raise CrudDeleteError(409, "Resource is referenced by official records")
 
 
-def _check_session_delete(cur: Any, item_id: UUID, telemetry_collection: object | None) -> None:
+def _check_session_delete(
+    cur: Any, item_id: UUID, telemetry_collection: CountDocumentsCollection | None
+) -> None:
     cur.execute("SELECT state FROM race_sessions WHERE id=%s", (item_id,))
     existing = cur.fetchone()
     if existing and existing["state"] in ("ACTIVE", "PAUSED"):
@@ -71,8 +85,7 @@ def _check_session_delete(cur: Any, item_id: UUID, telemetry_collection: object 
         raise CrudDeleteError(409, "Generated races must be removed through the demo-race endpoint")
     if telemetry_collection is None:
         raise CrudDeleteError(503, "MongoDB telemetry store is unavailable")
-    count_documents = getattr(telemetry_collection, "count_documents")
-    if count_documents({"session_id": str(item_id)}, limit=1):
+    if telemetry_collection.count_documents({"session_id": str(item_id)}, limit=1):
         raise CrudDeleteError(409, "Session has telemetry records and cannot be deleted")
     _ensure_no_reference(
         cur,
@@ -102,7 +115,10 @@ def _check_special_delete_reference(cur: Any, table: str, item_id: UUID) -> None
 
 
 def delete_crud_row(
-    table: str, resource: str, item_id: UUID, telemetry_collection: object | None
+    table: str,
+    resource: str,
+    item_id: UUID,
+    telemetry_collection: CountDocumentsCollection | None,
 ) -> None:
     """Delete one CRUD row after checking its official and runtime dependencies."""
     dependencies = {
@@ -119,7 +135,9 @@ def delete_crud_row(
             child_table, foreign_key = child
             _ensure_no_reference(
                 cur,
-                f"SELECT 1 FROM {child_table} WHERE {foreign_key}=%s LIMIT 1",
+                SQL("SELECT 1 FROM {} WHERE {}=%s LIMIT 1").format(
+                    Identifier(child_table), Identifier(foreign_key)
+                ),
                 (item_id,),
             )
         if table == "race_sessions":
@@ -128,6 +146,6 @@ def delete_crud_row(
             _check_special_delete_reference(cur, table, item_id)
         if table == "race_events":
             cur.execute("DELETE FROM pit_boxes WHERE event_id=%s", (item_id,))
-        cur.execute(f"DELETE FROM {table} WHERE id=%s", (item_id,))
+        cur.execute(SQL("DELETE FROM {} WHERE id=%s").format(Identifier(table)), (item_id,))
         if cur.rowcount == 0:
             raise CrudDeleteError(404, f"{resource[:-1].capitalize()} not found")
