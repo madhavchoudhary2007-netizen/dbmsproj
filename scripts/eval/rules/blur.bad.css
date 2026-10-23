@@ -1,0 +1,1 @@
+.card { filter: blur(0); } .frosted { -webkit-backdrop-filter: blur(2px); } .utilities { @apply md:hover:blur-sm backdrop-blur-[2px]; }

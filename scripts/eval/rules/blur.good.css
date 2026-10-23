@@ -1,0 +1,1 @@
+/* Explicit no-blur utilities are allowed. */ .card { filter: none; backdrop-filter: none; } .copy { content: "blur(2px) is only prose"; }
