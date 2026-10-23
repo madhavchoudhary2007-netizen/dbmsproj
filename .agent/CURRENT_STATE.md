@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 7c6c086
+git_head: c64e793
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -15,7 +15,7 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T331 pure moves accepted: EventBus462ea55, JSON/parser47fc39d, errors882e5ed, validation049a179, models0adc5bb, livenessrouter4c4f401, domainhelpers64214d6. AST/alias proofs and snapshot9PASS each. Latest rootfull214PASS0skip/livePASS. Ruffall0; mypy217errors15/42files afterliveness, fullzeroT339.
 - T44156 introduced1implicitexport error; repaircec7835 restored direct constant import/baseline217. No thresholds loosened. Some worker envelopes used placeholder Verify or inaccurate counts; root corrected format/counts and reranactualVerify beforeaccept, logged in childenvelopes.
 - T361 accepted1e61efd from tokens7768158/rootinstall553ed00/config9335c83: Tailwind4.3.3 +@tailwindcss/postcss4.3.3, autoprefixer removed. Rootbuild/lint/types0,audit0vulnerabilities,925nonpalettebrowserchecksPASS5projects. npm-generatedlock1183changedlines separately from authored<=150workerpackets; ownerexplicitplaninstall, no handwritten product/lock lines.
-- T360 lightgate4f53ecd activated>=0.85, AA4.5 unchanged,80cases collected. Actual dashboarddesktop1FAIL expected on currentdarkUI; never skipped. Radius4c707d9/maskera1eea31, gray10b17c4/wiringb1fec1c selftests0; good0/bad1 fixtures. Blur b395e35 accepted17cases after repair1 for root-proven bareutility/commafilter bypasses; not wired yet. Gradient/weight wiring accepted. Legacyradius2hits remain; otherstyle rules/motionplinth/palette roles pending.
+- T360 lightgate4f53ecd activated>=0.85, AA4.5 unchanged,80cases collected. Actual dashboarddesktop1FAIL expected on currentdarkUI; never skipped. Radius4c707d9/maskera1eea31, gray10b17c4/wiringb1fec1c selftests0; good0/bad1 fixtures. All seven visual rule families wired; motion integration/mobile utility coverage and role-pixel gate pending. Legacy10hits retained.
 
 ## Execution contracts
 - Only overhaul/neo-brutal, accept.sh commits, rerun every Verify, <=3files/150authoredchangedlines, atmost2 fresh packet-only customworkers in shared ignoredclones. No worker commits. Root integrates sequentially and updates state every acceptance. .agent/orchestrate.py persists clone/integrate/mark helpers.
@@ -31,25 +31,6 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - Architecture/ADRs/docs/state/packets/envelopes/orchestration helpers and root-owned planned dependency installs only. Zero authored product lines; integrating worker patches is not product authorship. Canonical lock operation bypassed autoGit tail only to honor accept-only; independently verified.
 
 ## Recent acceptance / review
-- Health wrappers4e8f466/31a3bd4 and SQLrouter4b411cc/1356d28 preserve exact handler AST/main aliases. Full214PASS0skip/livePASS after each; Ruff0; mypy217errors16/43files. Temporary callback factories are T332 dependency-injection debt.
-- Gradient6c04161/weight20e9e21/wiring7b1c487 accepted after regression repairs: selftests24/31; shared scanner/mypy0; actual seven legacy violations remain, covered by visual phases.
-- Root fixed two Verify assumptions without weakening assertions: FastAPI included-router identity traversal; multi-module mypy --explicit-package-bases.
-- T44173 repair2 and T44175 repair1 returned PASSED in isolated clones; root review/acceptance pending. Repairs cover CSS important/case and shadow aliases/RGB; contrast offset/order/conditional classes. T44176 EER move ready.
-
-- T-44176 accepted9d8cae0: Moved unchanged EER metadata handler into SQL router with main alias; exact AST and endpoint identity plus9 snapshot tests pass. Verify0.
-
-- T-44173 accepted66c4550: Added hard-shadow validator with28 regression controls including canonical aliases, RGB, CSS case and important handling. Verify0.
-
-- T-44175 acceptedd0e50ef: Added white-on-red checker with24 controls, character offsets, declaration precedence and conditional JSX literals. Verify0.
-
-- T-44177 acceptedb549015: Integrated shadow/contrast into shared scanner and selftests; good fixtures0 and bad fixtures1. Verify0.
-
-- T-44178 acceptedb886991: Moved unchanged EXPLAIN handler into SQL router with precise Connection callback and preserved alias. Verify0.
-
-- T44180 rejected beforeaccept: unnecessary untyped registration helper hid connection types; repair1 requests direct typed factory nesting and exact Verify envelope. Isolated clone only. Rootfull214PASS0skip/livePASS after EXPLAIN, mypy217/Ruff0.
-
-- T44179 motion candidate rejected: seconds/important false positives, unknown timing/10s delay and no-preference bypass. Repair1 adds exact probes; patch stays isolated.
-
-- T44180repair1 Verify failed C90111>10, contradicting root estimate. Repair2 allows fully typed helper as temporary complexity boundary with precise Connection callback; no gate relaxed.
-
-- T-44180 accepted7c6c086: Moved unchanged constraint/transaction handlers into fully typed helper required by C901; precise connection and mainaliases preserved. Verify0.
+- Health/SQL pure moves through7c6c086 preserve AST/main aliases. Full214PASS0skip/livePASS through EXPLAIN; latest rollback-demo rootrun active. Ruff0/mypy217errors16/43files. Typed temporary factory helpers required by C901; T332 replaces them.
+- T360 shadow66c4550/contrastd0e50ef/wiringb549015/motionc64e793 accepted with regression repairs. Shared neo actual10legacyCSSviolations; motion wrapper next. No thresholds weakened. Counts/static boundary not delivery proof.
+- Root corrected FastAPI included-router probe, mypy namespace, and underestimated C901 (typed helper retained after observed11>10). Worker placeholder Verify formats normalized then exact command rerun.

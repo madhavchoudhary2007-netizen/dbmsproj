@@ -42,6 +42,7 @@ from starlette.middleware.base import RequestResponseEndpoint
 
 from . import token_revocation
 from .analytics_router import create_analytics_router
+from .api.dbms_mongo import create_dbms_mongo_router
 from .api.dbms_sql import create_dbms_sql_router
 from .api.health import health_live as health_live
 from .api.health import legacy_router as legacy_health_router
@@ -1806,30 +1807,15 @@ transaction_demo = dbms_sql_handlers["transaction_demo"]
 app.include_router(dbms_sql_router)
 
 
-@app.get("/api/dbms/overview")
-def dbms_overview(user=admin_dependency):
-    counts = fetch_one("""SELECT
-      (SELECT count(*) FROM race_sessions WHERE state='ACTIVE') AS active_sessions,
-      (SELECT count(*) FROM race_sessions WHERE state='COMPLETED') AS completed_sessions,
-      (SELECT count(*) FROM incident_reports WHERE state='OPEN') AS open_incidents,
-      (SELECT count(*) FROM pit_reservations WHERE status='RESERVED') AS reserved_pit_stops,
-      (SELECT count(*) FROM pit_reservations WHERE status='COMPLETED') AS completed_pit_stops,
-      (SELECT count(*) FROM session_results) AS official_results""")
-    try:
-        telemetry_samples = mongo_ready().count_documents({})
-        mongo_status = "up"
-    except (HTTPException, PyMongoError):
-        telemetry_samples = None
-        mongo_status = "down"
-    return jsonable(
-        {
-            **counts,
-            "telemetry_samples": telemetry_samples,
-            "postgres": "up",
-            "mongodb": mongo_status,
-            "updated_at": datetime.now(UTC),
-        }
-    )
+dbms_mongo_router, dbms_mongo_handlers = create_dbms_mongo_router(
+    lambda *a, **kw: fetch_one(*a, **kw),
+    lambda value: jsonable(value),
+    lambda: mongo_ready(),
+    admin_dependency,
+)
+dbms_overview = dbms_mongo_handlers["dbms_overview"]
+dbms_telemetry = dbms_mongo_handlers["dbms_telemetry"]
+app.include_router(dbms_mongo_router)
 
 
 def public_dbms_tables():
@@ -2088,22 +2074,6 @@ def session_laps(session_id: UUID, user=authenticated_user_dependency):
     return jsonable(
         {"session_id": session_id, "laps": laps, "incidents": incidents, "pit_reservations": stops}
     )
-
-
-@app.get("/api/dbms/telemetry")
-def dbms_telemetry(user=admin_dependency):
-    try:
-        col = mongo_ready()
-        return {
-            "store": "MongoDB",
-            "count": col.count_documents({}),
-            "indexes": list(col.index_information().keys()),
-            "sample": jsonable(list(col.find({}, {"_id": 0}).sort("ts", DESCENDING).limit(3))),
-        }
-    except HTTPException:
-        raise
-    except Exception as exc:
-        raise HTTPException(503, "Could not inspect MongoDB telemetry") from exc
 
 
 def mongo_database_ready():
