@@ -1226,7 +1226,9 @@ def advance_simulation_tick(
         number = int(driver.get("number") or 1)
         pace_offset = sim.pace_offsets_ms.get(driver_id, (number % 7 - 3) * 95)
         assignment = pit_assignments.get(driver_id)
-        in_pit = (driver_id in pit_driver_ids) or bool(assignment and assignment["starts_at"] <= timestamp < assignment["ends_at"])
+        in_pit = (driver_id in pit_driver_ids) or bool(
+            assignment and assignment["starts_at"] <= timestamp < assignment["ends_at"]
+        )
         sector_ms, throttle, brake, speed = calculate_sector_performance(
             sector, pace_offset, safety_car, in_pit, driver_rng
         )
@@ -1282,28 +1284,55 @@ def advance_simulation_tick(
             }
         )
 
-    ordered = sorted(current, key=lambda packet: (-packet["lap"], -packet["sector"], packet["elapsed_ms"]))
+    ordered = sorted(
+        current, key=lambda packet: (-packet["lap"], -packet["sector"], packet["elapsed_ms"])
+    )
     positions = {packet["driver_id"]: position for position, packet in enumerate(ordered, start=1)}
     for packet in current:
         packet["position"] = positions[packet["driver_id"]]
-    timing = [{key: packet[key] for key in ("driver_id", "position", "lap", "sector", "elapsed_ms", "lap_time_ms", "last_lap_ms", "sector_ms", "pit_state", "pit_reservation_id", "pit_box_number", "pit_team_id")}
-              for packet in ordered]
+    timing = [
+        {
+            key: packet[key]
+            for key in (
+                "driver_id",
+                "position",
+                "lap",
+                "sector",
+                "elapsed_ms",
+                "lap_time_ms",
+                "last_lap_ms",
+                "sector_ms",
+                "pit_state",
+                "pit_reservation_id",
+                "pit_box_number",
+                "pit_team_id",
+            )
+        }
+        for packet in ordered
+    ]
     sim.race_clock_ms += 15_000
     return current, {"cars": timing, "safety_car": safety_car}
 
 
 def refresh_simulation_pit_state(sim: Simulation, timestamp: datetime):
     with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-        cur.execute("""UPDATE pit_reservations SET status='COMPLETED'
-            WHERE session_id=%s AND status='RESERVED' AND ends_at<=%s RETURNING id""", (sim.session_id, timestamp))
+        cur.execute(
+            """UPDATE pit_reservations SET status='COMPLETED'
+            WHERE session_id=%s AND status='RESERVED' AND ends_at<=%s RETURNING id""",
+            (sim.session_id, timestamp),
+        )
         expired_ids = [row["id"] for row in cur.fetchall()]
         if expired_ids:
             cur.execute(PIT_RESERVATION_SELECT + " WHERE r.id=ANY(%s)", (expired_ids,))
             expired = cur.fetchall()
         else:
             expired = []
-        cur.execute(PIT_RESERVATION_SELECT + """ WHERE r.session_id=%s AND r.driver_id IS NOT NULL
-            AND r.status='RESERVED' AND r.ends_at>%s ORDER BY r.starts_at""", (sim.session_id, timestamp))
+        cur.execute(
+            PIT_RESERVATION_SELECT
+            + """ WHERE r.session_id=%s AND r.driver_id IS NOT NULL
+            AND r.status='RESERVED' AND r.ends_at>%s ORDER BY r.starts_at""",
+            (sim.session_id, timestamp),
+        )
         active = cur.fetchall()
     for reservation in expired:
         publish(sim.session_id, "pit.update", reservation)
@@ -1319,7 +1348,8 @@ def refresh_simulation_pit_state(sim: Simulation, timestamp: datetime):
             sim.compound_by_driver[key] = compounds[(compounds.index(base) + 1) % len(compounds)]
             car = next((row for row in sim.drivers if str(row["id"]) == key), {})
             sim.pit_due_tire_age_by_driver[key] = tire_stint_target(
-                sim.compound_by_driver[key], int(car.get("number") or 1))
+                sim.compound_by_driver[key], int(car.get("number") or 1)
+            )
     sim.pit_reservations_by_driver = {str(row["driver_id"]): row for row in active}
     return sim.pit_reservations_by_driver
 
@@ -1330,18 +1360,27 @@ def schedule_simulation_pit_stops(sim: Simulation, packets: list[dict[str, Any]]
         driver_id = str(packet["driver_id"])
         driver = next((row for row in sim.drivers if str(row["id"]) == driver_id), None)
         number = int((driver or {}).get("number") or 1)
-        compound = sim.compound_by_driver.setdefault(driver_id, ("SOFT", "MEDIUM", "HARD")[number % 3])
-        target_age = sim.pit_due_tire_age_by_driver.setdefault(driver_id, tire_stint_target(compound, number))
-        if (packet["sector"] != 3 or packet["lap"] >= completion_lap
-                or packet["tire_age_laps"] < target_age
-                or driver_id in sim.pit_reservations_by_driver):
+        compound = sim.compound_by_driver.setdefault(
+            driver_id, ("SOFT", "MEDIUM", "HARD")[number % 3]
+        )
+        target_age = sim.pit_due_tire_age_by_driver.setdefault(
+            driver_id, tire_stint_target(compound, number)
+        )
+        if (
+            packet["sector"] != 3
+            or packet["lap"] >= completion_lap
+            or packet["tire_age_laps"] < target_age
+            or driver_id in sim.pit_reservations_by_driver
+        ):
             continue
         if not driver or not driver.get("team_id"):
             sim.pit_due_tire_age_by_driver[driver_id] = MAX_SESSION_LAPS + 1
             continue
         duration = timedelta(seconds=max(0.6, 3.0 / max(sim.rate_hz, 0.2)))
         try:
-            reservation = create_automatic_reservation(sim.session_id, driver["team_id"], driver["id"], duration)
+            reservation = create_automatic_reservation(
+                sim.session_id, driver["team_id"], driver["id"], duration
+            )
         except Exception as exc:
             log.warning("Automatic pit stop allocation failed for %s: %s", driver_id, exc)
             sim.pit_due_tire_age_by_driver[driver_id] = MAX_SESSION_LAPS + 1
@@ -1355,17 +1394,28 @@ def record_simulated_incidents(sim: Simulation, packets: list[dict[str, Any]]):
     """Create a few reviewable race reports as laps complete."""
     if not sim.is_generated:
         return
-    descriptions = {7: "Track limits observed at corner exit", 23: "Minor wheel-to-wheel contact under review", 41: "Unsafe rejoin reported by race control"}
+    descriptions = {
+        7: "Track limits observed at corner exit",
+        23: "Minor wheel-to-wheel contact under review",
+        41: "Unsafe rejoin reported by race control",
+    }
     for lap, description in descriptions.items():
         if lap >= (sim.total_laps or MAX_SESSION_LAPS) or lap in sim.incident_laps_recorded:
             continue
-        finished = [packet for packet in packets if packet["lap"] == lap and packet["sector"] == 3 and packet["lap_time_ms"]]
+        finished = [
+            packet
+            for packet in packets
+            if packet["lap"] == lap and packet["sector"] == 3 and packet["lap_time_ms"]
+        ]
         if not finished:
             continue
         packet = finished[0]
         with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-            cur.execute("""INSERT INTO incident_reports(session_id,driver_id,lap,description)
-                VALUES (%s,%s,%s,%s) RETURNING *""", (sim.session_id, packet["driver_id"], lap, description))
+            cur.execute(
+                """INSERT INTO incident_reports(session_id,driver_id,lap,description)
+                VALUES (%s,%s,%s,%s) RETURNING *""",
+                (sim.session_id, packet["driver_id"], lap, description),
+            )
             row = cur.fetchone()
         sim.incident_laps_recorded.add(lap)
         publish(sim.session_id, "incident.update", row)
@@ -1373,8 +1423,11 @@ def record_simulated_incidents(sim: Simulation, packets: list[dict[str, Any]]):
 
 def cancel_automatic_pit_reservations(session_id: UUID | str):
     with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-        cur.execute("""UPDATE pit_reservations SET status='CANCELLED'
-            WHERE session_id=%s AND allocation_source='AUTOMATIC' AND status='RESERVED' RETURNING id""", (session_id,))
+        cur.execute(
+            """UPDATE pit_reservations SET status='CANCELLED'
+            WHERE session_id=%s AND allocation_source='AUTOMATIC' AND status='RESERVED' RETURNING id""",
+            (session_id,),
+        )
         ids = [row["id"] for row in cur.fetchall()]
         if ids:
             cur.execute(PIT_RESERVATION_SELECT + " WHERE r.id=ANY(%s)", (ids,))
@@ -1409,8 +1462,11 @@ async def simulation_loop(sim: Simulation):
             await asyncio.sleep(0.05)
             continue
         try:
-            session = fetch_one("""SELECT s.state,s.safety_car,e.championship_id
-                FROM race_sessions s JOIN race_events e ON e.id=s.event_id WHERE s.id=%s""", (sim.session_id,))
+            session = fetch_one(
+                """SELECT s.state,s.safety_car,e.championship_id
+                FROM race_sessions s JOIN race_events e ON e.id=s.event_id WHERE s.id=%s""",
+                (sim.session_id,),
+            )
             if not session:
                 sim.status = "error"
                 return
@@ -1422,23 +1478,47 @@ async def simulation_loop(sim: Simulation):
                 return
             timestamp = datetime.now(UTC)
             pit_assignments = refresh_simulation_pit_state(sim, timestamp)
-            packets, timing = advance_simulation_tick(sim, timestamp, safety_car=session["safety_car"], pit_assignments=pit_assignments)
+            packets, timing = advance_simulation_tick(
+                sim, timestamp, safety_car=session["safety_car"], pit_assignments=pit_assignments
+            )
             for packet in packets:
                 inserted = col.insert_one(dict(packet))
-                publish(sim.session_id, "telemetry.sample", telemetry_ws_payload(packet, inserted.inserted_id))
+                publish(
+                    sim.session_id,
+                    "telemetry.sample",
+                    telemetry_ws_payload(packet, inserted.inserted_id),
+                )
             publish(sim.session_id, "timing.update", timing)
             schedule_simulation_pit_stops(sim, packets)
             record_simulated_incidents(sim, packets)
             completion_lap = min(sim.total_laps or MAX_SESSION_LAPS, MAX_SESSION_LAPS)
             if all(packet["lap"] == completion_lap and packet["sector"] == 3 for packet in packets):
                 ordered = sorted(packets, key=lambda packet: packet["elapsed_ms"])
-                best_laps = {row["_id"]: row["best_lap_ms"] for row in col.aggregate([
-                    {"$match": {"session_id": str(sim.session_id), "lap_time_ms": {"$gt": 0}}},
-                    {"$group": {"_id": "$driver_id", "best_lap_ms": {"$min": "$lap_time_ms"}}},
-                ])}
+                best_laps = {
+                    row["_id"]: row["best_lap_ms"]
+                    for row in col.aggregate(
+                        [
+                            {
+                                "$match": {
+                                    "session_id": str(sim.session_id),
+                                    "lap_time_ms": {"$gt": 0},
+                                }
+                            },
+                            {
+                                "$group": {
+                                    "_id": "$driver_id",
+                                    "best_lap_ms": {"$min": "$lap_time_ms"},
+                                }
+                            },
+                        ]
+                    )
+                }
                 fastest_driver_id = min(best_laps, key=best_laps.get) if best_laps else None
-                pole_driver_id = (min(sim.pace_offsets_ms, key=sim.pace_offsets_ms.get)
-                                  if sim.is_generated and sim.pace_offsets_ms else None)
+                pole_driver_id = (
+                    min(sim.pace_offsets_ms, key=sim.pace_offsets_ms.get)
+                    if sim.is_generated and sim.pace_offsets_ms
+                    else None
+                )
                 rows = []
                 with connection() as conn, conn.cursor() as cur:
                     for position, packet in enumerate(ordered, start=1):
