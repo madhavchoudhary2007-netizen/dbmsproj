@@ -1,4 +1,11 @@
 # Perfection loop
+
+## OWNER OVERRIDE (2026-10-23), takes precedence over the phase plan
+- Phase 2 (structure) is capped. Finish only the router/repository split already in progress (auth and membership), then make no further splits. Put the rest in the backlog with reasons.
+- Before any more structure work, in this order: F-ACE01 (login throttling per account and per source, with tests), F-E02 (safe npm upgrades only, no major migrations; record what you skipped and why), F-DOM-04 (telemetry duplicates and out-of-order packets), F-DOM-05 (simulator seed persisted so a race can be replayed). Each test-first: a failing test, then the fix, then the full isolated suite.
+- Then run the full evaluation once (evaluation.md, score.sh) so a real score exists. After that, fix only what the score and the ratchets (ruff, mypy, explicit any) point to, highest weight first.
+- At most 15 more tasks before the first full evaluation. Then write the final report.
+
 branch: perfection-loop
 phase: 2 — structure, in progress
 cycle: 0 of 8
