@@ -1,7 +1,7 @@
 <!-- LOCK:BEGIN -->
 > STATUS: LOCKED
-> SHA256: 12c12221b65b1ee38a63e3efda98f460535368fea1b19740befec706e626a868
-> LOCKED_AT: 2026-10-23T05:15:46Z
+> SHA256: 0dbd38b2c32d662bc2d5aaa31178ba23a93b28d1f8a6dfd23a8322e5bf229cda
+> LOCKED_AT: 2026-10-23T05:31:29Z
 > LOCKED_BY: orchestrator
 <!-- LOCK:END -->
 # ApexGrid architecture — existing system, improvement in place
@@ -118,6 +118,8 @@ type LoginReply = { access_token: string; token_type: "bearer"; user: { id: UUID
 type Session = { id: UUID; event_id: UUID; session_type: "PRACTICE" | "QUALIFYING" | "RACE"; state: SessionState; total_laps: number; scheduled_at: UTC; started_at: UTC | null; ended_at: UTC | null };
 type SessionAction = { action: "start" | "pause" | "resume" | "finish" | "reset" };
 type DemoRaceCreate = { cars?: number }; // omitted 8..16 random; explicit 6..20
+// ADR-006 internal contract: demo_races.simulation_seed is bigint|null; new
+// generated races persist a nonnegative seed and restore it with the roster.
 type PitAutoRequest = { session_id: UUID; team_id: UUID; driver_id?: UUID };
 type PitReservation = { id: UUID; pit_box_id: UUID; session_id: UUID; team_id: UUID; driver_id: UUID | null; allocation_source: "MANUAL" | "AUTOMATIC"; starts_at: UTC; ends_at: UTC; status: ReservationStatus; box_number: number };
 type Telemetry = { session_id: UUID; driver_id: UUID; ts: UTC; lap: number; sector: number; elapsed_ms: number; lap_time_ms?: number | null; sector_ms: number[]; position?: number | null; speed_kph: number; throttle_pct: number; brake_pct: number; tire_compound: "SOFT" | "MEDIUM" | "HARD" | "INTERMEDIATE" | "WET"; tire_age_laps: number; tire_wear_pct: number; tire_temp_c: number[]; pit_state: string; pit_reservation_id?: UUID | null; pit_box_number?: number | null };
@@ -138,7 +140,7 @@ PostgreSQL's 17 existing tables are `users`, `teams`, `drivers`, `team_membershi
 |---|---|---|
 | Login | anonymous -> authenticating -> authenticated or error; authenticated -> refreshing/me -> authenticated or anonymous; authenticated -> signed out | `auth/login`, `auth/me`; JWT role checked server-side; localStorage token is current risk. ADR-002 specifies the planned HttpOnly session cookie, signed CSRF cookie/header, credentialed fetch, explicit logout and cookie-authenticated WebSocket; implementation remains pending. |
 | Session | SCHEDULED -> ACTIVE or CANCELLED; ACTIVE <-> PAUSED; ACTIVE/PAUSED -> COMPLETED/CANCELLED/SCHEDULED(reset); COMPLETED/CANCELLED -> SCHEDULED(reset) where API permits | PostgreSQL trigger and timestamp checks; `POST /sessions/{id}/action`; lap 0..72 |
-| Simulation | absent -> running <-> paused -> stopped; stopped/reset -> running after clean start; generated completion -> archived + optionally new auto race | in-memory `simulations`, SQL session and Mongo telemetry; restore from stored packets on restart. ADR-004 requires one active backend process per PostgreSQL database, enforced by a lifespan advisory lock; lock loss fails closed. |
+| Simulation | absent -> running <-> paused -> stopped; stopped/reset -> running after clean start; generated completion -> archived + optionally new auto race | in-memory `simulations`, SQL session and Mongo telemetry; restore from stored packets on restart. ADR-004 requires one active backend process per PostgreSQL database, enforced by a lifespan advisory lock; lock loss fails closed. ADR-006 permits additive nullable `demo_races.simulation_seed`; new generated races persist a seed and derive deterministic sector values from seed, roster and progress, with explicit external inputs for replay. Legacy null-seed races remain valid. |
 | Pit reservation | requested -> locked/allocation -> RESERVED or conflict/no-box error; RESERVED -> COMPLETED/CANCELLED; terminal states cannot reopen | SQL row lock, exclusion/unique constraints; auto chooses earliest free event box/window; Mongo/WS reflect assigned driver |
 | Telemetry | produced -> Pydantic validated -> ordered/idempotent check -> Mongo persisted -> WS published -> client snapshot/stream; exact retry -> existing 202 without new publish; older/conflicting packet -> 409; WS disconnect -> reconnect + snapshot | ADR-005 applies per session/driver lap, sector and elapsed ordering to API ingest; reject invalid lap/driver/session; SQL and Mongo may be briefly out of sync, show partial state |
 | Incident/standing | OPEN -> APPROVED or REJECTED; approval -> immutable penalty/points/eligibility; completed result -> recalculated standings | SQL transaction/trigger and explicit-cursor routine; repeat decision must be rejected. ADR-003 rejects new unsupported time/grid sanctions before state transition and labels historical affected outputs provisional. |
@@ -198,7 +200,7 @@ Severity P0 blocks reproducible verification/security; P1 blocks a protocol gate
 | G12 JWT secret | P1 | Backend fails closed outside local mode, but local demo secret/Compose fallback must be excluded from shared deployment and tested. |
 | G13 giant mixed modules | P1 | `special-pages.tsx` ~1720 lines, `main.py` ~2175, `globals.css` ~1416; W1/W2 boundaries and reviewability need small extractions. |
 | G14 request/stream race conditions | P1 | Different polling/WS paths use local guards; verify navigation cancellation, reconnect snapshot, duplicate ticks and Mongo partial failures. ADR-005 adds an ordered/idempotent ingest test and fix for F-DOM-04. |
-| G15 deterministic simulation | P1 | Existing tests check lap/sector bounds, but fixed-step/restart reproducibility and simultaneous pit conflicts need a deterministic test harness. |
+| G15 deterministic simulation | P1 | Existing tests check lap/sector bounds, but fixed-step/restart reproducibility and simultaneous pit conflicts need a deterministic test harness. ADR-006 adds a persisted seed for generated-race replay without changing wire shapes; W3 proves fixed-input reproducibility before W2 implementation. |
 | G16 runtime mismatch | P2 | Host Node 26/Python 3.14 vs Docker Node 22/Python 3.12; run matching-container checks in CI. |
 | G17 CI and scoring | P1 | No CI workflow; score >=95/all hard gates cannot be claimed yet. Add reproducible gates and score report. |
 | G18 documentation drift | P2 | Historical docs mention E2E passing while no browser E2E setup exists; distinguish prior manual browser checks from automated E2E. |
@@ -248,7 +250,8 @@ Lens 5 boundary matrix: 0/1/72/73 laps and sector three boundary (API-04); dupli
 - R04: Large mixed UI/API files make the strict W1/W2 packet boundaries costly. Extract in small behavior-preserving steps with one focused verify each.
 - R05: Runtime and Compose availability differ from historical verification. Any result measured on host Python 3.14/Node 26 needs container parity before final evaluation.
 - R06: Process-local simulator and EventBus cannot serve concurrent backend processes coherently. ADR-004's PostgreSQL advisory lock and lock-loss fail-closed path require isolated acceptance and documentation before Phase 2 closes.
-- R07: ADR-005's new HTTP 409 ingest outcome and exact-retry behavior are authorized but unimplemented. Manual and simulator packets can still race until the ordered ingest path is verified; retain historical Mongo rows.
+- R07: ADR-005 manual-ingest ordering and exact retry passed T-164..174 plus the 132-test disposable backend and live acceptance gates. Simulator writes still use their own path and external packets may interleave; preserve historical Mongo rows and keep this concurrency risk visible.
+- R08: ADR-006 seed alone cannot reproduce wall-clock timestamps, manual interventions, safety-car changes or pit assignments. Replay requires the stored roster and those explicit inputs; legacy null-seed rows remain nondeterministic. Migration and tests are pending.
 
 ## ADR-002 focused Phase C: auth transport
 
@@ -265,3 +268,7 @@ Pass 1, Lens 1 traced live creation/control, telemetry fan-out and reconnect acr
 ## ADR-005 focused Phase C: telemetry ordering
 
 Pass 1, Lens 1 traced API-07 ingest -> Mongo -> WebSocket/live/DBMS and retained all existing outputs while making exact retry safe. Lens 2 requires strict pre-fix failures, then offline focused tests and the full disposable backend/live gate, owned by T-164/T-165. Lens 3 adds no dependency or screen; the 409 message must state the cause plainly. Lens 4 requires a process-local serialized read/check/insert against persisted per-driver telemetry under ADR-004's single-process guard; no historical rewrite. Lens 5 covers exact retry, same-position conflicting payload, older lap/sector/elapsed, independent drivers and restart with existing Mongo data. Pass 2 found zero further architecture amendments; these tests and runtime changes remain pending.
+
+## ADR-006 focused Phase C: generated-race replay
+
+Pass 1, Lens 1 traced generated race create -> SQL demo_races/entries -> simulator tick -> Mongo telemetry -> active-race restore and found the roster and seed must both survive restart. Lens 2 requires strict pre-fix failure for fixed-seed repeatability plus seed create/restore carry-through, migration 003 applied on apexgrid-test, then full backend/live acceptance. Lens 3 adds no dependency or screen; an internal seed is the smallest in-place change. Lens 4 uses a stable per-driver/progress RNG so a resumed race does not depend on process-global random draw count; nonseeded legacy races preserve current behavior. Lens 5 covers null legacy seed, 0 and maximum 63-bit seed, multiple drivers, restart with the same roster and external inputs, and the 72-lap cap. Pass 2 found zero further architecture amendments; explicit wall-clock and pit/safety-car inputs remain a replay precondition, recorded in ADR-006 and Risks R08.
