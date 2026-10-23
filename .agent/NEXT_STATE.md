@@ -3,11 +3,11 @@ updated_at: 2026-10-22T20:54:39Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-154 — Extract generated-race DELETE SQL writes
-- worker: W2 | priority: P2 | after: T-153
-- target_files: backend/app/main.py, backend/app/demo_race_repository.py
-- contract: move post-simulator DELETE SQL, ID reads and standings recalculation into a typed repository helper on the caller's cursor; preserve statement order and Mongo cleanup
-- verify: seeded lifecycle/persistence and blocked-delete tests; Ruff <=555, mypy <=227
+### T-155 — Move generated-race DELETE route to APIRouter
+- worker: W2 | priority: P2 | after: T-154
+- target_files: backend/app/main.py, backend/app/demo_race_router.py
+- contract: register DELETE in the existing demo router, preserve route behavior and main.delete_demo_race direct-call compatibility
+- verify: seeded lifecycle/persistence, blocked-delete and OpenAPI tests; Ruff <=554, mypy <=227
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-154 ✓ 5808275; ordered DELETE SQL moved to same-cursor repository helper; focused 4/4 on apexgrid-test, Ruff 554/mypy 227.
 - T-153 ✓ cfe68ef; typed same-cursor DELETE preflight, four focused contracts passed; Ruff 555/mypy 227.
 - T-152 ✓ df03eb2; POST moved to APIRouter, three focused checks passed; Ruff 556/mypy 227.
 - T-151 ✓ bf608f2; creation SQL transaction moved to typed repository; 2 seeded tests passed, Ruff 558/mypy 248; full backend 119/0/0 and live acceptance passed.
@@ -43,7 +44,4 @@ loop_iteration: 1 of 5
 - T-126 ✓ d2201f5; user list/detail SQL moved to typed repository; seeded contract 2 passed on apexgrid-test, Ruff 600, mypy 259. Worker socket denied; orchestrator reran after type repair.
 - T-125 ✓ e410407; seeded auth/user contract 2 passed on apexgrid-test, Ruff 600. Worker socket denied; orchestrator reran, corrected generated-ID fixture and cleanup definition before acceptance.
 - T-124 ✓ ffac0c8; backend-cwd import passes; marker retired; isolated backend 112 passed, zero skips/failures/xfails, live acceptance passed. F-STRUCT-01/02 closed.
-- T-123 ✓ 0930e54; strict backend-cwd import xfail accepted, --runxfail fails on missing backend package; Ruff 600.
-- T-122 ✓ 9e09f97; paused/running simulator guards pass, Ruff 600, mypy 259; marker retired, full isolated backend 111 passed. Live API startup failed import; F-STRUCT-02 queued.
-- T-121 ✓ dee5f57; two strict simulator xfails accepted; --runxfail proves paused hang and running DB read after lease loss, Ruff 600.
-- T-001..T-120: accepted history and evidence in git/LOOP.md.
+- T-001..T-123: accepted history and evidence in git/LOOP.md.
