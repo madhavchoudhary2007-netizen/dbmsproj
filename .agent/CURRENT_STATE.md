@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 3afff87
+git_head: 462ea55
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -37,3 +37,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T44149rootreal14casesPASS (tenGETgoldens+4comparison); immutablefixturecopiedbyteidentically. Initialworkerclaimedmissingfiledespiteexisting2376bytefixture, absolute-pathretryresolved; no changesoutsidepacket. Rootfull214suite running. T44150radiuslintfoundationW3runninginparallelallowedPhase5interleave.
 
 - T-330 accepted3afff87: Close OpenAPI and ten real GET golden contract guard from accepted W3 children. Thirty focused tests pass; full isolated suite has 214 passed, zero skips, with live acceptance passed. Verify exit0; 0 changed lines.
+
+- T-44151 accepted462ea55: Moved EventBus verbatim into backend.app.core.events, added the main.EventBus import alias, and retained bus = EventBus() in its original location. Verify exit0; 82 changed lines.

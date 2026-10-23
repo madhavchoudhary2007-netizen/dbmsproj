@@ -1,0 +1,1 @@
+.pill { border-radius: var(--radius-full); } .square { border-radius: 0; } .round { border-radius: 9999px; } .none { border-radius: 0px; } .tw { @apply rounded-none; }
