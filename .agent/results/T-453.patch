@@ -1,0 +1,377 @@
+diff --git a/backend/app/main.py b/backend/app/main.py
+index 435511a..9e18f79 100644
+--- a/backend/app/main.py
++++ b/backend/app/main.py
+@@ -276,14 +276,22 @@ def current_user(
+     return jsonable(user)
+ 
+ 
++authenticated_user_dependency = Depends(current_user)
++
++
+ def roles(*allowed: str) -> Callable[..., Any]:
+-    def check(user: Any = Depends(current_user)) -> Any:
++    def check(user: Any = authenticated_user_dependency) -> Any:
+         if user["role"] not in allowed:
+             raise HTTPException(403, "Insufficient role")
+         return user
+     return check
+ 
+ 
++admin_role_dependency = Depends(roles("ADMIN"))
++admin_steward_dependency = Depends(roles("ADMIN", "STEWARD"))
++admin_steward_principal_dependency = Depends(roles("ADMIN", "STEWARD", "PRINCIPAL"))
++
++
+ def create_automatic_reservation(session_id: UUID | str, team_id: UUID | str,
+                                  driver_id: UUID | str | None, duration: timedelta):
+     with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
+@@ -314,19 +322,19 @@ def crud_routes(resource: str, table: str, cols: tuple[str, ...], joins: str = "
+     prefix = f"/api/{resource}"
+ 
+     @app.get(prefix)
+-    def listing(limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0), user=Depends(current_user)):
++    def listing(limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0), user=authenticated_user_dependency):
+         l, o = limit_offset(limit, offset)
+         return jsonable(list_crud_rows(base, l, o))
+ 
+     @app.get(prefix + "/{item_id}")
+-    def get_item(item_id: UUID, user=Depends(current_user)):
++    def get_item(item_id: UUID, user=authenticated_user_dependency):
+         result = get_crud_row(base, table, item_id)
+         if not result:
+             raise HTTPException(404, f"{resource[:-1].capitalize()} not found")
+         return jsonable(result)
+ 
+     @app.post(prefix, status_code=201)
+-    def create_item(payload: dict[str, Any], user=Depends(roles("ADMIN"))):
++    def create_item(payload: dict[str, Any], user=admin_role_dependency):
+         clean = {k: v for k, v in payload.items() if k in cols and k != "id"}
+         if not clean:
+             raise HTTPException(422, "At least one writable field is required")
+@@ -335,7 +343,7 @@ def crud_routes(resource: str, table: str, cols: tuple[str, ...], joins: str = "
+         return jsonable(row)
+ 
+     @app.patch(prefix + "/{item_id}")
+-    def update_item(item_id: UUID, payload: dict[str, Any], user=Depends(roles("ADMIN"))):
++    def update_item(item_id: UUID, payload: dict[str, Any], user=admin_role_dependency):
+         clean = {k: v for k, v in payload.items() if k in cols and k != "id"}
+         if not clean:
+             raise HTTPException(422, "At least one writable field is required")
+@@ -352,7 +360,7 @@ def crud_routes(resource: str, table: str, cols: tuple[str, ...], joins: str = "
+         return jsonable(row)
+ 
+     @app.delete(prefix + "/{item_id}", status_code=204)
+-    def delete_item(item_id: UUID, user=Depends(roles("ADMIN"))):
++    def delete_item(item_id: UUID, user=admin_role_dependency):
+         try:
+             delete_crud_row(table, resource, item_id, telemetry_collection)
+         except CrudDeleteError as exc:
+@@ -386,7 +394,7 @@ app.include_router(create_user_router(roles, jsonable))
+ 
+ 
+ @app.post("/api/sessions/{session_id}/action")
+-async def session_action(session_id: UUID, body: Action, user=Depends(roles("ADMIN", "STEWARD"))):
++async def session_action(session_id: UUID, body: Action, user=admin_steward_dependency):
+     transitions = {"start": ("SCHEDULED", "ACTIVE"), "pause": ("ACTIVE", "PAUSED"), "resume": ("PAUSED", "ACTIVE"), "finish": (("ACTIVE", "PAUSED"), "COMPLETED"), "reset": (("ACTIVE", "PAUSED", "COMPLETED", "CANCELLED"), "SCHEDULED")}
+     before, after = transitions[body.action]
+     states = before if isinstance(before, tuple) else (before,)
+@@ -437,7 +445,7 @@ async def session_action(session_id: UUID, body: Action, user=Depends(roles("ADM
+ 
+ 
+ @app.get("/api/sessions/{session_id}/results")
+-def results(session_id: UUID, user=Depends(current_user)):
++def results(session_id: UUID, user=authenticated_user_dependency):
+     return jsonable(fetch_all("""SELECT r.*,u.full_name AS driver_name,d.number,t.name AS team_name,
+       EXISTS(SELECT 1 FROM incident_reports i JOIN penalties p ON p.incident_id=i.id
+         WHERE i.session_id=r.session_id AND (p.time_seconds>0 OR p.grid_places>0)) AS provisional
+@@ -450,7 +458,7 @@ def results(session_id: UUID, user=Depends(current_user)):
+ 
+ 
+ @app.post("/api/sessions/{session_id}/results")
+-def save_results(session_id: UUID, rows: list[ResultIn], user=Depends(roles("ADMIN", "STEWARD"))):
++def save_results(session_id: UUID, rows: list[ResultIn], user=admin_steward_dependency):
+     if len(rows) > 100:
+         raise HTTPException(422, "At most 100 results per request")
+     session = fetch_one("""SELECT s.state,EXISTS(SELECT 1 FROM demo_races d WHERE d.session_id=s.id) AS generated
+@@ -477,14 +485,14 @@ def save_results(session_id: UUID, rows: list[ResultIn], user=Depends(roles("ADM
+ 
+ 
+ @app.post("/api/championships/{championship_id}/recalculate")
+-def recalculate(championship_id: UUID, user=Depends(roles("ADMIN", "STEWARD"))):
++def recalculate(championship_id: UUID, user=admin_steward_dependency):
+     with connection() as conn, conn.cursor() as cur:
+         cur.execute("SELECT recalculate_standings(%s)", (championship_id,))
+     return {"championship_id": str(championship_id), "recalculated": True}
+ 
+ 
+ @app.get("/api/championships/{championship_id}/standings")
+-def standings(championship_id: UUID, user=Depends(current_user)):
++def standings(championship_id: UUID, user=authenticated_user_dependency):
+     return jsonable(fetch_all("""SELECT s.*,u.full_name AS driver_name,d.number,t.name AS team_name,
+       EXISTS(SELECT 1 FROM race_events re JOIN race_sessions rs ON rs.event_id=re.id
+         JOIN incident_reports i ON i.session_id=rs.id JOIN penalties p ON p.incident_id=i.id
+@@ -496,7 +504,7 @@ def standings(championship_id: UUID, user=Depends(current_user)):
+ 
+ 
+ @app.get("/api/incidents")
+-def get_incidents(state: str | None = None, limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0), user=Depends(current_user)):
++def get_incidents(state: str | None = None, limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0), user=authenticated_user_dependency):
+     sql = "SELECT i.*,u.full_name AS driver_name,d.number,s.session_type,e.name AS event_name FROM incident_reports i JOIN drivers d ON d.id=i.driver_id JOIN users u ON u.id=d.user_id JOIN race_sessions s ON s.id=i.session_id JOIN race_events e ON e.id=s.event_id"
+     params: list[Any] = []
+     if state:
+@@ -507,7 +515,7 @@ def get_incidents(state: str | None = None, limit: int = Query(50, ge=1, le=200)
+ 
+ 
+ @app.post("/api/incidents", status_code=201)
+-def create_incident(body: IncidentIn, user=Depends(roles("ADMIN", "STEWARD"))):
++def create_incident(body: IncidentIn, user=admin_steward_dependency):
+     with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
+         cur.execute("SELECT total_laps FROM race_sessions WHERE id=%s", (body.session_id,))
+         session = cur.fetchone()
+@@ -526,7 +534,7 @@ def create_incident(body: IncidentIn, user=Depends(roles("ADMIN", "STEWARD"))):
+ 
+ 
+ @app.post("/api/incidents/{incident_id}/decision")
+-def decide_incident(incident_id: UUID, body: Decision, user=Depends(roles("ADMIN", "STEWARD"))):
++def decide_incident(incident_id: UUID, body: Decision, user=admin_steward_dependency):
+     with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
+         cur.execute("SELECT * FROM incident_reports WHERE id=%s FOR UPDATE", (incident_id,)); incident=cur.fetchone()
+         if not incident: raise HTTPException(404,"Incident not found")
+@@ -547,7 +555,7 @@ app.include_router(create_pit_router(current_user, jsonable))
+ 
+ 
+ @app.post("/api/pit-reservations", status_code=201)
+-def reserve_pit(body: ReservationIn, user=Depends(roles("ADMIN", "STEWARD", "PRINCIPAL"))):
++def reserve_pit(body: ReservationIn, user=admin_steward_principal_dependency):
+     if user["role"] == "PRINCIPAL":
+         own_team=fetch_one("SELECT id FROM teams WHERE id=%s AND principal_user_id=%s",(body.team_id,user["id"]))
+         if not own_team:
+@@ -571,7 +579,7 @@ def reserve_pit(body: ReservationIn, user=Depends(roles("ADMIN", "STEWARD", "PRI
+ 
+ 
+ @app.post("/api/pit-reservations/auto", status_code=201)
+-def reserve_pit_auto(body: AutoReservationIn, user=Depends(roles("ADMIN", "STEWARD", "PRINCIPAL"))):
++def reserve_pit_auto(body: AutoReservationIn, user=admin_steward_principal_dependency):
+     if user["role"] == "PRINCIPAL":
+         own_team = fetch_one("SELECT id FROM teams WHERE id=%s AND principal_user_id=%s", (body.team_id, user["id"]))
+         if not own_team:
+@@ -610,7 +618,7 @@ class ReservationStatus(BaseModel):
+ 
+ 
+ @app.patch("/api/pit-reservations/{reservation_id}")
+-def update_pit_reservation(reservation_id: UUID, body: ReservationStatus, user=Depends(roles("ADMIN", "STEWARD", "PRINCIPAL"))):
++def update_pit_reservation(reservation_id: UUID, body: ReservationStatus, user=admin_steward_principal_dependency):
+     with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
+         cur.execute("""SELECT r.*,t.principal_user_id FROM pit_reservations r
+             JOIN teams t ON t.id=r.team_id WHERE r.id=%s FOR UPDATE OF r""", (reservation_id,))
+@@ -675,7 +683,7 @@ def demo_race_row(session_id: UUID | str):
+     return result
+ 
+ 
+-def list_demo_races(limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0), user=Depends(current_user)):
++def list_demo_races(limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0), user=authenticated_user_dependency):
+     ids = list_demo_race_ids(limit, offset)
+     return [demo_race_row(row["session_id"]) for row in ids]
+ 
+@@ -794,14 +802,14 @@ async def resume_or_create_auto_demo_race(create_if_missing: bool = True):
+ 
+ async def create_demo_race(
+     body: DemoRaceCreate = DEFAULT_DEMO_RACE_CREATE,
+-    user: Any = Depends(roles("ADMIN", "STEWARD")),
++    user: Any = admin_steward_dependency,
+ ) -> Any:
+     return await run_demo_race_create(
+         body, _make_demo_race, launch_demo_simulation, demo_race_row
+     )
+ 
+ 
+-async def delete_demo_race(session_id: UUID, user=Depends(roles("ADMIN", "STEWARD"))):
++async def delete_demo_race(session_id: UUID, user=admin_steward_dependency):
+     return await run_demo_race_delete(
+         session_id,
+         simulations,
+@@ -1186,7 +1194,7 @@ async def simulation_loop(sim: Simulation):
+ 
+ 
+ @app.post("/api/sessions/{session_id}/simulate")
+-async def control_simulation(session_id: UUID, body: SimulationControl, user=Depends(roles("ADMIN", "STEWARD"))):
++async def control_simulation(session_id: UUID, body: SimulationControl, user=admin_steward_dependency):
+     if mongo_ready() is None:
+         raise HTTPException(503, "MongoDB telemetry store is unavailable")
+     sim = simulations.get(str(session_id))
+@@ -1342,16 +1350,19 @@ def health():
+     return {"status":"ok" if all(v=="up" for v in state.values()) else "degraded","services":state}
+ 
+ 
+-def admin(user=Depends(roles("ADMIN"))): return user
++def admin(user=admin_role_dependency): return user
++
++
++admin_dependency = Depends(admin)
+ 
+ 
+ @app.get("/api/dbms/schema")
+-def dbms_schema(user=Depends(admin)):
++def dbms_schema(user=admin_dependency):
+     return jsonable(fetch_all("SELECT table_name,column_name,data_type,is_nullable FROM information_schema.columns WHERE table_schema='public' ORDER BY table_name,ordinal_position"))
+ 
+ 
+ @app.get("/api/dbms/overview")
+-def dbms_overview(user=Depends(admin)):
++def dbms_overview(user=admin_dependency):
+     counts = fetch_one("""SELECT
+       (SELECT count(*) FROM race_sessions WHERE state='ACTIVE') AS active_sessions,
+       (SELECT count(*) FROM race_sessions WHERE state='COMPLETED') AS completed_sessions,
+@@ -1375,7 +1386,7 @@ def public_dbms_tables():
+ 
+ 
+ @app.get("/api/dbms/tables")
+-def dbms_tables(user=Depends(admin)):
++def dbms_tables(user=admin_dependency):
+     names = public_dbms_tables()
+     with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
+         rows = []
+@@ -1387,7 +1398,7 @@ def dbms_tables(user=Depends(admin)):
+ 
+ @app.get("/api/dbms/tables/{table_name}")
+ def dbms_table_rows(table_name: str, limit: int = Query(50, ge=1, le=100),
+-                    offset: int = Query(0, ge=0), user=Depends(admin)):
++                    offset: int = Query(0, ge=0), user=admin_dependency):
+     if table_name not in public_dbms_tables():
+         raise HTTPException(404, "Database table not found")
+     columns = fetch_all("""SELECT column_name FROM information_schema.columns
+@@ -1412,14 +1423,14 @@ def dbms_table_rows(table_name: str, limit: int = Query(50, ge=1, le=100),
+ 
+ 
+ @app.get("/api/dbms/races")
+-def dbms_races(user=Depends(admin)):
++def dbms_races(user=admin_dependency):
+     return jsonable(fetch_all("""SELECT s.id,s.state,s.total_laps,s.started_at,s.ended_at,e.name AS event_name,c.name AS circuit_name
+       FROM race_sessions s JOIN race_events e ON e.id=s.event_id JOIN circuits c ON c.id=e.circuit_id LEFT JOIN demo_races d ON d.session_id=s.id
+       WHERE s.session_type='RACE' ORDER BY CASE WHEN s.state='ACTIVE' THEN 0 WHEN s.state='PAUSED' THEN 1 ELSE 2 END,COALESCE(d.auto_repeat,false) DESC,s.scheduled_at DESC"""))
+ 
+ 
+ @app.get("/api/dbms/races/{session_id}")
+-def dbms_race(session_id: UUID, include_laps: bool = True, user=Depends(admin)):
++def dbms_race(session_id: UUID, include_laps: bool = True, user=admin_dependency):
+     session = fetch_one("""SELECT s.*,e.name AS event_name,c.name AS circuit_name FROM race_sessions s
+       JOIN race_events e ON e.id=s.event_id JOIN circuits c ON c.id=e.circuit_id WHERE s.id=%s AND s.session_type='RACE'""", (session_id,))
+     if not session:
+@@ -1469,7 +1480,7 @@ def race_lap_measurements(col, match: dict[str, Any]):
+ 
+ 
+ @app.get("/api/dbms/races/{session_id}/laps")
+-def dbms_race_laps(session_id: UUID, user=Depends(admin)):
++def dbms_race_laps(session_id: UUID, user=admin_dependency):
+     session = fetch_one("SELECT id FROM race_sessions WHERE id=%s AND session_type='RACE'", (session_id,))
+     if not session:
+         raise HTTPException(404, "Race not found")
+@@ -1481,7 +1492,7 @@ def dbms_race_laps(session_id: UUID, user=Depends(admin)):
+ 
+ 
+ @app.get("/api/sessions/{session_id}/laps")
+-def session_laps(session_id: UUID, user=Depends(current_user)):
++def session_laps(session_id: UUID, user=authenticated_user_dependency):
+     session = fetch_one("SELECT id FROM race_sessions WHERE id=%s", (session_id,))
+     if not session:
+         raise HTTPException(404, "Session not found")
+@@ -1494,7 +1505,7 @@ def session_laps(session_id: UUID, user=Depends(current_user)):
+ 
+ 
+ @app.get("/api/dbms/eer")
+-def dbms_eer(user=Depends(admin)):
++def dbms_eer(user=admin_dependency):
+     columns = fetch_all("""SELECT c.table_name,c.column_name,c.data_type,EXISTS(SELECT 1 FROM information_schema.key_column_usage k
+       JOIN information_schema.table_constraints t ON t.constraint_name=k.constraint_name AND t.constraint_schema=k.constraint_schema
+       WHERE t.constraint_type='PRIMARY KEY' AND k.table_schema='public' AND k.table_name=c.table_name AND k.column_name=c.column_name) AS primary_key
+@@ -1513,19 +1524,19 @@ def dbms_eer(user=Depends(admin)):
+ 
+ 
+ @app.get("/api/dbms/indexes")
+-def dbms_indexes(user=Depends(admin)):
++def dbms_indexes(user=admin_dependency):
+     return jsonable(fetch_all("SELECT tablename,indexname,indexdef FROM pg_indexes WHERE schemaname='public' ORDER BY tablename,indexname"))
+ 
+ 
+ @app.get("/api/dbms/explain")
+-def dbms_explain(query: Literal["leaderboard","licence"], user=Depends(admin)):
++def dbms_explain(query: Literal["leaderboard","licence"], user=admin_dependency):
+     sql={"leaderboard":"SELECT driver_id,lap_time_ms FROM session_results WHERE session_id=(SELECT id FROM race_sessions WHERE session_type='RACE' ORDER BY scheduled_at LIMIT 1) AND lap_time_ms IS NOT NULL ORDER BY session_id,lap_time_ms LIMIT 20","licence":"SELECT id,licence_number FROM drivers WHERE licence_number='APX-DEMO'"}[query]
+     with connection() as conn,conn.cursor(row_factory=tuple_row) as cur: cur.execute("EXPLAIN (FORMAT JSON) "+sql); plan=cur.fetchone()[0]
+     return {"query":query,"plan":plan}
+ 
+ 
+ @app.post("/api/dbms/constraint-demo")
+-def constraint_demo(user=Depends(admin)):
++def constraint_demo(user=admin_dependency):
+     with connection() as conn,conn.cursor(row_factory=tuple_row) as cur:
+         cur.execute("SAVEPOINT constraint_demo")
+         try:
+@@ -1545,12 +1556,12 @@ def constraint_demo(user=Depends(admin)):
+ 
+ 
+ @app.get("/api/dbms/locks")
+-def dbms_locks(user=Depends(admin)):
++def dbms_locks(user=admin_dependency):
+     return jsonable(fetch_all("SELECT locktype,mode,granted,relation::regclass::text AS relation,pid FROM pg_locks WHERE database=(SELECT oid FROM pg_database WHERE datname=current_database()) ORDER BY granted,mode"))
+ 
+ 
+ @app.get("/api/dbms/telemetry")
+-def dbms_telemetry(user=Depends(admin)):
++def dbms_telemetry(user=admin_dependency):
+     try:
+         col=mongo_ready(); return {"store":"MongoDB","count":col.count_documents({}),"indexes":list(col.index_information().keys()),"sample":jsonable(list(col.find({}, {"_id":0}).sort("ts",DESCENDING).limit(3)))}
+     except HTTPException: raise
+@@ -1564,7 +1575,7 @@ def mongo_database_ready():
+ 
+ 
+ @app.get("/api/dbms/mongo/collections")
+-def dbms_mongo_collections(user=Depends(admin)):
++def dbms_mongo_collections(user=admin_dependency):
+     """List application collections with their actual document and index metadata."""
+     try:
+         database = mongo_database_ready()
+@@ -1594,7 +1605,7 @@ def dbms_mongo_collection_documents(
+     driver_id: str | None = Query(None, max_length=64),
+     lap: int | None = Query(None, ge=1),
+     sector: int | None = Query(None, ge=1, le=3),
+-    user=Depends(admin),
++    user=admin_dependency,
+ ):
+     """Browse one real Mongo collection without permitting arbitrary collection names or query syntax."""
+     try:
+@@ -1619,7 +1630,7 @@ def dbms_mongo_collection_documents(
+ 
+ 
+ @app.get("/api/dbms/polyglot")
+-def dbms_polyglot(user=Depends(admin)):
++def dbms_polyglot(user=admin_dependency):
+     sql="""SELECT s.id AS session_id,s.state,d.id AS driver_id,u.full_name
+       FROM race_sessions s JOIN (
+         SELECT session_id,driver_id FROM session_results
+@@ -1638,7 +1649,7 @@ lock_demo_guard = threading.Lock()
+ 
+ 
+ @app.post("/api/dbms/lock-demo")
+-def dbms_lock_demo(user=Depends(admin)):
++def dbms_lock_demo(user=admin_dependency):
+     """Demonstrate two real transactions contending on a pit box row."""
+     if not lock_demo_guard.acquire(blocking=False):
+         raise HTTPException(409, "A lock demonstration is already running")
+@@ -1727,7 +1738,7 @@ def dbms_lock_demo(user=Depends(admin)):
+ 
+ 
+ @app.post("/api/dbms/transaction-demo")
+-def transaction_demo(user=Depends(admin)):
++def transaction_demo(user=admin_dependency):
+     with connection() as conn,conn.cursor(row_factory=tuple_row) as cur:
+         cur.execute("SELECT txid_current()")
+         txid=cur.fetchone()[0]
+@@ -1747,5 +1758,5 @@ def transaction_demo(user=Depends(admin)):
+ 
+ 
+ @app.post("/api/dbms/recalculate")
+-def dbms_recalculate(championship_id: UUID, user=Depends(admin)):
++def dbms_recalculate(championship_id: UUID, user=admin_dependency):
+     return recalculate(championship_id,user)

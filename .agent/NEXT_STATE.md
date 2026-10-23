@@ -8,11 +8,6 @@ phase: 1 honest green baseline
 - target_files: backend/app/main.py
 - contract: bind dependencies once preserving auth/OpenAPI; <=150 lines
 - verify: .venv/bin/ruff check --select B008 backend/app/main.py
-### T-454 — database test format slice
-- worker: W3 | priority: P1 | origin: bounded T-311 subdivision
-- target_files: backend/tests/test_database.py
-- contract: range550-650 format only; exact AST and150 cap
-- verify: .venv/bin/ruff format --check --range 550-650 backend/tests/test_database.py && .venv/bin/python -c 'import ast,pathlib,subprocess; p="backend/tests/test_database.py"; assert ast.dump(ast.parse(pathlib.Path(p).read_text())) == ast.dump(ast.parse(subprocess.check_output(["git","show","HEAD:"+p],text=True)))'
 
 ## Blocked
 - T-310/T-311 remain open until full parent Ruff/format/frontend-lint commands exit0; no intermediate count is a parent pass.
@@ -20,6 +15,7 @@ phase: 1 honest green baseline
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-454 accepted0df18c1; test range550-650 AST preserved.
 - T-452 accepted8504aea; test range400-480 AST preserved.
 - T-448 accepted4d16cea; pit/archive AST preserved and scoped Ruff/format0 after one split repair.
 - T-451 accepteddc1a36f; test imports and unused counter lint0.

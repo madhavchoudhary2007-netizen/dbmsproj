@@ -41,3 +41,4 @@ last_eval_score: no verified overhaul score; historical100 excludes new gates
 - T-300 requested two model profile lines; otherwise architecture/ADR/state/packets/envelopes and patch integration only. Zero authored frontend/backend product lines.
 - T-448 repair accepted4d16cea:130 changed lines in pit/archive; exact AST unchanged, full scoped Ruff/format0. Deterministic RNG has one justified S311 inline suppression.
 - T-452 accepted8504aea:40 test-format lines, exact AST unchanged, range400-480 green. No additional DB rerun needed for AST-identical formatting; next behavior-affecting batch reruns full suite.
+- T-454 accepted0df18c1:82 test-format lines, exact AST preserved. T-453 OpenAPI comparison unchanged60d831ab; full gate follows integration.
