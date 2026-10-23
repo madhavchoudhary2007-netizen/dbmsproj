@@ -1,0 +1,216 @@
+diff --git a/backend/app/main.py b/backend/app/main.py
+index 4db5296..9c66867 100644
+--- a/backend/app/main.py
++++ b/backend/app/main.py
+@@ -871,9 +871,54 @@ def _make_demo_race(cars: int | None = None, auto_repeat: bool = False):
+     car_count = cars if cars is not None else rng.randint(8, 16)
+     session_id, event_id = uuid4(), uuid4()
+     now = datetime.now(UTC)
+-    given = ["Amelia", "Rafael", "Maya", "Theo", "Nina", "Luca", "Aisha", "Felix", "Sofia", "Ethan", "Leila", "Oscar", "Priya", "Mateo", "Zara", "Jonah", "Ines", "Kai", "Elena", "Arjun"]
+-    family = ["Bennett", "Costa", "Shah", "Moreau", "Kim", "Novak", "Singh", "Fischer", "Alvarez", "Tanaka", "Dubois", "Reed", "Petrov", "Okafor", "Lindholm", "Santos", "Kaur", "Weber", "Nakamura", "Clarke"]
+-    names = [f"{a} {b}" for a, b in zip(rng.sample(given, car_count), rng.sample(family, car_count), strict=False)]
++    given = [
++        "Amelia",
++        "Rafael",
++        "Maya",
++        "Theo",
++        "Nina",
++        "Luca",
++        "Aisha",
++        "Felix",
++        "Sofia",
++        "Ethan",
++        "Leila",
++        "Oscar",
++        "Priya",
++        "Mateo",
++        "Zara",
++        "Jonah",
++        "Ines",
++        "Kai",
++        "Elena",
++        "Arjun",
++    ]
++    family = [
++        "Bennett",
++        "Costa",
++        "Shah",
++        "Moreau",
++        "Kim",
++        "Novak",
++        "Singh",
++        "Fischer",
++        "Alvarez",
++        "Tanaka",
++        "Dubois",
++        "Reed",
++        "Petrov",
++        "Okafor",
++        "Lindholm",
++        "Santos",
++        "Kaur",
++        "Weber",
++        "Nakamura",
++        "Clarke",
++    ]
++    names = [
++        f"{a} {b}"
++        for a, b in zip(rng.sample(given, car_count), rng.sample(family, car_count), strict=False)
++    ]
+     try:
+         generated, total_laps = create_demo_race_records(
+             session_id, event_id, now, names, auto_repeat, seed=seed
+@@ -897,21 +942,23 @@ def launch_demo_simulation(session_id: UUID | str):
+     sim.task = asyncio.create_task(simulation_loop(sim))
+ 
+ 
+-app.include_router(create_demo_race_router(
+-    current_user,
+-    roles("ADMIN", "STEWARD"),
+-    demo_race_row,
+-    list_demo_race_ids,
+-    _make_demo_race,
+-    launch_demo_simulation,
+-    lambda: simulations,
+-    connection,
+-    dict_row,
+-    mongo_ready,
+-    DemoRaceDeleteConflict,
+-    validate_demo_race_delete,
+-    delete_demo_race_records,
+-))
++app.include_router(
++    create_demo_race_router(
++        current_user,
++        roles("ADMIN", "STEWARD"),
++        demo_race_row,
++        list_demo_race_ids,
++        _make_demo_race,
++        launch_demo_simulation,
++        lambda: simulations,
++        connection,
++        dict_row,
++        mongo_ready,
++        DemoRaceDeleteConflict,
++        validate_demo_race_delete,
++        delete_demo_race_records,
++    )
++)
+ 
+ 
+ def restore_simulation_from_telemetry(sim: Simulation):
+@@ -919,16 +966,22 @@ def restore_simulation_from_telemetry(sim: Simulation):
+     col = mongo_ready()
+     for driver in sim.drivers:
+         driver_id = str(driver["id"])
+-        latest = col.find_one({"session_id": str(sim.session_id), "driver_id": driver_id}, sort=[("ts", DESCENDING)])
++        latest = col.find_one(
++            {"session_id": str(sim.session_id), "driver_id": driver_id}, sort=[("ts", DESCENDING)]
++        )
+         sim.lap_by_driver[driver_id] = int(latest.get("lap", 1)) if latest else 1
+         sim.sector_by_driver[driver_id] = int(latest.get("sector", 0)) if latest else 0
+         sim.elapsed_by_driver[driver_id] = int(latest.get("elapsed_ms", 0)) if latest else 0
+-        sim.sector_splits_by_driver[driver_id] = list(latest.get("sector_ms") or []) if latest else []
++        sim.sector_splits_by_driver[driver_id] = (
++            list(latest.get("sector_ms") or []) if latest else []
++        )
+         sim.next_sector_due_by_driver[driver_id] = sim.elapsed_by_driver[driver_id]
+         if latest and latest.get("last_lap_ms"):
+             sim.last_lap_by_driver[driver_id] = int(latest["last_lap_ms"])
+         sim.tire_age_by_driver[driver_id] = int(latest.get("tire_age_laps", 0)) if latest else 0
+-        sim.tire_wear_by_driver[driver_id] = float(latest.get("tire_wear_pct", 0)) if latest else 0.0
++        sim.tire_wear_by_driver[driver_id] = (
++            float(latest.get("tire_wear_pct", 0)) if latest else 0.0
++        )
+         if latest and latest.get("tire_compound"):
+             sim.compound_by_driver[driver_id] = latest["tire_compound"]
+     sim.race_clock_ms = max(sim.elapsed_by_driver.values(), default=0)
+@@ -937,27 +990,39 @@ def restore_simulation_from_telemetry(sim: Simulation):
+ def restore_simulated_incidents(sim: Simulation):
+     """Keep a restarted simulator from duplicating reports already in the archive."""
+     sim.incident_laps_recorded = {
+-        row["lap"] for row in fetch_all(
++        row["lap"]
++        for row in fetch_all(
+             "SELECT DISTINCT lap FROM incident_reports WHERE session_id=%s", (sim.session_id,)
+         )
+     }
+ 
+ 
+ async def resume_or_create_auto_demo_race(create_if_missing: bool = True):
+-    active_races = fetch_all("SELECT s.id,s.total_laps,d.auto_repeat,d.simulation_seed FROM race_sessions s JOIN demo_races d ON d.session_id=s.id WHERE s.state='ACTIVE' ORDER BY d.created_at")
++    active_races = fetch_all(
++        "SELECT s.id,s.total_laps,d.auto_repeat,d.simulation_seed FROM race_sessions s JOIN demo_races d ON d.session_id=s.id WHERE s.state='ACTIVE' ORDER BY d.created_at"
++    )
+     for active in active_races:
+         session_id = active["id"]
+-        entries = fetch_all("""SELECT d.id,d.number,de.pace_offset_ms,tm.team_id,t.name AS team_name
++        entries = fetch_all(
++            """SELECT d.id,d.number,de.pace_offset_ms,tm.team_id,t.name AS team_name
+             FROM demo_race_entries de JOIN drivers d ON d.id=de.driver_id
+             JOIN race_sessions s ON s.id=de.session_id
+             JOIN team_memberships tm ON tm.driver_id=d.id AND tm.start_date<=s.scheduled_at::date
+               AND (tm.end_date IS NULL OR tm.end_date>=s.scheduled_at::date)
+-            JOIN teams t ON t.id=tm.team_id WHERE de.session_id=%s ORDER BY d.number""", (session_id,))
++            JOIN teams t ON t.id=tm.team_id WHERE de.session_id=%s ORDER BY d.number""",
++            (session_id,),
++        )
+         if not entries:
+             log.error("Active generated race %s has no entries", session_id)
+             continue
+-        sim = Simulation(session_id, entries, 2.0, total_laps=active["total_laps"], seed=active.get("simulation_seed"))
+-        sim.pace_offsets_ms = {str(d["id"]):d["pace_offset_ms"] for d in entries}
++        sim = Simulation(
++            session_id,
++            entries,
++            2.0,
++            total_laps=active["total_laps"],
++            seed=active.get("simulation_seed"),
++        )
++        sim.pace_offsets_ms = {str(d["id"]): d["pace_offset_ms"] for d in entries}
+         restore_simulation_from_telemetry(sim)
+         sim.auto_repeat = active["auto_repeat"]
+         sim.is_generated = True
+@@ -976,9 +1041,7 @@ async def create_demo_race(
+     body: DemoRaceCreate = DEFAULT_DEMO_RACE_CREATE,
+     user: Any = admin_steward_dependency,
+ ) -> Any:
+-    return await run_demo_race_create(
+-        body, _make_demo_race, launch_demo_simulation, demo_race_row
+-    )
++    return await run_demo_race_create(body, _make_demo_race, launch_demo_simulation, demo_race_row)
+ 
+ 
+ async def delete_demo_race(session_id: UUID, user=admin_steward_dependency):
+@@ -996,18 +1059,23 @@ async def delete_demo_race(session_id: UUID, user=admin_steward_dependency):
+ 
+ class EventBus:
+     def __init__(self):
+-        self.clients: dict[str,set[tuple[asyncio.AbstractEventLoop,asyncio.Queue]]]={}
+-        self.lock=threading.RLock()
+-    def subscribe(self,sid):
+-        q=asyncio.Queue(maxsize=50); loop=asyncio.get_running_loop()
+-        with self.lock: self.clients.setdefault(str(sid),set()).add((loop,q))
++        self.clients: dict[str, set[tuple[asyncio.AbstractEventLoop, asyncio.Queue]]] = {}
++        self.lock = threading.RLock()
++
++    def subscribe(self, sid):
++        q = asyncio.Queue(maxsize=50)
++        loop = asyncio.get_running_loop()
++        with self.lock:
++            self.clients.setdefault(str(sid), set()).add((loop, q))
+         return q
+-    def unsubscribe(self,sid,q):
++
++    def unsubscribe(self, sid, q):
+         with self.lock:
+-            clients=self.clients.get(str(sid),set())
++            clients = self.clients.get(str(sid), set())
+             clients.difference_update(item for item in list(clients) if item[1] is q)
++
+     @staticmethod
+-    def _enqueue(q,event):
++    def _enqueue(q, event):
+         if q.full():
+             try: q.get_nowait()
+             except asyncio.QueueEmpty: pass
