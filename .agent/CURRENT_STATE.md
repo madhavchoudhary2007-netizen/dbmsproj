@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 6cca3aa
+git_head: 87025ef
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex
@@ -15,6 +15,7 @@ last_eval_score: historical 100 claim is not a verified baseline for this overha
 - T-302 accepted59a180e; ADR activation locked9010959b. T-442 accepted7bdbf4c; bootstrap/operation+telemetry schemas Ruff and format exit0; 23 changed product lines. Disposable full suite/live acceptance running; parent T-310 not yet green.
 - T-443 accepted6cca3aa: frontend lint0 errors/warnings, typecheck0; spacing/banned/motion scripts exit0. Neo-brutal lint NOT_RUN until T-360. Existing perf spec allows17.0ms vs required16.7; T-413 must tighten it, current performance not claimed passing.
 - T-442 full gate initially failed104pass/32failed (7 failures+25 errors) because orphan PID79496 held test runtime lease. lsof confirmed only test ports15432/27018 and18000, PPID1; terminated that disposable API process gracefully. Full isolated rerun in progress, no real databases/volumes touched.
+- T-442 rerun passed136 tests, zero failures/skips/xfails plus live acceptance. T-444 accepted87025ef: analytics/auth/pit routers Ruff+format0; OpenAPI SHA before/after identical60d831ab. Full backend check follows current bounded batch; no API contract changed.
 
 ## Contracts and guardrails
 - Preserve every feature, route, copy string, data hook, aria name, state class and DBMS hash route. APIs additive only, each contract change needs ADR and owner approval at the stated hard stop.

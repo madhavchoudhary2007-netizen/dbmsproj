@@ -1,0 +1,101 @@
+diff --git a/backend/tests/test_database.py b/backend/tests/test_database.py
+index 075f13f..25ed339 100644
+--- a/backend/tests/test_database.py
++++ b/backend/tests/test_database.py
+@@ -7,7 +7,7 @@ pgcrypto and btree_gist plus temporary schemas.
+ import os
+ import sys
+ import uuid
+-from datetime import datetime, timezone
++from datetime import UTC, datetime
+ from pathlib import Path
+ 
+ import pytest
+@@ -15,12 +15,15 @@ import pytest
+ try:
+     import psycopg
+     _connect = psycopg.connect
++    _database_error = psycopg.DatabaseError
+ except ImportError:
+     try:
+         import psycopg2
+         _connect = psycopg2.connect
++        _database_error = psycopg2.DatabaseError
+     except ImportError:
+         _connect = None
++        _database_error = None
+ 
+ URL = os.getenv("DATABASE_URL")
+ pytestmark = pytest.mark.skipif(
+@@ -35,7 +38,7 @@ def _sqlstate(exc):
+ 
+ 
+ def _auto_pit_fixture(cur):
+-    now = datetime.now(timezone.utc)
++    now = datetime.now(UTC)
+     cur.execute("SELECT id FROM championships WHERE name='ApexGrid World Series' AND season=2026")
+     championship_id = cur.fetchone()[0]
+     cur.execute("SELECT id FROM circuits WHERE name='Harbor Ring'")
+@@ -148,7 +151,7 @@ def test_penalty_insert_accumulates_once_and_bans_at_threshold(db):
+     assert cur.fetchone()[0] == "RACE_BANNED"
+     cur.execute("SELECT points FROM penalty_points WHERE driver_id=%s AND season=2026", (driver_id,))
+     assert cur.fetchone()[0] == 12
+-    with pytest.raises(Exception):
++    with pytest.raises(_database_error):
+         cur.execute("INSERT INTO penalties(incident_id,driver_id,points) VALUES (%s,%s,3)", (incident2, driver_id))
+ 
+ 
+@@ -191,7 +194,7 @@ def test_standings_and_overlapping_pit_reservation(db):
+                     WHERE s.session_type='RACE' LIMIT 1""")
+     box, session, team = cur.fetchone()
+     cur.execute("SELECT reserve_pit_box(%s,%s,%s,'2026-03-15 08:00+00','2026-03-15 09:00+00')", (box, session, team))
+-    with pytest.raises(Exception):
++    with pytest.raises(_database_error):
+         cur.execute("SELECT reserve_pit_box(%s,%s,%s,'2026-03-15 08:30+00','2026-03-15 09:30+00')", (box, session, team))
+ 
+ 
+@@ -216,7 +219,7 @@ def test_historical_penalty_provisional(db, monkeypatch):
+     def schema_fetch_all(query, params=()):
+         cur.execute(query, params)
+         columns = [column.name for column in cur.description]
+-        return [dict(zip(columns, row)) for row in cur.fetchall()]
++        return [dict(zip(columns, row, strict=True)) for row in cur.fetchall()]
+ 
+     monkeypatch.setattr(main, "fetch_all", schema_fetch_all)
+     cur.execute("SELECT recalculate_standings(%s)", (championship_id,))
+@@ -230,7 +233,7 @@ def test_historical_penalty_provisional(db, monkeypatch):
+ 
+ def test_unclassified_bonus_points_do_not_count(db):
+     _, cur = db
+-    now = datetime.now(timezone.utc)
++    now = datetime.now(UTC)
+     cur.execute("INSERT INTO championships(name,season) VALUES ('Unclassified bonus regression',2099) RETURNING id")
+     championship_id = cur.fetchone()[0]
+     cur.execute("SELECT id FROM circuits WHERE name='Harbor Ring'")
+@@ -263,7 +266,7 @@ def test_penalty_requires_approved_incident_and_matching_driver(db):
+                     VALUES (%s,%s,5,'pending penalty guard','OPEN') RETURNING id""",
+                 (session_id, incident_driver))
+     open_incident = cur.fetchone()[0]
+-    with pytest.raises(Exception):
++    with pytest.raises(_database_error):
+         cur.execute("INSERT INTO penalties(incident_id,driver_id,points) VALUES (%s,%s,2)",
+                     (open_incident, incident_driver))
+ 
+@@ -271,7 +274,7 @@ def test_penalty_requires_approved_incident_and_matching_driver(db):
+                     VALUES (%s,%s,6,'driver penalty guard','APPROVED') RETURNING id""",
+                 (session_id, incident_driver))
+     approved_incident = cur.fetchone()[0]
+-    with pytest.raises(Exception):
++    with pytest.raises(_database_error):
+         cur.execute("INSERT INTO penalties(incident_id,driver_id,points) VALUES (%s,%s,2)",
+                     (approved_incident, other_driver))
+ 
+@@ -552,7 +555,7 @@ def test_concurrent_auto_allocations_serialize_on_event(db):
+                 cursor.close()
+ 
+         workers = [threading.Thread(target=allocate, args=(conn, driver), daemon=True)
+-                   for conn, driver in zip(conns, drivers)]
++                   for conn, driver in zip(conns, drivers, strict=True)]
+         for worker in workers:
+             worker.start()
+         for worker in workers:

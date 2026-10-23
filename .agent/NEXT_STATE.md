@@ -3,11 +3,6 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-444 — T-310 router dependency-default lint batch
-- worker: W2 | priority: P1 | origin: bounded subdivision T-310
-- target_files: backend/app/analytics_router.py, backend/app/auth_router.py, backend/app/pit_router.py
-- contract: bind Depends objects during router construction, preserve HTTP/OpenAPI behavior; format, <=150 changed lines
-- verify: .venv/bin/ruff check backend/app/analytics_router.py backend/app/auth_router.py backend/app/pit_router.py && .venv/bin/ruff format --check backend/app/analytics_router.py backend/app/auth_router.py backend/app/pit_router.py
 ### T-445 — T-311 precise database assertions
 - worker: W3 | priority: P1 | origin: bounded subdivision T-311
 - target_files: backend/tests/test_database.py
@@ -20,6 +15,7 @@ phase: 1 honest green baseline
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-444 accepted87025ef; routers Ruff/format0, OpenAPI unchanged; full batch gate next.
 - T-443 accepted6cca3aa; frontend lint/typecheck+three existing scripts green; neo lint not yet present.
 - T-302 accepted59a180e; explicit owner approval recorded and lock verified.
 - T-442 accepted7bdbf4c; three files Ruff/format green, disposable full gate running.
