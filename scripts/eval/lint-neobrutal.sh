@@ -15,6 +15,7 @@ fi
 python3 - "$@" <<'PY'
 import os, re, sys
 from pathlib import Path
+from scripts.eval.source_text import mask_comments
 
 allowed = re.compile(r"^(?:0(?:px)?|9999px|var\(--radius-(?:none|full)\))$", re.I)
 css_radius = re.compile(r"\b(?:border-radius|border-(?:top|right|bottom|left|start|end)(?:-[a-z]+)?-radius)\s*:\s*([^;{}]+)", re.I)
@@ -24,24 +25,7 @@ extensions = {".css", ".scss", ".sass", ".js", ".jsx", ".ts", ".tsx", ".html", "
 skip = {"node_modules", ".next", "dist", "build", "vendor", "coverage", "generated"}
 
 def check(text, css=False):
-    chars = list(text); i = 0; quote = ""
-    while i < len(chars):
-        c = chars[i]
-        if quote:
-            if c == "\\": i += 2; continue
-            if c == quote: quote = ""
-        elif c in "'\"`": quote = c
-        elif text.startswith("/*", i):
-            end = text.find("*/", i + 2); end = len(text) if end < 0 else end + 2
-            for j in range(i, end):
-                if chars[j] != "\n": chars[j] = " "
-            i = end; continue
-        elif not css and text.startswith("//", i):
-            end = text.find("\n", i + 2); end = len(text) if end < 0 else end
-            for j in range(i, end): chars[j] = " "
-            i = end; continue
-        i += 1
-    clean = "".join(chars); hits = []
+    clean = mask_comments(text, css=css); hits = []
     for m in css_radius.finditer(clean):
         vals = re.split(r"\s+", m.group(1).strip())
         if not vals or any(not allowed.fullmatch(v.strip("'\"")) for v in vals): hits.append((m.start(), "CSS radius"))

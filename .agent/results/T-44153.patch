@@ -1,0 +1,86 @@
+diff --git a/scripts/eval/lint-neobrutal.sh b/scripts/eval/lint-neobrutal.sh
+index ae8f568..97ca3c4 100644
+--- a/scripts/eval/lint-neobrutal.sh
++++ b/scripts/eval/lint-neobrutal.sh
+@@ -15,6 +15,7 @@ fi
+ python3 - "$@" <<'PY'
+ import os, re, sys
+ from pathlib import Path
++from scripts.eval.source_text import mask_comments
+ 
+ allowed = re.compile(r"^(?:0(?:px)?|9999px|var\(--radius-(?:none|full)\))$", re.I)
+ css_radius = re.compile(r"\b(?:border-radius|border-(?:top|right|bottom|left|start|end)(?:-[a-z]+)?-radius)\s*:\s*([^;{}]+)", re.I)
+@@ -24,24 +25,7 @@ extensions = {".css", ".scss", ".sass", ".js", ".jsx", ".ts", ".tsx", ".html", "
+ skip = {"node_modules", ".next", "dist", "build", "vendor", "coverage", "generated"}
+ 
+ def check(text, css=False):
+-    chars = list(text); i = 0; quote = ""
+-    while i < len(chars):
+-        c = chars[i]
+-        if quote:
+-            if c == "\\": i += 2; continue
+-            if c == quote: quote = ""
+-        elif c in "'\"`": quote = c
+-        elif text.startswith("/*", i):
+-            end = text.find("*/", i + 2); end = len(text) if end < 0 else end + 2
+-            for j in range(i, end):
+-                if chars[j] != "\n": chars[j] = " "
+-            i = end; continue
+-        elif not css and text.startswith("//", i):
+-            end = text.find("\n", i + 2); end = len(text) if end < 0 else end
+-            for j in range(i, end): chars[j] = " "
+-            i = end; continue
+-        i += 1
+-    clean = "".join(chars); hits = []
++    clean = mask_comments(text, css=css); hits = []
+     for m in css_radius.finditer(clean):
+         vals = re.split(r"\s+", m.group(1).strip())
+         if not vals or any(not allowed.fullmatch(v.strip("'\"")) for v in vals): hits.append((m.start(), "CSS radius"))
+diff --git a/scripts/eval/source_text.py b/scripts/eval/source_text.py
+new file mode 100644
+index 0000000..c3fc107
+--- /dev/null
++++ b/scripts/eval/source_text.py
+@@ -0,0 +1,42 @@
++"""Source text helpers shared by evaluation checkers."""
++
++
++def _mask_comment(text: str, chars: list[str], i: int, css: bool) -> int | None:
++    if text.startswith("/*", i):
++        end = text.find("*/", i + 2)
++        end = len(text) if end < 0 else end + 2
++        for j in range(i, end):
++            if chars[j] != "\n":
++                chars[j] = " "
++        return end
++    if not css and text.startswith("//", i):
++        end = text.find("\n", i + 2)
++        end = len(text) if end < 0 else end
++        for j in range(i, end):
++            chars[j] = " "
++        return end
++    return None
++
++
++def mask_comments(text: str, css: bool = False) -> str:
++    """Mask comments while preserving offsets, newlines, and quoted text."""
++    chars = list(text)
++    i = 0
++    quote = ""
++    while i < len(chars):
++        char = chars[i]
++        if quote:
++            if char == "\\":
++                i += 2
++                continue
++            if char == quote:
++                quote = ""
++        elif char in "'\"`":
++            quote = char
++        else:
++            end = _mask_comment(text, chars, i, css)
++            if end is not None:
++                i = end
++                continue
++        i += 1
++    return "".join(chars)

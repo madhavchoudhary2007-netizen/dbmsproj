@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 4c707d9
+git_head: 47fc39d
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -43,3 +43,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T-44150 accepted4c707d9: Updated the shared checker to preserve CSS URLs and detect quoted JS radius keys, including corner properties. Self-test covers both reported cases and comment line positions. Default scan reports the two existing globals.css hits at lines 116 and 985. Verify exit0; 94 changed lines.
 
 - T3303afff87 accepted30contractchecks; full214PASS0skip/livePASS. T44151462ea55 EventBus exactAST/publicalias proof+11offlinePASS; fullrerunrunning. T441504c707d9 radius-onlylinter acceptedafter2repairs/sharedscanner/URL+quotedkeyprobes, selftest0; actuallegacy2radiusviolations remainbaseline, wholeT360notcomplete. T44152serialization/parsermove andT44153sharedmaskerqueued; no authoredorchestratorproductcode.
+
+- T-44152 accepted47fc39d: Moved JSON/telemetry serializers and WebSocket bearer parser verbatim to core modules; retained main aliases. Verify exit0; 64 changed lines.

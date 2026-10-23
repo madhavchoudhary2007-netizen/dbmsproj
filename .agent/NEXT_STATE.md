@@ -8,15 +8,11 @@ phase: 3 API contract guard (Phases0–2 complete; baseline score51.2974)
 - contract: T360 foundation readability: extract sourcecommentmasking fromembeddedchecker into formatted reusable stdlibmodule scripts/eval/source_text.py. Sharedmask_comments(text:str,css:bool=False)->str preservesoffset/newlines/quotes andonlyJSlinecomments exactlycurrentbehavior. Checker callshelper, allradiuspatterns/selftests/fixtures/output remainunchanged. No additionalrulesyet.
 - verify: bash scripts/eval/lint-neobrutal.sh --self-test && .venv/bin/ruff check scripts/eval/source_text.py && .venv/bin/ruff format --check scripts/eval/source_text.py && .venv/bin/mypy --strict scripts/eval/source_text.py
 
-### T-44152 W2 — OPEN
-- target_files: backend/app/core/serialization.py, backend/app/core/security.py, backend/app/main.py
-- contract: T331 puremovechild2: move jsonable and telemetry_ws_payload verbatim tocore/serialization.py andwebsocket_bearer tocore/security.py; retainmainpublicaliasesimports andsamebindingsforrouterfactories. No logic/type changes.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,importlib,pathlib,subprocess; old=ast.parse(subprocess.check_output(["git","show","4c707d9:backend/app/main.py"],text=True)); originals={n.name:ast.dump(n) for n in old.body if isinstance(n,ast.FunctionDef)}; moves={"jsonable":"serialization","telemetry_ws_payload":"serialization","websocket_bearer":"security"}; assert all(originals[n]==ast.dump(next(x for x in ast.parse(pathlib.Path("backend/app/core/"+m+".py").read_text()).body if isinstance(x,ast.FunctionDef) and x.name==n)) for n,m in moves.items()); main=importlib.import_module("backend.app.main"); assert all(getattr(main,n) is getattr(importlib.import_module("backend.app.core."+m),n) for n,m in moves.items()); print("PASS exact function bodies and main public aliases")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k 'websocket_uses_bearer or mongo_telemetry_payload or mongo_naive_utc' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py && .venv/bin/ruff check backend/app/main.py backend/app/core && .venv/bin/ruff format --check backend/app/main.py backend/app/core
-
 ## Deferred
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44152 accepted47fc39d; verify0.
 - T-44150 accepted4c707d9; verify0.
 - T-44151 accepted462ea55; verify0.
 - T-330 accepted3afff87; verify0.
