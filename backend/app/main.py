@@ -1798,6 +1798,7 @@ dbms_sql_router, dbms_sql_handlers = create_dbms_sql_router(
 dbms_schema = dbms_sql_handlers["dbms_schema"]
 dbms_indexes = dbms_sql_handlers["dbms_indexes"]
 dbms_locks = dbms_sql_handlers["dbms_locks"]
+dbms_eer = dbms_sql_handlers["dbms_eer"]
 app.include_router(dbms_sql_router)
 
 
@@ -2083,36 +2084,6 @@ def session_laps(session_id: UUID, user=authenticated_user_dependency):
     return jsonable(
         {"session_id": session_id, "laps": laps, "incidents": incidents, "pit_reservations": stops}
     )
-
-
-@app.get("/api/dbms/eer")
-def dbms_eer(user=admin_dependency):
-    columns = fetch_all(
-        """SELECT c.table_name,c.column_name,c.data_type,EXISTS(SELECT """
-        """1 FROM information_schema.key_column_usage k
-      JOIN information_schema.table_constraints t ON """
-        """t.constraint_name=k.constraint_name AND t.constraint_schema=k.constraint_schema
-      WHERE t.constraint_type='PRIMARY KEY' AND k.table_schema='public' AND """
-        """k.table_name=c.table_name AND k.column_name=c.column_name) AS primary_key
-      FROM information_schema.columns c WHERE c.table_schema='public' ORDER BY """
-        """c.table_name,c.ordinal_position"""
-    )
-    relationships = fetch_all(
-        """SELECT DISTINCT child.relname AS child,ca.attname AS """
-        """foreign_key,parent.relname AS parent,
-      pa.attname AS parent_key,NOT ca.attnotnull AS optional,
-      CASE WHEN EXISTS(SELECT 1 FROM pg_constraint uq WHERE uq.conrelid=f.conrelid AND """
-        """uq.contype IN ('p','u') AND uq.conkey <@ f.conkey)
-        THEN '0..1' ELSE '0..many' END AS children_per_parent
-      FROM pg_constraint f JOIN pg_class child ON child.oid=f.conrelid JOIN """
-        """pg_namespace ns ON ns.oid=child.relnamespace
-      JOIN pg_class parent ON parent.oid=f.confrelid
-      CROSS JOIN LATERAL unnest(f.conkey,f.confkey) AS pair(child_num,parent_num)
-      JOIN pg_attribute ca ON ca.attrelid=f.conrelid AND ca.attnum=pair.child_num
-      JOIN pg_attribute pa ON pa.attrelid=f.confrelid AND pa.attnum=pair.parent_num
-      WHERE f.contype='f' AND ns.nspname='public' ORDER BY child.relname,ca.attname"""
-    )
-    return {"columns": columns, "relationships": relationships}
 
 
 @app.get("/api/dbms/explain")

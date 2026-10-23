@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 4b411cc
+git_head: 1356d28
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -12,10 +12,10 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - Phase1 acceptedT31035578c9/T3118570e58/T312e0f7adf/T3134089fb6/T314c0c8061. Root144PASS0skip/livePASS; browser1005PASS5projects. HostedCI NOT_RUN. Evidence/history in git/phase1.evidence.json.
 - Phase2 parents T3204789586/T321caf033f/T322a12bc68/T3233146736/T32461643df/T3252bff831 accepted. JWTrevocation ADR008/migration004 onlydisposable; logoutreuse401/WS4401, CSRF/legacy/outage/expiry tests. ADR011 live/ready probes. Full184PASS0skip/livePASS twice. CSPbuild/lint/types0+85axePASS. Inlinebootstrap unsafe-inline compatibility retained; unsafe-eval devonly. T441458f721ae preserves exact3HTMLdocs routes,16testsPASS, APIs strict.
 - T3303afff87 complete: snapshot9+union7+realGETgoldens14=30PASS; full214PASS0skip/livePASS. Fixture captures own SQLtransaction, rolls back0own users/sessions. Existing API snapshot permanent gate. No API/schema changes in current moves.
-- T331 pure moves accepted: EventBus462ea55, JSON/parser47fc39d, errors882e5ed, validation049a179, models0adc5bb, livenessrouter4c4f401, domainhelpers64214d6. AST/alias proofs and snapshot9PASS each. Latest rootfull214PASS0skip/livePASS throughliveness; domainhelpers rerun active. Ruffall0; mypy217errors15/42files afterliveness, fullzeroT339.
+- T331 pure moves accepted: EventBus462ea55, JSON/parser47fc39d, errors882e5ed, validation049a179, models0adc5bb, livenessrouter4c4f401, domainhelpers64214d6. AST/alias proofs and snapshot9PASS each. Latest rootfull214PASS0skip/livePASS. Ruffall0; mypy217errors15/42files afterliveness, fullzeroT339.
 - T44156 introduced1implicitexport error; repaircec7835 restored direct constant import/baseline217. No thresholds loosened. Some worker envelopes used placeholder Verify or inaccurate counts; root corrected format/counts and reranactualVerify beforeaccept, logged in childenvelopes.
 - T361 accepted1e61efd from tokens7768158/rootinstall553ed00/config9335c83: Tailwind4.3.3 +@tailwindcss/postcss4.3.3, autoprefixer removed. Rootbuild/lint/types0,audit0vulnerabilities,925nonpalettebrowserchecksPASS5projects. npm-generatedlock1183changedlines separately from authored<=150workerpackets; ownerexplicitplaninstall, no handwritten product/lock lines.
-- T360 lightgate4f53ecd activated>=0.85, AA4.5 unchanged,80cases collected. Actual dashboarddesktop1FAIL expected on currentdarkUI; never skipped. Radius4c707d9/maskera1eea31, gray10b17c4/wiringb1fec1c selftests0; good0/bad1 fixtures. Blur b395e35 accepted17cases after repair1 for root-proven bareutility/commafilter bypasses; not wired yet. GradientT44167W3 active. Legacyradius2hits remain; otherstyle rules/motionplinth/palette roles pending.
+- T360 lightgate4f53ecd activated>=0.85, AA4.5 unchanged,80cases collected. Actual dashboarddesktop1FAIL expected on currentdarkUI; never skipped. Radius4c707d9/maskera1eea31, gray10b17c4/wiringb1fec1c selftests0; good0/bad1 fixtures. Blur b395e35 accepted17cases after repair1 for root-proven bareutility/commafilter bypasses; not wired yet. Gradient/weight wiring accepted. Legacyradius2hits remain; otherstyle rules/motionplinth/palette roles pending.
 
 ## Execution contracts
 - Only overhaul/neo-brutal, accept.sh commits, rerun every Verify, <=3files/150authoredchangedlines, atmost2 fresh packet-only customworkers in shared ignoredclones. No worker commits. Root integrates sequentially and updates state every acceptance. .agent/orchestrate.py persists clone/integrate/mark helpers.
@@ -30,20 +30,8 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 ## Orchestrator direct edits
 - Architecture/ADRs/docs/state/packets/envelopes/orchestration helpers and root-owned planned dependency installs only. Zero authored product lines; integrating worker patches is not product authorship. Canonical lock operation bypassed autoGit tail only to honor accept-only; independently verified.
 
-- T44168first result FAILED because root identity probe assumed flat FastAPIapp.routes; installed _IncludedRouter uses original_router. Root corrected traversal with exact-one endpoint identity (no HTTP/assertionthreshold change), restored only its clone target files, requested repair1. Worker separately ran21HTTP/snapshotPASS.
-
-- T-44168 accepted4e8f466: Moved readiness body unchanged into typed health registration; main aliases and late-bound callbacks preserve behavior.21 tests pass after root introspection fix. Verify0.
-
-- Root rejected T44167 beforeaccept: solid bg arbitrary utility falsely countedgradient. Repair1 plus exactform counts requested. Root rejected T44169 beforeaccept: prose object string/lineheight900 falsepositives, conditional font-black missed. Repair1 requested; both diffs remain isolated/referenced in clones.
-
-- T-44170 accepted31a3bd4: Moved legacy health handler into API module with live getter/callback bindings and original normalized body.21 tests/route identity proof pass. Verify0.
-
-- T-44167 accepted6c04161: Gradient rule with exact allowed path, solid-utility controls and24selftestcases. Verify0.
-
-- T-44169 accepted20e9e21: Fontweight900 rule with31selftestcases, repaired prose/lineheight false positives and conditional classes. Verify0.
-
-- T44171first FAILED on root Verify namespace resolution (not product/scanner defect): multi-file mypy duplicated source_text. Root confirmed --explicit-package-bases strict0 acrossall5files, updated Verify, restored only clone target and requested repair1. No type rule suppressed.
-
-- T-44171 accepted7b1c487: Wired blur/gradient/weight into shared scanner and all selftests. Strict namespace-aware mypy0; each good/bad probe preserves expected exit. Verify0.
-
-- T-44172 accepted4b411cc: Moved unchanged SQL schema handler to typed router factory, preserving late callbacks and main endpoint alias.9snapshot tests pass. Verify0.
+## Recent acceptance / review
+- Health wrappers4e8f466/31a3bd4 and SQLrouter4b411cc/1356d28 preserve exact handler AST/main aliases. Full214PASS0skip/livePASS after each; Ruff0; mypy217errors16/43files. Temporary callback factories are T332 dependency-injection debt.
+- Gradient6c04161/weight20e9e21/wiring7b1c487 accepted after regression repairs: selftests24/31; shared scanner/mypy0; actual seven legacy violations remain, covered by visual phases.
+- Root fixed two Verify assumptions without weakening assertions: FastAPI included-router identity traversal; multi-module mypy --explicit-package-bases.
+- T44173 repair2 and T44175 repair1 returned PASSED in isolated clones; root review/acceptance pending. Repairs cover CSS important/case and shadow aliases/RGB; contrast offset/order/conditional classes. T44176 EER move ready.
