@@ -1,5 +1,11 @@
 import { expect, test } from "@playwright/test";
 
+interface PerformanceWithMemory extends Performance {
+  memory?: {
+    usedJSHeapSize: number;
+  };
+}
+
 test("measure 600-frame animation timing and heap growth on animated live scene", async ({ page }) => {
   await page.route("**/api/**", async (routeRequest) => {
     const pathname = new URL(routeRequest.request().url()).pathname;
@@ -18,7 +24,7 @@ test("measure 600-frame animation timing and heap growth on animated live scene"
   const metrics = await page.evaluate(async () => {
     return new Promise<{ p95: number; mean: number; heapGrowthMb: number }>((resolve) => {
       const deltas: number[] = [];
-      const startHeap = (performance as any).memory?.usedJSHeapSize ?? 0;
+      const startHeap = (performance as PerformanceWithMemory).memory?.usedJSHeapSize ?? 0;
       let last: number | null = null;
 
       function step(timestamp: number) {
@@ -30,7 +36,7 @@ test("measure 600-frame animation timing and heap growth on animated live scene"
           deltas.sort((a, b) => a - b);
           const p95 = deltas[Math.floor(deltas.length * 0.95)];
           const mean = deltas.reduce((a, b) => a + b, 0) / deltas.length;
-          const endHeap = (performance as any).memory?.usedJSHeapSize ?? 0;
+          const endHeap = (performance as PerformanceWithMemory).memory?.usedJSHeapSize ?? 0;
           const heapGrowthMb = (endHeap - startHeap) / (1024 * 1024);
           resolve({ p95, mean, heapGrowthMb });
         } else {
