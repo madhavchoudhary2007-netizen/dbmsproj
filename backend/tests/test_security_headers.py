@@ -140,6 +140,8 @@ def test_health_ready_reports_each_dependency_state(app_client, monkeypatch, fai
     services = {key: "up" for key in ("postgres", "mongodb", "runtime_lease")}
     if failure in services:
         services[failure] = "down"
+    elif failure == "missing_lease":
+        services["runtime_lease"] = "down"
     status = 200 if failure is None else 503
     expected = {
         "status": "ready" if status == 200 else "not_ready",

@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 749f9c5
+git_head: caf033f
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -10,14 +10,8 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 ## Phase and verified facts
 - Phase0 completeT300e465e89/T30113e6100/T30259a180e. ADR007 activated after owner approval; lock9010959b verifies, boot0. Work through all12phases per owner's latest instruction.
 - Phase1 T31035578c9/T3118570e58 accepted: WHOLEapp/testsRuff0 and43filesformatted; no remainingC901. T312e0f7adf selected3filesmypy0; freshglobal227 ->218 belowplan222. T3134089fb6 CIvalidator0; hostedCI NOT_RUN. T314c0c8061 scorer accepted;8regressionsPASS, F7/F8/F9+hardF2, missing/duplicate/unknown/reweighted/null evidence blocks delivery. All four freshdimension artifacts acceptedT44123..26; score51.2974 exit1honestbaseline, notdeliverable. Phase1complete; Phase2testsnext.
-- T44114/15 extracted coherent start/reset operations; pause/resume map preserves status/errors. T44114 exactAST proof differed only SQL indentation whitespace; full136+livePASS, no exact-AST identity claim. T44116 finalization domain extraction preserves SQL/publish/lifecycle order; fullrerun136/livePASS. T44122 lockworker/cleanup bodiesASTidentical(SQLwhitespacenormalized), full136/livePASS. T312/T314 fullrerunsPASS; latest144tests0skips+allliveflows.
-- Latest completed fullisolated baseline afterT314:144passed,0failed/skipped/xfailed; login/session/simulator/Mongo/WS/pitconflict/trigger-ban/results/standings/DBMS/generatedrace flowsPASS, no18000listener. Cleanup fixT44804a3ab7f usesexec for realAPIpid and waits; prior orphan lease failures resolved without realDB changes.
-- Fresh entireformat check exposed11leftovers, correctedT44117..21; now44app/testfilesformatted andallRuff0, including newscorer tests.
-- Formatting/literal children in git preserve AST/runtimeSQL/directives/canonicalcontents and <=150lines. SQL psycopg safecomposition/CRUD guardsT458/T4482/T44111 accepted; principal guardT4411311595ad normalized-inlineAST identical.
-- OpenAPI SHA unchanged60d831ab5cc96051d2fa2caa9b4a2f25d89a6444c05c2a5ceed0aaf8c660346b, lastchecked afterT44115; root computes withoutlifespan using APP_ENV=local. No deployed secret bypass.
-- T4405248d21 doc-only catalogue alignment: displayminimum48px leading1, allmotion100–300ms; longloops replaced bystaticongoing content/event-triggered200ms, reducedmotion retained. No architecture/gate change.
-- T441a49641c shared palette measurement includescontrast1 and excludesonlyariahidden decorativeduplicates; transparentancestorsresolved. RootChromium regression3PASS withoutapp/server, typecheck/lint0, spacing/banned/motion0. Neo lint NOT_RUN untilT360. FPS17ms musttighten16.7 atT413.
-- Strictmypy218errors11/31files remain forT339; nozero claim. Pip audit0(no vulnerabilities); npm high-audit0(3moderate,0high/critical). Productionbuildexit0 phase1.build.raw.log; generatednext-env diff restored. CItemporarymypyfailureexplicituntilT339, allotherchecksrequired.
+- Phase1 fullisolated144passed0failed/skipped/xfail and liveacceptanceallflowsPASS; browser1005PASS/all5projects after2originmockfixesT44128ad19d48. Typecheck/lint/build/Ruff44formatted/audit-high0; npm3moderate. Strictmypy218errors11/31files remainsT339. APIbaseline60d831ab5cc96051d2fa2caa9b4a2f25d89a6444c05c2a5ceed0aaf8c660346b capturedphase2.openapi-before.raw.json. CIvalidator0,hostedNOT_RUN.
+- Phase1 accepted child details live in git and phase1.evidence.json. Score51.2974 is baselineonly; F4realbrowserjourney, F8typing,A3/A5/A6lightdesign/bloat,P1/P2Lighthouse,P3assetgraph,P5FPS,E1/E2coverage stillgaps. No pass claim for incompletechecks.
 
 ## Execution contracts
 - Only overhaul/neo-brutal; no merge/force/historyrewrite. Only accept.sh commits; rerun every Verify. <=3files/150changedlines perpacket. Atmost2 packet-only customworkers in ignoredsharedclones .agent/workspaces, dependency symlinks; workers nevercommit. Integrate sequentially, updatestate everyaccept.
@@ -52,3 +46,9 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T-44133 accepted091e4de: Added failing-first tests for CORS defaults and wildcard rejection, security headers and HSTS, and liveness/readiness probes. The red recorder confirmed 11 expected failures, 1 pass, 0 errors, and 0 skips. Verify exit0; 148 changed lines.
 
 - T-44134 accepted749f9c5: Added the workspace root to sys.path inside the fixture before importing the app. The recorder captured the expected offline red baseline: 2 passed, 4 failed, 0 errors, 0 skipped. Verify exit0; 123 changed lines.
+
+- T-321 acceptedcaf033f: Default CORS allow-list now includes localhost and loopback origins. Config import raises a clear CORS_ORIGINS error if the allow-list contains '*'. Verify exit0; 6 changed lines.
+
+- T44134 requiredoneimportpathrepairafterrecorderexposedcollectionerror; corrected123lines,2PASS4expectedFAIL0errors/skips. T44133red12collected1PASS11expectedFAIL; T321CORS3PASS/ruff/format0. T44129healthimplementationrunning; T44135repo unittestredqueued.
+
+- T44129FAILED5PASS1testexpectationbug: missing_lease503 expectedallservicesup contraryADR011down. Productdiff36linesheldinclone; W3T44136correctsexpectation(noassertionweakening) beforehealthreverify.
