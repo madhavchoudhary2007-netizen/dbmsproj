@@ -92,6 +92,7 @@ score: NOT_RUN
 - Existing Playwright config and 16-route smoke test require stronger authenticated journey coverage. Login keyboard audit and responsive run are open from prior work.
 
 ## Findings
+- T-157 moved auth me/logout into the same router, kept current_user/CSRF dependencies and cookie clearing; accept.sh reran 20 focused auth/cookie checks. Ruff stayed 549, mypy improved 225→222; full isolated backend passed 119 with zero failures/skips/xfails and live acceptance passed (2026-10-23).
 - T-156 extracted login into auth_router while preserving browser cookie/CSRF, no-Origin bearer response, and call-time test monkeypatch behavior. accept.sh reran 20 auth/cookie checks. Ruff improved 553→549, mypy 226→225; full isolated backend passed 119 with zero failures/skips/xfails and live acceptance passed (2026-10-23).
 - T-155 moved generated-race DELETE registration and orchestration into demo_race_router, retained call-time main wrapper for direct unit tests, and preserved auth/HTTP/transaction order. accept.sh reran 5 focused checks on apexgrid-test. Ruff improved 554→553, mypy 227→226; full isolated backend passed 119 with zero failures/skips/xfails and live acceptance passed (2026-10-23).
 - T-154 moved generated-race DELETE SQL, including standings recalculation and conditional generated-driver/user cleanup, to a typed same-cursor repository helper after simulator stop. Mandatory accept.sh reran 4 focused checks on apexgrid-test; Ruff improved 555→554, mypy stayed 227. Full isolated gate remains pending before DELETE route extraction (2026-10-23).
