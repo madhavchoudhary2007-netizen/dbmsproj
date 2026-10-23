@@ -11,6 +11,7 @@ phase: 2 — structure, in progress
 cycle: 0 of 8
 score: NOT_RUN
 
+- T-164 accepted: offline fake-store ingest reproduction, 1 ordinary pass and 3 strict xfails; orchestrator --runxfail observed all three duplicate/order failures on old code. Seven owner-priority tasks accepted before the first evaluation.
 - ADR-005 accepted for F-DOM-04: exact retry preserves HTTP 202 and packet ID without another event; older/conflicting ingest gets 409. Focused five-lens review passed with zero second-pass amendments; architecture relocked at 12c12221. No runtime change yet.
 - T-171 F-E02 safe-only dependency pass: `npm audit` baseline 1 critical/7 high/2 moderate; `npm audit fix` without force updated Next and eslint-config-next 16.3.8→16.4.2 (lockfile only). Post-audit 0 critical/7 high/2 moderate. Typecheck/build pass; strict lint remains 45 explicit-any errors. Full disposable backend 127/0/0 and live acceptance pass. Skipped Tailwind 3→4 and eslint-config-next 16→14 suggestions because they are breaking major changes; `--force` not run. F-E02 remains open due high vulnerabilities. Six owner-priority tasks accepted before first evaluation.
 - T-170 accepted: mypy limiter regression fixed without behavior change. Global strict count restored to 222; Ruff 543, focused login 6/6. F-ACE01 closed after prior 127/0/0 disposable backend and live acceptance. Five owner-priority tasks accepted before first evaluation.

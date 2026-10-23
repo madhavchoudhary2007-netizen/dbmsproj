@@ -1,13 +1,8 @@
 # NEXT_STATE
-updated_at: 2026-10-23T05:14:17Z
+updated_at: 2026-10-23T05:25:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-164 — F-DOM-04 ordered telemetry reproduction
-- worker: W3 | priority: P2 | after: F-E02
-- target_files: backend/tests/test_telemetry_ordering.py
-- contract: strict expected-failure tests for duplicate and older per-driver packets, plus unaffected distinct driver/lap progression
-- verify: APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_telemetry_ordering.py
 ### T-165 — F-DOM-04 ingest ordering fix
 - worker: W2 | priority: P2 | after: T-164
 - target_files: backend/app/telemetry_repository.py, backend/app/telemetry_router.py
@@ -31,6 +26,7 @@ loop_iteration: 0 of 8
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-164 ✓ 80a2bc9; 1 ordinary pass/3 strict xfails; --runxfail 3 failures on old code.
 - T-171 ✓ safe npm audit fix: Next/eslint 16.4.2; critical 0, high 7/moderate 2 deferred major-only; typecheck/build and isolated 127/0/0 pass.
 - T-170 ✓ 8573293; mypy strict 222 baseline restored; Ruff 543, login 6/6.
 - T-169 ✓ 4e88ceb; focused 6/6; full isolated backend 127/0/0 and live acceptance; mypy +1 repair T-170.
