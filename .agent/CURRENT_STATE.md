@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 8570e58
+git_head: 2429939
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -73,3 +73,6 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 - T-44109 acceptedd9258cb: Extracted two exact Cursor fixture classes; full API-test Ruff/format and3 focused tests pass. Verify exit0; 41 changed lines.
 
 - T-311 accepted8570e58: Full backend-test and strict frontend lint milestone passes without source changes. Verify exit0; 0 changed lines.
+
+- T-44107 accepted2429939: Cleaned demo/config lint preserving non-import AST and parsed TOML; narrow documented exceptions only. Verify exit0; 59 changed lines.
+- T-44110 first FAILED:212 changed lines exceeded150 despite selected checks0. Clone reverted; repair1 defers SIM117 context merges, retains exact scopes. No root product diff from failed attempt.

@@ -11,7 +11,7 @@ import time
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeout
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from datetime import UTC, datetime, timedelta
 from typing import Any, Literal
 from uuid import UUID, uuid4
@@ -141,10 +141,8 @@ async def lifespan(application: FastAPI):
                 mongo_client.close()
             mongo_client = None
             telemetry_collection = None
-            try:
+            with suppress(Exception):
                 close_pool()
-            except Exception:
-                pass
         finally:
             application.state.runtime_lease = None
             runtime_lease.close()
@@ -752,8 +750,8 @@ def reserve_pit(body: ReservationIn, user=admin_steward_principal_dependency):
             reservation_id = cur.fetchone()["id"]
             cur.execute(PIT_RESERVATION_SELECT + " WHERE r.id=%s", (reservation_id,))
             row = cur.fetchone()
-    except (UniqueViolation, ExclusionViolation):
-        raise HTTPException(409, "Pit box is already reserved for this time")
+    except (UniqueViolation, ExclusionViolation) as exc:
+        raise HTTPException(409, "Pit box is already reserved for this time") from exc
     except ForeignKeyViolation as exc:
         raise HTTPException(404, "Pit box, session, or team not found") from exc
     except Exception as exc:
@@ -1044,10 +1042,8 @@ def restore_simulated_incidents(sim: Simulation):
 
 async def resume_or_create_auto_demo_race(create_if_missing: bool = True):
     active_races = fetch_all(
-        (
-            "SELECT s.id,s.total_laps,d.auto_repeat,d.simulation_seed FROM race_sessions s JOIN d"
-            "emo_races d ON d.session_id=s.id WHERE s.state='ACTIVE' ORDER BY d.created_at"
-        )
+        "SELECT s.id,s.total_laps,d.auto_repeat,d.simulation_seed FROM race_sessions s JOIN d"
+        "emo_races d ON d.session_id=s.id WHERE s.state='ACTIVE' ORDER BY d.created_at"
     )
     for active in active_races:
         session_id = active["id"]
@@ -1125,14 +1121,10 @@ class EventBus:
     @staticmethod
     def _enqueue(q, event):
         if q.full():
-            try:
+            with suppress(asyncio.QueueEmpty):
                 q.get_nowait()
-            except asyncio.QueueEmpty:
-                pass
-        try:
+        with suppress(asyncio.QueueFull):
             q.put_nowait(event)
-        except asyncio.QueueFull:
-            pass
 
     def send(self, sid, event):
         try:
@@ -1806,17 +1798,13 @@ app.include_router(create_analytics_router(current_user, jsonable))
 @app.get("/api/health")
 def health():
     state = {"postgres": "down", "mongodb": "down"}
-    try:
+    with suppress(Exception):
         fetch_one("SELECT 1 AS ok")
         state["postgres"] = "up"
-    except Exception:
-        pass
-    try:
+    with suppress(Exception):
         if mongo_client:
             mongo_client.admin.command("ping")
             state["mongodb"] = "up"
-    except Exception:
-        pass
     return {
         "status": "ok" if all(v == "up" for v in state.values()) else "degraded",
         "services": state,
@@ -1834,10 +1822,8 @@ admin_dependency = Depends(admin)
 def dbms_schema(user=admin_dependency):
     return jsonable(
         fetch_all(
-            (
-                "SELECT table_name,column_name,data_type,is_nullable FROM information_schema.colu"
-                "mns WHERE table_schema='public' ORDER BY table_name,ordinal_position"
-            )
+            "SELECT table_name,column_name,data_type,is_nullable FROM information_schema.colu"
+            "mns WHERE table_schema='public' ORDER BY table_name,ordinal_position"
         )
     )
 
@@ -2160,10 +2146,8 @@ def dbms_eer(user=admin_dependency):
 def dbms_indexes(user=admin_dependency):
     return jsonable(
         fetch_all(
-            (
-                "SELECT tablename,indexname,indexdef FROM pg_indexes WHERE schemaname='public' OR"
-                "DER BY tablename,indexname"
-            )
+            "SELECT tablename,indexname,indexdef FROM pg_indexes WHERE schemaname='public' OR"
+            "DER BY tablename,indexname"
         )
     )
 
@@ -2191,10 +2175,8 @@ def constraint_demo(user=admin_dependency):
         cur.execute("SAVEPOINT constraint_demo")
         try:
             cur.execute(
-                (
-                    "INSERT INTO drivers(licence_number,number,eligibility) VALUES ('APX-DEMO-CON"
-                    "STRAINT',-1,'ACTIVE')"
-                )
+                "INSERT INTO drivers(licence_number,number,eligibility) VALUES ('APX-DEMO-CON"
+                "STRAINT',-1,'ACTIVE')"
             )
             result = {"constraint": "unexpectedly accepted"}
             cur.execute("ROLLBACK TO SAVEPOINT constraint_demo")
@@ -2216,11 +2198,9 @@ def constraint_demo(user=admin_dependency):
 def dbms_locks(user=admin_dependency):
     return jsonable(
         fetch_all(
-            (
-                "SELECT locktype,mode,granted,relation::regclass::text AS relation,pid FROM pg_lo"
-                "cks WHERE database=(SELECT oid FROM pg_database WHERE datname=current_database()"
-                ") ORDER BY granted,mode"
-            )
+            "SELECT locktype,mode,granted,relation::regclass::text AS relation,pid FROM pg_lo"
+            "cks WHERE database=(SELECT oid FROM pg_database WHERE datname=current_database()"
+            ") ORDER BY granted,mode"
         )
     )
 
@@ -2395,16 +2375,16 @@ def dbms_lock_demo(user=admin_dependency):
     outcome = None
     try:
         target = fetch_one(
-            (
-                "SELECT b.id AS pit_box_id,s.id AS session_id,t.id AS team_id FROM pit_boxes b JO"
-                "IN race_sessions s ON s.event_id=b.event_id CROSS JOIN teams t ORDER BY b.number"
-                ",s.scheduled_at LIMIT 1"
-            )
+            "SELECT b.id AS pit_box_id,s.id AS session_id,t.id AS team_id FROM pit_boxes b JO"
+            "IN race_sessions s ON s.event_id=b.event_id CROSS JOIN teams t ORDER BY b.number"
+            ",s.scheduled_at LIMIT 1"
         )
         if not target:
             raise HTTPException(503, "Seeded pit box, session, or team is unavailable")
         starts_at = datetime.now(UTC) + timedelta(
-            days=3650 + random.randrange(10000), seconds=random.randrange(86400)
+            # Non-security randomized demonstration reservation window.
+            days=3650 + random.randrange(10000),  # noqa: S311
+            seconds=random.randrange(86400),  # noqa: S311
         )
         ends_at = starts_at + timedelta(minutes=2)
         ready = threading.Event()
@@ -2508,10 +2488,8 @@ def dbms_lock_demo(user=admin_dependency):
             if worker:
                 worker.shutdown(wait=True, cancel_futures=True)
             if future and future.done() and outcome is None:
-                try:
+                with suppress(Exception):
                     outcome = future.result()
-                except Exception:
-                    pass
             if outcome:
                 second_reservation_id = outcome.get("reservation_id")
             reservation_ids = [rid for rid in (first_reservation_id, second_reservation_id) if rid]
