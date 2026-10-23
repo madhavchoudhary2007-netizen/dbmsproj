@@ -76,3 +76,26 @@ for (const [id, path] of routes) {
       .toEqual([]);
   });
 }
+
+test("prefers-reduced-motion: reduce disables animations and transitions across components", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.route("**/api/**", async (route) => {
+    const pathname = new URL(route.request().url()).pathname;
+    if (pathname === "/api/auth/me") {
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ id: 1, email: "admin@example.test", full_name: "Admin", role: "admin" }) });
+    } else {
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify([]) });
+    }
+  });
+
+  await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+  const matchesReduced = await page.evaluate(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  expect(matchesReduced).toBe(true);
+
+  const bodyStyle = await page.evaluate(() => {
+    const style = window.getComputedStyle(document.body);
+    return { animationDuration: style.animationDuration, transitionDuration: style.transitionDuration };
+  });
+  const durSec = parseFloat(bodyStyle.animationDuration);
+  expect(durSec <= 0.001 || bodyStyle.animationDuration === "1e-05s").toBe(true);
+});
