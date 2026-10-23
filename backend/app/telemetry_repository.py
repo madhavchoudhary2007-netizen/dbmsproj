@@ -1,17 +1,27 @@
 from datetime import datetime
+from threading import RLock
 from typing import Any, Literal, cast
 from uuid import UUID
 
 from pymongo import DESCENDING
 from pymongo.collection import Collection
 from pymongo.errors import PyMongoError
-from pymongo.results import InsertOneResult
 
 from .database import connection, fetch_all, fetch_one
 
 TelemetryIngestOutcome = Literal[
-    "session_not_found", "session_inactive", "driver_not_found", "write_failed"
+    "session_not_found", "session_inactive", "driver_not_found", "write_failed",
+    "out_of_order",
 ]
+
+_telemetry_ingest_lock = RLock()
+
+
+class TelemetryIngestResult:
+    def __init__(self, document: dict[str, Any], inserted: bool):
+        self.document = document
+        self.inserted = inserted
+        self.inserted_id = document["_id"]
 
 
 class TelemetryIngestError(Exception):
@@ -25,20 +35,46 @@ def insert_telemetry(
     session_id: UUID,
     driver_id: UUID,
     document: dict[str, Any],
-) -> InsertOneResult:
-    """Validate the relational references and insert within one DB connection scope."""
-    with connection() as conn, conn.cursor() as cur:
-        cur.execute("SELECT state FROM race_sessions WHERE id=%s FOR SHARE", (session_id,))
-        session = cur.fetchone()
-        if not session:
-            raise TelemetryIngestError("session_not_found")
-        if session["state"] != "ACTIVE":
-            raise TelemetryIngestError("session_inactive")
-        cur.execute("SELECT 1 FROM drivers WHERE id=%s", (driver_id,))
-        if not cur.fetchone():
-            raise TelemetryIngestError("driver_not_found")
+) -> TelemetryIngestResult:
+    """Validate references, then ingest one ordered, idempotent packet."""
+    with _telemetry_ingest_lock:
+        with connection() as conn, conn.cursor() as cur:
+            cur.execute("SELECT state FROM race_sessions WHERE id=%s FOR SHARE", (session_id,))
+            session = cur.fetchone()
+            if not session:
+                raise TelemetryIngestError("session_not_found")
+            if session["state"] != "ACTIVE":
+                raise TelemetryIngestError("session_inactive")
+            cur.execute("SELECT 1 FROM drivers WHERE id=%s", (driver_id,))
+            if not cur.fetchone():
+                raise TelemetryIngestError("driver_not_found")
+        query = {"session_id": str(session_id), "driver_id": str(driver_id)}
         try:
-            return collection.insert_one(document)
+            existing = list(collection.find(query))
+            latest = max(
+                existing,
+                key=lambda row: (
+                    row.get("lap", -1), row.get("sector", -1),
+                    row.get("elapsed_ms", -1),
+                ),
+                default=None,
+            )
+            if latest is not None:
+                if {key: value for key, value in latest.items() if key != "_id"} == document:
+                    return TelemetryIngestResult(latest, False)
+                previous_position = (latest.get("lap", -1), latest.get("sector", -1))
+                incoming_position = (document["lap"], document["sector"])
+                if (
+                    incoming_position <= previous_position
+                    or document["elapsed_ms"] <= latest.get("elapsed_ms", -1)
+                ):
+                    raise TelemetryIngestError("out_of_order")
+            result = collection.insert_one(document)
+            return TelemetryIngestResult(
+                {**document, "_id": result.inserted_id}, True
+            )
+        except TelemetryIngestError:
+            raise
         except PyMongoError as exc:
             raise TelemetryIngestError("write_failed") from exc
 

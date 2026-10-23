@@ -25,6 +25,7 @@ INGEST_ERROR_RESPONSES = {
         "Telemetry can only be ingested for an active session",
     ),
     "driver_not_found": (404, "Driver not found"),
+    "out_of_order": (409, "Telemetry is out of order"),
 }
 
 
@@ -46,7 +47,7 @@ def create_telemetry_router(
         document["driver_id"] = str(packet.driver_id)
         document["ts"] = packet.ts
         try:
-            inserted = insert_telemetry(
+            result = insert_telemetry(
                 collection, packet.session_id, packet.driver_id, document
             )
         except TelemetryIngestError as exc:
@@ -54,8 +55,10 @@ def create_telemetry_router(
                 exc.outcome, (503, "Telemetry store write failed")
             )
             raise HTTPException(status_code, detail) from exc
-        clean = telemetry_ws_payload(document, inserted.inserted_id)
-        publish(packet.session_id, "telemetry.sample", clean)
+        stored = {key: value for key, value in result.document.items() if key != "_id"}
+        clean = telemetry_ws_payload(stored, result.inserted_id)
+        if result.inserted:
+            publish(packet.session_id, "telemetry.sample", clean)
         return {"accepted": True, "packet": clean}
 
     @router.get("/api/telemetry")
