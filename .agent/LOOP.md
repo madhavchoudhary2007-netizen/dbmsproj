@@ -11,6 +11,7 @@ phase: 2 — structure, in progress
 cycle: 0 of 8
 score: NOT_RUN
 
+- T-167 accepted: idempotent nullable migration 003 and repository seed persistence/dedicated grid RNG, focused two --runxfail cases pass. Ruff 540 (from 543), mypy 222. Thirteen owner-priority tasks accepted before evaluation; simulator/restore T-175 next.
 - T-166 accepted: four strict offline F-DOM-05 expected failures for migration, seed persistence/repeatable grid, deterministic packets, and active restore. Orchestrator --runxfail confirmed all four fail on old code. Twelve owner-priority tasks accepted before first evaluation.
 - ADR-006 accepted for F-DOM-05: nullable additive `demo_races.simulation_seed`, seeded generated choices and stable per-driver/progress telemetry RNG, with legacy null fallback and explicit replay inputs. Focused five-lens review passed on second pass with R08 recorded; architecture relocked at 0dbd38b2. Eleven owner-priority tasks before first evaluation.
 - F-DOM-04 closed: after T-174, full apexgrid-test backend 132 passed, zero failures/skips/xfails, and live acceptance passed all listed flows; Ruff 543/mypy 222. T-166 seed/replay reproduction next. Eleven owner-priority tasks accepted before first evaluation.
