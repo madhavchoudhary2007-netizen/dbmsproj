@@ -11,6 +11,7 @@ phase: 2 — structure, in progress
 cycle: 0 of 8
 score: NOT_RUN
 
+- T-176 accepted: deterministic simulation S311 exceptions justified narrowly; focused replay 4/4, Ruff back to 540, mypy 222. Fifteen owner-priority tasks accepted before first full evaluation, so no further product task dispatch until evaluation.
 - T-175 accepted: new generated races persist cryptographic seed and use stable per-driver/progress sector RNG; active restore loads seed. Four unmarked replay tests pass. Ruff rose 540→542 from two S311 findings on intentional deterministic RNG; T-176 queued to restore ratchet. Fourteen owner-priority tasks before evaluation; full isolated gate pending.
 - T-167 accepted: idempotent nullable migration 003 and repository seed persistence/dedicated grid RNG, focused two --runxfail cases pass. Ruff 540 (from 543), mypy 222. Thirteen owner-priority tasks accepted before evaluation; simulator/restore T-175 next.
 - T-166 accepted: four strict offline F-DOM-05 expected failures for migration, seed persistence/repeatable grid, deterministic packets, and active restore. Orchestrator --runxfail confirmed all four fail on old code. Twelve owner-priority tasks accepted before first evaluation.

@@ -1,13 +1,8 @@
 # NEXT_STATE
-updated_at: 2026-10-23T07:25:00Z
+updated_at: 2026-10-23T07:40:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-176 — seeded simulator Ruff ratchet repair
-- worker: W2 | priority: P2 | after: T-175
-- target_files: backend/app/main.py
-- contract: justify deterministic nonsecurity RNG at two new S311 hits without changing behavior; Ruff <=540, mypy <=222
-- verify: APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_simulation_replay.py
 
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
@@ -16,6 +11,7 @@ loop_iteration: 0 of 8
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-176 ✓ 03e4839; focused 4/4, Ruff restored 540, mypy 222.
 - T-175 ✓ 43b8914; engine/create/restore focused 4/4, mypy 222, Ruff +2 S311 repair T-176.
 - T-167 ✓ a992b66; migration/repository focused 2/2, Ruff 540/mypy 222.
 - T-166 ✓ 9a5aca1; 4 strict xfails; --runxfail 4 old-code failures, no DB/server.
