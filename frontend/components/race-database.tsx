@@ -8,6 +8,23 @@ type RaceState = "ACTIVE" | "PAUSED" | "SCHEDULED";
 const pollingStates: RaceState[] = ["ACTIVE", "PAUSED", "SCHEDULED"];
 const isPollingState = (state: unknown) => pollingStates.includes(String(state) as RaceState);
 
+interface RaceSnapshot {
+  session?: { id?: string | number; state?: string; [key: string]: unknown };
+  drivers?: Row[];
+  results?: Row[];
+  latest?: Row[];
+  laps?: Row[];
+  incidents?: Row[];
+  penalties?: Row[];
+  pit_reservations?: Row[];
+  packets?: Row[];
+  completed_driver_laps?: number;
+  telemetry_count?: number;
+  lap_source?: string;
+  updated_at?: string;
+  [key: string]: unknown;
+}
+
 export function RaceDatabase({selectedRace = "", onSelectRace, refreshToken = 0}: {selectedRace?: string; onSelectRace?: (id: string) => void; refreshToken?: number} = {}) {
   const [races, setRaces] = useState<Row[]>([]);
   const [raceListLoading, setRaceListLoading] = useState(true);
@@ -16,7 +33,7 @@ export function RaceDatabase({selectedRace = "", onSelectRace, refreshToken = 0}
   const selectedRef = useRef(selectedRace);
   const selectedRaceRef = useRef(selectedRace);
   const onSelectRaceRef = useRef(onSelectRace);
-  const [snapshot, setSnapshot] = useState<Record<string, unknown> | null>(null);
+  const [snapshot, setSnapshot] = useState<RaceSnapshot | null>(null);
   const [snapshotError, setSnapshotError] = useState("");
   const [archiveLaps, setArchiveLaps] = useState<Row[]>([]);
   const [lapLoading, setLapLoading] = useState(false);
@@ -65,10 +82,10 @@ export function RaceDatabase({selectedRace = "", onSelectRace, refreshToken = 0}
     void load();
     return () => { disposed = true; clearTimeout(timer); };
   }, [refreshToken]);
-  const selectedState = races.find((race) => String(race.id) === selected)?.state;
+  const selectedState = String(races.find((race) => String(race.id) === selected)?.state || "");
   const selectedStateRef = useRef(selectedState);
   useEffect(() => {
-    selectedStateRef.current = snapshot?.session?.state ?? selectedState;
+    selectedStateRef.current = String(snapshot?.session?.state ?? selectedState);
   }, [selectedState, snapshot?.session?.state]);
   useEffect(() => {
     let disposed = false, timer: ReturnType<typeof setTimeout>;
@@ -126,7 +143,7 @@ export function RaceDatabase({selectedRace = "", onSelectRace, refreshToken = 0}
     void load();
     return () => { disposed = true; clearTimeout(timer); };
   }, [selected, view, revision, lapRevision, refreshToken]);
-  const drivers: Row[] = snapshot?.drivers || [];
+  const drivers: Row[] = asArray(snapshot?.drivers);
   const a = left || String(drivers[0]?.id || "");
   const b = right || String(drivers[1]?.id || drivers[0]?.id || "");
   const name = (id: string) => String(drivers.find((d) => String(d.id) === id)?.driver_name || id || "Unknown driver");
@@ -165,10 +182,10 @@ export function RaceDatabase({selectedRace = "", onSelectRace, refreshToken = 0}
   const live = sessionState === "ACTIVE";
   const hasLiveTiming = isPollingState(sessionState);
   const statusLabel = live ? "ACTIVE · updating every second" : sessionState === "PAUSED" ? "PAUSED · polling for updates" : sessionState === "SCHEDULED" ? "SCHEDULED · polling for updates" : `${sessionState || "Race"} · saved records`;
-  const timing = (snapshot?.latest || []).map((r: Row) => ({ ...r, driver_name: name(String(r.driver_id)), lap_seconds: r.last_lap_ms ? Number(Number(r.last_lap_ms) / 1000).toFixed(3) : r.lap_time_ms ? Number(Number(r.lap_time_ms) / 1000).toFixed(3) : "—", sector_times_ms: Array.isArray(r.sector_ms) ? r.sector_ms.join(" / ") : "—" }));
-  const results = (snapshot?.results || []).map((r: Row) => ({ ...r, best_lap_seconds: r.lap_time_ms ? Number(Number(r.lap_time_ms) / 1000).toFixed(3) : "—" }));
+  const timing = asArray(snapshot?.latest).map((r: Row) => ({ ...r, driver_name: name(String(r.driver_id)), lap_seconds: r.last_lap_ms ? Number(Number(r.last_lap_ms) / 1000).toFixed(3) : r.lap_time_ms ? Number(Number(r.lap_time_ms) / 1000).toFixed(3) : "—", sector_times_ms: Array.isArray(r.sector_ms) ? (r.sector_ms as (string | number)[]).join(" / ") : "—" }));
+  const results = asArray(snapshot?.results).map((r: Row) => ({ ...r, best_lap_seconds: r.lap_time_ms ? Number(Number(r.lap_time_ms) / 1000).toFixed(3) : "—" }));
   const provisional = results.some((result: Row) => result.provisional === true);
-  const penalties = (snapshot?.penalties || []).map((penalty: Row) => ({
+  const penalties = asArray(snapshot?.penalties).map((penalty: Row) => ({
     ...penalty,
     driver_name: penalty.driver_name || drivers.find((driver) => String(driver.id) === String(penalty.driver_id))?.driver_name || "Unknown driver",
   }));
@@ -182,12 +199,12 @@ export function RaceDatabase({selectedRace = "", onSelectRace, refreshToken = 0}
     {raceError && <div className="notice error-notice">Race list: {raceError}</div>}
     {snapshotError && <div className="notice error-notice">Race records: {snapshotError}</div>}
     {snapshot ? <>
-      <div className="race-db-summary"><span className={live ? "live-dot" : ""}>{statusLabel}</span><span>MongoDB: {Number(snapshot.telemetry_count || 0).toLocaleString()} samples</span><span>{snapshot.completed_driver_laps ?? archiveLaps.length} completed driver laps</span><span>PostgreSQL: {results.length} results</span><span>Updated {new Date(snapshot.updated_at).toLocaleTimeString()}</span></div>
+      <div className="race-db-summary"><span className={live ? "live-dot" : ""}>{statusLabel}</span><span>MongoDB: {Number(snapshot.telemetry_count || 0).toLocaleString()} samples</span><span>{String(snapshot.completed_driver_laps ?? archiveLaps.length)} completed driver laps</span><span>PostgreSQL: {results.length} results</span><span>Updated {new Date(String(snapshot.updated_at || "")).toLocaleTimeString()}</span></div>
       {snapshot.lap_source === "historical_demo" && <p className="muted">Historical demo: these saved laps were generated from the seeded fictional race classification.</p>}
       <div className="dbms-buttons">{[["timing", live ? "Live timing records" : "Timing records"], ["laps", "Lap-by-lap comparison"], ["relational", "Incidents & pit records"]].map(([id,label]) => <Button key={id} kind={view===id ? "primary" : "secondary"} onClick={() => setView(id)}>{label}</Button>)}</div>
       {view === "timing" && <><h3>{hasLiveTiming ? "Latest telemetry per driver" : provisional ? "Provisional classification" : "Final classification"}</h3>{!hasLiveTiming && provisional && <div className="notice">Historical time and grid penalties are recorded but not applied to official order or points. Review penalties before treating this classification as final.</div>}<DataTable rows={hasLiveTiming ? timing : results} columns={hasLiveTiming ? ["position","driver_name","lap","sector","sector_times_ms","lap_seconds","elapsed_ms","speed_kph","tire_compound","pit_state","pit_box_number"] : ["position","driver_name","number","licence_number","best_lap_seconds","classified","pole","fastest_lap"]}/>{!hasLiveTiming && <><h3>Last recorded telemetry</h3><DataTable rows={timing} columns={["position","driver_name","lap","sector","sector_times_ms","elapsed_ms","lap_seconds","pit_state","pit_box_number"]}/></>}</>}
-      {view === "laps" && <><div className="inline-form">{[[a,setLeft,"Compare driver A"],[b,setRight,"Compare driver B"]].map(([value,setter,label],i) => <label key={i}>{String(label)}<select aria-label={String(label)} value={String(value)} onChange={(e) => (setter as (v:string)=>void)(e.target.value)}>{drivers.map((d) => <option key={String(d.id)} value={String(d.id)}>{String(d.driver_name)} · #{String(d.number)}</option>)}</select></label>)}</div>{lapLoading && <p className="muted">Loading saved lap archive…</p>}{lapError && <div className="notice error-notice" role="alert">Lap archive: {lapError} <Button kind="secondary" onClick={() => setLapRevision((value) => value + 1)}>Retry lap archive</Button></div>}<p className="muted">Lap times in seconds. Delta = {name(a)} minus {name(b)}; a negative delta means the first driver was faster. Only completed laps are compared.</p>{comparisons.length ? <><div style={{height:300}}><ResponsiveContainer><LineChart data={comparisons}><CartesianGrid strokeDasharray="3 3" stroke="#293443"/><XAxis dataKey="lap"/><YAxis domain={["auto","auto"]} unit="s"/><Tooltip/><Line dataKey="a" name={name(a)} stroke="#e7ff6b" dot={false} connectNulls={false}/><Line dataKey="b" name={name(b)} stroke="#66c8ff" dot={false} connectNulls={false}/></LineChart></ResponsiveContainer></div><DataTable rows={comparisons.map((r) => ({lap:r.lap,driver_a_seconds:r.a?.toFixed(3),driver_b_seconds:r.b?.toFixed(3),delta_seconds:r.delta_seconds,sectors_a_ms:r.sector_a?.join(" / "),sectors_b_ms:r.sector_b?.join(" / ")}))} columns={["lap","driver_a_seconds","driver_b_seconds","delta_seconds","sectors_a_ms","sectors_b_ms"]}/></> : <div className="state">{lapLoading ? "Loading lap comparisons…" : "No completed lap measurements are stored for this race yet."}</div>}<h3>Every driver lap</h3><p className="muted">{archiveLaps.length} saved driver laps · showing {archiveLaps.length ? visibleLapPage * lapPageSize + 1 : 0}–{Math.min((visibleLapPage + 1) * lapPageSize, archiveLaps.length)}</p><DataTable rows={visibleArchiveLaps.map((lap) => ({driver_name:name(String(lap.driver_id)),lap:lap.lap,sector_1_ms:Array.isArray(lap.sector_ms)?lap.sector_ms[0]:null,sector_2_ms:Array.isArray(lap.sector_ms)?lap.sector_ms[1]:null,sector_3_ms:Array.isArray(lap.sector_ms)?lap.sector_ms[2]:null,lap_time_ms:lap.lap_time_ms,position:lap.position}))} columns={["driver_name","lap","sector_1_ms","sector_2_ms","sector_3_ms","lap_time_ms","position"]}/>{lapPages > 1 && <div className="dbms-pagination"><Button kind="secondary" disabled={visibleLapPage === 0} onClick={() => setLapPage((page) => Math.max(0, page - 1))}>Previous</Button><span className="muted">Page {visibleLapPage + 1} of {lapPages}</span><Button kind="secondary" disabled={visibleLapPage >= lapPages - 1} onClick={() => setLapPage((page) => page + 1)}>Next</Button></div>}</>}
-      {view === "relational" && <><h3>Incident reports</h3><DataTable rows={snapshot.incidents} columns={["driver_name","lap","state","description"]}/><h3>Penalties</h3><DataTable rows={penalties} columns={["id","driver_name","points","time_seconds","grid_places"]}/><h3>Named pit stops</h3><DataTable rows={snapshot.pit_reservations} columns={["driver_name","team_name","box_number","allocation_source","starts_at","ends_at","status"]}/></>}
+      {view === "laps" && <><div className="inline-form">{[[a,setLeft,"Compare driver A"],[b,setRight,"Compare driver B"]].map(([value,setter,label],i) => <label key={i}>{String(label)}<select aria-label={String(label)} value={String(value)} onChange={(e) => (setter as (v:string)=>void)(e.target.value)}>{drivers.map((d) => <option key={String(d.id)} value={String(d.id)}>{String(d.driver_name)} · #{String(d.number)}</option>)}</select></label>)}</div>{lapLoading && <p className="muted">Loading saved lap archive…</p>}{lapError && <div className="notice error-notice" role="alert">Lap archive: {lapError} <Button kind="secondary" onClick={() => setLapRevision((value) => value + 1)}>Retry lap archive</Button></div>}<p className="muted">Lap times in seconds. Delta = {name(a)} minus {name(b)}; a negative delta means the first driver was faster. Only completed laps are compared.</p>{comparisons.length ? <><div style={{height:300}}><ResponsiveContainer><LineChart data={comparisons}><CartesianGrid strokeDasharray="3 3" stroke="#293443"/><XAxis dataKey="lap"/><YAxis domain={["auto","auto"]} unit="s"/><Tooltip/><Line dataKey="a" name={name(a)} stroke="#e7ff6b" dot={false} connectNulls={false}/><Line dataKey="b" name={name(b)} stroke="#66c8ff" dot={false} connectNulls={false}/></LineChart></ResponsiveContainer></div><DataTable rows={comparisons.map((r) => ({lap:r.lap,driver_a_seconds:r.a?.toFixed(3),driver_b_seconds:r.b?.toFixed(3),delta_seconds:r.delta_seconds,sectors_a_ms:Array.isArray(r.sector_a)?(r.sector_a as (string|number)[]).join(" / "):undefined,sectors_b_ms:Array.isArray(r.sector_b)?(r.sector_b as (string|number)[]).join(" / "):undefined}))} columns={["lap","driver_a_seconds","driver_b_seconds","delta_seconds","sectors_a_ms","sectors_b_ms"]}/></> : <div className="state">{lapLoading ? "Loading lap comparisons…" : "No completed lap measurements are stored for this race yet."}</div>}<h3>Every driver lap</h3><p className="muted">{archiveLaps.length} saved driver laps · showing {archiveLaps.length ? visibleLapPage * lapPageSize + 1 : 0}–{Math.min((visibleLapPage + 1) * lapPageSize, archiveLaps.length)}</p><DataTable rows={visibleArchiveLaps.map((lap) => ({driver_name:name(String(lap.driver_id)),lap:lap.lap,sector_1_ms:Array.isArray(lap.sector_ms)?lap.sector_ms[0]:null,sector_2_ms:Array.isArray(lap.sector_ms)?lap.sector_ms[1]:null,sector_3_ms:Array.isArray(lap.sector_ms)?lap.sector_ms[2]:null,lap_time_ms:lap.lap_time_ms,position:lap.position}))} columns={["driver_name","lap","sector_1_ms","sector_2_ms","sector_3_ms","lap_time_ms","position"]}/>{lapPages > 1 && <div className="dbms-pagination"><Button kind="secondary" disabled={visibleLapPage === 0} onClick={() => setLapPage((page) => Math.max(0, page - 1))}>Previous</Button><span className="muted">Page {visibleLapPage + 1} of {lapPages}</span><Button kind="secondary" disabled={visibleLapPage >= lapPages - 1} onClick={() => setLapPage((page) => page + 1)}>Next</Button></div>}</>}
+      {view === "relational" && <><h3>Incident reports</h3><DataTable rows={asArray(snapshot.incidents)} columns={["driver_name","lap","state","description"]}/><h3>Penalties</h3><DataTable rows={penalties} columns={["id","driver_name","points","time_seconds","grid_places"]}/><h3>Named pit stops</h3><DataTable rows={asArray(snapshot.pit_reservations)} columns={["driver_name","team_name","box_number","allocation_source","starts_at","ends_at","status"]}/></>}
     </> : <div className="state">{selected ? "Loading race records…" : raceListLoading ? "Loading races…" : "No races available."}</div>}
   </section>;
 }
