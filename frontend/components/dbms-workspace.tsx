@@ -38,20 +38,38 @@ function formatMongoDocument(document: Row): Row {
   };
 }
 
-function planRows(plan: any, depth = 0): Row[] {
+interface ExplainPlanNode {
+  "Node Type"?: string;
+  "Relation Name"?: string;
+  "Index Name"?: string;
+  "Startup Cost"?: number;
+  "Total Cost"?: number;
+  "Plan Rows"?: number;
+  Plans?: ExplainPlanNode[];
+  [key: string]: unknown;
+}
+
+interface TableDataResponse {
+  total: number;
+  rows?: Row[];
+  columns?: Row[];
+  [key: string]: unknown;
+}
+
+function planRows(plan: ExplainPlanNode | null | undefined, depth = 0): Row[] {
   if (!plan) return [];
   return [{node: `${"  ".repeat(depth)}${plan["Node Type"] || "Unknown"}`,
     relation: plan["Relation Name"] || "—", index: plan["Index Name"] || "—",
     startup_cost: plan["Startup Cost"], total_cost: plan["Total Cost"],
     plan_rows: plan["Plan Rows"]},
-    ...(plan.Plans || []).flatMap((child: any) => planRows(child, depth + 1))];
+    ...(plan.Plans || []).flatMap((child: ExplainPlanNode) => planRows(child, depth + 1))];
 }
 
 export function DbmsWorkspace() {
   const [view, setView] = useState<View>("overview");
-  const [overview, setOverview] = useState<any>();
+  const [overview, setOverview] = useState<Record<string, unknown> | null>(null);
   const [overviewError, setOverviewError] = useState("");
-  const [readData, setReadData] = useState<any>();
+  const [readData, setReadData] = useState<Record<string, unknown> | null>(null);
   const [readError, setReadError] = useState("");
   const [updatedAt, setUpdatedAt] = useState("");
   const [revision, setRevision] = useState(0);
@@ -60,7 +78,7 @@ export function DbmsWorkspace() {
   const [tables, setTables] = useState<Row[]>([]);
   const [table, setTable] = useState("");
   const [tableOffset, setTableOffset] = useState(0);
-  const [tableData, setTableData] = useState<any>();
+  const [tableData, setTableData] = useState<TableDataResponse | null>(null);
   const [mongoOffset, setMongoOffset] = useState(0);
   const [mongoDraftFilters, setMongoDraftFilters] = useState({session_id: "", driver_id: "", lap: "", sector: ""});
   const [mongoFilters, setMongoFilters] = useState({session_id: "", driver_id: "", lap: "", sector: ""});
@@ -69,7 +87,7 @@ export function DbmsWorkspace() {
   const [championship, setChampionship] = useState("");
   const [operation, setOperation] = useState("");
   const [operationError, setOperationError] = useState("");
-  const [operationResults, setOperationResults] = useState<Record<string, any>>({});
+  const [operationResults, setOperationResults] = useState<Record<string, Record<string, unknown>>>({});
 
   const selectView = (nextView: View) => {
     setView(nextView);
@@ -135,9 +153,9 @@ export function DbmsWorkspace() {
     let timer: ReturnType<typeof setTimeout>;
     const load = async () => {
       try {
-        const value = await api<any>("/dbms/tables");
+        const value = await api<{ tables?: Row[] }>("/dbms/tables");
         if (!disposed) {
-          const rows = asArray(value.tables);
+          const rows = asArray(value?.tables);
           setTables(rows);
           setTable((previous) => {
             if (rows.some((row) => row.table_name === previous)) return previous;
@@ -160,10 +178,10 @@ export function DbmsWorkspace() {
     if (view !== "tables" || !table) return;
     let disposed = false;
     let timer: ReturnType<typeof setTimeout>;
-    setTableData(undefined);
+    setTableData(null);
     const load = async () => {
       try {
-        const value = await api(`/dbms/tables/${encodeURIComponent(table)}?limit=50&offset=${tableOffset}`);
+        const value = await api<TableDataResponse>(`/dbms/tables/${encodeURIComponent(table)}?limit=50&offset=${tableOffset}`);
         if (!disposed) {
           setTableData(value);
           if (value.total <= tableOffset && tableOffset > 0)
@@ -252,7 +270,7 @@ export function DbmsWorkspace() {
     {view === "mongo-collections" && <section className="panel"><div className="eyebrow">MONGODB / DATABASE {readData?.database || ""}</div><h2>Collections</h2><p className="muted">Live document counts and index totals for each application collection.</p><DataTable rows={asArray(readData?.collections).map((collection) => ({...collection, index_count: asArray(collection.indexes).length}))} columns={["name","document_count","index_count"]}/></section>}
     {view === "mongo-indexes" && <section className="panel"><div className="eyebrow">MONGODB / TELEMETRY COLLECTION</div><h2>Collection indexes</h2><p className="muted">Index definitions reported by MongoDB for the telemetry collection.</p><DataTable rows={asArray(readData?.collections).flatMap((collection) => asArray(collection.indexes).map((index) => ({collection: collection.name, name: index.name, key: JSON.stringify(index.key), unique: index.unique ?? false, sparse: index.sparse ?? false})))} columns={["collection","name","key","unique","sparse"]}/></section>}
     {view === "telemetry" && <section className="panel"><div className="eyebrow">MONGODB / TELEMETRY COLLECTION</div><h2>Telemetry documents</h2><p className="muted">Browse actual documents, filter by race session, driver, lap or sector, and page through results. Lap time is recorded when a lap completes. Select a row to inspect its complete JSON document.</p><form className="dbms-mongo-filters" onSubmit={(event) => {event.preventDefault(); setMongoOffset(0); setMongoFilters({...mongoDraftFilters}); setSelectedMongoDocument(null);}}><label>Session ID<input value={mongoDraftFilters.session_id} onChange={(event) => setMongoDraftFilters({...mongoDraftFilters, session_id: event.target.value})} /></label><label>Driver ID<input value={mongoDraftFilters.driver_id} onChange={(event) => setMongoDraftFilters({...mongoDraftFilters, driver_id: event.target.value})} /></label><label>Lap<input type="number" min="1" value={mongoDraftFilters.lap} onChange={(event) => setMongoDraftFilters({...mongoDraftFilters, lap: event.target.value})} /></label><label>Sector<input type="number" min="1" max="3" value={mongoDraftFilters.sector} onChange={(event) => setMongoDraftFilters({...mongoDraftFilters, sector: event.target.value})} /></label><Button type="submit" kind="secondary">Apply filters</Button><Button type="button" kind="secondary" onClick={() => {const empty = {session_id: "", driver_id: "", lap: "", sector: ""}; setMongoDraftFilters(empty); setMongoFilters(empty); setMongoOffset(0); setSelectedMongoDocument(null);}}>Clear</Button></form><p className="muted">{readData ? `${readData.total?.toLocaleString?.() ?? 0} documents · showing ${readData.total ? mongoOffset + 1 : 0}–${Math.min(mongoOffset + 50, readData.total)}` : "Loading documents…"}</p><DataTable rows={asArray(readData?.documents).map(formatMongoDocument)} columns={["id","ts","session_id","driver_id","lap","sector","sector_ms","lap_time_ms","elapsed_ms","position","speed_kph","throttle_pct","brake_pct","tire_compound","tire_age_laps","tire_wear_pct","tire_temp_c","pit_state","pit_box_number","source"]} onSelect={(document) => setSelectedMongoDocument(asArray(readData?.documents).find((raw) => raw.id === document.id) || document)}/><div className="dbms-pagination"><Button kind="secondary" disabled={mongoOffset === 0} onClick={() => {setSelectedMongoDocument(null); setMongoOffset((value) => Math.max(0, value - 50));}}>Previous</Button><Button kind="secondary" disabled={!readData || mongoOffset + 50 >= readData.total} onClick={() => {setSelectedMongoDocument(null); setMongoOffset((value) => value + 50);}}>Next</Button></div>{selectedMongoDocument && <Modal title={`Telemetry document · lap ${String(selectedMongoDocument.lap ?? "—")} · sector ${String(selectedMongoDocument.sector ?? "—")}`} close={() => setSelectedMongoDocument(null)}><p className="muted">MongoDB document ID: {String(selectedMongoDocument.id || "—")}</p><pre className="dbms-mongo-json">{JSON.stringify(selectedMongoDocument, null, 2)}</pre></Modal>}</section>}
-    {view === "polyglot" && <section className="panel"><div className="eyebrow">POSTGRESQL + MONGODB</div><h2>Cross-store results</h2><p className="muted">Official SQL race results joined by shared session and driver IDs to recent MongoDB sample counts.</p><DataTable rows={asArray(readData?.rows).map((row) => ({...row, telemetry_samples: (row.telemetry as any)?.samples ?? 0, latest_sample: (row.telemetry as any)?.latest ?? "—"}))} columns={["session_id","state","full_name","driver_id","telemetry_samples","latest_sample"]}/></section>}
+    {view === "polyglot" && <section className="panel"><div className="eyebrow">POSTGRESQL + MONGODB</div><h2>Cross-store results</h2><p className="muted">Official SQL race results joined by shared session and driver IDs to recent MongoDB sample counts.</p><DataTable rows={asArray(readData?.rows).map((row) => { const tel = typeof row.telemetry === "object" && row.telemetry !== null ? (row.telemetry as Record<string, unknown>) : undefined; return { ...row, telemetry_samples: (tel?.samples as number | undefined) ?? 0, latest_sample: (tel?.latest as string | undefined) ?? "—" }; })} columns={["session_id","state","full_name","driver_id","telemetry_samples","latest_sample"]}/></section>}
     {view === "operations" && <section className="panel"><div className="eyebrow">DATABASE ACTIONS</div><h2>Transaction and rule demonstrations</h2><p className="muted">Each action returns its actual database outcome. Choose an action to run it; read-only views update automatically.</p>{operationError && <div className="notice error-notice" role="alert">{operationError}</div>}<div className="dbms-operation-grid">{operations.map(([key,title,description,path]) => <article className="dbms-operation-card" key={key}><h3>{title}</h3><p>{description}</p><Button disabled={!!operation} onClick={() => void runOperation(key,path)}>{operation === key ? "Running…" : `Run ${title.toLowerCase()}`}</Button>{operationResults[key] && <><p className="dbms-operation-outcome">{key === "constraint" ? operationResults[key].rejected ? "Constraint rejected invalid row" : "Constraint accepted row" : key === "transaction" ? operationResults[key].savepoint_rolled_back ? "Rollback verified" : "Rollback check failed" : operationResults[key].lock_wait_observed && operationResults[key].overlapping_reservation === "rejected" ? `Lock wait ${operationResults[key].lock_wait_ms} ms; overlap rejected` : "Lock check failed"}</p><details className="dbms-details"><summary>API response</summary><pre>{JSON.stringify(operationResults[key],null,2)}</pre></details></>}</article>)}</div><div className="dbms-recalculate"><h3>Recalculate standings</h3><div className="inline-form"><label>Championship<select aria-label="Championship for recalculation" value={championship} onChange={(event) => { setChampionship(event.target.value); setOperationResults((previous) => { const {recalculate: _result, ...rest} = previous; return rest; }); }}><option value="">Select championship</option>{championships.map((row) => <option key={String(row.id)} value={String(row.id)}>{String(row.name || row.id)}</option>)}</select></label><Button disabled={!championship || !!operation} onClick={() => void runOperation("recalculate", `/dbms/recalculate?championship_id=${encodeURIComponent(championship)}`)}>{operation === "recalculate" ? "Running…" : "Recalculate"}</Button></div>{operationResults.recalculate && <><p className="dbms-operation-outcome">Standings recalculated for championship {String(operationResults.recalculate.championship_id || championship)}.</p><details className="dbms-details"><summary>API response</summary><pre>{JSON.stringify(operationResults.recalculate,null,2)}</pre></details></>}</div></section>}
   </div>;
 }
