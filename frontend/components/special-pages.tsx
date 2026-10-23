@@ -35,14 +35,28 @@ import {
 } from "./ui";
 import { useAuth } from "./auth";
 import { DbmsWorkspace } from "./dbms-workspace";
+interface DashboardData {
+  active_sessions?: unknown;
+  scheduled_events?: unknown;
+  open_incidents?: unknown;
+  drivers?: unknown;
+  active_session?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+interface HealthData {
+  services?: Record<string, unknown>;
+  status?: unknown;
+  [key: string]: unknown;
+}
+
 export function Dashboard() {
-  const [data, setData] = useState<any>(),
-    [health, setHealth] = useState<any>(),
+  const [data, setData] = useState<DashboardData | null>(null),
+    [health, setHealth] = useState<HealthData | null>(null),
     [err, setErr] = useState(""),
     [load, setLoad] = useState(true);
   const fetchData = useCallback(() => {
     setLoad(true);
-    Promise.all([api("/dashboard"), api("/health")])
+    Promise.all([api<DashboardData>("/dashboard"), api<HealthData>("/health")])
       .then(([d, h]) => {
         setData(d);
         setHealth(h);
@@ -70,8 +84,8 @@ export function Dashboard() {
               ["scheduled_events", data.scheduled_events],
               ["open_incidents", data.open_incidents],
               ["drivers", data.drivers],
-            ].map(([k, v]: any) => (
-              <div className="stat-card" key={k}>
+            ].map(([k, v]) => (
+              <div className="stat-card" key={String(k)}>
                 <span>{String(k).replaceAll("_", " ")}</span>
                 <b>{pretty(v)}</b>
                 <small>API reported</small>
@@ -109,7 +123,7 @@ export function Dashboard() {
                   <h2>Platform status</h2>
                 </div>
               </div>
-              {Object.entries(health?.services || {}).map(([k, v]: any) => (
+              {Object.entries(health?.services || {}).map(([k, v]) => (
                 <div className="detail-row" key={k}>
                   <span>{k}</span>
                   <b className={v === "up" ? "green" : ""}>{pretty(v)}</b>
@@ -217,7 +231,7 @@ export function SessionPage() {
     if (!selected) return;
     setSimMessage("");
     try {
-      const response = await api(`/sessions/${selected}/simulate`, {
+      const response = await api<{ state?: string; cars?: number; rate_hz?: number }>(`/sessions/${selected}/simulate`, {
         method: "POST",
         body: JSON.stringify({ action, cars: simCars, rate_hz: simRate }),
       });
@@ -579,7 +593,7 @@ export function StewardDesk() {
     setBusy(true);
     setMessage("");
     try {
-      const result = await api<any>(`/incidents/${active.id}/decision`, {
+      const result = await api<{ driver?: { season_points?: number | string; eligibility?: string } }>(`/incidents/${active.id}/decision`, {
         method: "POST",
         body: JSON.stringify({
           approve,
@@ -771,8 +785,8 @@ export function LiveTiming() {
     [liveIncidents, setLiveIncidents] = useState<Row[]>([]),
     [livePitStops, setLivePitStops] = useState<Row[]>([]),
     [recordsError, setRecordsError] = useState(""),
-    [snapshot, setSnapshot] = useState<any>(),
-    [timing, setTiming] = useState<any>({ cars: [], safety_car: false }),
+    [snapshot, setSnapshot] = useState<Record<string, unknown> | null>(null),
+    [timing, setTiming] = useState<{ cars?: Row[]; safety_car?: boolean; [key: string]: unknown }>({ cars: [], safety_car: false }),
     [status, setStatus] = useState("Choose an active session"),
     [error, setError] = useState(""),
     [demoBusy, setDemoBusy] = useState(false),
@@ -815,10 +829,10 @@ export function LiveTiming() {
     refreshLists()
       .then(({ sessionRows, raceRows, current }) => {
         if (disposed || !current || !autoFollow.current) return;
-        const activeDemo = raceRows.find((r: any) => r.state === "ACTIVE");
+        const activeDemo = raceRows.find((r: Row) => r.state === "ACTIVE");
         const active = activeDemo
-          ? sessionRows.find((r: any) => String(r.id) === String(activeDemo.session_id))
-          : sessionRows.find((r: any) => r.state === "ACTIVE");
+          ? sessionRows.find((r: Row) => String(r.id) === String(activeDemo.session_id))
+          : sessionRows.find((r: Row) => r.state === "ACTIVE");
         if (active) setSession(String(active.id));
       })
       .catch((e) => { if (!disposed) reportError("lists", e instanceof Error ? e.message : "Unable to load live sessions"); });
@@ -860,7 +874,7 @@ export function LiveTiming() {
     let timer: ReturnType<typeof setTimeout> | undefined;
     const load = async () => {
       try {
-        const value = await api<any>(`/sessions/${session}/laps`);
+        const value = await api<{ laps?: Row[]; incidents?: Row[]; pit_reservations?: Row[] }>(`/sessions/${session}/laps`);
         if (alive) {
           setCompletedLaps(asArray(value.laps));
           setLiveIncidents(asArray(value.incidents));
@@ -881,7 +895,7 @@ export function LiveTiming() {
     clearError();
     setDemoMessage("");
     try {
-      const created = await api<any>("/demo-races", {
+      const created = await api<{ session_id?: string | number; event_name?: string; car_count?: number } & Record<string, unknown>>("/demo-races", {
         method: "POST",
         body: JSON.stringify({}),
       });
@@ -905,14 +919,14 @@ export function LiveTiming() {
       await api(`/demo-races/${encodeURIComponent(String(race.session_id))}`, { method: "DELETE" });
       const { sessionRows, raceRows } = await refreshLists();
       if (session === String(race.session_id)) {
-        const activeDemo = raceRows.find((r: any) => r.state === "ACTIVE");
+        const activeDemo = raceRows.find((r: Row) => r.state === "ACTIVE");
         const next = activeDemo && sessionRows.find((r) => String(r.id) === String(activeDemo.session_id));
-        const nextSession = String(next?.id || sessionRows.find((r: any) => r.state === "ACTIVE")?.id || "");
+        const nextSession = String(next?.id || sessionRows.find((r: Row) => r.state === "ACTIVE")?.id || "");
         setSession(nextSession);
         if (!nextSession) {
           setPackets([]);
           setTiming({ cars: [], safety_car: false });
-          setSnapshot(undefined);
+          setSnapshot(null);
           setStatus("Choose an active session");
         }
         setDriver("");
@@ -931,10 +945,10 @@ export function LiveTiming() {
     setSessionDrivers([]);
     setPackets([]);
     setTiming({ cars: [], safety_car: false });
-    setSnapshot(undefined);
+    setSnapshot(null);
     let alive = true,
       ws: WebSocket | undefined,
-      timer: any,
+      timer: ReturnType<typeof setTimeout> | undefined,
       attempt = 0,
       startedAt: string | undefined,
       refreshRequest = 0,
@@ -961,17 +975,17 @@ export function LiveTiming() {
     const refresh = async () => {
       const request = ++refreshRequest;
       try {
-        const s = await api<any>(`/sessions/${session}/live`);
+        const s = await api<{ session?: Row; drivers?: Row[]; packets?: Row[] } & Record<string, unknown>>(`/sessions/${session}/live`);
         if (!alive || request !== refreshRequest) return;
         if (alive) {
           const sessionData = s.session || s;
           sessionState = String(sessionData.state || sessionState);
           setSnapshot(sessionData);
           setSessionDrivers(asArray(s.drivers));
-          startedAt = sessionData.started_at || startedAt;
-          setTiming((prev: any) => ({
+          startedAt = (sessionData.started_at as string | undefined) || startedAt;
+          setTiming((prev) => ({
             ...prev,
-            safety_car: s.session?.safety_car ?? prev.safety_car,
+            safety_car: (s.session?.safety_car as boolean | undefined) ?? prev.safety_car,
           }));
           if (Array.isArray(s.packets))
             setPackets(s.packets.filter(belongsToCurrentRun));
@@ -1023,7 +1037,7 @@ export function LiveTiming() {
             if (sessionState === "CANCELLED") ws?.close();
             void refresh();
           }
-          setSnapshot((prev: any) => ({
+          setSnapshot((prev) => ({
             ...prev,
             ...(msg.data || {}),
             last_event: msg,
@@ -1178,13 +1192,13 @@ export function LiveTiming() {
             <span className="muted">{demoRaces.length} race{demoRaces.length === 1 ? "" : "s"}</span>
           </div>
           <div className="demo-race-list">
-            {visibleDemoRaces.map((race: any) => (
+            {visibleDemoRaces.map((race: Row) => (
               <div className="demo-race-row" key={String(race.session_id)}>
                 <button className="demo-race-select" onClick={() => { autoFollow.current = false; setSession(String(race.session_id)); setDriver(""); }} aria-label={`Show ${race.event_name} ${String(race.session_id).slice(0, 8)} live timing`}>
-                  <span className="demo-race-name">{race.event_name || "Generated race"}</span>
-                  <span className="demo-race-meta">{race.circuit_name || "Circuit pending"} · {race.car_count} cars · {race.total_laps} laps · {String(race.created_at || "").slice(0, 10)} · {String(race.session_id).slice(0, 8)}</span>
+                  <span className="demo-race-name">{String(race.event_name || "Generated race")}</span>
+                  <span className="demo-race-meta">{String(race.circuit_name || "Circuit pending")} · {String(race.car_count)} cars · {String(race.total_laps)} laps · {String(race.created_at || "").slice(0, 10)} · {String(race.session_id).slice(0, 8)}</span>
                 </button>
-                <span className={`demo-state ${race.state === "ACTIVE" ? "is-active" : ""}`}>{race.state}</span>
+                <span className={`demo-state ${race.state === "ACTIVE" ? "is-active" : ""}`}>{String(race.state)}</span>
                 {canManageDemos && <button className="icon-button danger-icon" aria-label={`Delete ${race.event_name} ${String(race.session_id).slice(0, 8)}`} disabled={demoBusy} onClick={() => setDeleteRace(race)}><Trash2 size={15} /></button>}
               </div>
             ))}
@@ -1323,7 +1337,7 @@ export function LiveTiming() {
                 ["brake_pct", "Brake · %", "#ff6b62"],
                 ["lap_time_ms", "Lap time · ms", "#4fd4bd"],
                 ["tire_wear_pct", "Tire wear · %", "#ffc45c"],
-              ].map(([key, title, color]: any) => (
+              ].map(([key, title, color]) => (
                 <div className="panel chart-panel" key={key}>
                   <div className="eyebrow">SELECTED DRIVER TELEMETRY</div>
                   <h2>{title}</h2>
@@ -1505,7 +1519,7 @@ export function PitWall() {
       if (targetEvent) setEvent(targetEvent);
       setSelectedSession(targetSession);
       if (targetEvent && targetSession) {
-        const [b, r, strat] = await Promise.allSettled([api<any>(`/pit-boxes?event_id=${encodeURIComponent(targetEvent)}`), api<any>(`/pit-reservations?session_id=${encodeURIComponent(targetSession)}`), api<Row>(`/sessions/${encodeURIComponent(targetSession)}/pit-strategy`)]);
+        const [b, r, strat] = await Promise.allSettled([api<Row[]>(`/pit-boxes?event_id=${encodeURIComponent(targetEvent)}`), api<Row[]>(`/pit-reservations?session_id=${encodeURIComponent(targetSession)}`), api<Row>(`/sessions/${encodeURIComponent(targetSession)}/pit-strategy`)]);
         if (request !== loadRequest.current) return;
         if (b.status === "rejected") throw b.reason;
         if (r.status === "rejected") throw r.reason;
@@ -1524,7 +1538,7 @@ export function PitWall() {
     const poll = async () => {
       const request = loadRequest.current; setStrategyLoading(true);
       try {
-        const [b, r, s] = await Promise.all([api<any>(`/pit-boxes?event_id=${encodeURIComponent(event)}`), api<any>(`/pit-reservations?session_id=${encodeURIComponent(selectedSession)}`), api<Row>(`/sessions/${encodeURIComponent(selectedSession)}/pit-strategy`)]);
+        const [b, r, s] = await Promise.all([api<Row[]>(`/pit-boxes?event_id=${encodeURIComponent(event)}`), api<Row[]>(`/pit-reservations?session_id=${encodeURIComponent(selectedSession)}`), api<Row>(`/sessions/${encodeURIComponent(selectedSession)}/pit-strategy`)]);
         if (!disposed && request === loadRequest.current) { setBoxes(asArray(b)); setRes(asArray(r)); setStrategy(asArray(s.strategy)); setHistory((s.historical_summary || {}) as Row); setError(""); setStrategyError(""); }
       } catch (e) { if (!disposed && request === loadRequest.current) setStrategyError(e instanceof Error ? e.message : "Unable to refresh pit strategy"); }
       finally { if (!disposed) setStrategyLoading(false); }
@@ -1660,12 +1674,14 @@ export function Analytics() {
         description="Filter driver metrics using the analytics API. Results and comparisons reflect returned data."
       />
       <div className="filter-panel">
-        {[
-          ["Championship", champ, setChamp, opts.championships],
-          ["Circuit", circuit, setCircuit, opts.circuits],
-          ["Driver", driver, setDriver, opts.drivers],
-          ["Team", team, setTeam, opts.teams],
-        ].map(([title, value, setter, items]: any) => (
+        {(
+          [
+            ["Championship", champ, setChamp, opts.championships],
+            ["Circuit", circuit, setCircuit, opts.circuits],
+            ["Driver", driver, setDriver, opts.drivers],
+            ["Team", team, setTeam, opts.teams],
+          ] as [string, string, (val: string) => void, Row[]][]
+        ).map(([title, value, setter, items]) => (
           <label key={title}>
             {title}
             <select value={value} onChange={(e) => setter(e.target.value)}>
