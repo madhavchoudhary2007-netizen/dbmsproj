@@ -1,0 +1,8 @@
+.bad {
+  color: #888;
+  background: #8888;
+  border-color: #888888;
+  outline-color: #88888888;
+  @apply bg-gray-500 dark:text-slate-200 border-zinc-300;
+  --color: bg-[#777];
+}

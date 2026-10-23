@@ -1,0 +1,8 @@
+/* gray-family values in comments are ignored: .x { color: #888; } */
+.good {
+  color: #000;
+  background: #FFFDF5;
+  border-color: #FF6B6B;
+  background-image: url(#888);
+  content: "#888";
+}
