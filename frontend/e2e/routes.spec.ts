@@ -22,9 +22,23 @@ const routes = [
 for (const [id, route] of routes) {
   test(`${id} loads ${route} or its login redirect`, async ({ page }) => {
     const failures: string[] = [];
-    page.on("pageerror", (error) => failures.push(error.message));
+    page.on("pageerror", (error) => failures.push(`pageerror: ${error.message}`));
+    page.on("console", (msg) => {
+      if (msg.type() === "error") failures.push(`console: ${msg.text()}`);
+    });
     page.on("response", (response) => {
       if (response.status() >= 500) failures.push(`${response.status()} ${response.url()}`);
+    });
+    await page.route("**/api/**", async (routeRequest) => {
+      const pathname = new URL(routeRequest.request().url()).pathname;
+      if (pathname === "/api/auth/me" && route === "/login") {
+        await routeRequest.fulfill({ status: 401, json: { detail: "Authentication required" } });
+        return;
+      }
+      const body = pathname === "/api/auth/me"
+        ? { id: 999, email: "smoke@example.test", full_name: "Smoke Audit", role: "admin" }
+        : {};
+      await routeRequest.fulfill({ json: body });
     });
 
     const response = await page.goto(route, { waitUntil: "domcontentloaded" });
