@@ -548,12 +548,23 @@ def test_reserved_pit_driver_is_unique_per_session(db):
     assert _sqlstate(exc.value) == "23505"
 
     # Releasing a reservation makes its driver available for another stop.
-    cur.execute("UPDATE pit_reservations SET status='CANCELLED' WHERE session_id=%s AND driver_id=%s",
-                (session_id, drivers[0]))
-    cur.execute("""INSERT INTO pit_reservations(
+    cur.execute(
+        "UPDATE pit_reservations SET status='CANCELLED' WHERE session_id=%s AND driver_id=%s",
+        (session_id, drivers[0]),
+    )
+    cur.execute(
+        """INSERT INTO pit_reservations(
         pit_box_id,session_id,team_id,driver_id,starts_at,ends_at
     ) VALUES (%s,%s,%s,%s,%s,%s)""",
-        (second_box, session_id, team_id, drivers[0], now, now + __import__('datetime').timedelta(minutes=5)))
+        (
+            second_box,
+            session_id,
+            team_id,
+            drivers[0],
+            now,
+            now + __import__("datetime").timedelta(minutes=5),
+        ),
+    )
 
 
 def test_auto_pit_allocator_chooses_earliest_gap_and_next_unreserved_driver(db):
@@ -564,37 +575,57 @@ def test_auto_pit_allocator_chooses_earliest_gap_and_next_unreserved_driver(db):
     box_one = cur.fetchone()[0]
     # Leave a later booking on the first box. The allocator should fill the
     # earlier gap, then choose a different driver for the following request.
-    cur.execute("""INSERT INTO pit_reservations(pit_box_id,session_id,team_id,starts_at,ends_at)
+    cur.execute(
+        """INSERT INTO pit_reservations(pit_box_id,session_id,team_id,starts_at,ends_at)
         VALUES (%s,%s,%s,%s,%s)""",
-        (box_one, session_id, team_id, now + __import__('datetime').timedelta(minutes=10),
-         now + __import__('datetime').timedelta(minutes=20)))
-    cur.execute("SELECT reserve_pit_box_auto(%s,%s,%s,interval '5 minutes')",
-                (session_id, team_id, drivers[0]))
+        (
+            box_one,
+            session_id,
+            team_id,
+            now + __import__("datetime").timedelta(minutes=10),
+            now + __import__("datetime").timedelta(minutes=20),
+        ),
+    )
+    cur.execute(
+        "SELECT reserve_pit_box_auto(%s,%s,%s,interval '5 minutes')",
+        (session_id, team_id, drivers[0]),
+    )
     first_id = cur.fetchone()[0]
-    cur.execute("SELECT b.number,r.starts_at,r.allocation_source,r.driver_id FROM pit_reservations r "
-                "JOIN pit_boxes b ON b.id=r.pit_box_id WHERE r.id=%s", (first_id,))
+    cur.execute(
+        "SELECT b.number,r.starts_at,r.allocation_source,r.driver_id FROM pit_reservations r "
+        "JOIN pit_boxes b ON b.id=r.pit_box_id WHERE r.id=%s",
+        (first_id,),
+    )
     number, starts_at, source, assigned_driver = cur.fetchone()
     assert number == 1
-    assert starts_at < now + __import__('datetime').timedelta(minutes=10)
+    assert starts_at < now + __import__("datetime").timedelta(minutes=10)
     assert source == "AUTOMATIC" and assigned_driver == drivers[0]
 
-    cur.execute("SELECT reserve_pit_box_auto(%s,%s,NULL,interval '5 minutes')", (session_id, team_id))
+    cur.execute(
+        "SELECT reserve_pit_box_auto(%s,%s,NULL,interval '5 minutes')", (session_id, team_id)
+    )
     second_id = cur.fetchone()[0]
-    cur.execute("SELECT r.driver_id,b.number,r.allocation_source FROM pit_reservations r "
-                "JOIN pit_boxes b ON b.id=r.pit_box_id WHERE r.id=%s", (second_id,))
+    cur.execute(
+        "SELECT r.driver_id,b.number,r.allocation_source FROM pit_reservations r "
+        "JOIN pit_boxes b ON b.id=r.pit_box_id WHERE r.id=%s",
+        (second_id,),
+    )
     assigned_driver, number, source = cur.fetchone()
     assert assigned_driver == drivers[1]
     assert number == 2
     assert source == "AUTOMATIC"
 
     with pytest.raises(Exception) as error:
-        cur.execute("SELECT reserve_pit_box_auto(%s,%s,%s,interval '5 minutes')",
-                    (session_id, team_id, drivers[0]))
+        cur.execute(
+            "SELECT reserve_pit_box_auto(%s,%s,%s,interval '5 minutes')",
+            (session_id, team_id, drivers[0]),
+        )
     assert _sqlstate(error.value) == "23505"
 
 
 def test_concurrent_auto_allocations_serialize_on_event(db):
     import threading
+
     _, cur = db
     now, event_id, session_id, team_id, drivers = _auto_pit_fixture(cur)
     assert len(drivers) == 2
@@ -617,8 +648,10 @@ def test_concurrent_auto_allocations_serialize_on_event(db):
             cursor = conn.cursor()
             try:
                 barrier.wait(timeout=3)
-                cursor.execute("SELECT reserve_pit_box_auto(%s,%s,%s,interval '5 minutes')",
-                               (session_id, team_id, driver_id))
+                cursor.execute(
+                    "SELECT reserve_pit_box_auto(%s,%s,%s,interval '5 minutes')",
+                    (session_id, team_id, driver_id),
+                )
                 reservation_id = cursor.fetchone()[0]
                 conn.commit()
                 results.append(reservation_id)
@@ -628,8 +661,10 @@ def test_concurrent_auto_allocations_serialize_on_event(db):
             finally:
                 cursor.close()
 
-        workers = [threading.Thread(target=allocate, args=(conn, driver), daemon=True)
-                   for conn, driver in zip(conns, drivers, strict=True)]
+        workers = [
+            threading.Thread(target=allocate, args=(conn, driver), daemon=True)
+            for conn, driver in zip(conns, drivers, strict=True)
+        ]
         for worker in workers:
             worker.start()
         for worker in workers:
@@ -637,8 +672,9 @@ def test_concurrent_auto_allocations_serialize_on_event(db):
         assert all(not worker.is_alive() for worker in workers)
         assert not errors
         assert len(results) == 2
-        cur.execute("SELECT count(DISTINCT pit_box_id) FROM pit_reservations WHERE id=ANY(%s)",
-                    (results,))
+        cur.execute(
+            "SELECT count(DISTINCT pit_box_id) FROM pit_reservations WHERE id=ANY(%s)", (results,)
+        )
         assert cur.fetchone()[0] == 2
     finally:
         for conn in conns:
