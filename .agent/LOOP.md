@@ -92,6 +92,7 @@ score: NOT_RUN
 - Existing Playwright config and 16-route smoke test require stronger authenticated journey coverage. Login keyboard audit and responsive run are open from prior work.
 
 ## Findings
+- T-155 moved generated-race DELETE registration and orchestration into demo_race_router, retained call-time main wrapper for direct unit tests, and preserved auth/HTTP/transaction order. accept.sh reran 5 focused checks on apexgrid-test. Ruff improved 554→553, mypy 227→226; full isolated backend passed 119 with zero failures/skips/xfails and live acceptance passed (2026-10-23).
 - T-154 moved generated-race DELETE SQL, including standings recalculation and conditional generated-driver/user cleanup, to a typed same-cursor repository helper after simulator stop. Mandatory accept.sh reran 4 focused checks on apexgrid-test; Ruff improved 555→554, mypy stayed 227. Full isolated gate remains pending before DELETE route extraction (2026-10-23).
 - T-153 moved six generated-race DELETE conflict queries to a typed same-cursor repository helper. Worker socket denial required orchestrator rerun; four focused checks passed, Ruff 555/mypy 227 (2026-10-22).
 - T-152 moved generated-race POST to APIRouter and retained direct-call compatibility. Worker socket denial required orchestrator seeded rerun: 3/3 passed. Ruff improved to 556, mypy strict to 227; broader disposable gate pending (2026-10-22).
