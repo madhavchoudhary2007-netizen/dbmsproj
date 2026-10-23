@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 3146736
+git_head: 5b0b7e4
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -43,3 +43,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T-320 accepted4789586: Close failing-first security milestone from accepted W3 children T-44133/T-44134 and their recorded red baselines; current 18 focused assertions pass after accepted implementations. Verify exit0; 0 changed lines.
 
 - T-323 accepted3146736: Close JWT revocation from accepted repository, additive migration, HTTP/WS enforcement and edge-test children. Root isolated full suite: 184 passed, zero skips, and live acceptance passed. Verify exit0; 0 changed lines.
+
+- T-44146 accepted5b0b7e4: Added an OpenAPI compatibility guard, captured the current schema snapshot, and added regression cases for breaking and additive changes. Verify exit0; 144 changed lines.

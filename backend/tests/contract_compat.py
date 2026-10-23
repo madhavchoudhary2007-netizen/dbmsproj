@@ -2,13 +2,39 @@ HTTP_METHODS = {"get", "put", "post", "delete", "options", "head", "patch", "tra
 
 
 def _resolve(schema, document):
+    seen = set()
     while "$ref" in schema:
         ref = schema["$ref"]
+        if ref in seen:
+            raise AssertionError(f"circular schema reference: {ref}")
+        seen.add(ref)
         if not ref.startswith("#/components/schemas/"):
             raise AssertionError(f"unsupported schema reference: {ref}")
         name = ref.rsplit("/", 1)[1].replace("~1", "/").replace("~0", "~")
         schema = document["components"]["schemas"][name]
     return schema
+
+
+def _check_union(old, new, old_doc, new_doc, seen, keyword):
+    if keyword not in new:
+        raise AssertionError(f"schema {keyword} branches were removed")
+    for old_branch in old[keyword]:
+        failure = None
+        for new_branch in new[keyword]:
+            try:
+                _schema_compatible(old_branch, new_branch, old_doc, new_doc, set(seen))
+                break
+            except AssertionError as error:
+                failure = error
+        else:
+            if failure:
+                raise failure
+            raise AssertionError(f"schema {keyword} branches were removed")
+
+
+def _check_enum(old, new):
+    if "enum" in old and "enum" in new and not set(old["enum"]) <= set(new["enum"]):
+        raise AssertionError("schema enum values were removed")
 
 
 def _schema_compatible(old, new, old_doc, new_doc, seen):
@@ -31,6 +57,10 @@ def _schema_compatible(old, new, old_doc, new_doc, seen):
         if "items" not in new:
             raise AssertionError("schema items were removed")
         _schema_compatible(old["items"], new["items"], old_doc, new_doc, seen)
+    _check_enum(old, new)
+    for keyword in ("anyOf", "oneOf", "allOf"):
+        if keyword in old:
+            _check_union(old, new, old_doc, new_doc, seen, keyword)
 
 
 def assert_compatible(expected: dict, actual: dict) -> None:

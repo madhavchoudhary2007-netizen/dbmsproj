@@ -3,15 +3,16 @@ updated_at: 2026-10-23
 phase: 3 API contract guard (Phases0–2 complete; baseline score51.2974)
 
 ## Queue
-### T-44146 W3 — OPEN
-- target_files: backend/tests/contract_compat.py, backend/tests/test_contract_snapshot.py, backend/tests/snapshots/openapi.json
-- contract: Phase3 T330 child1: add backward-compatible OpenAPI snapshot guard BEFORE anyrefactor, plusnegative self-tests. Generate baselinefromcurrentapp.openapi() withoutlifespan/DB. snapshotJSONmachinefixture serializecompact canonicaljson(sortkeys,separators)+newline (neverprintcontents). Testscomparecurrentapp withcapturedfixture. No API/productedits. ParentT330 real10GETgoldens followsseparateboundedtask.
-- verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/pytest -q backend/tests/test_contract_snapshot.py && .venv/bin/ruff check backend/tests/contract_compat.py backend/tests/test_contract_snapshot.py && .venv/bin/ruff format --check backend/tests/contract_compat.py backend/tests/test_contract_snapshot.py
+### T-44147 W3 — OPEN
+- target_files: backend/tests/contract_compat.py, backend/tests/test_contract_compat_unions.py
+- contract: T330 guard gap found duringrootreview: current comparator ignores responsefields/types behind anyOf/oneOf/allOf and enumvalues, so nestedrequiredfieldremovalcanpass. Add failing tests first for union/ref nestedfield/type/enum removals, record actual red then fix ONLY testhelper; no productedits. Preserve existing9cases. Additivepaths/properties/unionbranches/refrenameequivalence stillpass. No refactoruntilallguardgapsclosed.
+- verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_contract_compat_unions.py && .venv/bin/ruff check backend/tests/contract_compat.py backend/tests/test_contract_compat_unions.py && .venv/bin/ruff format --check backend/tests/contract_compat.py backend/tests/test_contract_compat_unions.py
 
 ## Blocked
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44146 accepted5b0b7e4; verify0.
 - T-323 accepted3146736; verify0.
 - T-320 accepted4789586; verify0.
 - T-44145 accepted8f721ae; verify0.
