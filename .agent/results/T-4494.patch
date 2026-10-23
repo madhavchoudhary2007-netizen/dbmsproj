@@ -1,0 +1,215 @@
+diff --git a/backend/tests/test_api.py b/backend/tests/test_api.py
+index b332b66..68648c3 100644
+--- a/backend/tests/test_api.py
++++ b/backend/tests/test_api.py
+@@ -1878,16 +1878,22 @@ def test_pit_read_characterization(database_api_client):
+     assert seeded, "expected a seeded event with pit boxes and a reservation-free session"
+ 
+     client.cookies.clear()
+-    for path in (f"/api/pit-boxes?event_id={seeded['event_id']}",
+-                 f"/api/pit-reservations?session_id={seeded['session_id']}"):
++    for path in (
++        f"/api/pit-boxes?event_id={seeded['event_id']}",
++        f"/api/pit-reservations?session_id={seeded['session_id']}",
++    ):
+         anonymous = client.get(path)
+         assert anonymous.status_code == 401, anonymous.text
+         assert anonymous.json() == {"detail": "Authentication required"}
+         assert anonymous.headers["www-authenticate"] == "Bearer"
+ 
+-    login = client.post("/api/auth/login", json={
+-        "email": "admin@apexgrid.test", "password": "ApexGrid2026!",
+-    })
++    login = client.post(
++        "/api/auth/login",
++        json={
++            "email": "admin@apexgrid.test",
++            "password": "ApexGrid2026!",
++        },
++    )
+     assert login.status_code == 200, login.text
+     headers = {"Authorization": "Bearer " + login.json()["access_token"]}
+     client.cookies.clear()
+@@ -1896,9 +1902,21 @@ def test_pit_read_characterization(database_api_client):
+     assert boxes_response.status_code == 200, boxes_response.text
+     boxes = boxes_response.json()
+     assert isinstance(boxes, list) and boxes
+-    box_keys = {"id", "event_id", "number", "reservation_id", "session_id", "driver_id",
+-                "allocation_source", "starts_at", "ends_at", "status", "team_name",
+-                "driver_name", "driver_number"}
++    box_keys = {
++        "id",
++        "event_id",
++        "number",
++        "reservation_id",
++        "session_id",
++        "driver_id",
++        "allocation_source",
++        "starts_at",
++        "ends_at",
++        "status",
++        "team_name",
++        "driver_name",
++        "driver_number",
++    }
+     assert all(set(box) == box_keys for box in boxes)
+     assert [box["number"] for box in boxes] == sorted(box["number"] for box in boxes)
+     assert all(box["event_id"] == str(seeded["event_id"]) for box in boxes)
+@@ -1909,15 +1927,15 @@ def test_pit_read_characterization(database_api_client):
+     assert reservations_response.status_code == 200, reservations_response.text
+     assert reservations_response.json() == []
+ 
+-    for path in ("/api/pit-boxes?event_id=not-a-uuid",
+-                 "/api/pit-reservations?session_id=not-a-uuid"):
++    for path in (
++        "/api/pit-boxes?event_id=not-a-uuid",
++        "/api/pit-reservations?session_id=not-a-uuid",
++    ):
+         invalid = client.get(path, headers=headers)
+         assert invalid.status_code == 422, invalid.text
+ 
+ 
+-@pytest.mark.skipif(
+-    not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database"
+-)
++@pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
+ @pytest.mark.parametrize(
+     ("resource", "create_fields", "patch_fields", "missing_detail"),
+     [
+@@ -1934,14 +1952,22 @@ def test_crud_write_characterization(
+     database_api_client, resource, create_fields, patch_fields, missing_detail
+ ):
+     client = database_api_client
+-    admin_login = client.post("/api/auth/login", json={
+-        "email": "admin@apexgrid.test", "password": "ApexGrid2026!",
+-    })
++    admin_login = client.post(
++        "/api/auth/login",
++        json={
++            "email": "admin@apexgrid.test",
++            "password": "ApexGrid2026!",
++        },
++    )
+     assert admin_login.status_code == 200, admin_login.text
+     admin_headers = {"Authorization": "Bearer " + admin_login.json()["access_token"]}
+-    driver_login = client.post("/api/auth/login", json={
+-        "email": "driver01@apexgrid.test", "password": "ApexGrid2026!",
+-    })
++    driver_login = client.post(
++        "/api/auth/login",
++        json={
++            "email": "driver01@apexgrid.test",
++            "password": "ApexGrid2026!",
++        },
++    )
+     assert driver_login.status_code == 200, driver_login.text
+     driver_headers = {"Authorization": "Bearer " + driver_login.json()["access_token"]}
+ 
+@@ -2023,9 +2049,13 @@ def test_crud_delete_guard_characterization(database_api_client):
+     }
+     client = database_api_client
+     client.cookies.clear()
+-    login = client.post("/api/auth/login", json={
+-        "email": "admin@apexgrid.test", "password": "ApexGrid2026!",
+-    })
++    login = client.post(
++        "/api/auth/login",
++        json={
++            "email": "admin@apexgrid.test",
++            "password": "ApexGrid2026!",
++        },
++    )
+     assert login.status_code == 200, login.text
+     headers = {"Authorization": "Bearer " + login.json()["access_token"]}
+     client.cookies.clear()
+@@ -2054,10 +2084,14 @@ def test_crud_delete_guard_characterization(database_api_client):
+ 
+ @pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
+ def test_admin_lock_demo_observes_real_wait_and_exclusion_rejection(database_api_client):
+-    client=database_api_client
+-    login = client.post("/api/auth/login", json={"email":"admin@apexgrid.test", "password":"ApexGrid2026!"})
++    client = database_api_client
++    login = client.post(
++        "/api/auth/login", json={"email": "admin@apexgrid.test", "password": "ApexGrid2026!"}
++    )
+     assert login.status_code == 200, login.text
+-    response = client.post("/api/dbms/lock-demo", headers={"Authorization":"Bearer "+login.json()["access_token"]})
++    response = client.post(
++        "/api/dbms/lock-demo", headers={"Authorization": "Bearer " + login.json()["access_token"]}
++    )
+     assert response.status_code == 200, response.text
+     result = response.json()
+     assert result["lock_wait_observed"] is True
+@@ -2069,30 +2103,50 @@ def test_admin_lock_demo_observes_real_wait_and_exclusion_rejection(database_api
+ 
+ @pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
+ def test_admin_user_management_and_protected_driver_session_fields(database_api_client):
+-    suffix=uuid4().hex[:10]
+-    email=f"new-{suffix}@apexgrid.test"
+-    driver_id=None
+-    session_id=None
+-    user_id=None
+-    client=database_api_client
+-    admin_login=client.post("/api/auth/login",json={"email":"admin@apexgrid.test","password":"ApexGrid2026!"})
+-    assert admin_login.status_code==200,admin_login.text
+-    admin_headers={"Authorization":"Bearer "+admin_login.json()["access_token"]}
++    suffix = uuid4().hex[:10]
++    email = f"new-{suffix}@apexgrid.test"
++    driver_id = None
++    session_id = None
++    user_id = None
++    client = database_api_client
++    admin_login = client.post(
++        "/api/auth/login", json={"email": "admin@apexgrid.test", "password": "ApexGrid2026!"}
++    )
++    assert admin_login.status_code == 200, admin_login.text
++    admin_headers = {"Authorization": "Bearer " + admin_login.json()["access_token"]}
+     try:
+-        created=client.post("/api/users",headers=admin_headers,json={"email":email,"full_name":"API Test Driver","password":"InitialPass2026!","role":"DRIVER"})
+-        assert created.status_code==201,created.text
+-        user=created.json(); user_id=user["id"]
++        created = client.post(
++            "/api/users",
++            headers=admin_headers,
++            json={
++                "email": email,
++                "full_name": "API Test Driver",
++                "password": "InitialPass2026!",
++                "role": "DRIVER",
++            },
++        )
++        assert created.status_code == 201, created.text
++        user = created.json()
++        user_id = user["id"]
+         assert "password_hash" not in user
+-        assert client.get(f"/api/users/{user_id}",headers=admin_headers).json()["email"]==email
+-        listing=client.get("/api/users",headers=admin_headers)
+-        assert listing.status_code==200 and all("password_hash" not in row for row in listing.json())
+-
+-        changed=client.patch(f"/api/users/{user_id}",headers=admin_headers,json={"password":"ChangedPass2026!"})
+-        assert changed.status_code==200 and "password_hash" not in changed.json()
+-        old_login=client.post("/api/auth/login",json={"email":email,"password":"InitialPass2026!"})
+-        new_login=client.post("/api/auth/login",json={"email":email,"password":"ChangedPass2026!"})
+-        assert old_login.status_code==401
+-        assert new_login.status_code==200
++        assert client.get(f"/api/users/{user_id}", headers=admin_headers).json()["email"] == email
++        listing = client.get("/api/users", headers=admin_headers)
++        assert listing.status_code == 200 and all(
++            "password_hash" not in row for row in listing.json()
++        )
++
++        changed = client.patch(
++            f"/api/users/{user_id}", headers=admin_headers, json={"password": "ChangedPass2026!"}
++        )
++        assert changed.status_code == 200 and "password_hash" not in changed.json()
++        old_login = client.post(
++            "/api/auth/login", json={"email": email, "password": "InitialPass2026!"}
++        )
++        new_login = client.post(
++            "/api/auth/login", json={"email": email, "password": "ChangedPass2026!"}
++        )
++        assert old_login.status_code == 401
++        assert new_login.status_code == 200
+ 
+         created_driver=client.post("/api/drivers",headers=admin_headers,json={"user_id":user_id,"licence_number":f"TEST-{suffix}","number":900+random.randrange(100),"eligibility":"RACE_BANNED"})  # noqa: S311 -- seeded pseudo-random driver number is non-security API test data
+         assert created_driver.status_code==201,created_driver.text
