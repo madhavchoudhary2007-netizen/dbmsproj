@@ -1802,6 +1802,7 @@ dbms_indexes = dbms_sql_handlers["dbms_indexes"]
 dbms_locks = dbms_sql_handlers["dbms_locks"]
 dbms_eer = dbms_sql_handlers["dbms_eer"]
 dbms_explain = dbms_sql_handlers["dbms_explain"]
+dbms_races = dbms_sql_handlers["dbms_races"]
 constraint_demo = dbms_sql_handlers["constraint_demo"]
 transaction_demo = dbms_sql_handlers["transaction_demo"]
 app.include_router(dbms_sql_router)
@@ -1889,21 +1890,6 @@ def dbms_table_rows(
             "offset": offset,
             "updated_at": datetime.now(UTC),
         }
-    )
-
-
-@app.get("/api/dbms/races")
-def dbms_races(user=admin_dependency):
-    return jsonable(
-        fetch_all(
-            """SELECT s.id,s.state,s.total_laps,s.started_at,s.ended_at,e.name AS """
-            """event_name,c.name AS circuit_name
-      FROM race_sessions s JOIN race_events e ON e.id=s.event_id JOIN circuits c ON """
-            """c.id=e.circuit_id LEFT JOIN demo_races d ON d.session_id=s.id
-      WHERE s.session_type='RACE' ORDER BY CASE WHEN s.state='ACTIVE' THEN 0 WHEN """
-            """s.state='PAUSED' THEN 1 ELSE 2 END,COALESCE(d.auto_repeat,false) """
-            """DESC,s.scheduled_at DESC"""
-        )
     )
 
 

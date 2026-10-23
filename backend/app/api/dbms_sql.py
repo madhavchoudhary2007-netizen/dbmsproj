@@ -152,6 +152,20 @@ def create_dbms_sql_router(
             plan = cur.fetchone()[0]
         return {"query": query, "plan": plan}
 
+    @router.get("/api/dbms/races")
+    def dbms_races(user=admin_dependency):
+        return jsonable(
+            fetch_all(
+                """SELECT s.id,s.state,s.total_laps,s.started_at,s.ended_at,e.name AS """
+                """event_name,c.name AS circuit_name
+      FROM race_sessions s JOIN race_events e ON e.id=s.event_id JOIN circuits c ON """
+                """c.id=e.circuit_id LEFT JOIN demo_races d ON d.session_id=s.id
+      WHERE s.session_type='RACE' ORDER BY CASE WHEN s.state='ACTIVE' THEN 0 WHEN """
+                """s.state='PAUSED' THEN 1 ELSE 2 END,COALESCE(d.auto_repeat,false) """
+                """DESC,s.scheduled_at DESC"""
+            )
+        )
+
     demo_handlers = _register_demo_handlers(router, admin_dependency, connection)
 
     return router, {
@@ -160,5 +174,6 @@ def create_dbms_sql_router(
         "dbms_locks": dbms_locks,
         "dbms_eer": dbms_eer,
         "dbms_explain": dbms_explain,
+        "dbms_races": dbms_races,
         **demo_handlers,
     }

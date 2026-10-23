@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 20466aa
+git_head: 86e0b47
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -31,8 +31,12 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - Architecture/ADRs/docs/state/packets/envelopes/orchestration helpers and root-owned planned dependency installs only. Zero authored product lines; integrating worker patches is not product authorship. Canonical lock operation bypassed autoGit tail only to honor accept-only; independently verified.
 
 ## Recent acceptance / review
-- Health/SQL pure moves through7c6c086 preserve AST/main aliases. Full214PASS0skip/livePASS through EXPLAIN; latest rollback-demo rootrun active. Ruff0/mypy217errors16/43files. Typed temporary factory helpers required by C901; T332 replaces them.
+- Health/SQL pure moves through7c6c086 preserve AST/main aliases. Full214PASS0skip/livePASS through EXPLAIN; latest Mongo move full214PASS0skip/livePASS. Ruff0/mypy216errors17/44files after typed Collection boundary. Typed temporary factory helpers required by C901; T332 replaces them.
 - T360 shadow66c4550/contrastd0e50ef/wiringb549015/motionc64e793 accepted with regression repairs. Shared neo actual10legacyCSSviolations; motion wrapper next. No thresholds weakened. Counts/static boundary not delivery proof.
 - Root corrected FastAPI included-router probe, mypy namespace, and underestimated C901 (typed helper retained after observed11>10). Worker placeholder Verify formats normalized then exact command rerun.
 
 - T-44181 accepted20466aa: Moved unchanged overview/telemetry handlers into typed Mongo factory with main aliases and late callbacks. Verify0.
+
+- T-44182 accepted86e0b47: Integrated CSS motion validator, fixture selftest and explicit file mode while retaining original layout/shadow/all bans. Verify0.
+
+- Motionwrapper86e0b47 selftest0; actual3legacytransition violations at globals146/294/1112, expected redesign gaps. Neo baseline10violations.

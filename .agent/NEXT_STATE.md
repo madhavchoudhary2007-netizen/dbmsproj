@@ -3,15 +3,21 @@ updated_at: 2026-10-23
 phase: 3 T331 extraction; Phase5 T360 lints / T361accepted (Phases0–2 complete; baseline51.2974)
 
 ## Queue
-### T-44182 W3 — OPEN
-- target_files: scripts/eval/lint-motion.sh
-- contract: T360 integrate accepted CSS motion validator into lint-motion.sh while preserving original assertions; add offline selftest/explicit file mode.
-- verify: bash -n scripts/eval/lint-motion.sh && bash scripts/eval/lint-motion.sh --self-test && bash scripts/eval/lint-motion.sh scripts/eval/rules/motion.good.css && ! bash scripts/eval/lint-motion.sh scripts/eval/rules/motion.bad.css
+### T-44184 W2 — OPEN
+- target_files: backend/app/api/dbms_sql.py, backend/app/main.py
+- contract: T331 move unchanged DBMS race-list handler into SQL router.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,importlib,inspect,subprocess; old=ast.parse(subprocess.check_output(["git","show","86e0b47:backend/app/main.py"],text=True)); a=next(n for n in old.body if isinstance(n,ast.FunctionDef) and n.name=="dbms_races"); a.decorator_list=[]; module=importlib.import_module("backend.app.api.dbms_sql"); b=next(n for n in ast.walk(ast.parse(inspect.getsource(module))) if isinstance(n,ast.FunctionDef) and n.name=="dbms_races"); b.decorator_list=[]; assert ast.dump(a)==ast.dump(b); main=importlib.import_module("backend.app.main"); routes=[r for outer in main.app.routes for r in (outer.original_router.routes if hasattr(outer,"original_router") else [outer])]; assert sum(getattr(r,"endpoint",None) is main.dbms_races for r in routes)==1; print("PASS exact race list and alias")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py && .venv/bin/ruff check backend/app/main.py backend/app/api/dbms_sql.py && .venv/bin/ruff format --check backend/app/main.py backend/app/api/dbms_sql.py
+
+### T-44183 W3 — OPEN
+- target_files: scripts/eval/palette.ts, scripts/eval/palette-core.ts
+- contract: T360 A3 role-pixel gate: extract exact existing nearest-role scoring into reusable typed core, make existing palette CLI executable offline with installed frontend Sharp, and selftest thresholds.
+- verify: node --experimental-strip-types scripts/eval/palette.ts --self-test
 
 ## Deferred
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44182 accepted86e0b47; verify0.
 - T-44181 accepted20466aa; verify0.
 - T-44179 acceptedc64e793; verify0.
 - T-44180 accepted7c6c086; verify0.
