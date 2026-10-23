@@ -43,7 +43,8 @@ from starlette.middleware.base import RequestResponseEndpoint
 from . import token_revocation
 from .analytics_router import create_analytics_router
 from .api.health import health_live as health_live
-from .api.health import register_readiness
+from .api.health import legacy_router as legacy_health_router
+from .api.health import register_legacy_health, register_readiness
 from .api.health import router as health_router
 from .auth_cookie import verify_csrf_token
 from .auth_router import create_auth_router
@@ -1769,23 +1770,8 @@ async def session_ws(ws: WebSocket, session_id: UUID):
 app.include_router(create_analytics_router(current_user, jsonable))
 
 
-@app.get("/api/health", response_model=None)
-def health() -> HealthReport:
-    state: dict[str, Literal["up", "down"]] = {
-        "postgres": "down",
-        "mongodb": "down",
-    }
-    with suppress(Exception):
-        fetch_one("SELECT 1 AS ok")
-        state["postgres"] = "up"
-    with suppress(Exception):
-        if mongo_client:
-            mongo_client.admin.command("ping")
-            state["mongodb"] = "up"
-    return {
-        "status": "ok" if all(v == "up" for v in state.values()) else "degraded",
-        "services": state,
-    }
+health = register_legacy_health(lambda query: fetch_one(query), lambda: mongo_client)
+app.include_router(legacy_health_router)
 
 
 health_ready = register_readiness(

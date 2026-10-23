@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 64214d6
+git_head: 4e8f466
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -31,3 +31,7 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - Architecture/ADRs/docs/state/packets/envelopes/orchestration helpers and root-owned planned dependency installs only. Zero authored product lines; integrating worker patches is not product authorship. Canonical lock operation bypassed autoGit tail only to honor accept-only; independently verified.
 
 - T44168first result FAILED because root identity probe assumed flat FastAPIapp.routes; installed _IncludedRouter uses original_router. Root corrected traversal with exact-one endpoint identity (no HTTP/assertionthreshold change), restored only its clone target files, requested repair1. Worker separately ran21HTTP/snapshotPASS.
+
+- T-44168 accepted4e8f466: Moved readiness body unchanged into typed health registration; main aliases and late-bound callbacks preserve behavior.21 tests pass after root introspection fix. Verify0.
+
+- Root rejected T44167 beforeaccept: solid bg arbitrary utility falsely countedgradient. Repair1 plus exactform counts requested. Root rejected T44169 beforeaccept: prose object string/lineheight900 falsepositives, conditional font-black missed. Repair1 requested; both diffs remain isolated/referenced in clones.
