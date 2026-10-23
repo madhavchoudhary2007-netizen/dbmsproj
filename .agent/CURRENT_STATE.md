@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 4789586
+git_head: 3146736
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -34,10 +34,12 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - Phase1 fresh dimension artifactsT44123..26 accepted; historical commit detail in git. ADR011T44130/lockdb26; only2newhealthpaths acceptedT44129a3c0554 with6PASS and exactexistingOpenAPI preservation. T44136 fixed missingleaseexpecteddown testbug beforeacceptance.
 - Phase2 T44133/T44134 redtests accepted; T321CORS3PASS; T44135repo5red thenT44137repository/migration37lines5PASS/mypy0. T322all12header/CORS/healthPASS,mypy0. Migration004appliedonlydisposableapexgrid-test; realDBunchanged. No authoredorchestratorproductlines.
 
-- Phase2 accepted T321caf033f,T322a12bc68,T32461643df,T3252bff831 andboundedchildren in git. Revocationruntime12edd4e focused23PASS; edges3bb47c9 8PASS; realrepo9b8322c root4PASS transactionsrollback; 004appliedonlyapexgrid-test. Full180PASS0skip/livePASS beforedocsregressionfix; final184-suite running.
+- Phase2 accepted T321caf033f,T322a12bc68,T32461643df,T3252bff831 andboundedchildren in git. Revocationruntime12edd4e focused23PASS; edges3bb47c9 8PASS; realrepo9b8322c root4PASS transactionsrollback; 004appliedonlyapexgrid-test. Full180PASS0skip/livePASS beforedocsregressionfix; final184passed0failed/skipped/xfail+livePASS; T323accept rerun184PASS/livePASS.
 - T44142types42f0a46 fixesnewerrors; globalmypy217errors11/33files (T339), nofresherrorsleft. AlloldOpenAPIentriesunchanged; onlyADR011healthpathsadded. T324rootbuild/lint/types0+85axe/reducedmotionPASS; productionCSPsanitizedHTTPS/WSS/noevalcheck0. Inlinebootstrapcompatibilityrequiresunsafe-inline, dev-onlyunsafe-eval.
-- T44144testcaughtSwagger/ReDocbreakfromAPIdefaultnonepolicy; T44145 8f721ae exemptsONLY3legacyHTMLdocspaths, retainsAPI/404strictCSP,16testsPASS/mypy0. NoAPIshapechange. Rootfullrerunpending.
+- T44144testcaughtSwagger/ReDocbreakfromAPIdefaultnonepolicy; T44145 8f721ae exemptsONLY3legacyHTMLdocspaths, retainsAPI/404strictCSP,16testsPASS/mypy0. NoAPIshapechange. Rootfull184PASS/livePASS afterfix.
 - T44146Phase3OpenAPIguardpacketprepared, NOTdispatcheduntilPhase2closure. T33010GETgoldens follows; no refactorbeforeguard.
 - Ownacceptancehelper preservesNextgeneratednext-env bytes finally duringbuild (same3gates rerun); rootdidnot authorproductcode. Allsourcechecks/proofs in .agent/results/*.raw.log; onlyacceptedchildmetadata/state tracked.
 
 - T-320 accepted4789586: Close failing-first security milestone from accepted W3 children T-44133/T-44134 and their recorded red baselines; current 18 focused assertions pass after accepted implementations. Verify exit0; 0 changed lines.
+
+- T-323 accepted3146736: Close JWT revocation from accepted repository, additive migration, HTTP/WS enforcement and edge-test children. Root isolated full suite: 184 passed, zero skips, and live acceptance passed. Verify exit0; 0 changed lines.

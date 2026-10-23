@@ -1,13 +1,8 @@
 # NEXT_STATE
 updated_at: 2026-10-23
-phase: 2 security (Phase1 complete; baseline score51.2974)
+phase: 3 API contract guard (Phases0–2 complete; baseline score51.2974)
 
 ## Queue
-### T-323 Orchestrator — OPEN
-- target_files: backend/app/main.py, backend/app/auth_router.py, backend/app/token_revocation.py
-- contract: Close JWT revocation from accepted repository, additive migration, HTTP/WS enforcement and edge-test children. Root isolated full suite: 184 passed, zero skips, and live acceptance passed.
-- verify: bash scripts/eval/db-baseline.sh
-
 ### T-44146 W3 — OPEN
 - target_files: backend/tests/contract_compat.py, backend/tests/test_contract_snapshot.py, backend/tests/snapshots/openapi.json
 - contract: Phase3 T330 child1: add backward-compatible OpenAPI snapshot guard BEFORE anyrefactor, plusnegative self-tests. Generate baselinefromcurrentapp.openapi() withoutlifespan/DB. snapshotJSONmachinefixture serializecompact canonicaljson(sortkeys,separators)+newline (neverprintcontents). Testscomparecurrentapp withcapturedfixture. No API/productedits. ParentT330 real10GETgoldens followsseparateboundedtask.
@@ -17,6 +12,7 @@ phase: 2 security (Phase1 complete; baseline score51.2974)
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-323 accepted3146736; verify0.
 - T-320 accepted4789586; verify0.
 - T-44145 accepted8f721ae; verify0.
 - T-44144 accepted2e0345c; verify0.
