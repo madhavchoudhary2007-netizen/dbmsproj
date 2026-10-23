@@ -74,18 +74,13 @@ from .demo_race_router import (
     run_demo_race_create,
     run_demo_race_delete,
 )
-from .membership_repository import (
-    create_membership as create_membership_row,
-    list_driver_memberships,
-    list_team_memberships,
-    update_membership as update_membership_row,
-)
+from .membership_router import create_membership_router
 from .pit_repository import PIT_RESERVATION_SELECT, load_pit_strategy_rows, load_pit_telemetry
 from .pit_router import create_pit_router
 from .pit_strategy_router import create_pit_strategy_router
 from .pit_strategy_service import project_pit_strategy
 from .runtime_lease import acquire_runtime_lease, check_runtime_lease
-from .schemas_competition import MembershipIn, MembershipPatch, ResultIn
+from .schemas_competition import ResultIn
 from .schemas_operations import Action, AutoReservationIn, Decision, IncidentIn, ReservationIn
 from .schemas_simulation import DemoRaceCreate, SimulationControl
 from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
@@ -371,28 +366,7 @@ crud_routes("events", "race_events", ("id", "championship_id", "circuit_id", "ro
 crud_routes("sessions", "race_sessions", ("id", "event_id", "session_type", "scheduled_at", "total_laps", "safety_car"), "LEFT JOIN race_events e ON e.id=race_sessions.event_id LEFT JOIN circuits c ON c.id=e.circuit_id", "race_sessions.*,e.name AS event_name,c.name AS circuit_name")
 
 
-@app.get("/api/drivers/{driver_id}/memberships")
-def driver_memberships(driver_id: UUID, user=Depends(current_user)):
-    return jsonable(list_driver_memberships(driver_id))
-
-
-@app.get("/api/teams/{team_id}/memberships")
-def team_memberships(team_id: UUID, user=Depends(current_user)):
-    return jsonable(list_team_memberships(team_id))
-
-
-@app.post("/api/team-memberships", status_code=201)
-def create_membership(body: MembershipIn, user=Depends(roles("ADMIN"))):
-    return jsonable(create_membership_row(body))
-
-
-@app.patch("/api/team-memberships/{membership_id}")
-def update_membership(membership_id: UUID, body: MembershipPatch, user=Depends(roles("ADMIN"))):
-    if not body.model_dump(exclude_unset=True):
-        raise HTTPException(422,"At least one field is required")
-    row = update_membership_row(membership_id, body)
-    if not row: raise HTTPException(404,"Membership not found")
-    return jsonable(row)
+app.include_router(create_membership_router(current_user, roles, jsonable))
 
 
 app.include_router(
