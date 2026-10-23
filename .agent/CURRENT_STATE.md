@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 9efac10
+git_head: 2c78430
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -44,3 +44,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T44191red9efac10 accepted:9 missing-required-input assertions fail,2 positivecontrols pass; product/unit baseline intentionallyred untilW3T44193 helper repair. Tablemetadata2e9106e rootfull216 runs in its identical-source clone (before added testfile); finalrootfull227 required afterfix. T362hostbuild/lint/types0; browser85+4keyboard active, preservegeneratednextenv before any acceptance.
 
 - T44193 failed due root wrong Verify filename, not implementation: actualtest_contract_compat_unions.py. Reviewed51-line helper patch preserved; restored ownclonefile, repair1 requested with corrected path. T362host85axe+4keyboard PASS and build/lint/types0. No generatedfilechanges left.
+
+- T-44193 accepted2c78430: Strengthened required-input compatibility after9failing-first regressions;27 request/response/union tests pass, response rules preserved. Verify0.
