@@ -8,20 +8,16 @@ phase: 2 security (Phase1 complete; baseline score51.2974)
 - contract: Fix only 2 newly introduced mypy errors from security changes; preserveAPI/schema exactly. _purge_revocations token type is object|None notstr; annotateaccurately. health() untypedcall in newtypedready adds1error; typehealthresponse accurately withTypedDict and literalservices, suppressautomaticresponsemodelONLYvia explicitresponse_model=None toretainoldOpenAPI schema. No ignoreAnycast bypass. RootcomparesoldOpenAPIpaths after.
 - verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/pytest -q backend/tests/test_security_headers.py backend/tests/test_logout_revocation.py && .venv/bin/ruff check backend/app/main.py backend/app/auth_router.py && .venv/bin/ruff format --check backend/app/main.py backend/app/auth_router.py
 
-### T-44140 W3 — OPEN
-- target_files: backend/tests/test_auth_revocation_edges.py
-- contract: Add ADR008 offline auth-edge tests, targetnewfile, importing offline_auth fixture and signed_token from backend.tests.test_logout_revocation afterinsertingrootpath (perexistingtests). Cover malformedjti(empty/int/list)401, is_revoked outageHTTP503/WS4401, revoke_token outage503 withno clearedcookies, loginpurgecalledon successandcleanupfailure503(noissuance). Useephemeralsigningkeyfixture; noDB. Do nottestmissingexp asnewcontract; preserveexistinglegacy compatibility.
-- verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/pytest -q backend/tests/test_auth_revocation_edges.py && .venv/bin/ruff check backend/tests/test_auth_revocation_edges.py && .venv/bin/ruff format --check backend/tests/test_auth_revocation_edges.py
-
 ### T-324 W1 — OPEN
 - target_files: frontend/next.config.ts
 - contract: Add Next.js security responseheaders perplanT324 inconfig only. Keep allscreensandbehavior unchanged. No dependency/newUI. Rootwillrunbrowseraxeafteracceptance; workerbuildoffline/noports.
-- verify: npm --prefix frontend run build && npm --prefix frontend run lint && npm --prefix frontend run typecheck
+- verify: .venv/bin/python .agent/check-frontend-build.py
 
 ## Blocked
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44140 accepted3bb47c9; verify0.
 - T-44138 accepted12edd4e; verify0.
 - T-44139 accepted5e9584b; verify0.
 - T-322 accepteda12bc68; verify0.

@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 12edd4e
+git_head: 3bb47c9
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -39,3 +39,7 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T-44138 accepted12edd4e: Wired revocation checks into HTTP authentication and WebSocket handshakes; stored validated claims for logout; added logout revocation and login cleanup with PostgreSQL 503 handling. Verify exit0; 61 changed lines.
 
 - T44138 wiredrevocation accepted12edd4e23PASS; isolated004bootstrap0; fullbackendrunning. Freshmypy220 vs218 exposes2newannotations, T44142 fixesratchet beforephaseclose. T324clonebuild/lint/types0; rootacceptance+browserpending.
+
+- T-44140 accepted3bb47c9: Added offline tests for malformed jti values, revocation lookup and revoke outages, and login cleanup success and failure. Confirmed legacy and browser login behavior. Verify exit0; 112 changed lines.
+
+- T324 rootVerify wraps samebuild/lint/types torestoreonly Nextgeneratedtype-reference bytes finally, preventingbuildboundarynoise. Workerreported3tests actually3commands; accepted envelope records0tests, browsergate rootseparate.
