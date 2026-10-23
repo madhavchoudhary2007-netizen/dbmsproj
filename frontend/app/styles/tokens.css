@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  --color-*: initial;
+  --color-cream: #FFFDF5;
+  --color-paper: #FFFFFF;
+  --color-ink: #000000;
+  --color-red: #FF6B6B;
+  --color-yellow: #FFD93D;
+  --color-violet: #C4B5FD;
+  --color-mint: #7CF5B0;
+  --color-sky: #7CC4FF;
+
+  --spacing-*: initial;
+  --spacing-0: 0;
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+
+  --radius-*: initial;
+  --radius-none: 0;
+  --radius-full: 9999px;
+
+  --shadow-*: initial;
+  --shadow-nb-4: 4px 4px 0 0 #000;
+  --shadow-nb-8: 8px 8px 0 0 #000;
+  --shadow-nb-12: 12px 12px 0 0 #000;
+  --shadow-nb-16: 16px 16px 0 0 #000;
+
+  --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui;
+  --font-mono: var(--font-space-mono), ui-monospace;
+  --ease-mech: cubic-bezier(0.2, 0, 0, 1);
+}
+
+:root {
+  --nb-cream: var(--color-cream);
+  --nb-paper: var(--color-paper);
+  --nb-ink: var(--color-ink);
+  --nb-red: var(--color-red);
+  --nb-yellow: var(--color-yellow);
+  --nb-violet: var(--color-violet);
+  --nb-mint: var(--color-mint);
+  --nb-sky: var(--color-sky);
+  --nb-border: 4px solid #000;
+  --nb-radius-none: var(--radius-none);
+  --nb-radius-full: var(--radius-full);
+  --nb-shadow-4: var(--shadow-nb-4);
+  --nb-shadow-8: var(--shadow-nb-8);
+  --nb-shadow-12: var(--shadow-nb-12);
+  --nb-shadow-16: var(--shadow-nb-16);
+  --fs-display: clamp(3rem, 1.944rem + 4.507vw, 6rem);
+  --fs-h1: clamp(2rem, 1.472rem + 2.254vw, 3.5rem);
+  --fs-h2: clamp(1.75rem, 1.31rem + 1.878vw, 3rem);
+  --fs-h3: clamp(1.25rem, 1.074rem + 0.751vw, 1.75rem);
+  --fs-body: clamp(1rem, 0.956rem + 0.1878vw, 1.125rem);
+  --fs-label: clamp(0.75rem, 0.706rem + 0.188vw, 0.875rem);
+  --fs-data: 0.9375rem;
+}
