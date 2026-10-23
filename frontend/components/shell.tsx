@@ -84,16 +84,16 @@ export function Shell({ children }: { children: React.ReactNode }) {
   }, [open]);
   if (!ready || (user && path === "/login"))
     return (
-      <div className="loading-screen">
+      <main className="loading-screen" id="main-content" tabIndex={-1}>
         APEXGRID <span>Checking session…</span>
-      </div>
+      </main>
     );
   if (!user) {
-    if (path === "/" || path === "/login") return <>{children}</>;
+    if (path === "/" || path === "/login") return <main id="main-content" tabIndex={-1}>{children}</main>;
     return (
-      <div className="loading-screen">
+      <main className="loading-screen" id="main-content" tabIndex={-1}>
         APEXGRID <span>Redirecting to sign in…</span>
-      </div>
+      </main>
     );
   }
   return (
@@ -173,7 +173,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             {user.role}
           </div>
         </header>
-        <main className="content">{children}</main>
+        <main className="content" id="main-content" tabIndex={-1}>{children}</main>
         <footer className="footer">
           <span>APEXGRID MOTORSPORT OPERATIONS</span>
           <span>CONTROL SYSTEM · BUILD 1.0</span>

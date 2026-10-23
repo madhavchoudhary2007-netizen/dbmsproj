@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 7eeb81d
+git_head: 2ad337f
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -8,7 +8,7 @@ archetype: Neo-Brutal Motorsport (light); ADR007 approved
 last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF4; NOT_RUN P1/P2; notpresentable
 
 ## Phase and verified facts
-- Phases0–2 complete; owner requests all12, unattended. Phase3 T330 complete, T331 extraction in progress. Phase5 T361 accepted1e61efd, T360 lints in progress; T362 waits for both per plan§4. No later-phase completion claimed.
+- Phases0–2 complete; owner requests all12, unattended. Phase3 T330 complete, T331 extraction in progress. Phase5 T361 accepted1e61efd, T360 accepted2ad337f; T362 fonts/skip now next per plan§4. No later-phase completion claimed.
 - Phase1 acceptedT31035578c9/T3118570e58/T312e0f7adf/T3134089fb6/T314c0c8061. Root144PASS0skip/livePASS; browser1005PASS5projects. HostedCI NOT_RUN. Evidence/history in git/phase1.evidence.json.
 - Phase2 parents T3204789586/T321caf033f/T322a12bc68/T3233146736/T32461643df/T3252bff831 accepted. JWTrevocation ADR008/migration004 onlydisposable; logoutreuse401/WS4401, CSRF/legacy/outage/expiry tests. ADR011 live/ready probes. Full184PASS0skip/livePASS twice. CSPbuild/lint/types0+85axePASS. Inlinebootstrap unsafe-inline compatibility retained; unsafe-eval devonly. T441458f721ae preserves exact3HTMLdocs routes,16testsPASS, APIs strict.
 - T3303afff87 complete: snapshot9+union7+realGETgoldens14=30PASS; full214PASS0skip/livePASS. Fixture captures own SQLtransaction, rolls back0own users/sessions. Existing API snapshot permanent gate. No API/schema changes in current moves.
@@ -47,3 +47,7 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T-44187 accepted3c10f63: Extended shadow gate to JSX utilities/conditional classes, important variants and mobile-aware caps with regression controls. Verify0.
 
 - T-44188 accepted7eeb81d: Moved exact Mongo document handler; removed stale duplicate list decorator and unneeded wrapper.11 contract/runtime registration tests pass. Verify0.
+
+- T-360 accepted2ad337f: Closed accepted lint/palette setup; global legacy10neo/3motion and actual light-palette failure remain recorded for redesign, no skips or widened gates. Verify0.
+
+- Duplicate route correction7eeb81d passes11snapshot/runtime tests after red3343d87; full216test rerun active. Staticshadow utility3c10f63 accepted. Root212+ tests must remain green; no false claim all phases complete.
