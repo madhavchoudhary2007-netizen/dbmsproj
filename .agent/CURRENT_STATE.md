@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 61643df
+git_head: 42f0a46
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -45,3 +45,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T324 rootVerify wraps samebuild/lint/types torestoreonly Nextgeneratedtype-reference bytes finally, preventingbuildboundarynoise. Workerreported3tests actually3commands; accepted envelope records0tests, browsergate rootseparate.
 
 - T-324 accepted61643df: Added CSP and security response headers. API and WebSocket origins derive from the sanitized API URL; unsafe-eval is limited to development. Verify exit0; 53 changed lines.
+
+- T-44142 accepted42f0a46: Annotated health()'s local service state with up/down literals, fixing the TypedDict assignment error. The revocation token and health report annotations remain in place. Verify exit0; 20 changed lines.
