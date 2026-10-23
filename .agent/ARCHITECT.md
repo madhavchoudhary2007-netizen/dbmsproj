@@ -1,7 +1,7 @@
 <!-- LOCK:BEGIN -->
 > STATUS: LOCKED
-> SHA256: c05eeb0c03461c7292c04802ce8f4814efccd0a3ec78e84cba0ab993c10b3d24
-> LOCKED_AT: 2026-10-23T18:32:02Z
+> SHA256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
+> LOCKED_AT: 2026-10-23T18:47:02Z
 > LOCKED_BY: orchestrator
 <!-- LOCK:END -->
 # ApexGrid architecture — existing system, improvement in place
@@ -288,3 +288,7 @@ ADR-007 activation review: all five focused lenses rechecked after the owner app
 ## ADR-008 focused Phase C: logout revocation
 
 The five-lens trace, opaque-jti/UUID compatibility amendment and zero-amendment second pass are recorded in ADR-008. B.3/B.4 now permit this planned authentication transition: authenticated -> logout revocation persisted -> cookies cleared -> reused HTTP401 / new WS4401. T-320 owns failing-first and edge tests, T-323 the additive migration/repository/HTTP/WS enforcement; only apexgrid-test may be migrated. No-jti compatibility and fail-closed database availability are explicit risks. Existing role/Origin/CSRF/cookie/API contracts remain. No runtime or schema change is enacted by this amendment.
+
+## ADR-011 focused Phase C: health-probe dependency slice
+
+ADR-011 adds only GET /health/live (200/status alive, no external probes) and GET /health/ready (200/ready or503/not_ready, services postgres/mongodb/runtime_lease up/down). Existing /api/health is unchanged. T-320 owns offline failing-first tests; T-44129 implements only the health slice of T-338 before T-323 full acceptance, resolving the phase dependency. The five lenses and zero-amendment second pass are in ADR-011. New probe paths bypass only the global lease middleware: readiness checks ownership itself, liveness reports process availability during dependency failure. All existing auth/API/WS fail-closed behavior remains. No runtime change is enacted by this amendment.

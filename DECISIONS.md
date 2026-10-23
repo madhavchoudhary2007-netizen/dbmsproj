@@ -51,3 +51,5 @@ The product requirements remove the DBMS demonstrations.
 Perfection loop authorizations: `.agent/adr/ADR-001-perfection-loop-authorizations.md` (agent-architecture ADR namespace).
 
 - ADR-008 JWT logout revocation: .agent/adr/ADR-008-jwt-revocation.md (planned additive disposable-stack store; existing opaque jti and API contracts retained).
+
+- ADR-011 health probes: .agent/adr/ADR-011-health-probes.md; additive liveness/readiness only, health slice moved before T-323 to satisfy T-320 tests.

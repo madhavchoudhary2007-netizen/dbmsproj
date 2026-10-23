@@ -1,15 +1,15 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 4eed78c
+git_head: c2eb8d2
 branch: overhaul/neo-brutal
-architect_sha256: c05eeb0c03461c7292c04802ce8f4814efccd0a3ec78e84cba0ab993c10b3d24
+architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
 archetype: Neo-Brutal Motorsport (light); ADR007 approved
-last_eval_score: no verified overhaul score; historical100 omits new gates
+last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF4; NOT_RUN P1/P2; notpresentable
 
 ## Phase and verified facts
 - Phase0 completeT300e465e89/T30113e6100/T30259a180e. ADR007 activated after owner approval; lock9010959b verifies, boot0. Work through all12phases per owner's latest instruction.
-- Phase1 T31035578c9/T3118570e58 accepted: WHOLEapp/testsRuff0 and43filesformatted; no remainingC901. T312e0f7adf selected3filesmypy0; freshglobal227 ->218 belowplan222. T3134089fb6 CIvalidator0; hostedCI NOT_RUN. T314c0c8061 scorer accepted;8regressionsPASS, F7/F8/F9+hardF2, missing/duplicate/unknown/reweighted/null evidence blocks delivery. Four dimension refreshes inprogress.
+- Phase1 T31035578c9/T3118570e58 accepted: WHOLEapp/testsRuff0 and43filesformatted; no remainingC901. T312e0f7adf selected3filesmypy0; freshglobal227 ->218 belowplan222. T3134089fb6 CIvalidator0; hostedCI NOT_RUN. T314c0c8061 scorer accepted;8regressionsPASS, F7/F8/F9+hardF2, missing/duplicate/unknown/reweighted/null evidence blocks delivery. All four freshdimension artifacts acceptedT44123..26; score51.2974 exit1honestbaseline, notdeliverable. Phase1complete; Phase2testsnext.
 - T44114/15 extracted coherent start/reset operations; pause/resume map preserves status/errors. T44114 exactAST proof differed only SQL indentation whitespace; full136+livePASS, no exact-AST identity claim. T44116 finalization domain extraction preserves SQL/publish/lifecycle order; fullrerun136/livePASS. T44122 lockworker/cleanup bodiesASTidentical(SQLwhitespacenormalized), full136/livePASS. T312/T314 fullrerunsPASS; latest144tests0skips+allliveflows.
 - Latest completed fullisolated baseline afterT314:144passed,0failed/skipped/xfailed; login/session/simulator/Mongo/WS/pitconflict/trigger-ban/results/standings/DBMS/generatedrace flowsPASS, no18000listener. Cleanup fixT44804a3ab7f usesexec for realAPIpid and waits; prior orphan lease failures resolved without realDB changes.
 - Fresh entireformat check exposed11leftovers, correctedT44117..21; now44app/testfilesformatted andallRuff0, including newscorer tests.
@@ -42,3 +42,5 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 - T-44124 accepted1d5cb48: Recorded fresh aesthetic evidence for A-1 through A-7 with exact rubric weights; preserved A-5 and A-6 judgments. Verify exit0; 46 changed lines.
 
 - T-44125 accepted4eed78c: Recorded all six performance checks with their specified weights and evidence-based results; artifact is 40 lines. Verify exit0; 40 changed lines.
+
+- T-44126 acceptedc2eb8d2: Recorded fresh edge-check evidence from the current E2E specs and full rerun; E-1 and E-2 remain false because coverage is incomplete. Verify exit0; 34 changed lines.
