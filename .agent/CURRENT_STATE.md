@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 87025ef
+git_head: 2c4ffd3
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex
@@ -9,13 +9,14 @@ last_eval_score: historical 100 claim is not a verified baseline for this overha
 
 ## Active work
 - Owner approved ADR-007 in chat: "ok approved continue", then "dont stop you have all permissions". T-302 approval is satisfied; proceed through the approved plan. Scoped ADRs, tests, no destructive/production changes and unchanged thresholds still apply.
-- T-300 accepted e465e89: boot exit0/boot OK; branch based on perfection-loop1acf8e1. T-301 accepted13e6100 via accept.sh: ADR-007 draft amends A.4/A.5/B.5; five-lens pass2 yielded zero new amendments; relock/verify exit0. Phase0 paused at T-302 pending owner approved.
+- T-300 accepted e465e89: boot exit0/boot OK; branch based on perfection-loop1acf8e1. T-301 accepted13e6100 via accept.sh: ADR-007 draft amends A.4/A.5/B.5; five-lens pass2 yielded zero new amendments; relock/verify exit0. Phase0 completed following T-302 owner approval.
 - H=codex; models.env defaults HARNESS via caller and uses gpt-6.1-sol/medium for Codex orchestrator. Worker models/efforts/cap and context windows preserved. Claude 433000 context settings were owner-supplied edits and are preserved.
 - T-300 accepted by accept.sh, commit e465e89. Owner-supplied docs/overhaul-plan.md and .claude/settings.json were recorded unchanged; both were explicitly listed because accept.sh stages all changes.
 - T-302 accepted59a180e; ADR activation locked9010959b. T-442 accepted7bdbf4c; bootstrap/operation+telemetry schemas Ruff and format exit0; 23 changed product lines. Disposable full suite/live acceptance running; parent T-310 not yet green.
 - T-443 accepted6cca3aa: frontend lint0 errors/warnings, typecheck0; spacing/banned/motion scripts exit0. Neo-brutal lint NOT_RUN until T-360. Existing perf spec allows17.0ms vs required16.7; T-413 must tighten it, current performance not claimed passing.
 - T-442 full gate initially failed104pass/32failed (7 failures+25 errors) because orphan PID79496 held test runtime lease. lsof confirmed only test ports15432/27018 and18000, PPID1; terminated that disposable API process gracefully. Full isolated rerun in progress, no real databases/volumes touched.
 - T-442 rerun passed136 tests, zero failures/skips/xfails plus live acceptance. T-444 accepted87025ef: analytics/auth/pit routers Ruff+format0; OpenAPI SHA before/after identical60d831ab. Full backend check follows current bounded batch; no API contract changed.
+- T-445 accepted2c4ffd3: selected driver DatabaseError narrows four SQL exception checks, strict zips and UTC alias; eight selected Ruff hits gone. T-444/445 full disposable suite/live gate running. No worker altered assertions or thresholds; no product code written by orchestrator.
 
 ## Contracts and guardrails
 - Preserve every feature, route, copy string, data hook, aria name, state class and DBMS hash route. APIs additive only, each contract change needs ADR and owner approval at the stated hard stop.
@@ -35,3 +36,5 @@ last_eval_score: historical 100 claim is not a verified baseline for this overha
 ## Orchestrator direct edits
 - T-300: two requested models.env profile lines. T-301: architecture, ADR, lock banner and state/packet/envelope documentation only. Zero frontend/backend/gate edits; no workers dispatched.
 - State checkpoint accept initially rejected because completed T-301 target declaration had been removed from NEXT_STATE; restored the completed declaration and reran unchanged lock verification. No product/test/gate changes.
+
+- T-444/445 full disposable rerun exit0:136 passed,0 failed/skipped/xfailed and all live acceptance flows passed. T-446 OpenAPI SHA unchanged60d831ab (APP_ENV=local; initial import without local mode correctly refused absent configured JWT_SECRET).

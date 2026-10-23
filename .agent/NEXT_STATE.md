@@ -3,11 +3,16 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-445 — T-311 precise database assertions
+### T-446 — T-310 remaining small router lint
+- worker: W2 | priority: P1 | origin: bounded subdivision T-310
+- target_files: backend/app/user_router.py, backend/app/membership_router.py, backend/app/telemetry_router.py
+- contract: dependency-default cleanup and equivalent error map to meet C901, formatting; no wire/API changes
+- verify: .venv/bin/ruff check backend/app/user_router.py backend/app/membership_router.py backend/app/telemetry_router.py && .venv/bin/ruff format --check backend/app/user_router.py backend/app/membership_router.py backend/app/telemetry_router.py
+### T-447 — T-311 database test format slice
 - worker: W3 | priority: P1 | origin: bounded subdivision T-311
 - target_files: backend/tests/test_database.py
-- contract: narrow broad SQL exceptions to driver DB errors, strict equal-column zips, UTC alias; preserve every SQLSTATE and assertion
-- verify: .venv/bin/ruff check --select B017,B905,UP017 backend/tests/test_database.py
+- contract: format first180 source lines only, <=150 changed lines; exact AST preserved, parent full Ruff gate stays open
+- verify: .venv/bin/ruff format --check --range 1-180 backend/tests/test_database.py && .venv/bin/python -c 'import ast,pathlib,subprocess; p="backend/tests/test_database.py"; assert ast.dump(ast.parse(pathlib.Path(p).read_text())) == ast.dump(ast.parse(subprocess.check_output(["git","show","HEAD:"+p],text=True)))'
 
 ## Blocked
 - T-310/T-311 remain open until full parent Ruff/format/frontend-lint commands exit0; no intermediate count is a parent pass.
@@ -15,6 +20,7 @@ phase: 1 honest green baseline
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-445 accepted2c4ffd3; SQL exception assertions narrowed, selected eight lint hits removed.
 - T-444 accepted87025ef; routers Ruff/format0, OpenAPI unchanged; full batch gate next.
 - T-443 accepted6cca3aa; frontend lint/typecheck+three existing scripts green; neo lint not yet present.
 - T-302 accepted59a180e; explicit owner approval recorded and lock verified.

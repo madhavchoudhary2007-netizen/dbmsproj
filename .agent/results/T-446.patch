@@ -1,0 +1,190 @@
+diff --git a/backend/app/membership_router.py b/backend/app/membership_router.py
+index d0e6147..58f3014 100644
+--- a/backend/app/membership_router.py
++++ b/backend/app/membership_router.py
+@@ -8,8 +8,12 @@ from fastapi import APIRouter, Depends, HTTPException
+ 
+ from .membership_repository import (
+     create_membership as create_membership_row,
++)
++from .membership_repository import (
+     list_driver_memberships,
+     list_team_memberships,
++)
++from .membership_repository import (
+     update_membership as update_membership_row,
+ )
+ from .schemas_competition import MembershipIn, MembershipPatch
+@@ -21,24 +25,26 @@ def create_membership_router(
+     jsonable: Callable[[Any], Any],
+ ) -> APIRouter:
+     router = APIRouter()
++    authenticated_user = Depends(current_user)
++    admin_user = Depends(roles("ADMIN"))
+ 
+     @router.get("/api/drivers/{driver_id}/memberships")
+-    def driver_memberships(driver_id: UUID, user=Depends(current_user)):
++    def driver_memberships(driver_id: UUID, user=authenticated_user):
+         return jsonable(list_driver_memberships(driver_id))
+ 
+     @router.get("/api/teams/{team_id}/memberships")
+-    def team_memberships(team_id: UUID, user=Depends(current_user)):
++    def team_memberships(team_id: UUID, user=authenticated_user):
+         return jsonable(list_team_memberships(team_id))
+ 
+     @router.post("/api/team-memberships", status_code=201)
+-    def create_membership(body: MembershipIn, user=Depends(roles("ADMIN"))):
++    def create_membership(body: MembershipIn, user=admin_user):
+         return jsonable(create_membership_row(body))
+ 
+     @router.patch("/api/team-memberships/{membership_id}")
+     def update_membership(
+         membership_id: UUID,
+         body: MembershipPatch,
+-        user=Depends(roles("ADMIN")),
++        user=admin_user,
+     ):
+         if not body.model_dump(exclude_unset=True):
+             raise HTTPException(422, "At least one field is required")
+diff --git a/backend/app/telemetry_router.py b/backend/app/telemetry_router.py
+index af169b3..1b8b322 100644
+--- a/backend/app/telemetry_router.py
++++ b/backend/app/telemetry_router.py
+@@ -39,6 +39,8 @@ def create_telemetry_router(
+ ) -> APIRouter:
+     router = APIRouter()
+     ingest_dependency = Depends(roles("ADMIN", "STEWARD"))
++    authenticated_user = Depends(current_user)
++
+     @router.post("/api/telemetry/ingest", status_code=202)
+     def ingest(packet: Telemetry, user: Any = ingest_dependency):
+         collection = mongo_ready()
+@@ -47,9 +49,7 @@ def create_telemetry_router(
+         document["driver_id"] = str(packet.driver_id)
+         document["ts"] = packet.ts
+         try:
+-            result = insert_telemetry(
+-                collection, packet.session_id, packet.driver_id, document
+-            )
++            result = insert_telemetry(collection, packet.session_id, packet.driver_id, document)
+         except TelemetryIngestError as exc:
+             status_code, detail = INGEST_ERROR_RESPONSES.get(
+                 exc.outcome, (503, "Telemetry store write failed")
+@@ -66,7 +66,7 @@ def create_telemetry_router(
+         session_id: UUID,
+         driver_id: UUID | None = None,
+         limit: int = Query(50, ge=1, le=200),
+-        user=Depends(current_user),
++        user=authenticated_user,
+     ):
+         if not session_exists(session_id):
+             raise HTTPException(404, "Session not found")
+@@ -75,19 +75,27 @@ def create_telemetry_router(
+         collection = mongo_ready()
+         documents = list_telemetry(collection, session_id, driver_id, limit)
+         return [
+-            {**jsonable({key: value for key, value in doc.items() if key != "_id"}), "id": str(doc["_id"])}
++            {
++                **jsonable({key: value for key, value in doc.items() if key != "_id"}),
++                "id": str(doc["_id"]),
++            }
+             for doc in documents
+         ]
++
+     @router.get("/api/sessions/{session_id}/live")
+-    def live(session_id: UUID, user=Depends(current_user)):
++    def live(session_id: UUID, user=authenticated_user):
+         session = get_live_session(session_id)
+         if not session:
+             raise HTTPException(404, "Session not found")
+         collection = mongo_ready()
+         latest, drivers = get_live_telemetry(collection, session_id, session["scheduled_at"])
+         packets = [
+-            {**jsonable({key: value for key, value in doc.items() if key != "_id"}), "id": str(doc["_id"])}
++            {
++                **jsonable({key: value for key, value in doc.items() if key != "_id"}),
++                "id": str(doc["_id"]),
++            }
+             for doc in latest
+         ]
+         return {"session": jsonable(session), "drivers": jsonable(drivers), "packets": packets}
++
+     return router
+diff --git a/backend/app/user_router.py b/backend/app/user_router.py
+index 012c806..662df23 100644
+--- a/backend/app/user_router.py
++++ b/backend/app/user_router.py
+@@ -9,10 +9,18 @@ from fastapi import APIRouter, Depends, HTTPException, Query
+ from .schemas_auth import UserCreate, UserPatch
+ from .user_repository import (
+     UserPatchError,
++    list_users,
++)
++from .user_repository import (
+     create_user as create_user_record,
++)
++from .user_repository import (
+     delete_user as delete_user_record,
++)
++from .user_repository import (
+     get_user as get_user_record,
+-    list_users,
++)
++from .user_repository import (
+     update_user as update_user_record,
+ )
+ 
+@@ -22,28 +30,29 @@ def create_user_router(
+     jsonable: Callable[[Any], Any],
+ ) -> APIRouter:
+     router = APIRouter()
++    admin_user = Depends(roles("ADMIN"))
+ 
+     @router.get("/api/users")
+     def users(
+         limit: int = Query(50, ge=1, le=200),
+         offset: int = Query(0, ge=0),
+-        user=Depends(roles("ADMIN")),
++        user=admin_user,
+     ):
+         return jsonable(list_users(limit, offset))
+ 
+     @router.get("/api/users/{user_id}")
+-    def get_user(user_id: UUID, user=Depends(roles("ADMIN"))):
++    def get_user(user_id: UUID, user=admin_user):
+         result = get_user_record(user_id)
+         if not result:
+             raise HTTPException(404, "User not found")
+         return jsonable(result)
+ 
+     @router.post("/api/users", status_code=201)
+-    def create_user(body: UserCreate, user=Depends(roles("ADMIN"))):
++    def create_user(body: UserCreate, user=admin_user):
+         return jsonable(create_user_record(body))
+ 
+     @router.patch("/api/users/{user_id}")
+-    def update_user(user_id: UUID, body: UserPatch, user=Depends(roles("ADMIN"))):
++    def update_user(user_id: UUID, body: UserPatch, user=admin_user):
+         try:
+             updated = update_user_record(user_id, body)
+         except UserPatchError as exc:
+@@ -53,12 +62,14 @@ def create_user_router(
+         return jsonable(updated)
+ 
+     @router.delete("/api/users/{user_id}", status_code=204)
+-    def delete_user(user_id: UUID, user=Depends(roles("ADMIN"))):
++    def delete_user(user_id: UUID, user=admin_user):
+         result = delete_user_record(user_id)
+-        if result == "not_found":
+-            raise HTTPException(404, "User not found")
+-        if result == "referenced":
+-            raise HTTPException(409, "User is referenced by official records")
++        errors = {
++            "not_found": (404, "User not found"),
++            "referenced": (409, "User is referenced by official records"),
++        }
++        if error := errors.get(result):
++            raise HTTPException(*error)
+         return None
+ 
+     return router

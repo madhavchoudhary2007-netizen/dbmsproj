@@ -39,6 +39,8 @@ def create_telemetry_router(
 ) -> APIRouter:
     router = APIRouter()
     ingest_dependency = Depends(roles("ADMIN", "STEWARD"))
+    authenticated_user = Depends(current_user)
+
     @router.post("/api/telemetry/ingest", status_code=202)
     def ingest(packet: Telemetry, user: Any = ingest_dependency):
         collection = mongo_ready()
@@ -47,9 +49,7 @@ def create_telemetry_router(
         document["driver_id"] = str(packet.driver_id)
         document["ts"] = packet.ts
         try:
-            result = insert_telemetry(
-                collection, packet.session_id, packet.driver_id, document
-            )
+            result = insert_telemetry(collection, packet.session_id, packet.driver_id, document)
         except TelemetryIngestError as exc:
             status_code, detail = INGEST_ERROR_RESPONSES.get(
                 exc.outcome, (503, "Telemetry store write failed")
@@ -66,7 +66,7 @@ def create_telemetry_router(
         session_id: UUID,
         driver_id: UUID | None = None,
         limit: int = Query(50, ge=1, le=200),
-        user=Depends(current_user),
+        user=authenticated_user,
     ):
         if not session_exists(session_id):
             raise HTTPException(404, "Session not found")
@@ -75,19 +75,27 @@ def create_telemetry_router(
         collection = mongo_ready()
         documents = list_telemetry(collection, session_id, driver_id, limit)
         return [
-            {**jsonable({key: value for key, value in doc.items() if key != "_id"}), "id": str(doc["_id"])}
+            {
+                **jsonable({key: value for key, value in doc.items() if key != "_id"}),
+                "id": str(doc["_id"]),
+            }
             for doc in documents
         ]
+
     @router.get("/api/sessions/{session_id}/live")
-    def live(session_id: UUID, user=Depends(current_user)):
+    def live(session_id: UUID, user=authenticated_user):
         session = get_live_session(session_id)
         if not session:
             raise HTTPException(404, "Session not found")
         collection = mongo_ready()
         latest, drivers = get_live_telemetry(collection, session_id, session["scheduled_at"])
         packets = [
-            {**jsonable({key: value for key, value in doc.items() if key != "_id"}), "id": str(doc["_id"])}
+            {
+                **jsonable({key: value for key, value in doc.items() if key != "_id"}),
+                "id": str(doc["_id"]),
+            }
             for doc in latest
         ]
         return {"session": jsonable(session), "drivers": jsonable(drivers), "packets": packets}
+
     return router
