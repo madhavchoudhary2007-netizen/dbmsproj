@@ -3,11 +3,11 @@ updated_at: 2026-10-23T08:25:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-204 — normalize spacing in globals.css lines 1-700
+### T-205 — normalize spacing in globals.css lines 701-1445
 - worker: W1 | priority: P1 | origin: EVAL score A-1
 - target_files: frontend/app/globals.css
-- contract: normalize non-scale pixel spacing and convert borders to logical properties in globals.css lines 1-700
-- verify: npm --prefix frontend run lint && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh
+- contract: normalize non-scale pixel spacing and convert borders to logical properties in globals.css lines 701-1445
+- verify: bash scripts/eval/lint-spacing.sh && npm --prefix frontend run lint
 
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
