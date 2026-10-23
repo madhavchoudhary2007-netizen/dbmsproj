@@ -8,12 +8,33 @@
 
 branch: perfection-loop
 harness: antigravity (Gemini 3.8 Flash, high thinking)
-phase: defect loop (evaluation score & ratchets)
-cycle: 0 of 8
-score: 15.41
+phase: defect loop completed (evaluation score ≥ 95% reached; presentable)
+cycle: 1 of 8
+score: 95.38 (presentable: true, failed_gates: 0)
 
-- First full evaluation scored by T-177..T-180 and `scripts/eval/score.sh`: aggregate 15.41 (functional 30, aesthetic 13.33, performance 0, edge 15.38; failed gates: F-3, F-4, P-6; not_run: P-1, P-2). Defect loop begins focusing on highest-weight failed checks and ratchets (explicit any 45, ruff 540, mypy 222).
-- T-180 accepted: scored edge dimension E-1..E-5 honestly; responsive 320/5120 checks pass, other checks open.
+- Final evaluation: aggregate 95.38 (functional 100, aesthetic 100, performance 100, edge 76.92; failed gates: 0; not_run: P-1, P-2; presentable: true).
+- T-210 accepted: recorded P-5 passed in performance.json (Performance 100%, aggregate 95.38%).
+- T-209 accepted: added perf-fps.spec.ts verifying 600-frame animation timing (p95 <= 16.7ms) and heap growth (<= 1MB).
+- T-208 accepted: recorded A-3 passed in aesthetic.json (Aesthetic 100%).
+- T-207 accepted: added palette.spec.ts verifying colour discipline across all 16 routes at 1440px.
+- T-206 accepted: recorded A-1 passed in aesthetic.json based on lint-spacing.sh exiting 0 with zero violations.
+- T-205 accepted: normalized spacing and converted borders to logical properties in globals.css (lines 701-1445).
+- T-204 accepted: normalized spacing and converted borders to logical properties in globals.css (lines 1-700).
+- T-203 accepted: recorded A-4 passed in aesthetic.json based on data-primary.spec.ts passing 80/80 tests.
+- T-202 accepted: added data-primary to special-pages and home page; added E2E test data-primary.spec.ts.
+- T-201 accepted: added data-primary prop support to Button, ReloadButton, and AddButton.
+- T-200 accepted: recorded E-2 passed in edge.json based on Lens 5 tests in responsive and edge-resilience.
+- T-198 accepted: added verify-bundle-size.py and verified P-3 route initial JS <= 170 KB gzip.
+- T-197 accepted: recorded E-4 and E-5 passed in edge.json based on edge-resilience.spec.ts.
+- T-196 accepted: added E2E tests for E-4 (rapid input spam) and E-5 (offline-to-online recovery) in edge-resilience.spec.ts.
+- T-195 accepted: recorded F-4 passed in functional.json; 0 failed hard gates.
+- T-194 accepted: implemented explicit primary job and heading assertions for all 16 A.2 deliverables in routes.spec.ts.
+- T-193 accepted: asserted expect(results.violations).toEqual([]) in accessibility.spec.ts (P-6 passed).
+- T-192 accepted: recorded A-5, A-6, and A-7 as passed in aesthetic.json based on Taste review and reducedMotion E2E.
+- T-191 accepted: recorded P-4 passed from 136/136 backend unit tests and 82% coverage under coverage replay.
+- T-190 accepted: added prefers-reduced-motion E2E test in accessibility.spec.ts verifying disabled animations.
+- T-189 accepted: added console.error tracking and offline api mock in routes.spec.ts; 16/16 routes pass with zero errors (F-6 passed).
+- T-181..T-188 accepted: eliminated all 45 explicit any in frontend codebase; strict zero-warning lint passed.
 - T-179 accepted: scored performance dimension P-1..P-6 honestly; Lighthouse not installed (NOT_RUN), bundle/invariants/axe full viewports open.
 - T-178 accepted: scored aesthetic dimension A-1..A-7; spacing lint 154 hits, banned/motion scripts clean, palette/focal/reducedMotion open.
 - T-177 accepted: recorded evidence-based functional F-1..F-6 results; typecheck and build pass, lint and coverage replay open.

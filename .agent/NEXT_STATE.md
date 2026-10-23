@@ -3,11 +3,7 @@ updated_at: 2026-10-23T08:25:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-210 — record P-5 passed in performance.json
-- worker: Orchestrator | priority: P1 | origin: EVAL score P-5
-- target_files: .agent/eval/performance.json
-- contract: record P-5 passed based on perf-fps.spec.ts passing 600-frame animation timing and heap growth checks
-- verify: PLAYWRIGHT_PORT=32145 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts perf-fps.spec.ts --project=desktop-1440 && git checkout -- frontend/next-env.d.ts frontend/AGENTS.md
+- Queue empty — evaluation aggregate score 95.38% reached with zero failed hard gates (PRESENTABLE).
 
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
@@ -16,6 +12,16 @@ loop_iteration: 0 of 8
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-210 ✓ 17c3c47; recorded P-5 passed in performance.json (Performance 100%, aggregate 95.38%, presentable).
+- T-209 ✓ d2dbbec; added perf-fps.spec.ts verifying 600-frame animation timing (p95 <= 16.7ms) and heap growth (<= 1MB).
+- T-208 ✓ 21a1eca; recorded A-3 passed in aesthetic.json (Aesthetic 100%).
+- T-207 ✓ 67788d7; added palette.spec.ts verifying colour discipline across all 16 routes at 1440px.
+- T-206 ✓ d29bab2; recorded A-1 passed in aesthetic.json based on lint-spacing.sh exiting 0 with zero violations.
+- T-205 ✓ 3b0b796; normalized spacing and converted borders to logical properties in globals.css (lines 701-1445).
+- T-204 ✓ 2fa5f47; normalized spacing and converted borders to logical properties in globals.css (lines 1-700).
+- T-203 ✓ f714ae0; recorded A-4 passed in aesthetic.json based on data-primary.spec.ts passing 80/80 tests.
+- T-202 ✓ 9504c52; added data-primary to special-pages and home page; added E2E test data-primary.spec.ts.
+- T-201 ✓ d8b6dca; added data-primary prop support to Button, ReloadButton, and AddButton.
 - T-200 ✓ 7601b99; recorded E-2 passed in edge.json based on Lens 5 tests in responsive and edge-resilience.
 - T-199 ✓ 4f094b4; added Lens 5 edge tests in edge-resilience.spec.ts.
 - T-198 ✓ 6cbe188; added verify-bundle-size.py and verified P-3 route initial JS <= 170 KB gzip.
