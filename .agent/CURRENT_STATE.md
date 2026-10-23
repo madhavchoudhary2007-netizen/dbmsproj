@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 35578c9
+git_head: e0f7adf
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -47,3 +47,5 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 - T-44122 accepted024f663: Extracted the competing reservation and cleanup into typed helpers with explicit worker arguments; preserved cleanup and guard release order. Verify exit0; 133 changed lines.
 
 - T-310 accepted35578c9: Closed aggregate backend lint and format gate from accepted W2 subdivisions; no additional product edits. Verify exit0; 0 changed lines.
+
+- T-312 acceptede0f7adf: Added precise Response and validator annotations; validation bodies and schema behavior are unchanged. Verify exit0; 20 changed lines.

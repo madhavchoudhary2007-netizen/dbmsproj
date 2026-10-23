@@ -1,0 +1,120 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 214297b..32fffed 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -2,58 +2,97 @@ name: CI
+ 
+ on:
+   push:
+-    branches: [perfection-loop]
++    branches: [perfection-loop, master, 'overhaul/**']
+   pull_request:
+-    branches: [perfection-loop]
+ 
+ permissions:
+   contents: read
+ 
+ jobs:
+-  full-gates:
++  quality-gates:
+     runs-on: ubuntu-24.04
+     timeout-minutes: 45
++    env:
++      APP_ENV: local
++      MONGODB_DATABASE: apexgrid
++      DATABASE_URL: postgresql://postgres:${{ github.run_id }}@localhost:5432/apexgrid_test
++      MONGODB_URL: mongodb://root:${{ github.run_id }}@localhost:27017/?authSource=admin
++    services:
++      postgres:
++        image: postgres:16
++        env:
++          POSTGRES_USER: postgres
++          POSTGRES_PASSWORD: ${{ github.run_id }}
++          POSTGRES_DB: apexgrid_test
++        ports: ['5432:5432']
++        options: >-
++          --health-cmd "pg_isready -U postgres -d apexgrid_test"
++          --health-interval 10s --health-timeout 5s --health-retries 5
++      mongo:
++        image: mongo:7
++        env:
++          MONGO_INITDB_ROOT_USERNAME: root
++          MONGO_INITDB_ROOT_PASSWORD: ${{ github.run_id }}
++        ports: ['27017:27017']
++        options: >-
++          --health-cmd "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok'"
++          --health-interval 10s --health-timeout 5s --health-retries 5
+     steps:
+       - uses: actions/checkout@v4
+-
+-      - name: Set up Node.js 22
+-        uses: actions/setup-node@v4
++      - uses: actions/setup-node@v4
+         with:
+           node-version: 22
+           cache: npm
+           cache-dependency-path: frontend/package-lock.json
+-
+-      - name: Set up Python 3.12
+-        uses: actions/setup-python@v5
++      - uses: actions/setup-python@v5
+         with:
+           python-version: '3.12'
+           cache: pip
+           cache-dependency-path: |
+             backend/requirements.txt
+             backend/requirements-dev.txt
+-
+       - name: Install frontend dependencies
+         run: npm --prefix frontend ci
+-
+       - name: Install backend dependencies
+         run: |
+           python -m venv .venv
+           .venv/bin/python -m pip install --upgrade pip
+           .venv/bin/python -m pip install -r backend/requirements.txt -r backend/requirements-dev.txt
+-
++      - name: Bootstrap test databases
++        run: PYTHONPATH=backend .venv/bin/python -m app.bootstrap
++      - name: Ruff check
++        run: .venv/bin/ruff check backend/app backend/tests
++      - name: Ruff format
++        run: .venv/bin/ruff format --check backend/app backend/tests
++      - name: Strict mypy (temporary allowed failure until T-339)
++        continue-on-error: true
++        run: .venv/bin/mypy --strict backend/app
++      - name: Pytest with skip gate
++        run: |
++          mkdir -p reports
++          set +e
++          PYTHONPATH=backend .venv/bin/pytest backend/tests --junitxml=reports/junit.xml
++          status=$?
++          .venv/bin/python scripts/eval/junit_gate.py reports/junit.xml "$status"
++      - name: Frontend typecheck
++        run: npm --prefix frontend run typecheck
++      - name: Frontend lint
++        run: npm --prefix frontend run lint -- --max-warnings 0
++      - name: Frontend build
++        run: npm --prefix frontend run build
+       - name: Install Playwright browsers
+         run: npm --prefix frontend exec -- playwright install --with-deps chromium
+-
+-      - name: Run full quality gates
+-        run: bash scripts/eval/full-gates.sh
+-
+-      - name: Retain coverage and browser reports
++      - name: Mocked Playwright suite
++        env:
++          CI: 'true'
++        run: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --reporter=line
++      - name: Retain test and browser reports
+         if: always()
+         uses: actions/upload-artifact@v4
+         with:
+           name: quality-gate-reports
+           path: |
+-            coverage.xml
++            reports/
+             frontend/playwright-report/
+             frontend/test-results/
+           if-no-files-found: ignore

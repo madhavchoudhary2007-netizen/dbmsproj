@@ -8,14 +8,10 @@ phase: 1 honest green baseline
 - contract: RequiredCIgates with servicecontainers; temporarymypyexceptiononly.
 - verify: npx --offline --yes @action-validator/cli .github/workflows/ci.yml
 
-### T-312 W2 — OPEN
-- target_files: backend/app/auth_cookie.py, backend/app/schemas_auth.py, backend/app/schemas_telemetry.py
-- contract: Preciseannotationsonly; globalcountbelow222.
-- verify: .venv/bin/mypy --strict backend/app/auth_cookie.py backend/app/schemas_auth.py backend/app/schemas_telemetry.py && .venv/bin/ruff check backend/app/auth_cookie.py backend/app/schemas_auth.py backend/app/schemas_telemetry.py && .venv/bin/ruff format --check --output-format concise backend/app/auth_cookie.py backend/app/schemas_auth.py backend/app/schemas_telemetry.py
-
 ## Blocked
 
 ## Done
+- T-312 acceptede0f7adf; verify0.
 - T-310 accepted35578c9; verify0.
 - T-44122 accepted024f663; verify0.
 - T-44121 accepted0aafbee; verify0.
