@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 9d8cae0
+git_head: 66c4550
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -37,3 +37,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T44173 repair2 and T44175 repair1 returned PASSED in isolated clones; root review/acceptance pending. Repairs cover CSS important/case and shadow aliases/RGB; contrast offset/order/conditional classes. T44176 EER move ready.
 
 - T-44176 accepted9d8cae0: Moved unchanged EER metadata handler into SQL router with main alias; exact AST and endpoint identity plus9 snapshot tests pass. Verify0.
+
+- T-44173 accepted66c4550: Added hard-shadow validator with28 regression controls including canonical aliases, RGB, CSS case and important handling. Verify0.

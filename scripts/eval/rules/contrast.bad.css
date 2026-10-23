@@ -1,0 +1,2 @@
+.bad-red { color: white; background: #FF6B6B; }
+.bad-var { color: var(--nb-paper); background-color: var(--color-red) !important; }

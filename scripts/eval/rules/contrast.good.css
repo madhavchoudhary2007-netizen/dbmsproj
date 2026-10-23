@@ -1,0 +1,4 @@
+.safe-red { color: black; background: #FF6B6B; }
+.safe-paper { color: white; background: var(--nb-ink); }
+.safe-split { color: white; }
+.safe-split { background-color: #FF6B6B; }
