@@ -8,15 +8,11 @@ phase: 2 security (Phase1 complete; baseline score51.2974)
 - contract: Add failing-first offline repository tests for ADR008 mapping/SQL and outage, as bounded childT323. New module not yetexists; import dynamically inside eachtest and assert find_spec notNone, so red failures are assertions, notcollectionerrors. Mock database calls entirely. Cover opaquejti +UUIDform deterministicuuid5mapping, parameterized select ofunexpired revocation, insertboundkey+expiryONCONFLICT, purgeonlyexpired, errorspropagatenotfalse. <=140lines.
 - verify: .venv/bin/ruff check backend/tests/test_token_revocation.py && .venv/bin/ruff format --check backend/tests/test_token_revocation.py && .venv/bin/python .agent/check-red-tests.py T-44135 backend/tests/test_token_revocation.py
 
-### T-44129 W2 — OPEN
-- target_files: backend/app/main.py
-- contract: Implement ADR011 early health probes only (Phase3T338 logging remains later). Two public GET paths and models, reuse existing health() without changing /api/health. Exact middleware bypass only /health/live and /health/ready so lostlease doesn't mask probes.
-- verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/pytest -q backend/tests/test_security_headers.py -k health && .venv/bin/ruff check backend/app/main.py && .venv/bin/ruff format --check backend/app/main.py
-
 ## Blocked
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44129 accepteda3c0554; verify0.
 - T-44136 accepted31e5494; verify0.
 - T-321 acceptedcaf033f; verify0.
 - T-44134 accepted749f9c5; verify0.

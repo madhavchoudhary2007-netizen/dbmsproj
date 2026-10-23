@@ -1,0 +1,121 @@
+diff --git a/backend/tests/test_token_revocation.py b/backend/tests/test_token_revocation.py
+new file mode 100644
+index 0000000..4087ca0
+--- /dev/null
++++ b/backend/tests/test_token_revocation.py
+@@ -0,0 +1,115 @@
++import sys
++from contextlib import contextmanager
++from datetime import UTC, datetime, timedelta
++from importlib import import_module, util
++from pathlib import Path
++from uuid import NAMESPACE_URL, uuid5
++
++import pytest
++
++MODULE = "backend.app.token_revocation"
++sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
++
++
++def _module():
++    assert util.find_spec(MODULE) is not None, f"{MODULE} is not implemented"
++    return import_module(MODULE)
++
++
++class _Cursor:
++    def __init__(self):
++        self.calls = []
++
++    def __enter__(self):
++        return self
++
++    def __exit__(self, *_args):
++        return None
++
++    def execute(self, sql, params=()):
++        self.calls.append((sql, params))
++
++
++class _Connection:
++    def __init__(self):
++        self.cursor_instance = _Cursor()
++
++    @contextmanager
++    def cursor(self):
++        yield self.cursor_instance
++
++
++def test_revocation_key_maps_opaque_and_uuid_form_jtis_deterministically():
++    module = _module()
++    for jti in ("opaque.token-id_123", "550e8400-e29b-41d4-a716-446655440000"):
++        expected = uuid5(NAMESPACE_URL, "apexgrid.jwt:" + jti)
++        assert module.revocation_key(jti) == expected
++        assert module.revocation_key(jti) == expected
++
++
++def test_lookup_uses_bound_key_and_requires_unexpired_revocation(monkeypatch):
++    module = _module()
++    jti = "opaque-jti-value"
++    key = uuid5(NAMESPACE_URL, "apexgrid.jwt:" + jti)
++    seen = {}
++
++    def fetch_one(sql, params):
++        seen.update(sql=sql, params=params)
++        return {"jti": key}
++
++    monkeypatch.setattr(module, "fetch_one", fetch_one)
++    assert module.is_revoked(jti) is True
++    sql = " ".join(seen["sql"].lower().split())
++    assert "select" in sql and "revoked_tokens" in sql
++    assert "expires_at" in sql and ("now()" in sql or "current_timestamp" in sql)
++    assert key in seen["params"]
++
++
++def test_revoke_binds_key_and_expiry_and_is_idempotent(monkeypatch):
++    module = _module()
++    jti = "opaque-jti-value"
++    key = uuid5(NAMESPACE_URL, "apexgrid.jwt:" + jti)
++    expiry = datetime.now(UTC) + timedelta(minutes=5)
++    connection = _Connection()
++    monkeypatch.setattr(module, "connection", lambda: _connection_context(connection))
++
++    module.revoke_token(jti, expiry)
++
++    sql, params = connection.cursor_instance.calls[0]
++    sql = " ".join(sql.lower().split())
++    assert "insert into revoked_tokens" in sql
++    assert "on conflict" in sql and "do nothing" in sql
++    assert key in params and expiry in params
++
++
++def _connection_context(connection):
++    @contextmanager
++    def context():
++        yield connection
++
++    return context()
++
++
++def test_purge_deletes_only_expired_revocations(monkeypatch):
++    module = _module()
++    connection = _Connection()
++    monkeypatch.setattr(module, "connection", lambda: _connection_context(connection))
++
++    module.purge_expired_revocations()
++
++    sql, _params = connection.cursor_instance.calls[0]
++    sql = " ".join(sql.lower().split())
++    assert "delete from revoked_tokens" in sql
++    assert "where" in sql and "expires_at" in sql
++    assert "<" in sql and ("now()" in sql or "current_timestamp" in sql)
++
++
++def test_lookup_database_errors_propagate(monkeypatch):
++    module = _module()
++
++    def fail(*_args, **_kwargs):
++        raise RuntimeError("database unavailable")
++
++    monkeypatch.setattr(module, "fetch_one", fail)
++    with pytest.raises(RuntimeError, match="database unavailable"):
++        module.is_revoked("opaque-jti-value")
