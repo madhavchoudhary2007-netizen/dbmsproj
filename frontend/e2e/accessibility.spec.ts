@@ -72,8 +72,7 @@ for (const [id, path] of routes) {
     const results = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
       .analyze();
-    expect(results.violations.filter((violation) => violation.impact === "serious" || violation.impact === "critical"))
-      .toEqual([]);
+    expect(results.violations).toEqual([]);
   });
 }
 

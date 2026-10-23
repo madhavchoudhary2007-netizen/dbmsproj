@@ -1,13 +1,13 @@
 # NEXT_STATE
-updated_at: 2026-10-23T08:20:00Z
+updated_at: 2026-10-23T08:25:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-192 — update aesthetic evaluation with verified A-5, A-6, and A-7
-- worker: W3 | priority: P1 | origin: EVAL score A-5, A-6, A-7
-- target_files: .agent/eval/aesthetic.json
-- contract: record A-7 passed from reducedMotion E2E and lint-motion, and A-5/A-6 passed from Taste review
-- verify: python3 -c "import json; d=json.load(open('.agent/eval/aesthetic.json')); assert any(c['id']=='A-7' and c['passed'] for c in d['checks'])"
+### T-193 — assert zero axe violations across all severities in accessibility.spec.ts
+- worker: W3 | priority: P1 | origin: EVAL score P-6
+- target_files: frontend/e2e/accessibility.spec.ts
+- contract: assert results.violations is empty without filtering to prove zero violations at every viewport
+- verify: PLAYWRIGHT_PORT=32145 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts accessibility.spec.ts --project=desktop-1440 && git checkout -- frontend/next-env.d.ts frontend/AGENTS.md
 
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
@@ -16,6 +16,7 @@ loop_iteration: 0 of 8
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-192 ✓ 7b8619f; recorded A-5, A-6, and A-7 as passed in aesthetic.json based on Taste review and reducedMotion E2E.
 - T-191 ✓ bb2e164; recorded P-4 passed from 136/136 backend unit tests and 82% coverage under coverage replay.
 - T-190 ✓ cd6317c; added prefers-reduced-motion E2E test in accessibility.spec.ts verifying disabled animations.
 - T-189 ✓ 2597b1d; added console.error tracking and offline api mock in routes.spec.ts; 16/16 routes pass with zero errors.
