@@ -3,11 +3,6 @@ updated_at: 2026-10-23
 phase: 2 security (Phase1 complete; baseline score51.2974)
 
 ## Queue
-### T-44137 W2 — OPEN
-- target_files: backend/app/token_revocation.py, backend/migrations/004_token_revocation.sql
-- contract: Implement ADR008 revocation repository and additive004 migration only; no wiringyet. Unit tests alreadyred5asserts. No migration execution here, rootonlydisposable later.
-- verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/pytest -q backend/tests/test_token_revocation.py && .venv/bin/ruff check backend/app/token_revocation.py && .venv/bin/ruff format --check backend/app/token_revocation.py && .venv/bin/mypy --strict backend/app/token_revocation.py
-
 ### T-322 W2 — OPEN
 - target_files: backend/app/security_headers.py, backend/app/main.py
 - contract: Implement pureASGI security headers perT322, newmodule andmainregistration. AllHTTPresponses including404 and middleware503 getheaders. Preserve existingCORS/auth/lease. HSTS enabled only os.getenv('COOKIE_SECURE')=='1'; do notchange existingsecurecookiebehavior (separateexistingproductionflag). No HSTS withflagabsent/0.
@@ -17,6 +12,7 @@ phase: 2 security (Phase1 complete; baseline score51.2974)
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44137 accepted4b6a0fd; verify0.
 - T-44135 accepted7afadff; verify0.
 - T-44129 accepteda3c0554; verify0.
 - T-44136 accepted31e5494; verify0.

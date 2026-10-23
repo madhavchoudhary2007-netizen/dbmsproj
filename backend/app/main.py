@@ -4,6 +4,7 @@ import asyncio
 import hashlib
 import hmac
 import logging
+import os
 import random
 import secrets
 import threading
@@ -86,6 +87,7 @@ from .runtime_lease import acquire_runtime_lease, check_runtime_lease
 from .schemas_competition import ResultIn
 from .schemas_operations import Action, AutoReservationIn, Decision, IncidentIn, ReservationIn
 from .schemas_simulation import DemoRaceCreate, SimulationControl
+from .security_headers import SecurityHeadersMiddleware
 from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
 from .telemetry_router import create_telemetry_router
 from .user_router import create_user_router
@@ -178,6 +180,9 @@ async def require_runtime_lease(request: Request, call_next: RequestResponseEndp
                 },
             )
     return await call_next(request)
+
+
+app.add_middleware(SecurityHeadersMiddleware, secure=os.getenv("COOKIE_SECURE") == "1")
 
 
 def jsonable(value: Any) -> Any:
