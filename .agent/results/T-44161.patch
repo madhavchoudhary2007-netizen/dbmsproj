@@ -1,0 +1,112 @@
+diff --git a/backend/app/main.py b/backend/app/main.py
+index 657593d..be53435 100644
+--- a/backend/app/main.py
++++ b/backend/app/main.py
+@@ -14,7 +14,7 @@ from concurrent.futures import Future, ThreadPoolExecutor
+ from concurrent.futures import TimeoutError as FutureTimeout
+ from contextlib import asynccontextmanager, suppress
+ from datetime import UTC, datetime, timedelta
+-from typing import Any, Literal, TypedDict
++from typing import Any, Literal
+ from uuid import UUID, uuid4
+ 
+ import jwt
+@@ -35,7 +35,6 @@ from psycopg import IntegrityError, OperationalError, sql
+ from psycopg.errors import CheckViolation, ExclusionViolation, ForeignKeyViolation, UniqueViolation
+ from psycopg.rows import dict_row, tuple_row
+ from psycopg_pool import PoolClosed, PoolTimeout
+-from pydantic import BaseModel
+ from pymongo import DESCENDING, MongoClient
+ from pymongo.collection import Collection
+ from pymongo.errors import PyMongoError
+@@ -100,7 +99,15 @@ from .pit_strategy_router import create_pit_strategy_router
+ from .pit_strategy_service import project_pit_strategy
+ from .runtime_lease import acquire_runtime_lease, check_runtime_lease
+ from .schemas_competition import ResultIn
+-from .schemas_operations import Action, AutoReservationIn, Decision, IncidentIn, ReservationIn
++from .schemas_health import HealthReport, LivenessReport, ReadinessReport
++from .schemas_operations import (
++    Action,
++    AutoReservationIn,
++    Decision,
++    IncidentIn,
++    ReservationIn,
++    ReservationStatus,
++)
+ from .schemas_simulation import DemoRaceCreate, SimulationControl
+ from .security_headers import SecurityHeadersMiddleware
+ from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
+@@ -777,10 +784,6 @@ def reserve_pit_auto(body: AutoReservationIn, user=admin_steward_principal_depen
+     return result
+ 
+ 
+-class ReservationStatus(BaseModel):
+-    status: Literal["CANCELLED", "COMPLETED"]
+-
+-
+ @app.patch("/api/pit-reservations/{reservation_id}")
+ def update_pit_reservation(
+     reservation_id: UUID, body: ReservationStatus, user=admin_steward_principal_dependency
+@@ -1769,11 +1772,6 @@ async def session_ws(ws: WebSocket, session_id: UUID):
+ app.include_router(create_analytics_router(current_user, jsonable))
+ 
+ 
+-class HealthReport(TypedDict):
+-    status: Literal["ok", "degraded"]
+-    services: dict[str, Literal["up", "down"]]
+-
+-
+ @app.get("/api/health", response_model=None)
+ def health() -> HealthReport:
+     state: dict[str, Literal["up", "down"]] = {
+@@ -1793,15 +1791,6 @@ def health() -> HealthReport:
+     }
+ 
+ 
+-class LivenessReport(BaseModel):
+-    status: Literal["alive"]
+-
+-
+-class ReadinessReport(BaseModel):
+-    status: Literal["ready", "not_ready"]
+-    services: dict[str, Literal["up", "down"]]
+-
+-
+ @app.get("/health/live", response_model=LivenessReport)
+ def health_live(response: Response) -> LivenessReport:
+     response.headers["Cache-Control"] = "no-store"
+diff --git a/backend/app/schemas_operations.py b/backend/app/schemas_operations.py
+index e6bc197..ec547f0 100644
+--- a/backend/app/schemas_operations.py
++++ b/backend/app/schemas_operations.py
+@@ -65,3 +65,7 @@ class AutoReservationIn(BaseModel):
+     session_id: UUID
+     team_id: UUID
+     driver_id: UUID | None = None
++
++
++class ReservationStatus(BaseModel):
++    status: Literal["CANCELLED", "COMPLETED"]
+diff --git a/backend/app/schemas_health.py b/backend/app/schemas_health.py
+new file mode 100644
+index 0000000..3f240e7
+--- /dev/null
++++ b/backend/app/schemas_health.py
+@@ -0,0 +1,17 @@
++from typing import Literal, TypedDict
++
++from pydantic import BaseModel
++
++
++class HealthReport(TypedDict):
++    status: Literal["ok", "degraded"]
++    services: dict[str, Literal["up", "down"]]
++
++
++class LivenessReport(BaseModel):
++    status: Literal["alive"]
++
++
++class ReadinessReport(BaseModel):
++    status: Literal["ready", "not_ready"]
++    services: dict[str, Literal["up", "down"]]

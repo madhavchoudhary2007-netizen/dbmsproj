@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: cec7835
+git_head: 553ed00
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -42,3 +42,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 
 - T44158cec7835 repaired import-only ratchet: mypy217 in15/39files, snapshot9PASS. T44156 full214PASS0skip/livePASS. T44158root fullrunning.
 - T361 dependency installation is orchestrator-owned per explicit plan: Tailwind4/@tailwindcss/postcss replace Tailwind3/autoprefixer. npm-generated package-lock changes recorded separately from <=150-line authored worker packets; no hand-authored lockfile or product code. The UI integration remains a separate W1 packet.
+
+- T-44160 accepted553ed00: Installed planned Tailwind4.3.3/PostCSS adapter; removed autoprefixer. npm-generated lock updated; root audit0 vulnerabilities. W1 config/import integration pending. Verify0.

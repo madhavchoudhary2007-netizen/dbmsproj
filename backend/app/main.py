@@ -14,7 +14,7 @@ from concurrent.futures import Future, ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeout
 from contextlib import asynccontextmanager, suppress
 from datetime import UTC, datetime, timedelta
-from typing import Any, Literal, TypedDict
+from typing import Any, Literal
 from uuid import UUID, uuid4
 
 import jwt
@@ -35,7 +35,6 @@ from psycopg import IntegrityError, OperationalError, sql
 from psycopg.errors import CheckViolation, ExclusionViolation, ForeignKeyViolation, UniqueViolation
 from psycopg.rows import dict_row, tuple_row
 from psycopg_pool import PoolClosed, PoolTimeout
-from pydantic import BaseModel
 from pymongo import DESCENDING, MongoClient
 from pymongo.collection import Collection
 from pymongo.errors import PyMongoError
@@ -100,7 +99,15 @@ from .pit_strategy_router import create_pit_strategy_router
 from .pit_strategy_service import project_pit_strategy
 from .runtime_lease import acquire_runtime_lease, check_runtime_lease
 from .schemas_competition import ResultIn
-from .schemas_operations import Action, AutoReservationIn, Decision, IncidentIn, ReservationIn
+from .schemas_health import HealthReport, LivenessReport, ReadinessReport
+from .schemas_operations import (
+    Action,
+    AutoReservationIn,
+    Decision,
+    IncidentIn,
+    ReservationIn,
+    ReservationStatus,
+)
 from .schemas_simulation import DemoRaceCreate, SimulationControl
 from .security_headers import SecurityHeadersMiddleware
 from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
@@ -775,10 +782,6 @@ def reserve_pit_auto(body: AutoReservationIn, user=admin_steward_principal_depen
     result = jsonable(reservation)
     publish(body.session_id, "pit.update", result)
     return result
-
-
-class ReservationStatus(BaseModel):
-    status: Literal["CANCELLED", "COMPLETED"]
 
 
 @app.patch("/api/pit-reservations/{reservation_id}")
@@ -1769,11 +1772,6 @@ async def session_ws(ws: WebSocket, session_id: UUID):
 app.include_router(create_analytics_router(current_user, jsonable))
 
 
-class HealthReport(TypedDict):
-    status: Literal["ok", "degraded"]
-    services: dict[str, Literal["up", "down"]]
-
-
 @app.get("/api/health", response_model=None)
 def health() -> HealthReport:
     state: dict[str, Literal["up", "down"]] = {
@@ -1791,15 +1789,6 @@ def health() -> HealthReport:
         "status": "ok" if all(v == "up" for v in state.values()) else "degraded",
         "services": state,
     }
-
-
-class LivenessReport(BaseModel):
-    status: Literal["alive"]
-
-
-class ReadinessReport(BaseModel):
-    status: Literal["ready", "not_ready"]
-    services: dict[str, Literal["up", "down"]]
 
 
 @app.get("/health/live", response_model=LivenessReport)

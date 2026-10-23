@@ -65,3 +65,7 @@ class AutoReservationIn(BaseModel):
     session_id: UUID
     team_id: UUID
     driver_id: UUID | None = None
+
+
+class ReservationStatus(BaseModel):
+    status: Literal["CANCELLED", "COMPLETED"]

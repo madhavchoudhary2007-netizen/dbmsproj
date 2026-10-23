@@ -3,11 +3,6 @@ updated_at: 2026-10-23
 phase: 3 API contract guard (Phases0–2 complete; baseline score51.2974)
 
 ## Queue
-### T-44160 Orchestrator — OPEN
-- target_files: frontend/package.json, frontend/package-lock.json
-- contract: planned root-owned npm installation; generated lock only.
-- verify: npm --prefix frontend ls tailwindcss @tailwindcss/postcss && node -e 'const assert=require("node:assert/strict"); const p=require("./frontend/package.json"); assert.match(p.devDependencies.tailwindcss,/^\^4\./); assert.match(p.devDependencies["@tailwindcss/postcss"],/^\^4\./); assert.equal(p.devDependencies.autoprefixer,undefined); console.log("PASS planned Tailwind4 dependencies and removed autoprefixer")'
-
 ### T-44161 W2 — OPEN
 - target_files: backend/app/schemas_health.py, backend/app/schemas_operations.py, backend/app/main.py
 - contract: T331 move-only model extraction: move three health report types to schemas_health.py and ReservationStatus to existing schemas_operations.py, retaining main aliases. No field/default/typing/signature/wire changes.
@@ -22,6 +17,7 @@ phase: 3 API contract guard (Phases0–2 complete; baseline score51.2974)
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44160 accepted553ed00; verify0.
 - T-44158 acceptedcec7835; verify0.
 - T-44157 accepted4f53ecd; verify0.
 - T-44156 accepted049a179; verify0.
