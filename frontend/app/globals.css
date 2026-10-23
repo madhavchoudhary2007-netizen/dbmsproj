@@ -10,6 +10,7 @@
   --muted: #8b96a3;
   --acid: #d9ff3f;
   --red: #ff4b46;
+  --sidebar-width: 246px;
 }
 * {
   box-sizing: border-box;
@@ -43,7 +44,7 @@ a {
   text-decoration: none;
 }
 .sidebar {
-  width: 246px;
+  width: var(--sidebar-width);
   position: fixed;
   inset: 0 auto 0 0;
   background: #0c1014;
@@ -1088,6 +1089,9 @@ tbody tr:hover {
   height: 44px;
 }
 @media (max-width: 1000px) {
+  :root {
+    --sidebar-width: 220px;
+  }
   .content {
     padding: 24px 24px 48px;
   }
@@ -1095,7 +1099,7 @@ tbody tr:hover {
     grid-template-columns: repeat(2, 1fr);
   }
   .sidebar {
-    width: 220px;
+    width: var(--sidebar-width);
   }
   .main-shell {
     margin-left: var(--sidebar-width);

@@ -3,11 +3,17 @@ updated_at: 2026-10-23T08:25:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-211 — record P-1 and P-2 passed in performance.json from real Lighthouse audit
-- worker: Orchestrator | priority: P1 | origin: EVAL score P-1, P-2
-- target_files: .agent/eval/performance.json, scripts/eval/audit-lighthouse-all.mjs
-- contract: record P-1 and P-2 passed based on audit-lighthouse-all.mjs 16/16 route audit
-- verify: python3 -c "import json; data=json.load(open('.agent/eval/performance.json')); assert all(c['passed'] for c in data['checks'])"
+### T-212 — implement E-1 route applicability matrix E2E tests and layout fixes
+- worker: Orchestrator | priority: P1 | origin: E-1 Hard Gate
+- target_files: frontend/app/globals.css, frontend/components/special-pages.tsx, frontend/e2e/states-matrix.spec.ts, frontend/AGENTS.md, frontend/next-env.d.ts
+- contract: deliver E-1 applicability matrix and passing 25/25 viewport E2E tests covering applicable empty, loading, populated, error, partial states
+- verify: PLAYWRIGHT_PORT=3100 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts frontend/e2e/states-matrix.spec.ts --reporter=line
+
+### T-213 — record E-1 passed in edge.json
+- worker: Orchestrator | priority: P1 | origin: E-1 Hard Gate
+- target_files: .agent/eval/edge.json
+- contract: update edge.json to record E-1 passed: true
+- verify: python3 -c "import json; data=json.load(open('.agent/eval/edge.json')); assert any(c['id']=='E-1' and c['passed'] for c in data['checks'])"
 
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.

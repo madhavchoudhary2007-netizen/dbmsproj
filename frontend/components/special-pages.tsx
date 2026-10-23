@@ -56,10 +56,12 @@ export function Dashboard() {
     [load, setLoad] = useState(true);
   const fetchData = useCallback(() => {
     setLoad(true);
+    setErr("");
     Promise.all([api<DashboardData>("/dashboard"), api<HealthData>("/health")])
       .then(([d, h]) => {
         setData(d);
         setHealth(h);
+        setErr("");
       })
       .catch((e) => setErr(e.message))
       .finally(() => setLoad(false));
