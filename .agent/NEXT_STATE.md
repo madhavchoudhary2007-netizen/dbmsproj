@@ -3,11 +3,6 @@ updated_at: 2026-10-23
 phase: 0 architecture amendment
 
 ## Queue
-### T-300 — branch and harness boot
-- worker: O | priority: P0 | origin: overhaul-plan section3 Phase0
-- target_files: .agent/models.env, .claude/settings.json, docs/overhaul-plan.md
-- contract: branch overhaul/neo-brutal from perfection-loop; caller-selected harness; Codex gpt-6.1-sol; preserve owner-supplied settings/plan and worker/cap/context settings
-- verify: HARNESS=codex bash -c 'source .agent/models.env && bash scripts/agent/boot.sh'
 ### T-301 — ADR-007 architecture amendment
 - worker: O | priority: P0 | after: T-300
 - target_files: .agent/ARCHITECT.md, .agent/adr/ADR-007-neo-brutal-motorsport-light-overhaul.md
@@ -21,7 +16,8 @@ phase: 0 architecture amendment
 
 ## Blocked
 - T-310 onward: ADR-007 owner approval required.
-- T-440 reserved only for a concrete missing plan task; none added.
+- T-440 (O, before motion packets): align plan2.3/2.7 with owner100–300ms and display>=48px leading limits; those conflicting catalogue specifications are missing a correction task.
+- T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
-- none in overhaul branch yet.
+- T-300 accepted e465e89; boot exit0, lock/budgets pass, boot OK.
