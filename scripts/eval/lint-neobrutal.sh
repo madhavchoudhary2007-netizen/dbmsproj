@@ -19,6 +19,8 @@ from scripts.eval.neo_colour import _self_test as gray_self_test, check_gray
 from scripts.eval.neo_effects import _self_test as blur_self_test, check_blur
 from scripts.eval.neo_gradient import _self_test as gradient_self_test, check_gradients
 from scripts.eval.neo_weight import _self_test as weight_self_test, check_weight
+from scripts.eval.neo_shadow import self_test as shadow_self_test, check_shadows
+from scripts.eval.neo_contrast import _self_test as contrast_self_test, check_white_on_red
 from scripts.eval.source_text import mask_comments
 
 allowed = re.compile(r"^(?:0(?:px)?|9999px|var\(--radius-(?:none|full)\))$", re.I)
@@ -33,6 +35,8 @@ def check(text, css=False, path=''):
     hits.extend(check_blur(text, css=css))
     hits.extend(check_gradients(text, path=path, css=css))
     hits.extend(check_weight(text, css=css))
+    hits.extend(check_shadows(text, css=css))
+    hits.extend(check_white_on_red(text, css=css))
     for m in css_radius.finditer(clean):
         vals = re.split(r"\s+", m.group(1).strip())
         if not vals or any(not allowed.fullmatch(v.strip("'\"")) for v in vals): hits.append((m.start(), "CSS radius"))
@@ -63,9 +67,11 @@ if sys.argv[1] == "--self-test":
         blur_self_test()
         gradient_self_test()
         weight_self_test()
+        shadow_self_test()
+        contrast_self_test()
     except Exception as error:
         print(f"SELF-TEST FAILED: rule checker: {error}", file=sys.stderr); raise SystemExit(1)
-    print("SELF-TEST PASSED: fixtures, gray, blur, gradients, weight, radius, CSS, Tailwind, JS values, comments and URLs")
+    print("SELF-TEST PASSED: fixtures, gray, blur, gradients, weight, shadow, contrast, radius, CSS, Tailwind, JS values, comments and URLs")
     raise SystemExit(0)
 
 if sys.argv[1] != "--scan": raise SystemExit(2)

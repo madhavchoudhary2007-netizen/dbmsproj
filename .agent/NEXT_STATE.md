@@ -3,15 +3,21 @@ updated_at: 2026-10-23
 phase: 3 T331 extraction; Phase5 T360 lints / T361accepted (Phases0–2 complete; baseline51.2974)
 
 ## Queue
-### T-44175 W3 — OPEN
-- target_files: scripts/eval/neo_contrast.py, scripts/eval/rules/contrast.good.css, scripts/eval/rules/contrast.bad.css
-- contract: T360 white-on-red rule: add typed co-occurrence checker plus good/bad fixtures for the forbidden white foreground on #FF6B6B. Covers explicit CSS declarations, inline JS style objects and literal Tailwind class strings. Dynamic cascade remains covered by browser AA checks; do not pretend static text proves all computed styles.
-- verify: env PYTHONPATH=. .venv/bin/python scripts/eval/neo_contrast.py --self-test && .venv/bin/ruff check scripts/eval/neo_contrast.py && .venv/bin/ruff format --check scripts/eval/neo_contrast.py && .venv/bin/mypy --strict scripts/eval/neo_contrast.py
+### T-44178 W2 — OPEN
+- target_files: backend/app/api/dbms_sql.py, backend/app/main.py
+- contract: T331 move unchanged EXPLAIN handler into SQL router, preserving precise connection typing and main alias.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,importlib,inspect,subprocess; old=ast.parse(subprocess.check_output(["git","show","d0e50ef:backend/app/main.py"],text=True)); a=next(n for n in old.body if isinstance(n,ast.FunctionDef) and n.name=="dbms_explain"); a.decorator_list=[]; module=importlib.import_module("backend.app.api.dbms_sql"); b=next(n for n in ast.walk(ast.parse(inspect.getsource(module))) if isinstance(n,ast.FunctionDef) and n.name=="dbms_explain"); b.decorator_list=[]; assert ast.dump(a)==ast.dump(b); main=importlib.import_module("backend.app.main"); routes=[r for outer in main.app.routes for r in (outer.original_router.routes if hasattr(outer,"original_router") else [outer])]; assert sum(getattr(r,"endpoint",None) is main.dbms_explain for r in routes)==1; print("PASS exact EXPLAIN handler and alias")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py && .venv/bin/ruff check backend/app/main.py backend/app/api/dbms_sql.py && .venv/bin/ruff format --check backend/app/main.py backend/app/api/dbms_sql.py
+
+### T-44177 W3 — OPEN
+- target_files: scripts/eval/lint-neobrutal.sh
+- contract: T360 integrate accepted shadow and white-on-red rules into shared neo scanner and self-test. Preserve every existing rule/assertion.
+- verify: bash scripts/eval/lint-neobrutal.sh --self-test && bash scripts/eval/lint-neobrutal.sh scripts/eval/rules/shadow.good.css scripts/eval/rules/contrast.good.css && ! bash scripts/eval/lint-neobrutal.sh scripts/eval/rules/shadow.bad.css && ! bash scripts/eval/lint-neobrutal.sh scripts/eval/rules/contrast.bad.css
 
 ## Deferred
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44175 acceptedd0e50ef; verify0.
 - T-44173 accepted66c4550; verify0.
 - T-44176 accepted9d8cae0; verify0.
 - T-44174 accepted1356d28; verify0.

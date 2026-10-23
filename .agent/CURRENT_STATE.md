@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 66c4550
+git_head: d0e50ef
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -39,3 +39,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T-44176 accepted9d8cae0: Moved unchanged EER metadata handler into SQL router with main alias; exact AST and endpoint identity plus9 snapshot tests pass. Verify0.
 
 - T-44173 accepted66c4550: Added hard-shadow validator with28 regression controls including canonical aliases, RGB, CSS case and important handling. Verify0.
+
+- T-44175 acceptedd0e50ef: Added white-on-red checker with24 controls, character offsets, declaration precedence and conditional JSX literals. Verify0.
