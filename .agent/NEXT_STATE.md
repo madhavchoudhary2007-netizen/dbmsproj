@@ -3,10 +3,10 @@ updated_at: 2026-10-23
 phase: 3 API contract guard (Phases0–2 complete; baseline score51.2974)
 
 ## Queue
-### T-330 Orchestrator — OPEN
-- target_files: backend/tests/test_contract_snapshot.py, backend/tests/test_contract_goldens.py, backend/tests/contract_compat.py
-- contract: Close OpenAPI and ten real GET golden contract guard from accepted W3 children. Thirty focused tests pass; full isolated suite has 214 passed, zero skips, with live acceptance passed.
-- verify: env APEXGRID_TEST_STACK=1 APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_contract_compat_unions.py backend/tests/test_contract_goldens.py
+### T-44151 W2 — OPEN
+- target_files: backend/app/core/__init__.py, backend/app/core/events.py, backend/app/main.py
+- contract: T331 first puremovechild: extract EventBus class verbatim into backend/app/core/events.py. Keep main.EventBus publicalias import and main.bus singletoncreation exactlyasbefore; no behavior/typechanges. Do notmoveotherfunctions. Explicitcorepackage empty__init__.py permitted.
+- verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/python .agent/check-event-bus-move.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k 'websocket_bus or websocket_uses_bearer' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py && .venv/bin/ruff check backend/app/main.py backend/app/core && .venv/bin/ruff format --check backend/app/main.py backend/app/core
 
 ### T-44150 W3 — OPEN
 - target_files: scripts/eval/lint-neobrutal.sh, scripts/eval/rules/radius.good.css, scripts/eval/rules/radius.bad.css
@@ -17,6 +17,7 @@ phase: 3 API contract guard (Phases0–2 complete; baseline score51.2974)
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-330 accepted3afff87; verify0.
 - T-44149 accepted62443d0; verify0.
 - T-44148 accepteda5535b2; verify0.
 - T-44147 accepted6ae5e39; verify0.
