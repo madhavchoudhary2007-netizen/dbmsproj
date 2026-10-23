@@ -201,31 +201,49 @@ def test_standings_and_overlapping_pit_reservation(db):
     cur.execute("SELECT id FROM championships WHERE season=2026")
     championship_id = cur.fetchone()[0]
     cur.execute("SELECT recalculate_standings(%s)", (championship_id,))
-    cur.execute("SELECT count(*), min(rank), max(rank) FROM driver_standings WHERE championship_id=%s", (championship_id,))
+    cur.execute(
+        "SELECT count(*), min(rank), max(rank) FROM driver_standings WHERE championship_id=%s",
+        (championship_id,),
+    )
     assert cur.fetchone() == (10, 1, 10)
     cur.execute("""SELECT b.id,s.id,t.id FROM pit_boxes b JOIN race_events e ON e.id=b.event_id
                     JOIN race_sessions s ON s.event_id=e.id JOIN teams t ON true
                     WHERE s.session_type='RACE' LIMIT 1""")
     box, session, team = cur.fetchone()
-    cur.execute("SELECT reserve_pit_box(%s,%s,%s,'2026-03-15 08:00+00','2026-03-15 09:00+00')", (box, session, team))
+    cur.execute(
+        "SELECT reserve_pit_box(%s,%s,%s,'2026-03-15 08:00+00','2026-03-15 09:00+00')",
+        (box, session, team),
+    )
     with pytest.raises(_database_error):
-        cur.execute("SELECT reserve_pit_box(%s,%s,%s,'2026-03-15 08:30+00','2026-03-15 09:30+00')", (box, session, team))
+        cur.execute(
+            "SELECT reserve_pit_box(%s,%s,%s,'2026-03-15 08:30+00','2026-03-15 09:30+00')",
+            (box, session, team),
+        )
 
 
 def test_historical_penalty_provisional(db, monkeypatch):
     _, cur = db
     cur.execute("SELECT id FROM championships WHERE name='ApexGrid World Series' AND season=2026")
     championship_id = cur.fetchone()[0]
-    cur.execute("""SELECT e.round_number,s.id FROM race_events e JOIN race_sessions s ON s.event_id=e.id
+    cur.execute(
+        """SELECT e.round_number,s.id FROM race_events e JOIN race_sessions s ON s.event_id=e.id
         WHERE e.championship_id=%s AND e.round_number IN (1,2) AND s.session_type='RACE'
-        ORDER BY e.round_number""", (championship_id,))
+        ORDER BY e.round_number""",
+        (championship_id,),
+    )
     sessions = dict(cur.fetchall())
     round1, round2 = sessions[1], sessions[2]
-    cur.execute("""SELECT count(*), min(p.time_seconds) FROM penalties p
-        JOIN incident_reports i ON i.id=p.incident_id WHERE i.session_id=%s""", (round1,))
+    cur.execute(
+        """SELECT count(*), min(p.time_seconds) FROM penalties p
+        JOIN incident_reports i ON i.id=p.incident_id WHERE i.session_id=%s""",
+        (round1,),
+    )
     assert cur.fetchone() == (1, 5)
-    cur.execute("""SELECT count(*) FROM penalties p JOIN incident_reports i ON i.id=p.incident_id
-        WHERE i.session_id=%s""", (round2,))
+    cur.execute(
+        """SELECT count(*) FROM penalties p JOIN incident_reports i ON i.id=p.incident_id
+        WHERE i.session_id=%s""",
+        (round2,),
+    )
     assert cur.fetchone()[0] == 0
 
     from backend.app import main
@@ -242,28 +260,44 @@ def test_historical_penalty_provisional(db, monkeypatch):
     championship_standings = main.standings(championship_id)
     assert affected_results and all(row["provisional"] is True for row in affected_results)
     assert unaffected_results and all(row["provisional"] is False for row in unaffected_results)
-    assert championship_standings and all(row["provisional"] is True for row in championship_standings)
+    assert championship_standings and all(
+        row["provisional"] is True for row in championship_standings
+    )
 
 
 def test_unclassified_bonus_points_do_not_count(db):
     _, cur = db
     now = datetime.now(UTC)
-    cur.execute("INSERT INTO championships(name,season) VALUES ('Unclassified bonus regression',2099) RETURNING id")
+    cur.execute(
+        "INSERT INTO championships(name,season) VALUES ('Unclassified bonus regression',2099) RETURNING id"
+    )
     championship_id = cur.fetchone()[0]
     cur.execute("SELECT id FROM circuits WHERE name='Harbor Ring'")
     circuit_id = cur.fetchone()[0]
     cur.execute("SELECT id FROM drivers WHERE number=1 ORDER BY licence_number LIMIT 1")
     driver_id = cur.fetchone()[0]
-    cur.execute("""INSERT INTO race_events(championship_id,circuit_id,round_number,name,start_date)
-        VALUES (%s,%s,1,'Unclassified bonus regression',%s) RETURNING id""", (championship_id,circuit_id,now))
+    cur.execute(
+        """INSERT INTO race_events(championship_id,circuit_id,round_number,name,start_date)
+        VALUES (%s,%s,1,'Unclassified bonus regression',%s) RETURNING id""",
+        (championship_id, circuit_id, now),
+    )
     event_id = cur.fetchone()[0]
-    cur.execute("""INSERT INTO race_sessions(event_id,session_type,state,scheduled_at,started_at,ended_at,total_laps)
-        VALUES (%s,'RACE','COMPLETED',%s,%s,%s,1) RETURNING id""", (event_id,now,now,now))
+    cur.execute(
+        """INSERT INTO race_sessions(event_id,session_type,state,scheduled_at,started_at,ended_at,total_laps)
+        VALUES (%s,'RACE','COMPLETED',%s,%s,%s,1) RETURNING id""",
+        (event_id, now, now, now),
+    )
     session_id = cur.fetchone()[0]
-    cur.execute("""INSERT INTO session_results(session_id,driver_id,position,lap_time_ms,pole,fastest_lap,classified)
-        VALUES (%s,%s,1,90000,true,true,false)""", (session_id,driver_id))
+    cur.execute(
+        """INSERT INTO session_results(session_id,driver_id,position,lap_time_ms,pole,fastest_lap,classified)
+        VALUES (%s,%s,1,90000,true,true,false)""",
+        (session_id, driver_id),
+    )
     cur.execute("SELECT recalculate_standings(%s)", (championship_id,))
-    cur.execute("SELECT points FROM driver_standings WHERE championship_id=%s AND driver_id=%s", (championship_id,driver_id))
+    cur.execute(
+        "SELECT points FROM driver_standings WHERE championship_id=%s AND driver_id=%s",
+        (championship_id, driver_id),
+    )
     assert cur.fetchone()[0] == 0
 
 
@@ -276,26 +310,36 @@ def test_penalty_requires_approved_incident_and_matching_driver(db):
     cur.execute("SELECT id FROM race_sessions WHERE session_type='RACE' LIMIT 1")
     session_id = cur.fetchone()[0]
 
-    cur.execute("""INSERT INTO incident_reports(session_id,driver_id,lap,description,state)
+    cur.execute(
+        """INSERT INTO incident_reports(session_id,driver_id,lap,description,state)
                     VALUES (%s,%s,5,'pending penalty guard','OPEN') RETURNING id""",
-                (session_id, incident_driver))
+        (session_id, incident_driver),
+    )
     open_incident = cur.fetchone()[0]
     with pytest.raises(_database_error):
-        cur.execute("INSERT INTO penalties(incident_id,driver_id,points) VALUES (%s,%s,2)",
-                    (open_incident, incident_driver))
+        cur.execute(
+            "INSERT INTO penalties(incident_id,driver_id,points) VALUES (%s,%s,2)",
+            (open_incident, incident_driver),
+        )
 
-    cur.execute("""INSERT INTO incident_reports(session_id,driver_id,lap,description,state)
+    cur.execute(
+        """INSERT INTO incident_reports(session_id,driver_id,lap,description,state)
                     VALUES (%s,%s,6,'driver penalty guard','APPROVED') RETURNING id""",
-                (session_id, incident_driver))
+        (session_id, incident_driver),
+    )
     approved_incident = cur.fetchone()[0]
     with pytest.raises(_database_error):
-        cur.execute("INSERT INTO penalties(incident_id,driver_id,points) VALUES (%s,%s,2)",
-                    (approved_incident, other_driver))
+        cur.execute(
+            "INSERT INTO penalties(incident_id,driver_id,points) VALUES (%s,%s,2)",
+            (approved_incident, other_driver),
+        )
 
 
 def test_incident_laps_stay_within_session_distance(db):
     _, cur = db
-    cur.execute("SELECT id,total_laps FROM race_sessions WHERE total_laps>0 ORDER BY total_laps LIMIT 1")
+    cur.execute(
+        "SELECT id,total_laps FROM race_sessions WHERE total_laps>0 ORDER BY total_laps LIMIT 1"
+    )
     session_id, total_laps = cur.fetchone()
     cur.execute("SELECT id FROM drivers ORDER BY number LIMIT 1")
     driver_id = cur.fetchone()[0]
