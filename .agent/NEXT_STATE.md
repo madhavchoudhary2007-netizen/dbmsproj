@@ -3,15 +3,21 @@ updated_at: 2026-10-23
 phase: 2 security (Phase1 complete; baseline score51.2974)
 
 ## Queue
-### T-44145 W2 — OPEN
-- target_files: backend/app/security_headers.py
-- contract: Fix documented API docs regression introducedbyT322. Apply strictAPI CSP to allresponses exceptthe3exact legacyHTMLdocpaths /docs,/redoc,/docs/oauth2-redirect. Preserve their earlierworkinginline/CDNbehavior byleavingCSPunsetforthese3; keepnosniff/referrer/frame/permissions/HSTS otherheaders. Do notexempt prefixpathsorAPI/OpenAPIjson. ExplaincommentAPI-onlypolicydoesnotapplytolegacyinteractiveHTML.
-- verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/pytest -q backend/tests/test_docs_security.py backend/tests/test_security_headers.py && .venv/bin/ruff check backend/app/security_headers.py && .venv/bin/ruff format --check backend/app/security_headers.py && .venv/bin/mypy --strict backend/app/security_headers.py
+### T-320 Orchestrator — OPEN
+- target_files: backend/tests/test_security_headers.py, backend/tests/test_logout_revocation.py
+- contract: Close failing-first security milestone from accepted W3 children T-44133/T-44134 and their recorded red baselines; current 18 focused assertions pass after accepted implementations.
+- verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/pytest -q backend/tests/test_security_headers.py backend/tests/test_logout_revocation.py
+
+### T-44146 W3 — OPEN
+- target_files: backend/tests/contract_compat.py, backend/tests/test_contract_snapshot.py, backend/tests/snapshots/openapi.json
+- contract: Phase3 T330 child1: add backward-compatible OpenAPI snapshot guard BEFORE anyrefactor, plusnegative self-tests. Generate baselinefromcurrentapp.openapi() withoutlifespan/DB. snapshotJSONmachinefixture serializecompact canonicaljson(sortkeys,separators)+newline (neverprintcontents). Testscomparecurrentapp withcapturedfixture. No API/productedits. ParentT330 real10GETgoldens followsseparateboundedtask.
+- verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/pytest -q backend/tests/test_contract_snapshot.py && .venv/bin/ruff check backend/tests/contract_compat.py backend/tests/test_contract_snapshot.py && .venv/bin/ruff format --check backend/tests/contract_compat.py backend/tests/test_contract_snapshot.py
 
 ## Blocked
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44145 accepted8f721ae; verify0.
 - T-44144 accepted2e0345c; verify0.
 - T-44143 accepted9b8322c; verify0.
 - T-325 accepted2bff831; verify0.
