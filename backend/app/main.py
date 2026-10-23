@@ -1816,73 +1816,136 @@ def dbms_tables(user=admin_dependency):
     with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
         rows = []
         for name in names:
-            cur.execute(sql.SQL("SELECT count(*) AS count FROM public.{}").format(sql.Identifier(name)))
+            cur.execute(
+                sql.SQL("SELECT count(*) AS count FROM public.{}").format(sql.Identifier(name))
+            )
             rows.append({"table_name": name, "row_count": cur.fetchone()["count"]})
     return jsonable({"tables": rows, "updated_at": datetime.now(UTC)})
 
 
 @app.get("/api/dbms/tables/{table_name}")
-def dbms_table_rows(table_name: str, limit: int = Query(50, ge=1, le=100),
-                    offset: int = Query(0, ge=0), user=admin_dependency):
+def dbms_table_rows(
+    table_name: str,
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    user=admin_dependency,
+):
     if table_name not in public_dbms_tables():
         raise HTTPException(404, "Database table not found")
-    columns = fetch_all("""SELECT column_name FROM information_schema.columns
-      WHERE table_schema='public' AND table_name=%s ORDER BY ordinal_position""", (table_name,))
-    visible_columns = [row["column_name"] for row in columns if row["column_name"] not in {"password_hash"}]
-    primary_keys = fetch_all("""SELECT k.column_name FROM information_schema.table_constraints t
+    columns = fetch_all(
+        """SELECT column_name FROM information_schema.columns
+      WHERE table_schema='public' AND table_name=%s ORDER BY ordinal_position""",
+        (table_name,),
+    )
+    visible_columns = [
+        row["column_name"] for row in columns if row["column_name"] not in {"password_hash"}
+    ]
+    primary_keys = fetch_all(
+        """SELECT k.column_name FROM information_schema.table_constraints t
       JOIN information_schema.key_column_usage k ON k.constraint_name=t.constraint_name
         AND k.constraint_schema=t.constraint_schema AND k.table_name=t.table_name
       WHERE t.table_schema='public' AND t.table_name=%s AND t.constraint_type='PRIMARY KEY'
-      ORDER BY k.ordinal_position""", (table_name,))
+      ORDER BY k.ordinal_position""",
+        (table_name,),
+    )
     order_columns = [row["column_name"] for row in primary_keys] or visible_columns[:1]
     with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-        cur.execute(sql.SQL("SELECT {} FROM public.{} ORDER BY {} LIMIT %s OFFSET %s").format(
-          sql.SQL(",").join(map(sql.Identifier, visible_columns)), sql.Identifier(table_name),
-          sql.SQL(",").join(map(sql.Identifier, order_columns))), (limit, offset))
+        cur.execute(
+            sql.SQL("SELECT {} FROM public.{} ORDER BY {} LIMIT %s OFFSET %s").format(
+                sql.SQL(",").join(map(sql.Identifier, visible_columns)),
+                sql.Identifier(table_name),
+                sql.SQL(",").join(map(sql.Identifier, order_columns)),
+            ),
+            (limit, offset),
+        )
         rows = cur.fetchall()
-        cur.execute(sql.SQL("SELECT count(*) AS count FROM public.{}").format(sql.Identifier(table_name)))
+        cur.execute(
+            sql.SQL("SELECT count(*) AS count FROM public.{}").format(sql.Identifier(table_name))
+        )
         count = cur.fetchone()["count"]
-    return jsonable({"table_name": table_name, "columns": visible_columns,
-      "rows": rows, "total": count, "limit": limit, "offset": offset,
-      "updated_at": datetime.now(UTC)})
+    return jsonable(
+        {
+            "table_name": table_name,
+            "columns": visible_columns,
+            "rows": rows,
+            "total": count,
+            "limit": limit,
+            "offset": offset,
+            "updated_at": datetime.now(UTC),
+        }
+    )
 
 
 @app.get("/api/dbms/races")
 def dbms_races(user=admin_dependency):
-    return jsonable(fetch_all("""SELECT s.id,s.state,s.total_laps,s.started_at,s.ended_at,e.name AS event_name,c.name AS circuit_name
+    return jsonable(
+        fetch_all("""SELECT s.id,s.state,s.total_laps,s.started_at,s.ended_at,e.name AS event_name,c.name AS circuit_name
       FROM race_sessions s JOIN race_events e ON e.id=s.event_id JOIN circuits c ON c.id=e.circuit_id LEFT JOIN demo_races d ON d.session_id=s.id
-      WHERE s.session_type='RACE' ORDER BY CASE WHEN s.state='ACTIVE' THEN 0 WHEN s.state='PAUSED' THEN 1 ELSE 2 END,COALESCE(d.auto_repeat,false) DESC,s.scheduled_at DESC"""))
+      WHERE s.session_type='RACE' ORDER BY CASE WHEN s.state='ACTIVE' THEN 0 WHEN s.state='PAUSED' THEN 1 ELSE 2 END,COALESCE(d.auto_repeat,false) DESC,s.scheduled_at DESC""")
+    )
 
 
 @app.get("/api/dbms/races/{session_id}")
 def dbms_race(session_id: UUID, include_laps: bool = True, user=admin_dependency):
-    session = fetch_one("""SELECT s.*,e.name AS event_name,c.name AS circuit_name FROM race_sessions s
-      JOIN race_events e ON e.id=s.event_id JOIN circuits c ON c.id=e.circuit_id WHERE s.id=%s AND s.session_type='RACE'""", (session_id,))
+    session = fetch_one(
+        """SELECT s.*,e.name AS event_name,c.name AS circuit_name FROM race_sessions s
+      JOIN race_events e ON e.id=s.event_id JOIN circuits c ON c.id=e.circuit_id WHERE s.id=%s AND s.session_type='RACE'""",
+        (session_id,),
+    )
     if not session:
         raise HTTPException(404, "Race not found")
-    results = fetch_all("""SELECT r.*,u.full_name AS driver_name,d.number,d.licence_number FROM session_results r
-      JOIN drivers d ON d.id=r.driver_id LEFT JOIN users u ON u.id=d.user_id WHERE r.session_id=%s ORDER BY r.position NULLS LAST""", (session_id,))
-    incidents = fetch_all("""SELECT i.*,u.full_name AS driver_name FROM incident_reports i
+    results = fetch_all(
+        """SELECT r.*,u.full_name AS driver_name,d.number,d.licence_number FROM session_results r
+      JOIN drivers d ON d.id=r.driver_id LEFT JOIN users u ON u.id=d.user_id WHERE r.session_id=%s ORDER BY r.position NULLS LAST""",
+        (session_id,),
+    )
+    incidents = fetch_all(
+        """SELECT i.*,u.full_name AS driver_name FROM incident_reports i
       JOIN drivers d ON d.id=i.driver_id JOIN users u ON u.id=d.user_id
-      WHERE i.session_id=%s ORDER BY i.lap,i.id""", (session_id,))
-    penalties = fetch_all("SELECT p.* FROM penalties p JOIN incident_reports i ON i.id=p.incident_id WHERE i.session_id=%s", (session_id,))
+      WHERE i.session_id=%s ORDER BY i.lap,i.id""",
+        (session_id,),
+    )
+    penalties = fetch_all(
+        "SELECT p.* FROM penalties p JOIN incident_reports i ON i.id=p.incident_id WHERE i.session_id=%s",
+        (session_id,),
+    )
     provisional = session["state"] == "COMPLETED" and any(
         (penalty.get("time_seconds") or 0) > 0 or (penalty.get("grid_places") or 0) > 0
-        for penalty in penalties)
+        for penalty in penalties
+    )
     for result in results:
         result["provisional"] = provisional
-    reservations = fetch_all(PIT_RESERVATION_SELECT + " WHERE r.session_id=%s ORDER BY r.starts_at", (session_id,))
+    reservations = fetch_all(
+        PIT_RESERVATION_SELECT + " WHERE r.session_id=%s ORDER BY r.starts_at", (session_id,)
+    )
     col = mongo_ready()
     match = {"session_id": str(session_id)}
     # Full lap history is optional for the 1s live poll; it grows with every race lap.
     laps = race_lap_measurements(col, match) if include_laps else []
     driver_ids = col.distinct("driver_id", match)
-    latest = [col.find_one({**match, "driver_id": driver_id}, sort=[("ts", DESCENDING)]) for driver_id in driver_ids]
-    latest = sorted((row for row in latest if row), key=lambda row: (row.get("position") is None, row.get("position") or 0))
+    latest = [
+        col.find_one({**match, "driver_id": driver_id}, sort=[("ts", DESCENDING)])
+        for driver_id in driver_ids
+    ]
+    latest = sorted(
+        (row for row in latest if row),
+        key=lambda row: (row.get("position") is None, row.get("position") or 0),
+    )
     ids = {row["driver_id"] for row in latest} | {str(row["driver_id"]) for row in results}
-    drivers = fetch_all("SELECT d.id,d.number,d.licence_number,u.full_name AS driver_name FROM drivers d LEFT JOIN users u ON u.id=d.user_id WHERE d.id=ANY(%s::uuid[])", (list(ids),)) if ids else []
+    drivers = (
+        fetch_all(
+            "SELECT d.id,d.number,d.licence_number,u.full_name AS driver_name FROM drivers d LEFT JOIN users u ON u.id=d.user_id WHERE d.id=ANY(%s::uuid[])",
+            (list(ids),),
+        )
+        if ids
+        else []
+    )
     if include_laps:
-        lap_source = "historical_demo" if laps and all(x.get("source")=="historical_demo" for x in laps) else "recorded_telemetry"
+        lap_source = (
+            "historical_demo"
+            if laps and all(x.get("source") == "historical_demo" for x in laps)
+            else "recorded_telemetry"
+        )
     else:
         lap_source = "historical_demo" if col.find_one({**match, "sector":3, "lap_time_ms":{"$gt":0}, "source":"historical_demo"}, {"_id":1}) else "recorded_telemetry"
     completed_count = list(col.aggregate([
@@ -1899,9 +1962,23 @@ def dbms_race(session_id: UUID, include_laps: bool = True, user=admin_dependency
 
 def race_lap_measurements(col, match: dict[str, Any]):
     # Collapse retries to one complete lap per driver, retaining the latest stored measurement.
-    return list(col.aggregate([{"$match": {**match, "sector": 3, "lap_time_ms": {"$gt": 0}}},
-      {"$sort": {"ts": 1}}, {"$group": {"_id": {"driver_id": "$driver_id", "lap": "$lap"}, "record": {"$last": "$$ROOT"}}},
-      {"$replaceRoot": {"newRoot": "$record"}}, {"$project": {"_id": 0}}, {"$sort": {"lap": 1, "position": 1}}]))
+    return list(
+        col.aggregate(
+            [
+                {"$match": {**match, "sector": 3, "lap_time_ms": {"$gt": 0}}},
+                {"$sort": {"ts": 1}},
+                {
+                    "$group": {
+                        "_id": {"driver_id": "$driver_id", "lap": "$lap"},
+                        "record": {"$last": "$$ROOT"},
+                    }
+                },
+                {"$replaceRoot": {"newRoot": "$record"}},
+                {"$project": {"_id": 0}},
+                {"$sort": {"lap": 1, "position": 1}},
+            ]
+        )
+    )
 
 
 @app.get("/api/dbms/races/{session_id}/laps")
