@@ -33,6 +33,7 @@ class Simulation:
     incident_laps_recorded: set[int] = field(default_factory=set)
     pit_reservations_by_driver: dict[str, dict[str, object]] = field(default_factory=dict)
     pit_due_tire_age_by_driver: dict[str, int] = field(default_factory=dict)
+    seed: int | None = None
 
     def __post_init__(self) -> None:
         if self.total_laps is not None:

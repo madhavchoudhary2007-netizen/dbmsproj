@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import hmac
 import logging
 import random
+import secrets
 import threading
 import time
 from collections.abc import Callable
@@ -686,17 +688,19 @@ def choose_demo_car_numbers(car_count: int) -> list[int]:
 def _make_demo_race(cars: int | None = None, auto_repeat: bool = False):
     if mongo_ready() is None:
         raise HTTPException(503, "MongoDB telemetry store is unavailable")
-    car_count = cars if cars is not None else random.randint(8, 16)
+    seed = secrets.randbits(63)
+    rng = random.Random(seed)
+    car_count = cars if cars is not None else rng.randint(8, 16)
     session_id, event_id = uuid4(), uuid4()
     now = datetime.now(timezone.utc)
     given = ["Amelia", "Rafael", "Maya", "Theo", "Nina", "Luca", "Aisha", "Felix", "Sofia", "Ethan", "Leila", "Oscar", "Priya", "Mateo", "Zara", "Jonah", "Ines", "Kai", "Elena", "Arjun"]
     family = ["Bennett", "Costa", "Shah", "Moreau", "Kim", "Novak", "Singh", "Fischer", "Alvarez", "Tanaka", "Dubois", "Reed", "Petrov", "Okafor", "Lindholm", "Santos", "Kaur", "Weber", "Nakamura", "Clarke"]
-    names = [f"{a} {b}" for a, b in zip(random.sample(given, car_count), random.sample(family, car_count))]
+    names = [f"{a} {b}" for a, b in zip(rng.sample(given, car_count), rng.sample(family, car_count))]
     try:
-        generated, total_laps = create_demo_race_records(session_id, event_id, now, names, auto_repeat)
+        generated, total_laps = create_demo_race_records(session_id, event_id, now, names, auto_repeat, seed=seed)
     except DemoRaceSetupError as exc:
         raise HTTPException(409, str(exc)) from exc
-    sim = Simulation(session_id, generated, 2.0, total_laps=total_laps)
+    sim = Simulation(session_id, generated, 2.0, total_laps=total_laps, seed=seed)
     sim.auto_repeat = auto_repeat
     sim.is_generated = True
     sim.pace_offsets_ms = {str(d["id"]):d["pace_offset_ms"] for d in generated}
@@ -760,7 +764,7 @@ def restore_simulated_incidents(sim: "Simulation"):
 
 
 async def resume_or_create_auto_demo_race(create_if_missing: bool = True):
-    active_races = fetch_all("SELECT s.id,s.total_laps,d.auto_repeat FROM race_sessions s JOIN demo_races d ON d.session_id=s.id WHERE s.state='ACTIVE' ORDER BY d.created_at")
+    active_races = fetch_all("SELECT s.id,s.total_laps,d.auto_repeat,d.simulation_seed FROM race_sessions s JOIN demo_races d ON d.session_id=s.id WHERE s.state='ACTIVE' ORDER BY d.created_at")
     for active in active_races:
         session_id = active["id"]
         entries = fetch_all("""SELECT d.id,d.number,de.pace_offset_ms,tm.team_id,t.name AS team_name
@@ -772,7 +776,7 @@ async def resume_or_create_auto_demo_race(create_if_missing: bool = True):
         if not entries:
             log.error("Active generated race %s has no entries", session_id)
             continue
-        sim = Simulation(session_id, entries, 2.0, total_laps=active["total_laps"])
+        sim = Simulation(session_id, entries, 2.0, total_laps=active["total_laps"], seed=active.get("simulation_seed"))
         sim.pace_offsets_ms = {str(d["id"]):d["pace_offset_ms"] for d in entries}
         restore_simulation_from_telemetry(sim)
         sim.auto_repeat = active["auto_repeat"]
@@ -914,7 +918,7 @@ def advance_simulation_tick(sim: Simulation, timestamp: datetime, rng=None, safe
                             pit_driver_ids: set[str] | None = None,
                             pit_assignments: dict[str, dict[str, Any]] | None = None):
     """Advance every car by one sector and return internally consistent packets and timing."""
-    rng = rng or random
+    injected_rng = rng
     pit_driver_ids = pit_driver_ids or set()
     pit_assignments = pit_assignments or {}
     compounds = ("SOFT", "MEDIUM", "HARD")
@@ -934,13 +938,21 @@ def advance_simulation_tick(sim: Simulation, timestamp: datetime, rng=None, safe
         sector = 3 if frozen else previous_sector % 3 + 1 if advancing else previous_sector
         sim.lap_by_driver[driver_id] = lap
         sim.sector_by_driver[driver_id] = sector
+        prior_elapsed = sim.elapsed_by_driver.get(driver_id, 0)
+        if injected_rng is not None:
+            driver_rng = injected_rng
+        elif sim.seed is not None:
+            progress = f"{sim.seed}:{driver_id}:{lap}:{sector}:{prior_elapsed}".encode()
+            driver_rng = random.Random(int.from_bytes(hashlib.sha256(progress).digest(), "big"))
+        else:
+            driver_rng = random
 
         number = int(driver.get("number") or 1)
         pace_offset = sim.pace_offsets_ms.get(driver_id, (number % 7 - 3) * 95)
         assignment = pit_assignments.get(driver_id)
         in_pit = (driver_id in pit_driver_ids) or bool(assignment and assignment["starts_at"] <= timestamp < assignment["ends_at"])
         sector_ms, throttle, brake, speed = calculate_sector_performance(
-            sector, pace_offset, safety_car, in_pit, rng
+            sector, pace_offset, safety_car, in_pit, driver_rng
         )
 
         splits = sim.sector_splits_by_driver.setdefault(driver_id, [])
@@ -970,7 +982,7 @@ def advance_simulation_tick(sim: Simulation, timestamp: datetime, rng=None, safe
             "throttle_pct": round(throttle, 1), "brake_pct": round(brake, 1),
             "tire_compound": compound, "tire_age_laps": tire_age,
             "tire_wear_pct": round(wear, 1),
-            "tire_temp_c": [round(70 + speed * 0.09 + wear * 0.12 + rng.uniform(-2, 2), 1) for _ in range(4)],
+            "tire_temp_c": [round(70 + speed * 0.09 + wear * 0.12 + driver_rng.uniform(-2, 2), 1) for _ in range(4)],
             "pit_state": "IN_PIT" if in_pit else "PIT_SCHEDULED" if assignment else "TRACK",
             "pit_reservation_id": str(assignment["id"]) if assignment and assignment.get("id") else None,
             "pit_box_number": assignment.get("box_number") if assignment else None,
