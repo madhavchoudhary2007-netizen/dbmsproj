@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: ce4b44b
+git_head: 091e4de
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -48,3 +48,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T-44130 acceptedce4b44b: Recorded additive health ADR011 and early health dependency slice with focused architecture review and lock. Verify exit0; 37 changed lines.
 
 - T44134 firstresultFAILED because orchestrator-created redrecorder was not yet committed into clone. Product/testdiffinscope; infrastructure-only failure. Root linked read-only helper into bothsecuritytestclones, willrerun exactverify ratherthan re-dispatch (packets failed-result rule).
+
+- T-44133 accepted091e4de: Added failing-first tests for CORS defaults and wildcard rejection, security headers and HSTS, and liveness/readiness probes. The red recorder confirmed 11 expected failures, 1 pass, 0 errors, and 0 skips. Verify exit0; 148 changed lines.
