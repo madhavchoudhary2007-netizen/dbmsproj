@@ -64,7 +64,6 @@ from .core.events import EventBus
 from .core.security import websocket_bearer
 from .core.serialization import jsonable, telemetry_ws_payload
 from .core.validation import (
-    MAX_SESSION_LAPS,
     _crud_write_payload,
     _require_crud_record,
     limit_offset,
@@ -104,7 +103,7 @@ from .schemas_competition import ResultIn
 from .schemas_operations import Action, AutoReservationIn, Decision, IncidentIn, ReservationIn
 from .schemas_simulation import DemoRaceCreate, SimulationControl
 from .security_headers import SecurityHeadersMiddleware
-from .simulation_core import Simulation, calculate_sector_performance
+from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
 from .telemetry_router import create_telemetry_router
 from .user_router import create_user_router
 

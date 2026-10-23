@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 049a179
+git_head: 4f53ecd
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -30,28 +30,10 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - Requested modelprofilelines; architecture/ADR/docs/state/packets/envelopes/orchestrationhelpers only. T440 docs15lines. No authored productcode; integrating workerpatches is not bulkcode authorship.
 
 
-- T-44148 accepteda5535b2: Updated the disposable fixture to read MONGODB_URL, use PyJWT with a ten-minute token, insert users through the real connection, and close TestClient after capture. Verify exit0; 141 changed lines.
-
-- T-44149 accepted62443d0: Added ten golden route cases and pure comparison checks for additive keys, removed fields, changed values, and type changes. Copied the provided snapshot byte-for-byte. Verify exit0; 55 changed lines.
-
-- T44149rootreal14casesPASS (tenGETgoldens+4comparison); immutablefixturecopiedbyteidentically. Initialworkerclaimedmissingfiledespiteexisting2376bytefixture, absolute-pathretryresolved; no changesoutsidepacket. Rootfull214suite running. T44150radiuslintfoundationW3runninginparallelallowedPhase5interleave.
-
-- T-330 accepted3afff87: Close OpenAPI and ten real GET golden contract guard from accepted W3 children. Thirty focused tests pass; full isolated suite has 214 passed, zero skips, with live acceptance passed. Verify exit0; 0 changed lines.
-
-- T-44151 accepted462ea55: Moved EventBus verbatim into backend.app.core.events, added the main.EventBus import alias, and retained bus = EventBus() in its original location. Verify exit0; 82 changed lines.
-
-- T-44150 accepted4c707d9: Updated the shared checker to preserve CSS URLs and detect quoted JS radius keys, including corner properties. Self-test covers both reported cases and comment line positions. Default scan reports the two existing globals.css hits at lines 116 and 985. Verify exit0; 94 changed lines.
-
-- T3303afff87 accepted30contractchecks; full214PASS0skip/livePASS. T44151462ea55 EventBus exactAST/publicalias+11PASS/full214PASS0skip/livePASS. T441504c707d9 radius-onlylinter acceptedafter2repairs/sharedscanner/URL+quotedkeyprobes, selftest0; actuallegacy2radiusviolations remainbaseline, wholeT360notcomplete. T4415247fc39d serializers/protocol parser exactAST+12PASS/full214PASS0skip/livePASS; T44153a1eea31 typed masker selftest/Ruff/mypy0 accepted; no authoredorchestratorproductcode.
-
-- T-44152 accepted47fc39d: Moved JSON/telemetry serializers and WebSocket bearer parser verbatim to core modules; retained main aliases. Verify exit0; 64 changed lines.
-
-- T-44153 accepteda1eea31: Extracted typed comment masking helper; radius scanner policies and fixtures unchanged. Verify exit0; 62 changed lines.
-
-- T-44154 accepted882e5ed: Moved four unchanged exception handlers and retained main aliases with all seven registrations. Envelope command normalized to packet literal before root rerun. Verify exit0; 69 changed lines.
-
-- T44154 worker Verify field summarized instead of literal; root normalized envelope format, accepted only after actual command rerun0. No re-dispatch needed per failed-format rule. Full isolated rerun in progress. T44155 staged theme token file W1 running; not imported until Tailwind4 integration.
-
-- T-44155 accepted7768158: Added staged Tailwind4 theme tokens and approved nb aliases; not yet imported and no route rendering changes. Four static commands, zero test cases. Verify exit0; 63 changed lines.
-
-- T-44156 accepted049a179: Moved four unchanged validation and CRUD helpers to core.validation with main aliases; AST and aliases verified. Verify exit0; 64 changed lines.
+## Latest accepted work and active checks
+- T3303afff87 complete: snapshot9+union7+realGETgoldens14=30PASS. Golden real fixture uses own transaction and rolls back0users/sessions. Full214PASS0skip/livePASS. Permanent snapshot gate on every backend change.
+- T44151462ea55 EventBus; T4415247fc39d JSON/protocol; T44154882e5ed error handlers; T44156049a179 validators: exactAST/main alias checks0, snapshot9PASS each. Full214PASS0skip/livePASS throughT44154; T44156fullrunning.
+- T44153a1eea31 typed comment masker accepted selftest/Ruff/mypy0; radius scanner T441504c707d9 selftest0, valid0/invalid1 and quotedkey/CSSURL probes1. Legacyglobals2radius hits remain; otherADR007lint rules pending.
+- T441557768158 stagedtheme tokens63lines (not imported), typecheck/lint/old3lints0, tokenradius0. Taste: no DOM/rendering change. T441574f53ecd light luminance>=0.85 activated, AA4.5 preserved,80casescollected. Rootdesktopdashboard actually1FAIL as expected duringdarktransition; no skip. Root first used nonexistentprojectdesktop then correcteddesktop-1440, logged both.
+- Rootmypy218 afterT44156: worker moved constant import indirectly through validation, causing new implicit-export error. T44158repair queued to restore direct simulation_core import/baseline217. No threshold changed; fullzero atT339.
+- Worker reporting issues: T44154 summarized Verify instead of exactliteral, root normalized and reran; T44155 countedstaticcommands as tests, root corrected to0. No boundaries violated. Root authored0productlines.

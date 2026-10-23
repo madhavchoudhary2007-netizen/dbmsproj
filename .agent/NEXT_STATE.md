@@ -3,15 +3,16 @@ updated_at: 2026-10-23
 phase: 3 API contract guard (Phases0–2 complete; baseline score51.2974)
 
 ## Queue
-### T-44157 W3 — OPEN
-- target_files: frontend/e2e/palette.spec.ts
-- contract: T360 child: activate the approved light background palette assertion in palette.spec.ts. Update only the test title/comment/background assertion to the approved light archetype. Existing route inventory, mocks, headings measurement and 4.5 contrast threshold remain unchanged. Current dark UI is expected to fail this browser gate until redesign.
-- verify: npm --prefix frontend run typecheck && cd frontend && ./node_modules/.bin/playwright test e2e/palette.spec.ts --list && python3 -c 'from pathlib import Path; s=Path("e2e/palette.spec.ts").read_text(); assert "expect(result.bgLum).toBeGreaterThanOrEqual(0.85)" in s; assert "expect(contrast).toBeGreaterThanOrEqual(4.5)" in s; assert "test.skip" not in s and "test.fixme" not in s; print("PASS approved light gate and unchanged AA threshold")'
+### T-44158 W2 — OPEN
+- target_files: backend/app/main.py
+- contract: Repair the new mypy regression from T44156: main.py must import MAX_SESSION_LAPS directly from simulation_core, as before the move, rather than indirectly from core.validation. Change only that import; no product behavior changes.
+- verify: .venv/bin/ruff check backend/app/main.py && .venv/bin/ruff format --check backend/app/main.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py && .venv/bin/python -c 'import subprocess; r=subprocess.run([".venv/bin/mypy","--strict","backend/app"],capture_output=True,text=True); print(r.stdout.splitlines()[-1]); assert "Found 217 errors" in r.stdout; assert "does not explicitly export attribute" not in r.stdout'
 
 ## Deferred
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44157 accepted4f53ecd; verify0.
 - T-44156 accepted049a179; verify0.
 - T-44155 accepted7768158; verify0.
 - T-44154 accepted882e5ed; verify0.
