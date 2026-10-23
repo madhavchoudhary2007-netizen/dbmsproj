@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-23
-git_head: b395e35
+updated_at: 2026-10-24
+git_head: 64214d6
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -8,55 +8,26 @@ archetype: Neo-Brutal Motorsport (light); ADR007 approved
 last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF4; NOT_RUN P1/P2; notpresentable
 
 ## Phase and verified facts
-- Phases0–2 complete under approvedADR007; ownerwantsall12phases. Phase3 T330 complete; T331 behavior-preserving extraction in progress. Phase5foundationmayinterleaveperplan§4.
-- Phase1 T31035578c9/T3118570e58/T312e0f7adf/T3134089fb6/T314c0c8061 accepted. Full144PASS/livePASS; browser1005PASS(all5projects), rootbuild/lint/types0. HostedCI NOT_RUN. Exactchildhistoryin git andphase1.evidence.json.
-- Phase2 T3204789586/T321caf033f/T322a12bc68/T3233146736/T32461643df/T3252bff831 acceptedwithboundedchildren. ADR008JWTrevocation/004onlydisposablestack, logoutreuse401/WS4401, legacycompat/CSRF/outage/malformed tests. ADR011healthprocess/readiness6casesPASS. AlloldOpenAPIpaths/schemasunchanged; only2approvedhealthpathsadded. No realstacksourcebindmount/reload.
-- Phase2full184PASS0failed/skipped/xfail/livePASS twice inclT323accept. T324rootbuild/lint/types0+85axe/reducedmotionPASS, productionCSPsanitizedHTTPS/WSS/noeval. Bootstrapinlineunsafe-inline retainedcompatibility; evaldevonly. T441458f721ae preserves3legacyHTMLdocspathsfromAPI-onlyCSP; 16testsPASS, API/404strictretained.
-- Phase3 T441465b0b7e4 snapshot+9tests, full193PASS/livePASS. T441476ae5e39 union/ref/enumguard+7regressions16PASS, full200PASS/livePASS. Rootreproduced4pre-fixFAIL2PASSagainstoldhelper; firstrootprobefilenameimportfailedthenfixed, logged. Generatedredlogexcludedfromcommittedchangeenvelope, preservedseparately.
-- LatestRuffall0,55filesformatted, strictmypy217errors11/33files(T339). ThreeCSSlints0; neo radius scanner selftest0, legacy2hits; remainingT360rulespending. Pip audit0; npmhighaudit0 with3moderate. P3missinglayout/sharedassetsT44132; LighthouseabsentP1/P2NOT_RUN; FPS17msnot16.7untilT413. Currentdarkvisualdesignnotyetapprovedlightimplementation; nofinishedscoreclaim.
-- T44148fixture141linesrootcaptured10realGETresponsestwiceidentically; transactionrollbackleft0ownusers/sessions. FirstcapturecaughtwrongMongoenv/ConnectionAPI; repairedonce, importsPyJWT/dynamicexpiry/clientclose. Goldencomparisonchildnext; noDBschema/handler/resultmock.
+- Phases0–2 complete; owner requests all12, unattended. Phase3 T330 complete, T331 extraction in progress. Phase5 T361 accepted1e61efd, T360 lints in progress; T362 waits for both per plan§4. No later-phase completion claimed.
+- Phase1 acceptedT31035578c9/T3118570e58/T312e0f7adf/T3134089fb6/T314c0c8061. Root144PASS0skip/livePASS; browser1005PASS5projects. HostedCI NOT_RUN. Evidence/history in git/phase1.evidence.json.
+- Phase2 parents T3204789586/T321caf033f/T322a12bc68/T3233146736/T32461643df/T3252bff831 accepted. JWTrevocation ADR008/migration004 onlydisposable; logoutreuse401/WS4401, CSRF/legacy/outage/expiry tests. ADR011 live/ready probes. Full184PASS0skip/livePASS twice. CSPbuild/lint/types0+85axePASS. Inlinebootstrap unsafe-inline compatibility retained; unsafe-eval devonly. T441458f721ae preserves exact3HTMLdocs routes,16testsPASS, APIs strict.
+- T3303afff87 complete: snapshot9+union7+realGETgoldens14=30PASS; full214PASS0skip/livePASS. Fixture captures own SQLtransaction, rolls back0own users/sessions. Existing API snapshot permanent gate. No API/schema changes in current moves.
+- T331 pure moves accepted: EventBus462ea55, JSON/parser47fc39d, errors882e5ed, validation049a179, models0adc5bb, livenessrouter4c4f401, domainhelpers64214d6. AST/alias proofs and snapshot9PASS each. Latest rootfull214PASS0skip/livePASS throughliveness; domainhelpers rerun active. Ruffall0; mypy217errors15/42files afterliveness, fullzeroT339.
+- T44156 introduced1implicitexport error; repaircec7835 restored direct constant import/baseline217. No thresholds loosened. Some worker envelopes used placeholder Verify or inaccurate counts; root corrected format/counts and reranactualVerify beforeaccept, logged in childenvelopes.
+- T361 accepted1e61efd from tokens7768158/rootinstall553ed00/config9335c83: Tailwind4.3.3 +@tailwindcss/postcss4.3.3, autoprefixer removed. Rootbuild/lint/types0,audit0vulnerabilities,925nonpalettebrowserchecksPASS5projects. npm-generatedlock1183changedlines separately from authored<=150workerpackets; ownerexplicitplaninstall, no handwritten product/lock lines.
+- T360 lightgate4f53ecd activated>=0.85, AA4.5 unchanged,80cases collected. Actual dashboarddesktop1FAIL expected on currentdarkUI; never skipped. Radius4c707d9/maskera1eea31, gray10b17c4/wiringb1fec1c selftests0; good0/bad1 fixtures. Blur b395e35 accepted17cases after repair1 for root-proven bareutility/commafilter bypasses; not wired yet. GradientT44167W3 active. Legacyradius2hits remain; otherstyle rules/motionplinth/palette roles pending.
 
 ## Execution contracts
-- Only overhaul/neo-brutal; no merge/force/historyrewrite. Only accept.sh commits; rerun every Verify. <=3files/150changedlines perpacket. Atmost2 packet-only customworkers in ignoredsharedclones .agent/workspaces, dependency symlinks; workers nevercommit. Integrate sequentially, updatestate everyaccept.
-- Preserve routes/features/copy/hooks/aria/stateclasses/hashroutes, exactlyoneprimary/fiveUIstates. APIchanges additive/perownADR; no existingpath/method/response changes without ownerapproval. Lockedarchitecture governs.
-- Never .env/secrets/recursiveremoval/realDB/schema/volumewrites. DBtests only disposableapexgrid-test(postgres15432/Mongo27018). Preserve ownerstatus.sh paths/exclusions and run-loop.sh edits.
-- .agent/check-format-progress.py proves partialformat AST+canonical equivalence and strictdistance reduction. Parent zero gates never weakened. Rootlockscript autoGit tail bypassed only to honoraccept-only; canonical lock independentlyverified.
+- Only overhaul/neo-brutal, accept.sh commits, rerun every Verify, <=3files/150authoredchangedlines, atmost2 fresh packet-only customworkers in shared ignoredclones. No worker commits. Root integrates sequentially and updates state every acceptance. .agent/orchestrate.py persists clone/integrate/mark helpers.
+- Never .env/secrets, recursive deletion, realDB/schema/volume writes. DBwork only disposable apexgrid-test(PG15432/Mongo27018), projectlabel checked. CI testguard additionally permits explicit ephemeral GitHubservices. Realbackend has no sourcebind/reload. Preserve owner status.sh paths/exclusions and run-loop.sh edits.
+- Preserve every route/feature/copy/hook/aria/stateclass/hash, oneprimary/fivestates. API additions per ownADR; existing path/method/response changes needowner. Architecture lock unchanged andverified.
 
-## Open risks / task notes
-- T325 test-only W3 despiteplanW2 label. Oversizedplanrows split into boundedtasks. Domainstart/reset/finalize functions are cohesivecomplexity extractions; their singlecallsite status needs explicitA6 review at scoring/T331, do not conceal it.
-- Rejectedcapoverruns repaired in clones; T44111 envelopecounts corrected actual35/27 beforeaccept. T44114 unnecessarydriverhelper removed onreview. No rule/threshold weakening.
+## Open risks / next checks
+- Mypy217 pendingT339; oldgiantfiles/one-callsite complexity extractions need TasteA6 review. T44168 uses temporary typed registration wrapper solely for move; T332 replaces factory wiring/appglobals.
+- P3bundlechecker misseslayout/sharedassets T44132; LighthouseCLIabsentP1/P2NOT_RUN; FPS17ms untilT41316.7. HostedCI NOT_RUN. CurrentdarkUI/lightpalette FAIL; baseline51.2974 is not a delivery score.
+- Root initial palette check used wrongprojectdesktop, correcteddesktop-1440; both logs retained. ThreeoldCSSlints0; neo rules intentionally report legacy violations.
 
 ## Orchestrator direct edits
-- Requested modelprofilelines; architecture/ADR/docs/state/packets/envelopes/orchestrationhelpers only. T440 docs15lines. No authored productcode; integrating workerpatches is not bulkcode authorship.
+- Architecture/ADRs/docs/state/packets/envelopes/orchestration helpers and root-owned planned dependency installs only. Zero authored product lines; integrating worker patches is not product authorship. Canonical lock operation bypassed autoGit tail only to honor accept-only; independently verified.
 
-
-## Latest accepted work and active checks
-- T3303afff87 complete: snapshot9+union7+realGETgoldens14=30PASS. Golden real fixture uses own transaction and rolls back0users/sessions. Full214PASS0skip/livePASS. Permanent snapshot gate on every backend change.
-- T44151462ea55 EventBus; T4415247fc39d JSON/protocol; T44154882e5ed error handlers; T44156049a179 validators: exactAST/main alias checks0, snapshot9PASS each. Full214PASS0skip/livePASS throughT44154; T44156fullrunning.
-- T44153a1eea31 typed comment masker accepted selftest/Ruff/mypy0; radius scanner T441504c707d9 selftest0, valid0/invalid1 and quotedkey/CSSURL probes1. Legacyglobals2radius hits remain; otherADR007lint rules pending.
-- T441557768158 stagedtheme tokens63lines (not imported), typecheck/lint/old3lints0, tokenradius0. Taste: no DOM/rendering change. T441574f53ecd light luminance>=0.85 activated, AA4.5 preserved,80casescollected. Rootdesktopdashboard actually1FAIL as expected duringdarktransition; no skip. Root first used nonexistentprojectdesktop then correcteddesktop-1440, logged both.
-- Rootmypy218 afterT44156: worker moved constant import indirectly through validation, causing new implicit-export error. T44158repair queued to restore direct simulation_core import/baseline217. No threshold changed; fullzero atT339.
-- Worker reporting issues: T44154 summarized Verify instead of exactliteral, root normalized and reran; T44155 countedstaticcommands as tests, root corrected to0. No boundaries violated. Root authored0productlines.
-
-- T-44158 acceptedcec7835: Restored direct MAX_SESSION_LAPS import; new implicit-export error removed, mypy returns to baseline217. Verify0.
-
-- T44158cec7835 repaired import-only ratchet: mypy217 in15/39files, snapshot9PASS. T44156 full214PASS0skip/livePASS. T44158root fullrunning.
-- T361 dependency installation is orchestrator-owned per explicit plan: Tailwind4/@tailwindcss/postcss replace Tailwind3/autoprefixer. npm-generated package-lock changes recorded separately from <=150-line authored worker packets; no hand-authored lockfile or product code. The UI integration remains a separate W1 packet.
-
-- T-44160 accepted553ed00: Installed planned Tailwind4.3.3/PostCSS adapter; removed autoprefixer. npm-generated lock updated; root audit0 vulnerabilities. W1 config/import integration pending. Verify0.
-
-- T-44161 accepted0adc5bb: Moved health and reservation models unchanged, preserving main aliases and OpenAPI contracts. Verify0.
-
-- T-44159 accepted10b17c4: Added shared neutral color/gray-family rule and good/bad fixtures with29self-test assertions; scanner wiring next. Verify0.
-
-- T-44162 accepted9335c83: Integrated installed Tailwind4 adapter/token import and removed obsolete config; all legacy CSS rules preserved. Offline build/lint/types0. Verify0.
-
-- T-44163 acceptedb1fec1c: Wired gray/neutral checks into shared scanner and selftest, added inline JS style positive/negative controls.32gray assertions plus radius controls pass. Verify0.
-
-- T-44164 accepted4c4f401: Moved pure liveness handler to API router; retained main function/model aliases.21 focused tests and exact body proof pass. Verify0.
-
-- T44165root rejected before acceptance: bare blur utility and comma-containing filter-before-blur bypassed checker. Repair1 requested with regressions; no root product/test patch applied.
-
-- T-361 accepted1e61efd: Tailwind4 foundation complete: approved tokens, adapter/config integration, audit0. Root925 browser checks pass; light palette transition remains failing as planned. Verify0.
-
-- T-44165 acceptedb395e35: Added blur checker and fixtures; repaired root-proven bare-utility and nested comma-filter bypasses with regressions.17 cases pass. Verify0.
+- T44168first result FAILED because root identity probe assumed flat FastAPIapp.routes; installed _IncludedRouter uses original_router. Root corrected traversal with exact-one endpoint identity (no HTTP/assertionthreshold change), restored only its clone target files, requested repair1. Worker separately ran21HTTP/snapshotPASS.

@@ -43,6 +43,7 @@ from starlette.middleware.base import RequestResponseEndpoint
 from . import token_revocation
 from .analytics_router import create_analytics_router
 from .api.health import health_live as health_live
+from .api.health import register_readiness
 from .api.health import router as health_router
 from .auth_cookie import verify_csrf_token
 from .auth_router import create_auth_router
@@ -106,8 +107,9 @@ from .pit_strategy_service import (
 )
 from .runtime_lease import acquire_runtime_lease, check_runtime_lease
 from .schemas_competition import ResultIn
-from .schemas_health import HealthReport, ReadinessReport
+from .schemas_health import HealthReport as HealthReport
 from .schemas_health import LivenessReport as LivenessReport
+from .schemas_health import ReadinessReport as ReadinessReport
 from .schemas_operations import (
     Action,
     AutoReservationIn,
@@ -1786,26 +1788,12 @@ def health() -> HealthReport:
     }
 
 
+health_ready = register_readiness(
+    app,
+    lambda: health(),
+    lambda lease: check_runtime_lease(lease),
+)
 app.include_router(health_router)
-
-
-@app.get("/health/ready", response_model=ReadinessReport)
-def health_ready(response: Response) -> ReadinessReport:
-    services = dict(health()["services"])
-    runtime_lease = getattr(app.state, "runtime_lease", None)
-    if runtime_lease is None:
-        services["runtime_lease"] = "down"
-    else:
-        try:
-            check_runtime_lease(runtime_lease)
-            services["runtime_lease"] = "up"
-        except RuntimeError:
-            services["runtime_lease"] = "down"
-
-    ready = all(services.get(key) == "up" for key in ("postgres", "mongodb", "runtime_lease"))
-    if not ready:
-        response.status_code = 503
-    return ReadinessReport(status="ready" if ready else "not_ready", services=services)
 
 
 def admin(user=admin_role_dependency):
