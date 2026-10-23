@@ -1,0 +1,175 @@
+diff --git a/backend/app/api/dbms_mongo.py b/backend/app/api/dbms_mongo.py
+index 9abb7e3..ef9bd5c 100644
+--- a/backend/app/api/dbms_mongo.py
++++ b/backend/app/api/dbms_mongo.py
+@@ -2,7 +2,7 @@ from collections.abc import Callable
+ from datetime import UTC, datetime
+ from typing import Any
+ 
+-from fastapi import APIRouter, HTTPException
++from fastapi import APIRouter, HTTPException, Query
+ from pymongo import DESCENDING
+ from pymongo.collection import Collection
+ from pymongo.database import Database
+@@ -68,6 +68,9 @@ def create_dbms_mongo_router(
+             router, admin_dependency, mongo_database_ready, mongodb_database_name
+         )
+     )
++    handlers.update(
++        _register_document_handlers(router, admin_dependency, mongo_database_ready, jsonable)
++    )
+     return router, handlers
+ 
+ 
+@@ -109,3 +112,71 @@ def _register_collection_handlers(
+             raise HTTPException(503, "Could not inspect MongoDB collections") from exc
+ 
+     return {"dbms_mongo_collections": dbms_mongo_collections}
++
++
++def _register_document_handlers(
++    router: APIRouter,
++    admin_dependency: Any,
++    mongo_database_ready: Callable[[], Database[dict[str, Any]]],
++    jsonable: Callable[[Any], Any],
++) -> dict[str, Callable[..., Any]]:
++    @router.get("/api/dbms/mongo/collections/{collection_name}")
++    def dbms_mongo_collection_documents(
++        collection_name: str,
++        limit: int = Query(50, ge=1, le=100),
++        offset: int = Query(0, ge=0),
++        session_id: str | None = Query(None, max_length=64),
++        driver_id: str | None = Query(None, max_length=64),
++        lap: int | None = Query(None, ge=1),
++        sector: int | None = Query(None, ge=1, le=3),
++        user=admin_dependency,
++    ):
++        (
++            "Browse one real Mongo collection without permitting arbitrary collection "
++            # Keep the docstring split within the configured line length.
++            "names or query syntax."
++        )
++        try:
++            database = mongo_database_ready()
++            if (
++                collection_name.startswith("system.")
++                or collection_name not in database.list_collection_names()
++            ):
++                raise HTTPException(404, "MongoDB collection not found")
++            filters = {
++                key: value
++                for key, value in {
++                    "session_id": session_id,
++                    "driver_id": driver_id,
++                    "lap": lap,
++                    "sector": sector,
++                }.items()
++                if value is not None
++            }
++            collection = database[collection_name]
++            total = collection.count_documents(filters)
++            cursor = collection.find(filters).sort("ts", DESCENDING).skip(offset).limit(limit)
++            documents = [
++                {
++                    **jsonable({key: value for key, value in document.items() if key != "_id"}),
++                    "id": str(document["_id"]),
++                }
++                for document in cursor
++            ]
++            return jsonable(
++                {
++                    "collection": collection_name,
++                    "filters": filters,
++                    "documents": documents,
++                    "total": total,
++                    "limit": limit,
++                    "offset": offset,
++                    "updated_at": datetime.now(UTC),
++                }
++            )
++        except HTTPException:
++            raise
++        except Exception as exc:
++            raise HTTPException(503, "Could not read MongoDB collection") from exc
++
++    return {"dbms_mongo_collection_documents": dbms_mongo_collection_documents}
+diff --git a/backend/app/main.py b/backend/app/main.py
+index 03729f8..a971273 100644
+--- a/backend/app/main.py
++++ b/backend/app/main.py
+@@ -1819,6 +1819,7 @@ dbms_mongo_router, dbms_mongo_handlers = create_dbms_mongo_router(
+ dbms_overview = dbms_mongo_handlers["dbms_overview"]
+ dbms_telemetry = dbms_mongo_handlers["dbms_telemetry"]
+ dbms_mongo_collections = dbms_mongo_handlers["dbms_mongo_collections"]
++dbms_mongo_collection_documents = dbms_mongo_handlers["dbms_mongo_collection_documents"]
+ app.include_router(dbms_mongo_router)
+ 
+ 
+@@ -2071,67 +2072,6 @@ def mongo_database_ready():
+     return mongo_client[MONGODB_DATABASE]
+ 
+ 
+-@app.get("/api/dbms/mongo/collections")
+-@app.get("/api/dbms/mongo/collections/{collection_name}")
+-def dbms_mongo_collection_documents(
+-    collection_name: str,
+-    limit: int = Query(50, ge=1, le=100),
+-    offset: int = Query(0, ge=0),
+-    session_id: str | None = Query(None, max_length=64),
+-    driver_id: str | None = Query(None, max_length=64),
+-    lap: int | None = Query(None, ge=1),
+-    sector: int | None = Query(None, ge=1, le=3),
+-    user=admin_dependency,
+-):
+-    (
+-        "Browse one real Mongo collection without permitting arbitrary collection "
+-        # Keep the docstring split within the configured line length.
+-        "names or query syntax."
+-    )
+-    try:
+-        database = mongo_database_ready()
+-        if (
+-            collection_name.startswith("system.")
+-            or collection_name not in database.list_collection_names()
+-        ):
+-            raise HTTPException(404, "MongoDB collection not found")
+-        filters = {
+-            key: value
+-            for key, value in {
+-                "session_id": session_id,
+-                "driver_id": driver_id,
+-                "lap": lap,
+-                "sector": sector,
+-            }.items()
+-            if value is not None
+-        }
+-        collection = database[collection_name]
+-        total = collection.count_documents(filters)
+-        cursor = collection.find(filters).sort("ts", DESCENDING).skip(offset).limit(limit)
+-        documents = [
+-            {
+-                **jsonable({key: value for key, value in document.items() if key != "_id"}),
+-                "id": str(document["_id"]),
+-            }
+-            for document in cursor
+-        ]
+-        return jsonable(
+-            {
+-                "collection": collection_name,
+-                "filters": filters,
+-                "documents": documents,
+-                "total": total,
+-                "limit": limit,
+-                "offset": offset,
+-                "updated_at": datetime.now(UTC),
+-            }
+-        )
+-    except HTTPException:
+-        raise
+-    except Exception as exc:
+-        raise HTTPException(503, "Could not read MongoDB collection") from exc
+-
+-
+ @app.get("/api/dbms/polyglot")
+ def dbms_polyglot(user=admin_dependency):
+     sql = """SELECT s.id AS session_id,s.state,d.id AS driver_id,u.full_name
