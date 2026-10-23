@@ -3,11 +3,16 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-455 — database test format middle
+### T-458 — safe CRUD identifiers and telemetry format
+- worker: W2 | priority: P1 | origin: bounded T-310 subdivision
+- target_files: backend/app/crud_repository.py, backend/app/telemetry_repository.py
+- contract: composable SQL identifiers, bound values, precise count interface, preserved behavior
+- verify: .venv/bin/ruff check backend/app/crud_repository.py backend/app/telemetry_repository.py && .venv/bin/ruff format --check backend/app/crud_repository.py backend/app/telemetry_repository.py
+### T-456 — remaining database test format
 - worker: W3 | priority: P1 | origin: bounded T-311 subdivision
 - target_files: backend/tests/test_database.py
-- contract: range340-550 AST preserved; <=150 changes
-- verify: .venv/bin/ruff format --check --range 340-550 backend/tests/test_database.py && .venv/bin/python -c 'import ast,pathlib,subprocess; p="backend/tests/test_database.py"; assert ast.dump(ast.parse(pathlib.Path(p).read_text())) == ast.dump(ast.parse(subprocess.check_output(["git","show","HEAD:"+p],text=True)))'
+- contract: remaining full format <=150 lines; exact AST preserved
+- verify: .venv/bin/ruff format --check backend/tests/test_database.py && .venv/bin/python -c 'import ast,pathlib,subprocess; p="backend/tests/test_database.py"; assert ast.dump(ast.parse(pathlib.Path(p).read_text())) == ast.dump(ast.parse(subprocess.check_output(["git","show","HEAD:"+p],text=True)))'
 
 ## Blocked
 - T-310/T-311 remain open until full parent Ruff/format/frontend-lint commands exit0; no intermediate count is a parent pass.
@@ -15,6 +20,7 @@ phase: 1 honest green baseline
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-455 acceptedc457b0d; database middle format/AST0.
 - T-457 accepted72973d1; mechanical modernisation lint0/OpenAPI unchanged.
 - T-453 accepted301a40c; main B0080/OpenAPI unchanged, full gate running.
 - T-454 accepted0df18c1; test range550-650 AST preserved.

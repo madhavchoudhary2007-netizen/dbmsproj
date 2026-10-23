@@ -1,0 +1,208 @@
+diff --git a/backend/tests/test_database.py b/backend/tests/test_database.py
+index 35df364..3471dac 100644
+--- a/backend/tests/test_database.py
++++ b/backend/tests/test_database.py
+@@ -731,7 +731,9 @@ def test_concurrent_auto_allocations_serialize_on_event(db):
+ 
+ def test_session_state_guards_allow_api_lifecycle_and_reset(db):
+     _, cur = db
+-    cur.execute("SELECT s.id FROM race_sessions s JOIN race_events e ON e.id=s.event_id WHERE e.round_number=3 AND s.session_type='RACE'")
++    cur.execute(
++        "SELECT s.id FROM race_sessions s JOIN race_events e ON e.id=s.event_id WHERE e.round_number=3 AND s.session_type='RACE'"
++    )
+     session_id = cur.fetchone()[0]
+     with pytest.raises(Exception) as exc:
+         cur.execute("UPDATE race_sessions SET state='PAUSED' WHERE id=%s", (session_id,))
+@@ -740,11 +742,20 @@ def test_session_state_guards_allow_api_lifecycle_and_reset(db):
+         cur.execute("UPDATE race_sessions SET started_at=now() WHERE id=%s", (session_id,))
+     assert _sqlstate(exc.value) == "23514"
+ 
+-    cur.execute("UPDATE race_sessions SET state='ACTIVE',started_at='2026-05-10 14:00+00' WHERE id=%s", (session_id,))
++    cur.execute(
++        "UPDATE race_sessions SET state='ACTIVE',started_at='2026-05-10 14:00+00' WHERE id=%s",
++        (session_id,),
++    )
+     cur.execute("UPDATE race_sessions SET state='PAUSED' WHERE id=%s", (session_id,))
+     cur.execute("UPDATE race_sessions SET state='ACTIVE' WHERE id=%s", (session_id,))
+-    cur.execute("UPDATE race_sessions SET state='COMPLETED',ended_at='2026-05-10 16:00+00' WHERE id=%s", (session_id,))
+-    cur.execute("UPDATE race_sessions SET state='SCHEDULED',started_at=NULL,ended_at=NULL,safety_car=false WHERE id=%s", (session_id,))
++    cur.execute(
++        "UPDATE race_sessions SET state='COMPLETED',ended_at='2026-05-10 16:00+00' WHERE id=%s",
++        (session_id,),
++    )
++    cur.execute(
++        "UPDATE race_sessions SET state='SCHEDULED',started_at=NULL,ended_at=NULL,safety_car=false WHERE id=%s",
++        (session_id,),
++    )
+     cur.execute("SELECT state,started_at,ended_at FROM race_sessions WHERE id=%s", (session_id,))
+     assert cur.fetchone() == ("SCHEDULED", None, None)
+ 
+@@ -759,11 +770,16 @@ def test_classified_positions_are_unique_per_session(db):
+                     ORDER BY occupied.position LIMIT 1""")
+     session_id, occupied_position, target_result_id = cur.fetchone()
+     with pytest.raises(Exception) as exc:
+-        cur.execute("UPDATE session_results SET position=%s WHERE id=%s", (occupied_position, target_result_id))
++        cur.execute(
++            "UPDATE session_results SET position=%s WHERE id=%s",
++            (occupied_position, target_result_id),
++        )
+     assert _sqlstate(exc.value) == "23505"
+     # Unclassified results may retain a position also used by a classified result.
+-    cur.execute("UPDATE session_results SET position=%s,classified=false WHERE id=%s",
+-                (occupied_position, target_result_id))
++    cur.execute(
++        "UPDATE session_results SET position=%s,classified=false WHERE id=%s",
++        (occupied_position, target_result_id),
++    )
+ 
+ 
+ def test_driver_team_memberships_cannot_overlap(db):
+@@ -773,22 +789,33 @@ def test_driver_team_memberships_cannot_overlap(db):
+                     WHERE t2.name<>'Apex Racing' ORDER BY m.start_date LIMIT 1""")
+     membership_id, driver_id, _, next_team_id = cur.fetchone()
+     with pytest.raises(Exception) as exc:
+-        cur.execute("""INSERT INTO team_memberships(driver_id,team_id,start_date)
+-                        VALUES (%s,%s,'2026-02-01')""", (driver_id, next_team_id))
++        cur.execute(
++            """INSERT INTO team_memberships(driver_id,team_id,start_date)
++                        VALUES (%s,%s,'2026-02-01')""",
++            (driver_id, next_team_id),
++        )
+     assert _sqlstate(exc.value) == "23P01"
+ 
+     cur.execute("UPDATE team_memberships SET end_date='2026-01-31' WHERE id=%s", (membership_id,))
+-    cur.execute("""INSERT INTO team_memberships(driver_id,team_id,start_date,end_date)
+-                    VALUES (%s,%s,'2026-02-01','2026-12-31')""", (driver_id, next_team_id))
++    cur.execute(
++        """INSERT INTO team_memberships(driver_id,team_id,start_date,end_date)
++                    VALUES (%s,%s,'2026-02-01','2026-12-31')""",
++        (driver_id, next_team_id),
++    )
+     with pytest.raises(Exception) as exc:
+-        cur.execute("""INSERT INTO team_memberships(driver_id,team_id,start_date)
+-                        VALUES (%s,(SELECT id FROM teams WHERE name='Orion GP'),'2026-01-31')""", (driver_id,))
++        cur.execute(
++            """INSERT INTO team_memberships(driver_id,team_id,start_date)
++                        VALUES (%s,(SELECT id FROM teams WHERE name='Orion GP'),'2026-01-31')""",
++            (driver_id,),
++        )
+     assert _sqlstate(exc.value) == "23P01"
+ 
+ 
+ def test_generated_race_markers_enforce_ownership_and_cascade(db):
+     _, cur = db
+-    cur.execute("SELECT s.id,s.event_id FROM race_sessions s WHERE s.session_type='RACE' ORDER BY s.scheduled_at LIMIT 1")
++    cur.execute(
++        "SELECT s.id,s.event_id FROM race_sessions s WHERE s.session_type='RACE' ORDER BY s.scheduled_at LIMIT 1"
++    )
+     session_id, event_id = cur.fetchone()
+     cur.execute("SELECT id FROM race_events WHERE id<>%s LIMIT 1", (event_id,))
+     other_event_id = cur.fetchone()[0]
+@@ -796,23 +823,36 @@ def test_generated_race_markers_enforce_ownership_and_cascade(db):
+     driver_id = cur.fetchone()[0]
+ 
+     with pytest.raises(Exception) as exc:
+-        cur.execute("INSERT INTO demo_races(session_id,event_id) VALUES (%s,%s)", (session_id, other_event_id))
++        cur.execute(
++            "INSERT INTO demo_races(session_id,event_id) VALUES (%s,%s)",
++            (session_id, other_event_id),
++        )
+     assert _sqlstate(exc.value) == "23503"
+-    cur.execute("INSERT INTO demo_races(session_id,event_id) VALUES (%s,%s)", (session_id, event_id))
+-    cur.execute("INSERT INTO demo_race_entries(session_id,driver_id,pace_offset_ms) VALUES (%s,%s,0)",
+-                (session_id, driver_id))
++    cur.execute(
++        "INSERT INTO demo_races(session_id,event_id) VALUES (%s,%s)", (session_id, event_id)
++    )
++    cur.execute(
++        "INSERT INTO demo_race_entries(session_id,driver_id,pace_offset_ms) VALUES (%s,%s,0)",
++        (session_id, driver_id),
++    )
+ 
+     with pytest.raises(Exception) as exc:
+-        cur.execute("INSERT INTO demo_race_entries(session_id,driver_id,pace_offset_ms) VALUES (%s,%s,1)",
+-                    (session_id, driver_id))
++        cur.execute(
++            "INSERT INTO demo_race_entries(session_id,driver_id,pace_offset_ms) VALUES (%s,%s,1)",
++            (session_id, driver_id),
++        )
+     assert _sqlstate(exc.value) == "23505"
+     with pytest.raises(Exception) as exc:
+-        cur.execute("INSERT INTO demo_race_entries(session_id,driver_id,pace_offset_ms) VALUES (%s,%s,3001)",
+-                    (session_id, driver_id))
++        cur.execute(
++            "INSERT INTO demo_race_entries(session_id,driver_id,pace_offset_ms) VALUES (%s,%s,3001)",
++            (session_id, driver_id),
++        )
+     assert _sqlstate(exc.value) == "23514"
+     with pytest.raises(Exception) as exc:
+-        cur.execute("INSERT INTO demo_race_entries(session_id,driver_id,pace_offset_ms) VALUES (%s,%s,0)",
+-                    (session_id, uuid.uuid4()))
++        cur.execute(
++            "INSERT INTO demo_race_entries(session_id,driver_id,pace_offset_ms) VALUES (%s,%s,0)",
++            (session_id, uuid.uuid4()),
++        )
+     assert _sqlstate(exc.value) == "23503"  # Missing driver is rejected by its FK.
+ 
+     cur.execute("DELETE FROM demo_races WHERE session_id=%s", (session_id,))
+@@ -832,29 +872,47 @@ def test_migration_reruns_on_populated_schema_and_preserves_generated_race(db):
+     event_id = cur.fetchone()[0]
+     cur.execute("SELECT id FROM drivers WHERE number=1")
+     driver_id = cur.fetchone()[0]
+-    cur.execute("""INSERT INTO race_sessions(event_id,session_type,state,scheduled_at,started_at,ended_at,total_laps)
++    cur.execute(
++        """INSERT INTO race_sessions(event_id,session_type,state,scheduled_at,started_at,ended_at,total_laps)
+         VALUES (%s,'RACE','COMPLETED','2026-06-01 14:00+00','2026-06-01 14:00+00','2026-06-01 16:00+00',24)
+-        RETURNING id""", (event_id,))
++        RETURNING id""",
++        (event_id,),
++    )
+     session_id = cur.fetchone()[0]
+-    cur.execute("INSERT INTO demo_races(session_id,event_id) VALUES (%s,%s)", (session_id,event_id))
+-    cur.execute("INSERT INTO demo_race_entries(session_id,driver_id,pace_offset_ms) VALUES (%s,%s,17)",
+-                (session_id,driver_id))
+-    cur.execute("INSERT INTO session_results(session_id,driver_id,position,lap_time_ms) VALUES (%s,%s,1,90000)",
+-                (session_id,driver_id))
++    cur.execute(
++        "INSERT INTO demo_races(session_id,event_id) VALUES (%s,%s)", (session_id, event_id)
++    )
++    cur.execute(
++        "INSERT INTO demo_race_entries(session_id,driver_id,pace_offset_ms) VALUES (%s,%s,17)",
++        (session_id, driver_id),
++    )
++    cur.execute(
++        "INSERT INTO session_results(session_id,driver_id,position,lap_time_ms) VALUES (%s,%s,1,90000)",
++        (session_id, driver_id),
++    )
+     # Simulate an earlier deployment with the lookup-only index.
+-    cur.execute("CREATE INDEX idx_pit_reservations_driver_active ON pit_reservations(session_id,driver_id) WHERE status='RESERVED' AND driver_id IS NOT NULL")
++    cur.execute(
++        "CREATE INDEX idx_pit_reservations_driver_active ON pit_reservations(session_id,driver_id) WHERE status='RESERVED' AND driver_id IS NOT NULL"
++    )
+ 
+     cur.execute((ROOT / "migrations/001_initial.sql").read_text())
+ 
+     cur.execute("SELECT count(*) FROM drivers")
+     assert cur.fetchone()[0] == 10
+-    cur.execute("SELECT count(*) FROM pg_indexes WHERE schemaname=current_schema() AND indexname='idx_pit_reservations_driver_active'")
++    cur.execute(
++        "SELECT count(*) FROM pg_indexes WHERE schemaname=current_schema() AND indexname='idx_pit_reservations_driver_active'"
++    )
+     assert cur.fetchone()[0] == 0
+-    cur.execute("SELECT indexdef FROM pg_indexes WHERE schemaname=current_schema() AND indexname='uq_pit_reservations_active_driver'")
++    cur.execute(
++        "SELECT indexdef FROM pg_indexes WHERE schemaname=current_schema() AND indexname='uq_pit_reservations_active_driver'"
++    )
+     assert "UNIQUE INDEX" in cur.fetchone()[0]
+-    cur.execute("""SELECT s.state,s.total_laps,d.event_id,e.driver_id,e.pace_offset_ms,r.position
++    cur.execute(
++        """SELECT s.state,s.total_laps,d.event_id,e.driver_id,e.pace_offset_ms,r.position
+         FROM race_sessions s JOIN demo_races d ON d.session_id=s.id
+         JOIN demo_race_entries e ON e.session_id=s.id
+         JOIN session_results r ON r.session_id=s.id AND r.driver_id=e.driver_id
+-        WHERE s.id=%s""", (session_id,))
+-    assert cur.fetchone() == ("COMPLETED",24,event_id,driver_id,17,1)
++        WHERE s.id=%s""",
++        (session_id,),
++    )
++    assert cur.fetchone() == ("COMPLETED", 24, event_id, driver_id, 17, 1)
