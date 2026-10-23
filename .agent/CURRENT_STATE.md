@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-23T06:00:00Z
-git_head: 74b4454
+updated_at: 2026-10-23T06:10:00Z
+git_head: fe8aabd
 branch: perfection-loop
 architect_sha256: 12c12221b65b1ee38a63e3efda98f460535368fea1b19740befec706e626a868
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -22,7 +22,7 @@ last_eval_score: NOT_RUN (quality gates and role journeys remain open)
 - F-ACE01 closed by T-170. T-006 twice failed: five-state fixtures need a route-specific applicability matrix before T-026..028. Role journeys, permissions matrix, simulator invariants, frontend visual states, docs, performance and evaluation score remain open in NEXT_STATE/queue.
 - Phase 1 A/C/E P0/P1 findings closed after T-088. Phase 2 structure active: CRUD, analytics, pit, user and telemetry repositories; auth/operations/telemetry/competition/simulation schemas; analytics, pit read, user and telemetry APIRouters. ADR-004 single-process lease guards accepted; F-STRUCT-01/02 closed. ADR-003 full enforcement and P2 findings remain.
 - T-133..T-136: F-STRUCT-03 psycopg pool could not reopen across app lifespans; strict regression reproduced it, W2 recreated the pool, test fixture updated without weaker assertions. Full isolated backend and live acceptance passed; finding closed.
-- T-164/165/172 accepted: ingest ordering repro and fix, then seeded fixture alignment. Ruff 543/mypy 222 unchanged. Full disposable backend 131 passed/0 failed/skipped/xfailed and live acceptance passed. ADR-005 exact retry of an older persisted packet still needs a focused regression; T-173/174 queued before F-DOM-04 closes. Nine owner-priority tasks accepted before first evaluation.
+- T-164/165/172/173 accepted: ingest ordering repro/fix and seeded fixture alignment; full disposable backend 131/0/0/0 and live acceptance passed, Ruff 543/mypy 222. T-173 strict xfail confirms older exact retry returns 409 on current code; --runxfail 1 fail/4 pass. T-174 fix next. Ten owner-priority tasks before evaluation.
 - T-137..T-141: telemetry GET/live/ingest reads and writes moved to typed repository/router with seeded characterization. T-141 updated stale test schema import. Full isolated backend now passes 117 tests, zero failures/skips/xfails; live acceptance passes login, simulator, MongoDB, WebSocket, pits, standings, DBMS and generated races. Ruff 573, mypy 248. Next Phase 2 task: characterize pit strategy before splitting its oversized handler.
 - T-142 pit-strategy seeded historical read contract passed 1/1 without fixture mutation, Ruff 573. T-143 extracts bounded Mongo pit telemetry read into pit_repository while preserving live/historical decisions.
 - T-143 moved bounded latest packets and stop-history aggregation to typed pit_repository; seeded historical and live unit tests passed 2/2, Ruff 573/mypy 248. Full isolated gate pending after next pit-strategy split.

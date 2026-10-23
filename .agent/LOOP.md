@@ -11,6 +11,7 @@ phase: 2 — structure, in progress
 cycle: 0 of 8
 score: NOT_RUN
 
+- T-173 accepted: older exact retry strict xfail; orchestrator --runxfail observed HTTP 409, 4 unaffected cases pass. Ten owner-priority tasks accepted before evaluation.
 - Full isolated gate after T-172 passed 131 backend tests (zero failures, skips or xfails) and live acceptance. Focused ADR-005 review found an older exact retry is not yet idempotent because repository compares only the latest packet. T-173/174 queued before closure; nine owner-priority tasks accepted.
 - T-172 accepted after boundary check was cleared by committing the orchestrator's accepted T-165 test-marker and docs edits. Old seeded ingest fixture now derives forward telemetry; Ruff passes. Disposable full gate rerun pending. Nine owner-priority tasks before evaluation.
 - T-165 accepted: ordered/idempotent per-driver ingest, focused --runxfail 4/4 and unchanged Ruff 543/mypy 222. Full apexgrid-test gate failed 130 pass/1 fail because old seeded contract sends stale lap1/sector2 into a live generated race and now correctly receives 409. T-172 will make the fixture advance beyond current telemetry without weakening its assertions. Eight owner-priority tasks before evaluation.

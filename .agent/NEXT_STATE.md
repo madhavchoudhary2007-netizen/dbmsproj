@@ -1,13 +1,8 @@
 # NEXT_STATE
-updated_at: 2026-10-23T06:00:00Z
+updated_at: 2026-10-23T06:10:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-173 — older exact-retry reproduction
-- worker: W3 | priority: P2 | after: T-172
-- target_files: backend/tests/test_telemetry_ordering.py
-- contract: strict xfail: retry a persisted earlier packet after a newer one, preserve original ID and no extra event
-- verify: APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_telemetry_ordering.py
 ### T-174 — older exact-retry idempotency
 - worker: W2 | priority: P2 | after: T-173
 - target_files: backend/app/telemetry_repository.py
@@ -31,6 +26,7 @@ loop_iteration: 0 of 8
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-173 ✓ fe8aabd; 4 pass/1 strict xfail, --runxfail proves older exact retry 409.
 - T-172 ✓ 3051e13; seeded fixture derives forward packet from latest telemetry; Ruff passes, disposable rerun pending.
 - T-165 ✓ f4c3e6e; focused --runxfail 4/4, Ruff 543/mypy 222; full isolated 130 pass/1 old fixture failure, T-172 queued.
 - T-164 ✓ 80a2bc9; 1 ordinary pass/3 strict xfails; --runxfail 3 failures on old code.
