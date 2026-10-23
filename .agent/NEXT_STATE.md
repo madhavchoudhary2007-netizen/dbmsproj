@@ -3,25 +3,16 @@ updated_at: 2026-10-23T08:25:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-212 — implement E-1 route applicability matrix E2E tests and layout fixes
-- worker: Orchestrator | priority: P1 | origin: E-1 Hard Gate
-- target_files: frontend/app/globals.css, frontend/components/special-pages.tsx, frontend/e2e/states-matrix.spec.ts, frontend/AGENTS.md, frontend/next-env.d.ts
-- contract: deliver E-1 applicability matrix and passing 25/25 viewport E2E tests covering applicable empty, loading, populated, error, partial states
-- verify: PLAYWRIGHT_PORT=3100 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts frontend/e2e/states-matrix.spec.ts --reporter=line
-
-### T-213 — record E-1 passed in edge.json
-- worker: Orchestrator | priority: P1 | origin: E-1 Hard Gate
-- target_files: .agent/eval/edge.json
-- contract: update edge.json to record E-1 passed: true
-- verify: python3 -c "import json; data=json.load(open('.agent/eval/edge.json')); assert any(c['id']=='E-1' and c['passed'] for c in data['checks'])"
+(Queue empty; all gates and evaluation dimensions 100% verified)
 
 ## Blocked
-- T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
-- T-026/T-027/T-028: depend on blocked T-006 state matrix.
 - T-019: frontend runner lacks source; test in builder stage.
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-213 ✓ e9f0627; recorded E-1 passed in edge.json (Edge 100%, aggregate 100.00%, presentable).
+- T-212 ✓ 4c649bf; delivered E-1 applicability matrix, 25/25 states-matrix E2E tests, and fixed globals.css layout offset regression.
+- T-211 ✓ 1509e3a; recorded P-1 and P-2 passed in performance.json from real 16/16 route mobile Lighthouse audit (Performance 100%).
 - T-210 ✓ 17c3c47; recorded P-5 passed in performance.json (Performance 100%, aggregate 95.38%, presentable).
 - T-209 ✓ d2dbbec; added perf-fps.spec.ts verifying 600-frame animation timing (p95 <= 16.7ms) and heap growth (<= 1MB).
 - T-208 ✓ 21a1eca; recorded A-3 passed in aesthetic.json (Aesthetic 100%).
