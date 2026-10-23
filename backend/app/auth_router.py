@@ -11,6 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 
 from .auth_cookie import clear_auth_cookies, create_csrf_token, set_auth_cookies
 from .config import JWT_ALGORITHM, JWT_MINUTES, JWT_SECRET
+from .login_limiter import LoginLimiter
 from .schemas_auth import Login
 
 
@@ -22,10 +23,21 @@ def create_auth_router(
     current_user_dependency: Callable[..., Any],
 ) -> APIRouter:
     router = APIRouter()
+    limiter = LoginLimiter()
 
     @router.post("/api/auth/login")
     def login(body: Login, response: Response, request: Request) -> dict[str, Any]:
         require_allowed_origin(request)
+        retry_after = limiter.admit(
+            body.email.strip().casefold(),
+            request.client.host if request.client else "",
+        )
+        if retry_after is not None:
+            raise HTTPException(
+                429,
+                "Too many login attempts",
+                headers={"Retry-After": str(retry_after)},
+            )
         try:
             user = fetch_one_getter()(
                 "SELECT id,email,password_hash,full_name,role "
