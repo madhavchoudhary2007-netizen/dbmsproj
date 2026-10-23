@@ -50,7 +50,7 @@ function formatErrorDetail(value: unknown): string | undefined {
   return fields.length ? fields.join("; ") : undefined;
 }
 
-export async function api<T = any>(
+export async function api<T = unknown>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
@@ -127,7 +127,7 @@ function abortableDelay(ms: number, signal?: AbortSignal): Promise<void> {
 }
 
 /** Opt-in GET read with bounded retries for transient network and server errors. */
-export async function apiRead<T = any>(path: string, options: ApiReadOptions = {}): Promise<T> {
+export async function apiRead<T = unknown>(path: string, options: ApiReadOptions = {}): Promise<T> {
   const {
     signal: signalInput,
     method = "GET",
@@ -180,21 +180,28 @@ export async function listAll(path: string, params: Record<string, string> = {})
     if (page.length < pageSize) return rows;
   }
 }
-export const asArray = (v: any): Row[] =>
-  Array.isArray(v)
-    ? v
-    : Array.isArray(v?.items)
-      ? v.items
-      : Array.isArray(v?.results)
-        ? v.results
-        : [];
-export const label = (x: any) =>
-  typeof x === "string" || typeof x === "number"
-    ? String(x)
-    : x?.name || x?.full_name || x?.email || x?.id || "—";
-export const pretty = (x: any) => {
+export const asArray = (v: unknown): Row[] => {
+  if (Array.isArray(v)) return v as Row[];
+  if (typeof v === "object" && v !== null) {
+    const record = v as Record<string, unknown>;
+    if (Array.isArray(record.items)) return record.items as Row[];
+    if (Array.isArray(record.results)) return record.results as Row[];
+  }
+  return [];
+};
+export const label = (x: unknown): string => {
+  if (typeof x === "string" || typeof x === "number") return String(x);
+  if (typeof x === "object" && x !== null) {
+    const r = x as Record<string, unknown>;
+    const val = r.name ?? r.full_name ?? r.email ?? r.id;
+    if (val !== undefined && val !== null && val !== "") return String(val);
+  }
+  return "—";
+};
+export const pretty = (x: unknown): string => {
   if (x === null || x === undefined || x === "") return "—";
   if (typeof x === "boolean") return x ? "Yes" : "No";
   if (typeof x === "object") return label(x);
   return String(x);
 };
+

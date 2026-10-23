@@ -7,22 +7,22 @@ loop_iteration: 0 of 8
 - worker: W2 | priority: P1 | origin: EVAL score F-2 & explicit-any ratchet
 - target_files: frontend/lib/api.ts
 - contract: replace 5 explicit any with strict/unknown types preserving behavior
-- verify: npm --prefix frontend exec eslint frontend/lib/api.ts
+- verify: bash -c "cd frontend && npx eslint lib/api.ts"
 ### T-182 — eliminate explicit any in shell and race-database components
 - worker: W1 | priority: P1 | origin: EVAL score F-2 & explicit-any ratchet
 - target_files: frontend/components/shell.tsx,frontend/components/race-database.tsx
 - contract: replace 6 explicit any in shell.tsx and race-database.tsx with strict types
-- verify: npm --prefix frontend exec eslint frontend/components/shell.tsx frontend/components/race-database.tsx
+- verify: bash -c "cd frontend && npx eslint components/shell.tsx components/race-database.tsx"
 ### T-183 — eliminate explicit any in dbms-workspace component
 - worker: W1 | priority: P1 | origin: EVAL score F-2 & explicit-any ratchet
 - target_files: frontend/components/dbms-workspace.tsx
 - contract: replace 9 explicit any with strict types preserving schema and cell renderers
-- verify: npm --prefix frontend exec eslint frontend/components/dbms-workspace.tsx
+- verify: bash -c "cd frontend && npx eslint components/dbms-workspace.tsx"
 ### T-184 — eliminate explicit any in special-pages component
 - worker: W1 | priority: P1 | origin: EVAL score F-2 & explicit-any ratchet
 - target_files: frontend/components/special-pages.tsx
 - contract: replace 25 explicit any with strict types preserving props and renderers
-- verify: npm --prefix frontend exec eslint frontend/components/special-pages.tsx
+- verify: bash -c "cd frontend && npx eslint components/special-pages.tsx"
 ### T-185 — fix APP_ENV in full-gates backend coverage gate
 - worker: W3 | priority: P1 | origin: EVAL score F-3
 - target_files: scripts/eval/full-gates.sh
