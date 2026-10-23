@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-23T06:10:00Z
-git_head: fe8aabd
+updated_at: 2026-10-23T06:20:00Z
+git_head: ca06899
 branch: perfection-loop
 architect_sha256: 12c12221b65b1ee38a63e3efda98f460535368fea1b19740befec706e626a868
 archetype: enterprise-saas (5 signals); developer-tool secondary (3)
@@ -22,13 +22,14 @@ last_eval_score: NOT_RUN (quality gates and role journeys remain open)
 - F-ACE01 closed by T-170. T-006 twice failed: five-state fixtures need a route-specific applicability matrix before T-026..028. Role journeys, permissions matrix, simulator invariants, frontend visual states, docs, performance and evaluation score remain open in NEXT_STATE/queue.
 - Phase 1 A/C/E P0/P1 findings closed after T-088. Phase 2 structure active: CRUD, analytics, pit, user and telemetry repositories; auth/operations/telemetry/competition/simulation schemas; analytics, pit read, user and telemetry APIRouters. ADR-004 single-process lease guards accepted; F-STRUCT-01/02 closed. ADR-003 full enforcement and P2 findings remain.
 - T-133..T-136: F-STRUCT-03 psycopg pool could not reopen across app lifespans; strict regression reproduced it, W2 recreated the pool, test fixture updated without weaker assertions. Full isolated backend and live acceptance passed; finding closed.
-- T-164/165/172/173 accepted: ingest ordering repro/fix and seeded fixture alignment; full disposable backend 131/0/0/0 and live acceptance passed, Ruff 543/mypy 222. T-173 strict xfail confirms older exact retry returns 409 on current code; --runxfail 1 fail/4 pass. T-174 fix next. Ten owner-priority tasks before evaluation.
+- T-164/165/172/173/174 accepted: ingest ordering and older exact retry test-first repair; focused --runxfail 5/5 after T-174. Prior full disposable backend 131/0/0/0 and live acceptance passed; rerun after older-retry fix pending. Ruff 543/mypy 222 ratchets held. Eleven owner-priority tasks before evaluation.
 - T-137..T-141: telemetry GET/live/ingest reads and writes moved to typed repository/router with seeded characterization. T-141 updated stale test schema import. Full isolated backend now passes 117 tests, zero failures/skips/xfails; live acceptance passes login, simulator, MongoDB, WebSocket, pits, standings, DBMS and generated races. Ruff 573, mypy 248. Next Phase 2 task: characterize pit strategy before splitting its oversized handler.
 - T-142 pit-strategy seeded historical read contract passed 1/1 without fixture mutation, Ruff 573. T-143 extracts bounded Mongo pit telemetry read into pit_repository while preserving live/historical decisions.
 - T-143 moved bounded latest packets and stop-history aggregation to typed pit_repository; seeded historical and live unit tests passed 2/2, Ruff 573/mypy 248. Full isolated gate pending after next pit-strategy split.
 - T-144..T-155 split pit strategy and generated-race boundaries. T-156/T-157 moved auth routes into APIRouter. T-158..T-160 characterized membership API, moved SQL to typed repository and handlers to APIRouter; focused 2/2 after T-160, full disposable backend 120/0/0 and live acceptance passed. Ruff 543, mypy 222. T-161 characterized session lifecycle; owner override caps Phase 2 after accepted auth and membership splits. T-162 strict F-ACE01 tests: 1 pass/3 xfail; --runxfail 3 missing-429 failures. T-163 focused 4/4; full isolated red 90 pass/35 fail because successful logins count toward limit. T-168 strict success regression accepted (4 pass/2 xfail); T-169 repair passed 6/6; full isolated 127/0/0 and live acceptance. T-170 restored mypy strict 222 and Ruff 543; F-ACE01 closed. F-E02 audit/upgrade next; F-E02/DOM-04/05 and evaluation follow.
 
 ## Orchestrator direct edits and Taste review
+- 2026-10-23: retired T-173 strict xfail marker and unused pytest import (2 test lines) after T-174, and clarified older retry in docs/contracts.md. No product source edited.
 - 2026-10-23: removed four test lines (three strict telemetry xfail markers and unused pytest import) after T-165, and updated docs/contracts.md for ADR-005. No product source edited.
 - 2026-10-23: retired three accepted F-ACE01 xfail decorators and sorted the test import (4 test lines); focused 4/4, full gate exposed success-count defect. No product source edited. Retired two T-168 xfails (3 test lines); focused 6/6 and full isolated 127/0/0.
 - Product: one `frontend/package.json` build-script line switched Next build to webpack (e854d9b). No other product-source edits.

@@ -11,6 +11,7 @@ phase: 2 — structure, in progress
 cycle: 0 of 8
 score: NOT_RUN
 
+- T-174 accepted: older persisted exact retry returns stored ID/body before order rejection. Focused --runxfail 5/5; strict marker retired. Eleven owner-priority tasks accepted; full isolated rerun pending before F-DOM-04 closure.
 - T-173 accepted: older exact retry strict xfail; orchestrator --runxfail observed HTTP 409, 4 unaffected cases pass. Ten owner-priority tasks accepted before evaluation.
 - Full isolated gate after T-172 passed 131 backend tests (zero failures, skips or xfails) and live acceptance. Focused ADR-005 review found an older exact retry is not yet idempotent because repository compares only the latest packet. T-173/174 queued before closure; nine owner-priority tasks accepted.
 - T-172 accepted after boundary check was cleared by committing the orchestrator's accepted T-165 test-marker and docs edits. Old seeded ingest fixture now derives forward telemetry; Ruff passes. Disposable full gate rerun pending. Nine owner-priority tasks before evaluation.
