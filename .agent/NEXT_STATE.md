@@ -1,8 +1,18 @@
 # NEXT_STATE
-updated_at: 2026-10-23T05:50:00Z
+updated_at: 2026-10-23T06:00:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
+### T-173 — older exact-retry reproduction
+- worker: W3 | priority: P2 | after: T-172
+- target_files: backend/tests/test_telemetry_ordering.py
+- contract: strict xfail: retry a persisted earlier packet after a newer one, preserve original ID and no extra event
+- verify: APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_telemetry_ordering.py
+### T-174 — older exact-retry idempotency
+- worker: W2 | priority: P2 | after: T-173
+- target_files: backend/app/telemetry_repository.py
+- contract: search persisted exact packet before latest-position rejection, keep conflict 409
+- verify: APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q --runxfail backend/tests/test_telemetry_ordering.py
 ### T-166 — F-DOM-05 replay seed reproduction
 - worker: W3 | priority: P2 | after: T-165
 - target_files: backend/tests/test_simulation_replay.py
