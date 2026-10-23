@@ -42,6 +42,7 @@ from starlette.middleware.base import RequestResponseEndpoint
 
 from . import token_revocation
 from .analytics_router import create_analytics_router
+from .api.dbms_sql import create_dbms_sql_router
 from .api.health import health_live as health_live
 from .api.health import legacy_router as legacy_health_router
 from .api.health import register_legacy_health, register_readiness
@@ -1789,14 +1790,13 @@ def admin(user=admin_role_dependency):
 admin_dependency = Depends(admin)
 
 
-@app.get("/api/dbms/schema")
-def dbms_schema(user=admin_dependency):
-    return jsonable(
-        fetch_all(
-            "SELECT table_name,column_name,data_type,is_nullable FROM information_schema.colu"
-            "mns WHERE table_schema='public' ORDER BY table_name,ordinal_position"
-        )
-    )
+dbms_sql_router, dbms_sql_handlers = create_dbms_sql_router(
+    lambda *a, **kw: fetch_all(*a, **kw),
+    lambda v: jsonable(v),
+    admin_dependency,
+)
+dbms_schema = dbms_sql_handlers["dbms_schema"]
+app.include_router(dbms_sql_router)
 
 
 @app.get("/api/dbms/overview")
