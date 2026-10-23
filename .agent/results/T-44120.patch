@@ -1,0 +1,61 @@
+diff --git a/backend/tests/test_pit_strategy_contract.py b/backend/tests/test_pit_strategy_contract.py
+index cc5b4fc..4410cbd 100644
+--- a/backend/tests/test_pit_strategy_contract.py
++++ b/backend/tests/test_pit_strategy_contract.py
+@@ -34,9 +34,13 @@ def test_seeded_pit_strategy_read_contract(database_api_client):
+     assert anonymous.json() == {"detail": "Authentication required"}
+     assert anonymous.headers["www-authenticate"] == "Bearer"
+ 
+-    login = client.post("/api/auth/login", json={
+-        "email": "admin@apexgrid.test", "password": "ApexGrid2026!",
+-    })
++    login = client.post(
++        "/api/auth/login",
++        json={
++            "email": "admin@apexgrid.test",
++            "password": "ApexGrid2026!",
++        },
++    )
+     assert login.status_code == 200, login.text
+     headers = {"Authorization": "Bearer " + login.json()["access_token"]}
+     client.cookies.clear()
+@@ -49,17 +53,34 @@ def test_seeded_pit_strategy_read_contract(database_api_client):
+     assert response.status_code == 200, response.text
+     payload = response.json()
+     assert set(payload) == {
+-        "session_id", "session_state", "source", "strategy", "historical_summary",
++        "session_id",
++        "session_state",
++        "source",
++        "strategy",
++        "historical_summary",
+     }
+     assert payload["session_id"] == session_id
+     assert payload["session_state"] == seeded["state"] == "COMPLETED"
+     assert payload["source"] == "history"
+     assert isinstance(payload["strategy"], list) and payload["strategy"]
+     strategy_keys = {
+-        "driver_id", "driver_name", "driver_number", "team_id", "team_name",
+-        "current_lap", "tire_compound", "tire_age_laps", "tire_wear_pct",
+-        "pit_window_start_lap", "pit_window_end_lap", "recommended_stop_lap",
+-        "laps_until_decision", "status", "reason", "assigned_box", "stops",
++        "driver_id",
++        "driver_name",
++        "driver_number",
++        "team_id",
++        "team_name",
++        "current_lap",
++        "tire_compound",
++        "tire_age_laps",
++        "tire_wear_pct",
++        "pit_window_start_lap",
++        "pit_window_end_lap",
++        "recommended_stop_lap",
++        "laps_until_decision",
++        "status",
++        "reason",
++        "assigned_box",
++        "stops",
+     }
+     assert all(set(row) == strategy_keys for row in payload["strategy"])
+     assert all(row["status"] == "NO_AUTOMATIC_STRATEGY" for row in payload["strategy"])
