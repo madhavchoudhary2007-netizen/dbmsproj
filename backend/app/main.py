@@ -42,6 +42,8 @@ from starlette.middleware.base import RequestResponseEndpoint
 
 from . import token_revocation
 from .analytics_router import create_analytics_router
+from .api.health import health_live as health_live
+from .api.health import router as health_router
 from .auth_cookie import verify_csrf_token
 from .auth_router import create_auth_router
 from .config import (
@@ -99,7 +101,8 @@ from .pit_strategy_router import create_pit_strategy_router
 from .pit_strategy_service import project_pit_strategy
 from .runtime_lease import acquire_runtime_lease, check_runtime_lease
 from .schemas_competition import ResultIn
-from .schemas_health import HealthReport, LivenessReport, ReadinessReport
+from .schemas_health import HealthReport, ReadinessReport
+from .schemas_health import LivenessReport as LivenessReport
 from .schemas_operations import (
     Action,
     AutoReservationIn,
@@ -1791,10 +1794,7 @@ def health() -> HealthReport:
     }
 
 
-@app.get("/health/live", response_model=LivenessReport)
-def health_live(response: Response) -> LivenessReport:
-    response.headers["Cache-Control"] = "no-store"
-    return LivenessReport(status="alive")
+app.include_router(health_router)
 
 
 @app.get("/health/ready", response_model=ReadinessReport)
