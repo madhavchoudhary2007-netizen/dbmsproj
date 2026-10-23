@@ -11,6 +11,7 @@ phase: 2 — structure, in progress
 cycle: 0 of 8
 score: NOT_RUN
 
+- F-DOM-04 closed: after T-174, full apexgrid-test backend 132 passed, zero failures/skips/xfails, and live acceptance passed all listed flows; Ruff 543/mypy 222. T-166 seed/replay reproduction next. Eleven owner-priority tasks accepted before first evaluation.
 - T-174 accepted: older persisted exact retry returns stored ID/body before order rejection. Focused --runxfail 5/5; strict marker retired. Eleven owner-priority tasks accepted; full isolated rerun pending before F-DOM-04 closure.
 - T-173 accepted: older exact retry strict xfail; orchestrator --runxfail observed HTTP 409, 4 unaffected cases pass. Ten owner-priority tasks accepted before evaluation.
 - Full isolated gate after T-172 passed 131 backend tests (zero failures, skips or xfails) and live acceptance. Focused ADR-005 review found an older exact retry is not yet idempotent because repository compares only the latest packet. T-173/174 queued before closure; nine owner-priority tasks accepted.
@@ -146,7 +147,7 @@ score: NOT_RUN
 - F-DOM-01, area A, P1, closed by T-073/T-074: unclassified session results earned pole/fastest-lap points through unconditional terms in `recalculate_standings` (`backend/migrations/001_initial.sql:264`); strict DB xfail proved 2 points, additive 002 migration gates both bonuses, full isolated backend and live acceptance pass.
 - F-DOM-02, area A, P1, closed by T-077..T-088: new unsupported time/grid sanctions return 422 without writes; steward controls explain the limit; historical result, standings and archive outputs are visibly provisional across backend and browser gates. Full enforcement remains required P2 Phase 3 work under ADR-003.
 - F-DOM-03, area A, P1, closed by T-075/T-076: result upserts allowed completed classified position gaps (`backend/app/main.py:727-744`); strict API xfail proved missing 422, final position set now validates within the write transaction; full isolated backend and live acceptance pass.
-- F-DOM-04, area A, P2, open: telemetry insert/broadcast accepts duplicate and older packets (`backend/app/main.py:914-932`); test ordering/idempotency.
+- F-DOM-04, area A, P2, closed by T-164/165/172/173/174: strict test-first duplicate/older/conflict and older exact retry; full isolated 132/0/0/0 and live acceptance.
 - F-DOM-05, area A, P2, open: production simulator uses global random state without persisted seed (`backend/app/main.py:1451-1455,1661`); test restart/replay determinism.
 - F-ACE01, area C/E, P2, closed by T-162/163/168/169/170: `/api/auth/login` now limits five failed attempts per normalized account and trusted source in 60 seconds, releases successful admissions, and returns 429 with Retry-After; 127-test disposable backend and live acceptance passed.
 - F-A11, area D, P1, closed by T-039: `/login` copyright text was 3.88:1 against `#0b0e12` (axe serious at `frontend/app/globals.css:1073`); `--muted` yields 6.44:1. `RUN_XFAIL=1` reproduced before and passed after; marker removed.
