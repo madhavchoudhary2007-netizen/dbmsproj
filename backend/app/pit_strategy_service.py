@@ -14,6 +14,12 @@ Driver = dict[str, Any]
 DriverMap = dict[str, Driver]
 StopsMap = dict[str, list[Driver]]
 DRIVER_FIELDS = ("driver_name", "driver_number", "team_id", "team_name")
+PIT_TIRE_STINT_LAPS = 18
+
+
+def tire_stint_target(compound: str, car_number: int) -> int:
+    base = {"SOFT": 16, "MEDIUM": 20, "HARD": 24}.get(compound, PIT_TIRE_STINT_LAPS)
+    return max(12, min(28, base + int(car_number) % 5 - 2))
 
 
 def project_pit_strategy(

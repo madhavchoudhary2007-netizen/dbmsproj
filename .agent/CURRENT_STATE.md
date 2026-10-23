@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 1e61efd
+git_head: b395e35
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -58,3 +58,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T44165root rejected before acceptance: bare blur utility and comma-containing filter-before-blur bypassed checker. Repair1 requested with regressions; no root product/test patch applied.
 
 - T-361 accepted1e61efd: Tailwind4 foundation complete: approved tokens, adapter/config integration, audit0. Root925 browser checks pass; light palette transition remains failing as planned. Verify0.
+
+- T-44165 acceptedb395e35: Added blur checker and fixtures; repaired root-proven bare-utility and nested comma-filter bypasses with regressions.17 cases pass. Verify0.

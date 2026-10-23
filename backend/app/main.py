@@ -88,6 +88,7 @@ from .demo_race_repository import (
     list_demo_race_ids,
     validate_demo_race_delete,
 )
+from .demo_race_repository import choose_demo_car_numbers as choose_demo_car_numbers
 from .demo_race_router import (
     DEFAULT_DEMO_RACE_CREATE,
     create_demo_race_router,
@@ -98,7 +99,11 @@ from .membership_router import create_membership_router
 from .pit_repository import PIT_RESERVATION_SELECT, load_pit_strategy_rows, load_pit_telemetry
 from .pit_router import create_pit_router
 from .pit_strategy_router import create_pit_strategy_router
-from .pit_strategy_service import project_pit_strategy
+from .pit_strategy_service import PIT_TIRE_STINT_LAPS as PIT_TIRE_STINT_LAPS
+from .pit_strategy_service import (
+    project_pit_strategy,
+    tire_stint_target,
+)
 from .runtime_lease import acquire_runtime_lease, check_runtime_lease
 from .schemas_competition import ResultIn
 from .schemas_health import HealthReport, ReadinessReport
@@ -120,14 +125,6 @@ from .user_router import create_user_router
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("apexgrid")
 bearer = HTTPBearer(auto_error=False)
-PIT_TIRE_STINT_LAPS = 18
-
-
-def tire_stint_target(compound: str, car_number: int) -> int:
-    base = {"SOFT": 16, "MEDIUM": 20, "HARD": 24}.get(compound, PIT_TIRE_STINT_LAPS)
-    return max(12, min(28, base + int(car_number) % 5 - 2))
-
-
 mongo_client: MongoClient | None = None
 telemetry_collection = None
 
@@ -875,11 +872,6 @@ def list_demo_races(
 ):
     ids = list_demo_race_ids(limit, offset)
     return [demo_race_row(row["session_id"]) for row in ids]
-
-
-def choose_demo_car_numbers(car_count: int) -> list[int]:
-    # Numbers are unique in this grid; historical drivers may reuse them.
-    return random.sample(range(11, 100), car_count)
 
 
 def _make_demo_race(cars: int | None = None, auto_repeat: bool = False):

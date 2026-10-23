@@ -22,6 +22,11 @@ class DemoRaceDeleteConflict(Exception):
     pass
 
 
+def choose_demo_car_numbers(car_count: int) -> list[int]:
+    # Numbers are unique in this grid; historical drivers may reuse them.
+    return random.sample(range(11, 100), car_count)
+
+
 def validate_demo_race_delete(
     cur: Cursor[dict[str, Any]], session_id: UUID, marker: dict[str, Any]
 ) -> None:
