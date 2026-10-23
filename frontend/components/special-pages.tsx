@@ -73,7 +73,7 @@ export function Dashboard() {
         eyebrow="CONTROL ROOM / OVERVIEW"
         title="Race operations"
         description="Competition status and service health from the ApexGrid API."
-        action={<ReloadButton onClick={fetchData} />}
+        action={<ReloadButton onClick={fetchData} data-primary="true" />}
       />
       <StateMessage error={err} loading={load} retry={fetchData} />
       {data && (
@@ -1179,7 +1179,7 @@ export function LiveTiming() {
             <h2 id="demo-race-title">Put a full grid on track</h2>
             <p>Start a generated race with 8–16 fictional drivers and live timing. Sessions support up to 72 laps.</p>
           </div>
-          <Button disabled={demoBusy} onClick={() => void createDemoRace()}>
+          <Button disabled={demoBusy} data-primary="true" onClick={() => void createDemoRace()}>
             <Plus size={15} /> {demoBusy ? "Starting race…" : "Create live race"}
           </Button>
         </section>
@@ -1567,7 +1567,7 @@ export function PitWall() {
     <div className="toolbar select-toolbar">
       <label>Event<select value={event} onChange={(e) => { clearPitWallSelection(); setSelectedSession(""); setEvent(e.target.value); void load(e.target.value, ""); }}><option value="">Select event</option>{events.map((e) => <option key={String(e.id)} value={String(e.id)}>{String(e.name || e.id)} · {String(e.start_date || "").slice(0, 10)} · {String(e.id).slice(0, 8)}</option>)}</select></label>
       <label>Session<select value={selectedSession} onChange={(e) => { clearPitWallSelection(); setSelectedSession(e.target.value); void load(event, e.target.value); }}><option value="">Select session</option>{sessions.filter((s) => !event || s.event_id === event).map((s) => <option key={String(s.id)} value={String(s.id)}>{String(s.session_type || s.id)} · {String(s.state)} · {String(s.scheduled_at || "").slice(0, 10)} · {String(s.id).slice(0, 8)}</option>)}</select></label>
-      <span className="record-count">{boxes.length} BOXES · {res.length} PIT {res.length === 1 ? "STOP" : "STOPS"}</span><ReloadButton onClick={() => void load(event, selectedSession)} />
+      <span className="record-count">{boxes.length} BOXES · {res.length} PIT {res.length === 1 ? "STOP" : "STOPS"}</span><ReloadButton onClick={() => void load(event, selectedSession)} data-primary="true" />
     </div>
     <StateMessage error={error} loading={loading} retry={() => void load()} />{message && <div className="notice">{message}</div>}
 
@@ -1702,7 +1702,7 @@ export function Analytics() {
             placeholder="Season"
           />
         </label>
-        <Button onClick={() => void search()} disabled={busy}>
+        <Button data-primary="true" onClick={() => void search()} disabled={busy}>
           {busy ? "Loading…" : "Apply filters"}
         </Button>
       </div>
@@ -1738,7 +1738,7 @@ export function DbmsCenter() {
     </>;
   }
   return <>
-    <PageHeader eyebrow="PLATFORM / DATABASE ENGINEERING" title="DBMS workspace" description="Inspect live PostgreSQL and MongoDB records, explore the model, and run real database operations from one workspace." />
+    <PageHeader eyebrow="PLATFORM / DATABASE ENGINEERING" title="DBMS workspace" description="Inspect live PostgreSQL and MongoDB records, explore the model, and run real database operations from one workspace." action={<Button data-primary="true" onClick={() => { if (typeof window !== "undefined") window.location.hash = "overview"; }}>Overview</Button>} />
     <DbmsWorkspace />
   </>;
 }

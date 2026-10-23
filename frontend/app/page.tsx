@@ -12,7 +12,7 @@ export default function Home() {
   }, [ready, router, user]);
 
   return (
-    <div className="loading-screen">
+    <div className="loading-screen" data-primary="true">
       APEXGRID{" "}
       <span>{ready ? "Opening operations…" : "Checking session…"}</span>
     </div>

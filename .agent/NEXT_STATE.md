@@ -3,11 +3,11 @@ updated_at: 2026-10-23T08:25:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-201 — add data-primary support in ui.tsx, login, and standings
+### T-202 — add data-primary across special-pages, home, and verify with E2E test
 - worker: W1 | priority: P1 | origin: EVAL score A-4
-- target_files: frontend/components/ui.tsx, frontend/app/login/page.tsx, frontend/app/standings/page.tsx
-- contract: add data-primary attribute support to Button, ReloadButton, and AddButton; add data-primary="true" to login submit button and standings recalculate button
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
+- target_files: frontend/components/special-pages.tsx, frontend/app/page.tsx, frontend/e2e/data-primary.spec.ts
+- contract: add data-primary to special-pages actions and home loading screen; add data-primary.spec.ts asserting 1 visible data-primary element per route across viewports
+- verify: PLAYWRIGHT_PORT=32145 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts data-primary.spec.ts --project=desktop-1440 && git checkout -- frontend/next-env.d.ts frontend/AGENTS.md
 
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
