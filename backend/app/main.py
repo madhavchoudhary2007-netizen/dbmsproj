@@ -39,7 +39,7 @@ from pymongo.errors import PyMongoError
 from starlette.middleware.base import RequestResponseEndpoint
 
 from .analytics_router import create_analytics_router
-from .auth_cookie import clear_auth_cookies, verify_csrf_token
+from .auth_cookie import verify_csrf_token
 from .auth_router import create_auth_router
 from .config import (
     APP_ENV,
@@ -401,19 +401,9 @@ app.include_router(
         lambda: fetch_one,
         jsonable,
         lambda: APP_ENV != "local",
+        current_user,
     )
 )
-
-
-@app.get("/api/auth/me")
-def me(user=Depends(current_user)):
-    return user
-
-
-@app.post("/api/auth/logout")
-def logout(response: Response, user=Depends(current_user)):
-    clear_auth_cookies(response, secure=APP_ENV != "local")
-    return {"detail": "Logged out"}
 
 
 app.include_router(create_user_router(roles, jsonable))

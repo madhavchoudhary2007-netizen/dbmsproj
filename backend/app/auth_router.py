@@ -7,9 +7,9 @@ from typing import Any
 
 import bcrypt
 import jwt
-from fastapi import APIRouter, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 
-from .auth_cookie import create_csrf_token, set_auth_cookies
+from .auth_cookie import clear_auth_cookies, create_csrf_token, set_auth_cookies
 from .config import JWT_ALGORITHM, JWT_MINUTES, JWT_SECRET
 from .schemas_auth import Login
 
@@ -19,6 +19,7 @@ def create_auth_router(
     fetch_one_getter: Callable[[], Callable[..., Any]],
     jsonable: Callable[[Any], Any],
     secure_cookies: Callable[[], bool],
+    current_user_dependency: Callable[..., Any],
 ) -> APIRouter:
     router = APIRouter()
 
@@ -59,5 +60,16 @@ def create_auth_router(
         if request.headers.get("origin"):
             return {"user": user_data}
         return {"access_token": token, "token_type": "bearer", "user": user_data}
+
+    @router.get("/api/auth/me")
+    def me(user: Any = Depends(current_user_dependency)) -> Any:
+        return user
+
+    @router.post("/api/auth/logout")
+    def logout(
+        response: Response, user: Any = Depends(current_user_dependency)
+    ) -> dict[str, str]:
+        clear_auth_cookies(response, secure=secure_cookies())
+        return {"detail": "Logged out"}
 
     return router
