@@ -1,6 +1,7 @@
 """Seeded write characterization for telemetry ingest."""
 
 import os
+from datetime import datetime, timedelta
 
 import pytest
 from app import main as main_module
@@ -24,17 +25,35 @@ def _login(client, email):
     return {"Authorization": f"Bearer {response.json()['access_token']}"}
 
 
-def _packet(session_id, driver_id):
+def _packet(session_id, driver_id, latest_packet):
+    lap_time_ms = 90123
+    latest_ts = datetime.fromisoformat(latest_packet["ts"].replace("Z", "+00:00"))
     return {
         "session_id": session_id, "driver_id": driver_id,
-        "ts": "9998-01-01T00:00:00Z", "lap": 1, "sector": 2,
-        "elapsed_ms": 12345, "lap_time_ms": 90123,
+        "ts": (latest_ts + timedelta(milliseconds=lap_time_ms)).isoformat().replace("+00:00", "Z"),
+        "lap": latest_packet["lap"] + 1, "sector": 0,
+        "elapsed_ms": latest_packet["elapsed_ms"] + lap_time_ms, "lap_time_ms": lap_time_ms,
         "sector_ms": [30100, 30000, 30023], "position": 1,
         "speed_kph": 210.5, "throttle_pct": 82.0, "brake_pct": 3.0,
         "tire_compound": "MEDIUM", "tire_age_laps": 2,
         "tire_wear_pct": 4.5, "tire_temp_c": [80.0, 82.0, 79.0, 81.0],
         "pit_state": "TRACK",
     }
+
+
+def _latest_packet(client, admin, session_id, driver_id):
+    current = client.get(
+        f"/api/telemetry?session_id={session_id}", headers=admin
+    )
+    assert current.status_code == 200, current.text
+    driver_packets = [
+        row for row in current.json() if row["driver_id"] == driver_id
+    ]
+    assert driver_packets, "generated race should have current driver telemetry"
+    return max(
+        driver_packets,
+        key=lambda row: (row["lap"], row["sector"], row["elapsed_ms"]),
+    )
 
 
 PACKET_KEYS = {
@@ -105,8 +124,13 @@ def test_seeded_telemetry_ingest_write_contract(database_api_client):
         live = client.get(f"/api/sessions/{session_id}/live", headers=admin)
         assert live.status_code == 200, live.text
         driver_id = live.json()["drivers"][0]["id"]
-        packet = _packet(session_id, driver_id)
+        packet = _packet(
+            session_id, driver_id, _latest_packet(client, admin, session_id, driver_id)
+        )
         _assert_role_rejections(client, driver, packet)
+        packet = _packet(
+            session_id, driver_id, _latest_packet(client, admin, session_id, driver_id)
+        )
         accepted = client.post("/api/telemetry/ingest", headers=admin, json=packet)
         assert accepted.status_code == 202, accepted.text
         inserted_id = ObjectId(accepted.json()["packet"]["id"])
