@@ -1,0 +1,13 @@
+diff --git a/scripts/eval/db-baseline.sh b/scripts/eval/db-baseline.sh
+index 788a947..ec812db 100644
+--- a/scripts/eval/db-baseline.sh
++++ b/scripts/eval/db-baseline.sh
+@@ -58,7 +58,7 @@ printf 'Starting loopback API on 127.0.0.1:18000...\n'
+   DATABASE_URL="$DATABASE_URL" MONGODB_URL="$MONGODB_URL" \
+     MONGODB_DATABASE='apexgrid' APP_ENV='local' \
+     PYTHONPATH="$REPO_ROOT/backend${PYTHONPATH:+:$PYTHONPATH}" \
+-    "$TEST_PYTHON" -m uvicorn app.main:app --host 127.0.0.1 --port 18000
++    exec "$TEST_PYTHON" -m uvicorn app.main:app --host 127.0.0.1 --port 18000
+ ) >"$API_LOG" 2>&1 &
+ API_PID=$!
+ 
