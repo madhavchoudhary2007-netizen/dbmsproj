@@ -88,7 +88,7 @@ export default function Login() {
             />
           </label>
           {error && <div className="form-error">{error}</div>}
-          <button disabled={busy} className="button primary login-submit">
+          <button disabled={busy} data-primary="true" className="button primary login-submit">
             {busy ? "Authenticating…" : "Sign in"}
             <ArrowUpRight size={16} />
           </button>

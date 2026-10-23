@@ -37,18 +37,21 @@ export function Button({
   type = "button",
   disabled = false,
   kind = "primary",
+  "data-primary": dataPrimary,
 }: {
   children: React.ReactNode;
   onClick?: () => void;
   type?: "button" | "submit";
   disabled?: boolean;
   kind?: "primary" | "secondary" | "danger";
+  "data-primary"?: string | boolean;
 }) {
   return (
     <button
       type={type}
       disabled={disabled}
       onClick={onClick}
+      data-primary={dataPrimary}
       className={`button ${kind}`}
     >
       {children}
@@ -387,9 +390,9 @@ export function ResourceEditor({
     </form>
   );
 }
-export function ReloadButton({ onClick }: { onClick: () => void }) {
+export function ReloadButton({ onClick, "data-primary": dataPrimary }: { onClick: () => void; "data-primary"?: string | boolean }) {
   return (
-    <button className="icon-button" onClick={onClick} aria-label="Refresh">
+    <button className="icon-button" onClick={onClick} aria-label="Refresh" data-primary={dataPrimary}>
       <RefreshCw size={15} />
     </button>
   );
@@ -402,7 +405,7 @@ export function AddButton({
   children?: string;
 }) {
   return (
-    <Button onClick={onClick}>
+    <Button onClick={onClick} data-primary="true">
       <Plus size={15} />
       {children}
     </Button>

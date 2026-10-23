@@ -72,7 +72,7 @@ export default function Page() {
           </select>
         </label>
         {canRecalculate && (
-          <Button onClick={() => void recalc()} disabled={!champ || busy}>
+          <Button data-primary="true" onClick={() => void recalc()} disabled={!champ || busy}>
             {busy ? "Recalculating…" : "Recalculate standings"}
           </Button>
         )}
