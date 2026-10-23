@@ -3,7 +3,11 @@ updated_at: 2026-10-23T08:25:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-- Queue empty — evaluation aggregate score 95.38% reached with zero failed hard gates (PRESENTABLE).
+### T-211 — record P-1 and P-2 passed in performance.json from real Lighthouse audit
+- worker: Orchestrator | priority: P1 | origin: EVAL score P-1, P-2
+- target_files: .agent/eval/performance.json, scripts/eval/audit-lighthouse-all.mjs
+- contract: record P-1 and P-2 passed based on audit-lighthouse-all.mjs 16/16 route audit
+- verify: python3 -c "import json; data=json.load(open('.agent/eval/performance.json')); assert all(c['passed'] for c in data['checks'])"
 
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
