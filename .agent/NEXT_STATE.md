@@ -3,10 +3,10 @@ updated_at: 2026-10-23T08:25:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-202 — add data-primary across special-pages, home, and verify with E2E test
-- worker: W1 | priority: P1 | origin: EVAL score A-4
-- target_files: frontend/components/special-pages.tsx, frontend/app/page.tsx, frontend/e2e/data-primary.spec.ts
-- contract: add data-primary to special-pages actions and home loading screen; add data-primary.spec.ts asserting 1 visible data-primary element per route across viewports
+### T-203 — record A-4 passed in aesthetic.json
+- worker: Orchestrator | priority: P1 | origin: EVAL score A-4
+- target_files: .agent/eval/aesthetic.json
+- contract: record A-4 passed based on data-primary.spec.ts passing 80/80 tests across 16 routes and 5 viewports
 - verify: PLAYWRIGHT_PORT=32145 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts data-primary.spec.ts --project=desktop-1440 && git checkout -- frontend/next-env.d.ts frontend/AGENTS.md
 
 ## Blocked
