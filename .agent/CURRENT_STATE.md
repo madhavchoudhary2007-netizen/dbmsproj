@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 4f53ecd
+git_head: cec7835
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -37,3 +37,8 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T441557768158 stagedtheme tokens63lines (not imported), typecheck/lint/old3lints0, tokenradius0. Taste: no DOM/rendering change. T441574f53ecd light luminance>=0.85 activated, AA4.5 preserved,80casescollected. Rootdesktopdashboard actually1FAIL as expected duringdarktransition; no skip. Root first used nonexistentprojectdesktop then correcteddesktop-1440, logged both.
 - Rootmypy218 afterT44156: worker moved constant import indirectly through validation, causing new implicit-export error. T44158repair queued to restore direct simulation_core import/baseline217. No threshold changed; fullzero atT339.
 - Worker reporting issues: T44154 summarized Verify instead of exactliteral, root normalized and reran; T44155 countedstaticcommands as tests, root corrected to0. No boundaries violated. Root authored0productlines.
+
+- T-44158 acceptedcec7835: Restored direct MAX_SESSION_LAPS import; new implicit-export error removed, mypy returns to baseline217. Verify0.
+
+- T44158cec7835 repaired import-only ratchet: mypy217 in15/39files, snapshot9PASS. T44156 full214PASS0skip/livePASS. T44158root fullrunning.
+- T361 dependency installation is orchestrator-owned per explicit plan: Tailwind4/@tailwindcss/postcss replace Tailwind3/autoprefixer. npm-generated package-lock changes recorded separately from <=150-line authored worker packets; no hand-authored lockfile or product code. The UI integration remains a separate W1 packet.

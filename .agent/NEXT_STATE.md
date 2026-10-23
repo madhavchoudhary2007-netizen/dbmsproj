@@ -3,15 +3,26 @@ updated_at: 2026-10-23
 phase: 3 API contract guard (Phases0–2 complete; baseline score51.2974)
 
 ## Queue
-### T-44158 W2 — OPEN
-- target_files: backend/app/main.py
-- contract: Repair the new mypy regression from T44156: main.py must import MAX_SESSION_LAPS directly from simulation_core, as before the move, rather than indirectly from core.validation. Change only that import; no product behavior changes.
-- verify: .venv/bin/ruff check backend/app/main.py && .venv/bin/ruff format --check backend/app/main.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py && .venv/bin/python -c 'import subprocess; r=subprocess.run([".venv/bin/mypy","--strict","backend/app"],capture_output=True,text=True); print(r.stdout.splitlines()[-1]); assert "Found 217 errors" in r.stdout; assert "does not explicitly export attribute" not in r.stdout'
+### T-44160 Orchestrator — OPEN
+- target_files: frontend/package.json, frontend/package-lock.json
+- contract: planned root-owned npm installation; generated lock only.
+- verify: npm --prefix frontend ls tailwindcss @tailwindcss/postcss && node -e 'const assert=require("node:assert/strict"); const p=require("./frontend/package.json"); assert.match(p.devDependencies.tailwindcss,/^\^4\./); assert.match(p.devDependencies["@tailwindcss/postcss"],/^\^4\./); assert.equal(p.devDependencies.autoprefixer,undefined); console.log("PASS planned Tailwind4 dependencies and removed autoprefixer")'
+
+### T-44161 W2 — OPEN
+- target_files: backend/app/schemas_health.py, backend/app/schemas_operations.py, backend/app/main.py
+- contract: T331 move-only model extraction: move three health report types to schemas_health.py and ReservationStatus to existing schemas_operations.py, retaining main aliases. No field/default/typing/signature/wire changes.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,importlib,inspect,subprocess; old=ast.parse(subprocess.check_output(["git","show","cec7835:backend/app/main.py"],text=True)); names=("HealthReport","LivenessReport","ReadinessReport","ReservationStatus"); originals={n.name:ast.dump(n) for n in old.body if isinstance(n,ast.ClassDef)}; main=importlib.import_module("backend.app.main"); modules={n:importlib.import_module("backend.app.schemas_operations" if n=="ReservationStatus" else "backend.app.schemas_health") for n in names}; assert all(originals[n]==ast.dump(next(x for x in ast.parse(inspect.getsource(m)).body if isinstance(x,ast.ClassDef) and x.name==n)) and getattr(main,n) is getattr(m,n) for n,m in modules.items()); print("PASS exact model AST and aliases")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_security_headers.py && .venv/bin/ruff check backend/app/main.py backend/app/schemas_operations.py backend/app/schemas_health.py && .venv/bin/ruff format --check backend/app/main.py backend/app/schemas_operations.py backend/app/schemas_health.py
+
+### T-44159 W3 — OPEN
+- target_files: scripts/eval/neo_colour.py, scripts/eval/rules/gray.good.css, scripts/eval/rules/gray.bad.css
+- contract: T360 lint child: implement a reusable gray-family rule plus good/bad fixtures. This module will be wired into the shared neo-brutal scanner in the next child. Detect forbidden gray/slate/zinc/neutral/stone utilities and neutral CSS hex colors except pure black/white. Preserve source positions; ignore comments through mask_comments. No product edits.
+- verify: env PYTHONPATH=. .venv/bin/python scripts/eval/neo_colour.py --self-test && .venv/bin/ruff check scripts/eval/neo_colour.py && .venv/bin/ruff format --check scripts/eval/neo_colour.py && .venv/bin/mypy --strict scripts/eval/neo_colour.py
 
 ## Deferred
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44158 acceptedcec7835; verify0.
 - T-44157 accepted4f53ecd; verify0.
 - T-44156 accepted049a179; verify0.
 - T-44155 accepted7768158; verify0.
