@@ -21,7 +21,11 @@ class SecurityHeadersMiddleware:
                 headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
                 headers["X-Frame-Options"] = "DENY"
                 headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
-                headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'"
+                # The API-only policy does not apply to legacy interactive docs HTML.
+                if scope["path"] not in {"/docs", "/redoc", "/docs/oauth2-redirect"}:
+                    headers["Content-Security-Policy"] = (
+                        "default-src 'none'; frame-ancestors 'none'"
+                    )
                 if self.secure:
                     headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
                 elif "strict-transport-security" in headers:

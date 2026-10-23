@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 9b8322c
+git_head: 2e0345c
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -51,3 +51,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T-325 accepted2bff831: Parametrized the changing-X-Forwarded-For source throttle test with TRUST_PROXY unset and set to 0; existing assertions remain intact. Verify exit0; 10 changed lines.
 
 - T-44143 accepted9b8322c: Corrected the local database guard to apexgrid, added the separately guarded GitHub Actions service exception and root import path, scoped row counts to each test key, and set APEXGRID_TEST_STACK=1 in the isolated baseline pytest environment. Verify exit0; 144 changed lines.
+
+- T-44144 accepted2e0345c: Added parametrized legacy security header checks for /docs, /redoc, and /docs/oauth2-redirect, plus an API JSON CSP protection check. Verify exit0; 37 changed lines.
