@@ -3,7 +3,6 @@
 from contextlib import contextmanager
 from uuid import UUID
 
-import pytest
 from app import telemetry_repository
 from app.telemetry_router import create_telemetry_router
 from bson import ObjectId
@@ -114,7 +113,6 @@ def test_first_packet_is_accepted(monkeypatch):
     assert len(collection.documents) == len(events) == 1
 
 
-@pytest.mark.xfail(strict=True, reason="F-DOM-04: retries currently duplicate telemetry")
 def test_exact_retry_returns_original_response_without_insert_or_publish(monkeypatch):
     client, collection, events = setup_api(monkeypatch)
     body = packet()
@@ -125,7 +123,6 @@ def test_exact_retry_returns_original_response_without_insert_or_publish(monkeyp
     assert len(collection.documents) == len(events) == 1
 
 
-@pytest.mark.xfail(strict=True, reason="F-DOM-04: older and conflicting positions are accepted")
 def test_older_and_conflicting_packets_are_rejected_without_side_effects(monkeypatch):
     client, collection, events = setup_api(monkeypatch)
     assert client.post("/api/telemetry/ingest", json=packet()).status_code == 202
@@ -136,7 +133,6 @@ def test_older_and_conflicting_packets_are_rejected_without_side_effects(monkeyp
     assert len(collection.documents) == len(events) == 1
 
 
-@pytest.mark.xfail(strict=True, reason="F-DOM-04: per-driver persisted ordering is missing")
 def test_driver_streams_advance_independently_and_publish_once_per_new_packet(monkeypatch):
     client, collection, events = setup_api(monkeypatch)
     assert client.post("/api/telemetry/ingest", json=packet()).status_code == 202
