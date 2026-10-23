@@ -689,7 +689,7 @@ def _make_demo_race(cars: int | None = None, auto_repeat: bool = False):
     if mongo_ready() is None:
         raise HTTPException(503, "MongoDB telemetry store is unavailable")
     seed = secrets.randbits(63)
-    rng = random.Random(seed)
+    rng = random.Random(seed)  # noqa: S311 -- seeded race choices; seed is generated securely
     car_count = cars if cars is not None else rng.randint(8, 16)
     session_id, event_id = uuid4(), uuid4()
     now = datetime.now(timezone.utc)
@@ -943,7 +943,7 @@ def advance_simulation_tick(sim: Simulation, timestamp: datetime, rng=None, safe
             driver_rng = injected_rng
         elif sim.seed is not None:
             progress = f"{sim.seed}:{driver_id}:{lap}:{sector}:{prior_elapsed}".encode()
-            driver_rng = random.Random(int.from_bytes(hashlib.sha256(progress).digest(), "big"))
+            driver_rng = random.Random(int.from_bytes(hashlib.sha256(progress).digest(), "big"))  # noqa: S311 -- deterministic telemetry stream
         else:
             driver_rng = random
 
