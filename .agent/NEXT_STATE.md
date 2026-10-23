@@ -3,11 +3,11 @@ updated_at: 2026-10-22T20:54:39Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-159 — Extract team membership SQL to repository
-- worker: W2 | priority: P2 | after: T-158
-- target_files: backend/app/main.py, backend/app/membership_repository.py
-- contract: move membership GET/POST/PATCH SQL into typed repository functions; preserve route errors, status and response shape
-- verify: focused seeded membership test; Ruff <=549, mypy <=222
+### T-160 — Extract team membership routes into APIRouter
+- worker: W2 | priority: P2 | after: T-159
+- target_files: backend/app/main.py, backend/app/membership_router.py
+- contract: move four membership HTTP handlers to a router at the same registration point; preserve roles, status/error/JSON shapes
+- verify: focused seeded membership test; Ruff <=544, mypy <=222
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
 - T-026/T-027/T-028: depend on blocked T-006 state matrix.
@@ -15,6 +15,7 @@ loop_iteration: 1 of 5
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-159 ✓ 97432af; four membership SQL paths moved to typed repository, focused 1/1 on apexgrid-test, Ruff 544/mypy 222.
 - T-158 ✓ d25a9ae; seeded membership route contract passed 1/1 on apexgrid-test, Ruff 549.
 - T-157 ✓ 6558a79; me/logout moved into auth APIRouter, 20 focused tests; full backend 119/0/0 and live acceptance, Ruff 549/mypy 222.
 - T-156 ✓ 746ae38; login moved to auth APIRouter, 20 focused tests; full backend 119/0/0 and live acceptance, Ruff 549/mypy 225.
@@ -43,5 +44,4 @@ loop_iteration: 1 of 5
 - T-131 ✓ 9c633e9; seeded telemetry/live read contract passed 1/1 with scoped Mongo cleanup, Ruff 588; worker socket denied and orchestrator reran.
 - T-130 ✓ 1a9738b; five user routes moved to APIRouter, 4 focused seeded/route checks passed; Ruff 588, mypy 254; full isolated backend 114 passed and live acceptance passed.
 - T-129 ✓ 68f5c8a; user DELETE checks/write moved into one repository transaction, 3 seeded checks passed, Ruff 588, mypy 259; full isolated backend 114 passed, live acceptance passed.
-- T-128 ✓ 39770df; user PATCH validation/hash/UPDATE moved to typed repository, 3 seeded checks passed, Ruff 591, mypy 259; orchestrator reran after worker socket denial.
-- T-001..T-127: accepted history and evidence in git/LOOP.md.
+- T-001..T-128: accepted history and evidence in git/LOOP.md.

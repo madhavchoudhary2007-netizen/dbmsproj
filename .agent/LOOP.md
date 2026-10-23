@@ -92,6 +92,7 @@ score: NOT_RUN
 - Existing Playwright config and 16-route smoke test require stronger authenticated journey coverage. Login keyboard audit and responsive run are open from prior work.
 
 ## Findings
+- T-159 moved membership GET/POST/PATCH SQL to typed repository functions, preserving joins/order and transaction semantics; PATCH identifiers come from a schema-approved map. Worker socket denial required orchestrator rerun; focused 1/1 passed on apexgrid-test. Ruff improved 549→544, mypy stayed 222 (2026-10-23).
 - T-158 added a seeded membership API characterization for ordered driver/team reads, create/PATCH response shape, role errors, empty/missing PATCH and exact-ID cleanup. Worker socket denial required orchestrator rerun; focused 1/1 passed on apexgrid-test, Ruff stayed 549 (2026-10-23).
 - T-157 moved auth me/logout into the same router, kept current_user/CSRF dependencies and cookie clearing; accept.sh reran 20 focused auth/cookie checks. Ruff stayed 549, mypy improved 225→222; full isolated backend passed 119 with zero failures/skips/xfails and live acceptance passed (2026-10-23).
 - T-156 extracted login into auth_router while preserving browser cookie/CSRF, no-Origin bearer response, and call-time test monkeypatch behavior. accept.sh reran 20 auth/cookie checks. Ruff improved 553→549, mypy 226→225; full isolated backend passed 119 with zero failures/skips/xfails and live acceptance passed (2026-10-23).
