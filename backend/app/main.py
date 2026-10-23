@@ -1813,9 +1813,12 @@ dbms_mongo_router, dbms_mongo_handlers = create_dbms_mongo_router(
     lambda value: jsonable(value),
     lambda: mongo_ready(),
     admin_dependency,
+    lambda: mongo_database_ready(),
+    MONGODB_DATABASE,
 )
 dbms_overview = dbms_mongo_handlers["dbms_overview"]
 dbms_telemetry = dbms_mongo_handlers["dbms_telemetry"]
+dbms_mongo_collections = dbms_mongo_handlers["dbms_mongo_collections"]
 app.include_router(dbms_mongo_router)
 
 
@@ -2069,37 +2072,6 @@ def mongo_database_ready():
 
 
 @app.get("/api/dbms/mongo/collections")
-def dbms_mongo_collections(user=admin_dependency):
-    """List application collections with their actual document and index metadata."""
-    try:
-        database = mongo_database_ready()
-        collections = []
-        for name in sorted(
-            name for name in database.list_collection_names() if not name.startswith("system.")
-        ):
-            collection = database[name]
-            indexes = collection.index_information()
-            collections.append(
-                {
-                    "name": name,
-                    "document_count": collection.count_documents({}),
-                    "indexes": [
-                        {"name": index_name, **index} for index_name, index in indexes.items()
-                    ],
-                }
-            )
-        return {
-            "store": "MongoDB",
-            "database": MONGODB_DATABASE,
-            "collections": collections,
-            "updated_at": datetime.now(UTC),
-        }
-    except HTTPException:
-        raise
-    except Exception as exc:
-        raise HTTPException(503, "Could not inspect MongoDB collections") from exc
-
-
 @app.get("/api/dbms/mongo/collections/{collection_name}")
 def dbms_mongo_collection_documents(
     collection_name: str,

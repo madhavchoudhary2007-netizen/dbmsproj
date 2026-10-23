@@ -8,15 +8,11 @@ phase: 3 T331 extraction; Phase5 T360 lints / T361accepted (Phases0–2 complete
 - contract: T331 move unchanged Mongo collection-list metadata handler into existing Mongo router with typed database provider.
 - verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,importlib,inspect,subprocess; old=ast.parse(subprocess.check_output(["git","show","f385ea8:backend/app/main.py"],text=True)); a=next(n for n in old.body if isinstance(n,ast.FunctionDef) and n.name=="dbms_mongo_collections"); a.decorator_list=[]; module=importlib.import_module("backend.app.api.dbms_mongo"); b=next(n for n in ast.walk(ast.parse(inspect.getsource(module))) if isinstance(n,ast.FunctionDef) and n.name=="dbms_mongo_collections"); b.decorator_list=[]; assert ast.dump(a)==ast.dump(b); main=importlib.import_module("backend.app.main"); routes=[r for outer in main.app.routes for r in (outer.original_router.routes if hasattr(outer,"original_router") else [outer])]; assert sum(getattr(r,"endpoint",None) is main.dbms_mongo_collections for r in routes)==1; print("PASS exact Mongo collections handler and alias")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py && .venv/bin/ruff check backend/app/main.py backend/app/api/dbms_mongo.py && .venv/bin/ruff format --check backend/app/main.py backend/app/api/dbms_mongo.py
 
-### T-44185 W3 — OPEN
-- target_files: frontend/e2e/palette.spec.ts
-- contract: T360 enforce approved A3 screenshot role shares on existing 16-route palette tests at required1440 width using accepted shared scorer.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/palette.spec.ts --list
-
 ## Deferred
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44185 accepted030459a; verify0.
 - T-44183 acceptedf385ea8; verify0.
 - T-44184 accepted008414f; verify0.
 - T-44182 accepted86e0b47; verify0.
