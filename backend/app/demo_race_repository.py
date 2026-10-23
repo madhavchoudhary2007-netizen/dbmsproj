@@ -55,6 +55,36 @@ def validate_demo_race_delete(
         raise DemoRaceDeleteConflict("Demo race drivers have additional team references")
 
 
+def delete_demo_race_records(
+    cur: Cursor[dict[str, Any]], session_id: UUID, marker: dict[str, Any]
+) -> None:
+    cur.execute("SELECT driver_id FROM demo_race_entries WHERE session_id=%s", (session_id,))
+    driver_ids = [row["driver_id"] for row in cur.fetchall()]
+    cur.execute(
+        "SELECT d.user_id FROM demo_race_entries de JOIN drivers d ON d.id=de.driver_id "
+        "WHERE de.session_id=%s AND d.user_id IS NOT NULL",
+        (session_id,),
+    )
+    user_ids = [row["user_id"] for row in cur.fetchall()]
+    cur.execute("DELETE FROM pit_reservations WHERE session_id=%s", (session_id,))
+    cur.execute("DELETE FROM pit_boxes WHERE event_id=%s", (marker["event_id"],))
+    cur.execute("DELETE FROM incident_reports WHERE session_id=%s", (session_id,))
+    cur.execute("DELETE FROM session_results WHERE session_id=%s", (session_id,))
+    # Generated drivers are unique to this race. Rebuild this championship's
+    # derived standings after removing the race results so stale rows for those
+    # drivers disappear and the remaining ranks stay correct.
+    cur.execute("SELECT recalculate_standings(%s)", (marker["championship_id"],))
+    cur.execute("DELETE FROM demo_race_entries WHERE session_id=%s", (session_id,))
+    cur.execute("DELETE FROM demo_races WHERE session_id=%s", (session_id,))
+    cur.execute("DELETE FROM race_sessions WHERE id=%s", (session_id,))
+    cur.execute("DELETE FROM race_events WHERE id=%s", (marker["event_id"],))
+    if driver_ids:
+        cur.execute("DELETE FROM team_memberships WHERE driver_id=ANY(%s)", (driver_ids,))
+        cur.execute("DELETE FROM drivers WHERE id=ANY(%s)", (driver_ids,))
+    if user_ids:
+        cur.execute("DELETE FROM users WHERE id=ANY(%s)", (user_ids,))
+
+
 def create_demo_race_records(
     session_id: UUID,
     event_id: UUID,
