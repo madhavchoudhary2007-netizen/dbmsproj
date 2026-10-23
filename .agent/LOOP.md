@@ -11,6 +11,7 @@ phase: 2 — structure, in progress
 cycle: 0 of 8
 score: NOT_RUN
 
+- T-169 accepted: reservation-specific release after valid credentials/DB outage; six unmarked login tests pass. Full disposable backend 127 passed, zero failures/skips/xfails; live acceptance passes. Ruff 543 unchanged. Mypy strict rose 222→223 due a tuple-index type in login_limiter; T-170 is queued before closing F-ACE01.
 - T-168 accepted: two strict success-path xfails; --runxfail fails on 429 for repeated valid login and six valid accounts sharing one source. Ruff stays 543. T-169 will release successful admissions.
 - T-163 focused 4/4 after limiter, but full isolated gate failed: 90 passed/35 failed/0 skips because the source limit counted successful logins across tests. This is a real shared-source usability defect; T-168/169 test-first repair before F-E02. No F-ACE01 closure claim.
 - T-162 accepted: offline login limiter reproduction, 1 ordinary pass/3 strict xfails; --runxfail fails three sixth-attempt 429 checks on old code. F-ACE01 remains open until fix and full isolated suite.

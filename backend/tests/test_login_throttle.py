@@ -1,6 +1,5 @@
 """Database independent contract tests for login attempt throttling."""
 
-import pytest
 from app.auth_router import create_auth_router
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -105,7 +104,6 @@ def test_unknown_accounts_are_limited_and_recover_after_window(monkeypatch):
     assert recovered.status_code == 401
 
 
-@pytest.mark.xfail(reason="F-ACE01", strict=True)
 def test_repeated_successful_logins_do_not_consume_account_limit(monkeypatch):
     email = "known@example.test"
     user = {
@@ -132,7 +130,6 @@ def test_repeated_successful_logins_do_not_consume_account_limit(monkeypatch):
         assert "set-cookie" in response.headers
 
 
-@pytest.mark.xfail(reason="F-ACE01", strict=True)
 def test_distinct_successful_accounts_do_not_consume_source_limit(monkeypatch):
     users = {
         f"person{index}@example.test": {
