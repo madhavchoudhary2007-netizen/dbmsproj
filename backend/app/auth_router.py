@@ -28,15 +28,14 @@ def create_auth_router(
     @router.post("/api/auth/login")
     def login(body: Login, response: Response, request: Request) -> dict[str, Any]:
         require_allowed_origin(request)
-        retry_after = limiter.admit(
-            body.email.strip().casefold(),
-            request.client.host if request.client else "",
-        )
-        if retry_after is not None:
+        account = body.email.strip().casefold()
+        source = request.client.host if request.client else ""
+        admission = limiter.admit(account, source)
+        if admission.retry_after is not None:
             raise HTTPException(
                 429,
                 "Too many login attempts",
-                headers={"Retry-After": str(retry_after)},
+                headers={"Retry-After": str(admission.retry_after)},
             )
         try:
             user = fetch_one_getter()(
@@ -45,6 +44,7 @@ def create_auth_router(
                 (body.email,),
             )
         except Exception:
+            limiter.release(account, source, admission.token)
             raise HTTPException(503, "PostgreSQL is unavailable") from None
         try:
             valid_password = bool(
@@ -57,6 +57,7 @@ def create_auth_router(
             valid_password = False
         if not valid_password:
             raise HTTPException(401, "Invalid email or password")
+        limiter.release(account, source, admission.token)
         expiry = datetime.now(UTC) + timedelta(minutes=JWT_MINUTES)
         session_id = secrets.token_urlsafe(32)
         token = jwt.encode(
