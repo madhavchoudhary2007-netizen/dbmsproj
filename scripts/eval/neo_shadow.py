@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from scripts.eval.neo_contrast import CLASS, LITERAL
 from scripts.eval.neo_effects import _inside_string, _value_end
 from scripts.eval.source_text import mask_comments
 
@@ -25,6 +26,8 @@ _KEY = re.compile(
     re.IGNORECASE,
 )
 _IMPORTANT = re.compile(r"\s*!important\s*$", re.IGNORECASE)
+_NAMED_CLASS = re.compile(r"shadow-nb-(4|8|12|16)\Z")
+_MIN_PIXEL_VARIANT = re.compile(r"min-\[(\d+(?:\.\d+)?)px\]\Z")
 
 
 def _length(part: str) -> float | None:
@@ -66,6 +69,75 @@ def valid_shadow(value: str, max_offset: int = 16) -> bool:
     return bool(layers) and all(_literal_layer(layer, max_offset, True) for layer in layers)
 
 
+def _class_limit(variants: list[str], max_offset: int) -> int:
+    has_desktop_min = any(
+        item in {"sm", "md", "lg", "xl", "2xl"}
+        or (match := _MIN_PIXEL_VARIANT.fullmatch(item)) is not None
+        and float(match.group(1)) >= 620
+        for item in variants
+    )
+    has_mobile_max = any(item.startswith("max-") for item in variants)
+    return min(max_offset, 8) if has_mobile_max and not has_desktop_min else max_offset
+
+
+def _strip_important(utility: str) -> str | None:
+    leading = utility.startswith("!")
+    if leading:
+        utility = utility[1:]
+    trailing = utility.endswith("!")
+    if leading and trailing:
+        return None
+    return utility[:-1] if trailing else utility
+
+
+def _class_utility(token: str, max_offset: int) -> bool:
+    depth = 0
+    split = -1
+    for index, char in enumerate(token):
+        if char == "[":
+            depth += 1
+        elif char == "]":
+            depth = max(0, depth - 1)
+        elif char == ":" and depth == 0:
+            split = index
+    variants = token[:split].split(":") if split >= 0 else []
+    utility = _strip_important(token[split + 1 :] if split >= 0 else token)
+    if utility is None:
+        return False
+    limit = _class_limit(variants, max_offset)
+    if utility == "shadow-none" or utility in {"shadow-black", "shadow-ink"}:
+        return True
+    named = _NAMED_CLASS.fullmatch(utility)
+    if named:
+        return int(named.group(1)) <= limit
+    if utility.startswith("shadow-[") and utility.endswith("]"):
+        return valid_shadow(utility[8:-1].replace("_", " "), limit)
+    return not (utility == "shadow" or utility.startswith("shadow-"))
+
+
+def _class_hits(clean: str, max_offset: int, enabled: bool) -> list[tuple[int, str]]:
+    hits: list[tuple[int, str]] = []
+    if not enabled:
+        return hits
+    for match in CLASS.finditer(clean):
+        outside_tag = clean.rfind("<", 0, match.start()) <= clean.rfind(">", 0, match.start())
+        if _inside_string(clean, match.start()) or outside_tag:
+            continue
+        if match.group(2) is not None:
+            literals = [(match.start(2), match.group(2))]
+        else:
+            expression = match.group(3)
+            literals = [
+                (match.start(3) + item.start(2), item.group(2))
+                for item in LITERAL.finditer(expression)
+            ]
+        for offset, classes in literals:
+            for utility in re.finditer(r"\S+", classes):
+                if not _class_utility(utility.group(), max_offset):
+                    hits.append((offset + utility.start(), "disallowed hard shadow class"))
+    return hits
+
+
 def check_shadows(text: str, css: bool = False, max_offset: int = 16) -> list[tuple[int, str]]:
     clean = mask_comments(text, css)
     hits: list[tuple[int, str]] = []
@@ -95,7 +167,8 @@ def check_shadows(text: str, css: bool = False, max_offset: int = 16) -> list[tu
         )
         if not valid:
             hits.append((start, "disallowed hard shadow"))
-    return hits
+    hits.extend(_class_hits(clean, max_offset, not css))
+    return sorted(set(hits))
 
 
 def _expect(condition: bool) -> None:
@@ -109,6 +182,8 @@ def self_test() -> None:
     bad = (rules / "shadow.bad.css").read_text()
     _expect(check_shadows(good, css=True) == [])
     _expect(bool(check_shadows(bad, css=True)))
+    _expect(check_shadows(good) == [])
+    _expect(bool(check_shadows(bad)))
     _expect(valid_shadow("none"))
     _expect(valid_shadow("-8px 8px 0 0 #000", max_offset=8))
     _expect(not valid_shadow("9px 0px #000", max_offset=8))
@@ -135,6 +210,33 @@ def self_test() -> None:
     _expect(bool(check_shadows(".x { --nb-shadow-4: var(--other); }", css=True)))
     _expect(bool(check_shadows(".x { --shadow-nb-4: 4px 4px 0 #222; }", css=True)))
     _expect(bool(check_shadows(".x { --shadow-nb-4: 4px 4px 0 rgba(0,0,0,.5); }", css=True)))
+    _expect(
+        check_shadows('<div className="shadow-none shadow-nb-8 shadow-black shadow-ink" />') == []
+    )
+    _expect(check_shadows('<div className={active ? "shadow-nb-8" : "shadow-none"} />') == [])
+    _expect(check_shadows('<div className="max-sm:shadow-nb-8" />') == [])
+    _expect(check_shadows('<div className="shadow-nb-8! md:max-lg:shadow-nb-12" />') == [])
+    _expect(check_shadows('<div className="shadow-[4px_4px_0_#000]" />') == [])
+    _expect(
+        bool(
+            check_shadows(
+                '<div className="shadow shadow-sm shadow-md shadow-lg shadow-xl shadow-2xl" />'
+            )
+        )
+    )
+    _expect(
+        check_shadows('<div className="shadow-xl" />') == [(16, "disallowed hard shadow class")]
+    )
+    important_bad = '<div className="!shadow-xl" />'
+    _expect(check_shadows(important_bad) == [(16, "disallowed hard shadow class")])
+    _expect(bool(check_shadows('<div className="shadow-red-500" />')))
+    _expect(bool(check_shadows('<div className="shadow-[4px_4px_8px_#000]" />')))
+    _expect(bool(check_shadows('<div className="max-[620px]:shadow-nb-12" />')))
+    _expect(bool(check_shadows('<div className="max-sm:shadow-nb-12" />')))
+    _expect(
+        check_shadows('const copy = { message: "shadow-xl" }; // <div className="shadow-xl" />')
+        == []
+    )
 
 
 if __name__ == "__main__":

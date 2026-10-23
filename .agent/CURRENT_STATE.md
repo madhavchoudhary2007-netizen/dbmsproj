@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 9977cdf
+git_head: 3343d87
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -41,3 +41,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T44186 rootreview caught stale list-route decorator left on document handler: duplicate GET /api/dbms/mongo/collections. Snapshot/full214 missed it; OpenAPI can conceal duplicate registrations. T44188 candidate incorrectly preserves duplicate via delegating wrapper; rejected. T44189 W3 regression first, then repair original intended one-list/one-named route; no API intent change.
 - T44187 rejected beforeaccept for important-class bypass and desktop-only variant falsepositive; repair1 requested, isolatedclone.
 - Palette actual dashboard1440 fails shares[1,0,0], PNG/JSON attached; sourcegate80casescollect, no skips. Types/lint/spacing/banned0; motion3/neo10legacyhits.
+
+- T-44189 accepted3343d87: Added failing-first runtime route uniqueness/alias regression; recorded duplicate Mongo list decorator with1real assertion failure, no product check called green. Verify0.

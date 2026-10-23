@@ -1,1 +1,2 @@
 .card { box-shadow: 4px 4px 0 0 #000, var(--shadow-nb-8); }
+const Good = () => <div className="shadow-none shadow-nb-8 shadow-black max-sm:shadow-nb-8 shadow-nb-8! md:max-lg:shadow-nb-12 shadow-[4px_4px_0_#000]" />;

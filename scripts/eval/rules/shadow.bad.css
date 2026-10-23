@@ -1,1 +1,2 @@
 .card { box-shadow: 4px 4px 1px #000; }
+const Bad = () => <div className="!shadow-xl shadow-red-500 max-sm:shadow-nb-12 shadow-[4px_4px_8px_#000]" />;
