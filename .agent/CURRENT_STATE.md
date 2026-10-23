@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 73599b2
+git_head: 121a209
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -36,34 +36,20 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 ## Orchestrator direct edits
 - Requested two model-profile lines; architecture/ADR/state/packet/envelope/orchestration helper only. No authored frontend/backend product lines. Patch integration is worker output, not bulk source authorship.
 
-- T-4484 accepted2cc09da: Advanced145 lines of canonical main formatting with identical AST and canonical contents. Verify exit0; 145 changed lines.
 
-- T-4485 acceptede2d86a7: Advanced141 lines of canonical API-test formatting with identical AST and canonical contents. Verify exit0; 141 changed lines.
 
-- T-4486 accepteda141bc4: Advanced147 lines of canonical main formatting with identical AST and canonical contents. Verify exit0; 147 changed lines.
 
-- T-4487 acceptedb5afb5a: Advanced148 lines of canonical API-test formatting with identical AST and canonical contents. Verify exit0; 148 changed lines.
 
-- T-4488 accepted918245b: Advanced144 lines of canonical main formatting with identical AST and canonical contents. Verify exit0; 144 changed lines.
 
-- T-4489 acceptedab5592b: Advanced141 lines of canonical main formatting with identical AST and canonical contents. Verify exit0; 141 changed lines.
 
-- T-4490 accepted1f55cb6: Advanced140 lines of canonical API-test formatting with identical AST and canonical contents. Verify exit0; 140 changed lines.
 
-- T-4491 accepted6e710b3: Advanced142 lines of canonical main formatting with identical AST and canonical contents. Verify exit0; 142 changed lines.
 
-- T-4492 accepteda928c9c: Advanced150 lines of canonical API-test formatting with identical AST and canonical contents. Verify exit0; 150 changed lines.
 
-- T-4493 accepted5218003: Advanced148 lines of canonical main formatting with identical AST and canonical contents. Verify exit0; 148 changed lines.
 
-- T-4494 accepted4ce3333: Advanced148 lines of canonical API-test formatting with identical AST and canonical contents. Verify exit0; 148 changed lines.
 
-- T-4495 acceptedadc090f: Advanced143 lines of canonical main formatting with identical AST and canonical contents. Verify exit0; 143 changed lines.
 
-- T-4496 accepted293ac25: Advanced150 lines of canonical API-test formatting with identical AST and canonical contents. Verify exit0; 150 changed lines.
 
-- T-4497 acceptedf941fc9: Advanced145 lines of canonical main formatting with identical AST and canonical contents. Verify exit0; 145 changed lines.
 
-- T-4498 acceptedd8abb08: Advanced144 lines of canonical API-test formatting with identical AST and canonical contents. Verify exit0; 144 changed lines.
 
-- T-4499 accepted73599b2: Advanced146 lines of canonical main formatting with identical AST and canonical contents. Verify exit0; 146 changed lines.
+
+- Formatting children T-4484..T-44100 accepted via accept.sh, exact AST/canonical contents retained, <=150 per packet. Current formatter debt main43/test_api331. Latest full Ruff119(main64/test_api36/demo15/config4), down from542. No current score claimed.

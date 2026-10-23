@@ -3,7 +3,12 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-44100 — canonical formatting progress
+### T-44101 — finish main format and advance demo format
+- worker: W2 | priority: P1 | origin: bounded T-310 subdivision
+- target_files: backend/app/main.py, backend/app/demo_race_repository.py
+- contract: finish main then demo hunks, combined<=150, exact AST/canonical content
+- verify: .venv/bin/python .agent/check-format-progress.py backend/app/main.py && .venv/bin/python .agent/check-format-progress.py backend/app/demo_race_repository.py
+### T-44102 — canonical formatting progress
 - worker: W3 | priority: P1 | origin: bounded T-310/311 subdivision
 - target_files: backend/tests/test_api.py
 - contract: <=150 changed lines, identical AST/canonical content, strict format progress
@@ -14,6 +19,7 @@ phase: 1 honest green baseline
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-44100 accepted121a209; verify0.
 - T-4499 accepted73599b2; verify0.
 - T-4498 acceptedd8abb08; verify0.
 - T-4497 acceptedf941fc9; verify0.

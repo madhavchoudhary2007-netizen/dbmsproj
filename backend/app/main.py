@@ -2378,12 +2378,12 @@ def dbms_lock_demo(user=admin_dependency):
                 503, "Database did not report the competitor waiting on the pit box lock"
             )
         return {
-            "pit_box_id":str(target["pit_box_id"]),
-            "lock_wait_observed":True,
-            "lock_wait_ms":outcome["wait_ms"],
-            "first_reservation":"committed",
-            "overlapping_reservation":"rejected",
-            "rejection_sqlstate":outcome["sqlstate"],
+            "pit_box_id": str(target["pit_box_id"]),
+            "lock_wait_observed": True,
+            "lock_wait_ms": outcome["wait_ms"],
+            "first_reservation": "committed",
+            "overlapping_reservation": "rejected",
+            "rejection_sqlstate": outcome["sqlstate"],
         }
     finally:
         try:
@@ -2396,34 +2396,45 @@ def dbms_lock_demo(user=admin_dependency):
                     pass
             if outcome:
                 second_reservation_id = outcome.get("reservation_id")
-            reservation_ids=[rid for rid in (first_reservation_id,second_reservation_id) if rid]
+            reservation_ids = [rid for rid in (first_reservation_id, second_reservation_id) if rid]
             if reservation_ids:
                 with connection() as conn:
-                    conn.execute("DELETE FROM pit_reservations WHERE id=ANY(%s)", (reservation_ids,))
+                    conn.execute(
+                        "DELETE FROM pit_reservations WHERE id=ANY(%s)", (reservation_ids,)
+                    )
         finally:
             lock_demo_guard.release()
 
 
 @app.post("/api/dbms/transaction-demo")
 def transaction_demo(user=admin_dependency):
-    with connection() as conn,conn.cursor(row_factory=tuple_row) as cur:
+    with connection() as conn, conn.cursor(row_factory=tuple_row) as cur:
         cur.execute("SELECT txid_current()")
-        txid=cur.fetchone()[0]
-        cur.execute("CREATE TEMP TABLE IF NOT EXISTS transaction_demo_probe(value integer) ON COMMIT DROP")
+        txid = cur.fetchone()[0]
+        cur.execute(
+            "CREATE TEMP TABLE IF NOT EXISTS transaction_demo_probe(value integer) ON COMMIT DROP"
+        )
         cur.execute("TRUNCATE transaction_demo_probe")
         cur.execute("INSERT INTO transaction_demo_probe VALUES (1)")
         cur.execute("SELECT count(*) FROM transaction_demo_probe")
-        before=cur.fetchone()[0]
+        before = cur.fetchone()[0]
         cur.execute("SAVEPOINT tx_demo")
         cur.execute("INSERT INTO transaction_demo_probe VALUES (2)")
         cur.execute("SELECT count(*) FROM transaction_demo_probe")
-        during=cur.fetchone()[0]
+        during = cur.fetchone()[0]
         cur.execute("ROLLBACK TO SAVEPOINT tx_demo")
         cur.execute("SELECT count(*) FROM transaction_demo_probe")
-        after=cur.fetchone()[0]
-    return {"transaction_id":txid,"before":before,"during":during,"after_rollback":after,"savepoint_rolled_back":during==2 and after==before,"committed_effects":0}
+        after = cur.fetchone()[0]
+    return {
+        "transaction_id": txid,
+        "before": before,
+        "during": during,
+        "after_rollback": after,
+        "savepoint_rolled_back": during == 2 and after == before,
+        "committed_effects": 0,
+    }
 
 
 @app.post("/api/dbms/recalculate")
 def dbms_recalculate(championship_id: UUID, user=admin_dependency):
-    return recalculate(championship_id,user)
+    return recalculate(championship_id, user)
