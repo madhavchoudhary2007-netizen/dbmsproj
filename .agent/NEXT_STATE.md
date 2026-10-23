@@ -3,7 +3,12 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-4488 — canonical formatting progress
+### T-4490 — canonical formatting progress
+- worker: W3 | priority: P1 | origin: bounded T-310/311 subdivision
+- target_files: backend/tests/test_api.py
+- contract: <=150 changed lines, identical AST/canonical content, strict format progress
+- verify: .venv/bin/python .agent/check-format-progress.py backend/tests/test_api.py
+### T-4489 — canonical formatting progress
 - worker: W2 | priority: P1 | origin: bounded T-310/311 subdivision
 - target_files: backend/app/main.py
 - contract: <=150 changed lines, identical AST/canonical content, strict format progress
@@ -14,6 +19,7 @@ phase: 1 honest green baseline
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-4488 accepted918245b; verify0.
 - T-4487 acceptedb5afb5a; verify0.
 - T-4486 accepteda141bc4; verify0.
 - T-4485 acceptede2d86a7; verify0.
