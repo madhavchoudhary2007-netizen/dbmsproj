@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 111241c
+git_head: 639e5a9
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -58,3 +58,6 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 - Added .agent/check-lint-progress.py: bounded literal/comment cleanup requires unchanged AST/directives, strict selected-rule count decrease and format0. Parent all-rules zero gate remains mandatory. Main+demo full formatting completedT-44101; main61 findings remain, demo13/config4, before literal cleanup.
 
 - T-44102 accepted111241c: Advanced148 lines of canonical API-test formatting with identical AST and canonical contents. Verify exit0; 148 changed lines.
+
+- T-44104 accepted639e5a9: Advanced142 lines of canonical API-test formatting with identical AST and canonical contents. Verify exit0; 142 changed lines.
+- Formatter moved four existing test RNG noqa pragmas away from offending call lines; narrow S311 findings resurfaced without behavior/AST change. T-44106 restores precise pragma placement while finishing format/E501; no new ignored rule.
