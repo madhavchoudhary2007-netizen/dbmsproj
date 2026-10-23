@@ -1,4 +1,6 @@
 @import './styles/tokens.css';
+@import './styles/textures.css';
+@import './styles/components.css';
 :root {
   color-scheme: dark;
   --bg: #0b0e12;

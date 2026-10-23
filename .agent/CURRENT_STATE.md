@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: dc48751
+git_head: d0bb56a
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -37,3 +37,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T44194 rowbrowser ready pending integration; T44196textures/T44197componentsCSS fresh packet-only W1 workers running in disjointclones, cap2. Texture mustlandfirst. Roothostbuild/browser afterboth. Rootauthor0productlines.
 
 - T-44194 accepteddc48751: Moved unchanged SQL row browser into typed registration, preserving pagination, password exclusion, identifiers, mainalias and11 contract/runtime checks. Verify0.
+
+- T-44196 acceptedd0bb56a: Added five approved decorative textures and static skeleton token; no markup, data or route behavior changes. Verify0.
