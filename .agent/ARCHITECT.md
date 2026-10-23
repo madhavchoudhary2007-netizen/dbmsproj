@@ -1,7 +1,7 @@
 <!-- LOCK:BEGIN -->
 > STATUS: LOCKED
-> SHA256: c9780b9cd1ffe91fcb0fbf369b4b136205eb5c1ffb82e8cf199e42cca18c69c5
-> LOCKED_AT: 2026-10-22T09:33:56Z
+> SHA256: 12c12221b65b1ee38a63e3efda98f460535368fea1b19740befec706e626a868
+> LOCKED_AT: 2026-10-23T05:15:46Z
 > LOCKED_BY: orchestrator
 <!-- LOCK:END -->
 # ApexGrid architecture — existing system, improvement in place
@@ -126,6 +126,8 @@ type RaceArchive = { session: Session; results: unknown[]; incidents: unknown[];
 type DataState<T> = { kind: "empty" } | { kind: "loading"; previous?: T } | { kind: "populated"; data: T } | { kind: "error"; message: string; retry: () => void } | { kind: "partial"; data: T; message: string; retry: () => void };
 ```
 
+ADR-005 authorizes one API-07 ingest error-contract addition for F-DOM-04: nonidentical or older telemetry returns HTTP 409. An exact retry keeps the existing HTTP 202 response shape and packet ID without another write or live event. This is approved work, not a claim that the current ingest path enforces it.
+
 Pydantic inputs already in `backend/app/main.py`: `Login`, `Action`, `IncidentIn`, `Decision`, `ReservationIn`, `AutoReservationIn`, `Telemetry`, `ResultIn`, `DemoRaceCreate`, `SimulationControl`. ADR-003 specifies HTTP 422 for new positive time/grid sanction decisions until official race elapsed and starting-grid rules exist; historical rows remain and affected results must be labelled provisional. SQL row ownership and invariants are in `backend/migrations/001_initial.sql`; full route fields remain in `docs/contracts.md`. Future W2 packets should replace untyped frontend `Row`/`any` boundaries incrementally while preserving wire names unless an ADR-001 finding/change proposal justifies a contract change and a separate ADR records it.
 
 PostgreSQL's 17 existing tables are `users`, `teams`, `drivers`, `team_memberships`, `championships`, `circuits`, `race_events`, `race_sessions`, `incident_reports`, `demo_races`, `demo_race_entries`, `penalties`, `penalty_points`, `session_results`, `driver_standings`, `pit_boxes`, and `pit_reservations`. MongoDB currently owns the `telemetry` collection. Neither store is being redesigned.
@@ -138,7 +140,7 @@ PostgreSQL's 17 existing tables are `users`, `teams`, `drivers`, `team_membershi
 | Session | SCHEDULED -> ACTIVE or CANCELLED; ACTIVE <-> PAUSED; ACTIVE/PAUSED -> COMPLETED/CANCELLED/SCHEDULED(reset); COMPLETED/CANCELLED -> SCHEDULED(reset) where API permits | PostgreSQL trigger and timestamp checks; `POST /sessions/{id}/action`; lap 0..72 |
 | Simulation | absent -> running <-> paused -> stopped; stopped/reset -> running after clean start; generated completion -> archived + optionally new auto race | in-memory `simulations`, SQL session and Mongo telemetry; restore from stored packets on restart. ADR-004 requires one active backend process per PostgreSQL database, enforced by a lifespan advisory lock; lock loss fails closed. |
 | Pit reservation | requested -> locked/allocation -> RESERVED or conflict/no-box error; RESERVED -> COMPLETED/CANCELLED; terminal states cannot reopen | SQL row lock, exclusion/unique constraints; auto chooses earliest free event box/window; Mongo/WS reflect assigned driver |
-| Telemetry | produced -> Pydantic validated -> Mongo persisted -> WS published -> client snapshot/stream; WS disconnect -> reconnect + snapshot | reject invalid lap/driver/session; SQL and Mongo may be briefly out of sync, show partial state |
+| Telemetry | produced -> Pydantic validated -> ordered/idempotent check -> Mongo persisted -> WS published -> client snapshot/stream; exact retry -> existing 202 without new publish; older/conflicting packet -> 409; WS disconnect -> reconnect + snapshot | ADR-005 applies per session/driver lap, sector and elapsed ordering to API ingest; reject invalid lap/driver/session; SQL and Mongo may be briefly out of sync, show partial state |
 | Incident/standing | OPEN -> APPROVED or REJECTED; approval -> immutable penalty/points/eligibility; completed result -> recalculated standings | SQL transaction/trigger and explicit-cursor routine; repeat decision must be rejected. ADR-003 rejects new unsupported time/grid sanctions before state transition and labels historical affected outputs provisional. |
 
 ### B.5 Layout contract by screen
@@ -195,7 +197,7 @@ Severity P0 blocks reproducible verification/security; P1 blocks a protocol gate
 | G11 auth token storage | P1 | Bearer token remains in `localStorage` (`auth.tsx`/`api.ts`); ADR-002 specifies the cookie/CSRF and login response change, with matching backend/frontend/WS/acceptance tests before closing this finding. |
 | G12 JWT secret | P1 | Backend fails closed outside local mode, but local demo secret/Compose fallback must be excluded from shared deployment and tested. |
 | G13 giant mixed modules | P1 | `special-pages.tsx` ~1720 lines, `main.py` ~2175, `globals.css` ~1416; W1/W2 boundaries and reviewability need small extractions. |
-| G14 request/stream race conditions | P1 | Different polling/WS paths use local guards; verify navigation cancellation, reconnect snapshot, duplicate ticks and Mongo partial failures. |
+| G14 request/stream race conditions | P1 | Different polling/WS paths use local guards; verify navigation cancellation, reconnect snapshot, duplicate ticks and Mongo partial failures. ADR-005 adds an ordered/idempotent ingest test and fix for F-DOM-04. |
 | G15 deterministic simulation | P1 | Existing tests check lap/sector bounds, but fixed-step/restart reproducibility and simultaneous pit conflicts need a deterministic test harness. |
 | G16 runtime mismatch | P2 | Host Node 26/Python 3.14 vs Docker Node 22/Python 3.12; run matching-container checks in CI. |
 | G17 CI and scoring | P1 | No CI workflow; score >=95/all hard gates cannot be claimed yet. Add reproducible gates and score report. |
@@ -246,6 +248,7 @@ Lens 5 boundary matrix: 0/1/72/73 laps and sector three boundary (API-04); dupli
 - R04: Large mixed UI/API files make the strict W1/W2 packet boundaries costly. Extract in small behavior-preserving steps with one focused verify each.
 - R05: Runtime and Compose availability differ from historical verification. Any result measured on host Python 3.14/Node 26 needs container parity before final evaluation.
 - R06: Process-local simulator and EventBus cannot serve concurrent backend processes coherently. ADR-004's PostgreSQL advisory lock and lock-loss fail-closed path require isolated acceptance and documentation before Phase 2 closes.
+- R07: ADR-005's new HTTP 409 ingest outcome and exact-retry behavior are authorized but unimplemented. Manual and simulator packets can still race until the ordered ingest path is verified; retain historical Mongo rows.
 
 ## ADR-002 focused Phase C: auth transport
 
@@ -258,3 +261,7 @@ Pass 1, Lens 1 traced steward decision -> penalty record -> official result/stan
 ## ADR-004 focused Phase C: one process for live race state
 
 Pass 1, Lens 1 traced live creation/control, telemetry fan-out and reconnect across API-04/07/08 and found that process-local simulations and subscribers would diverge under two backend processes; one database-wide owner is required. Lens 2 assigns a binary dual-owner/release/lost-connection test on apexgrid-test, plus a full backend and live acceptance rerun. Lens 3 adds no dependency or new service; the guard is small and directly protects the existing capability. Lens 4 uses a PostgreSQL session advisory lock held across the FastAPI lifespan, acquired before restoring simulations and checked while serving; ownership loss fails closed. Lens 5 covers second-process startup refusal, normal release/reacquire, database disconnect and process restart. Pass 2 found zero further architecture amendments. The guard and docs are pending tasks, not passing claims.
+
+## ADR-005 focused Phase C: telemetry ordering
+
+Pass 1, Lens 1 traced API-07 ingest -> Mongo -> WebSocket/live/DBMS and retained all existing outputs while making exact retry safe. Lens 2 requires strict pre-fix failures, then offline focused tests and the full disposable backend/live gate, owned by T-164/T-165. Lens 3 adds no dependency or screen; the 409 message must state the cause plainly. Lens 4 requires a process-local serialized read/check/insert against persisted per-driver telemetry under ADR-004's single-process guard; no historical rewrite. Lens 5 covers exact retry, same-position conflicting payload, older lap/sector/elapsed, independent drivers and restart with existing Mongo data. Pass 2 found zero further architecture amendments; these tests and runtime changes remain pending.
