@@ -12,7 +12,7 @@ from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeout
 from contextlib import asynccontextmanager
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any, Literal
 from uuid import UUID, uuid4
 
@@ -173,7 +173,7 @@ def jsonable(value: Any) -> Any:
         return [jsonable(v) for v in value]
     if isinstance(value, datetime):
         if value.tzinfo is None or value.utcoffset() is None:
-            value = value.replace(tzinfo=timezone.utc)
+            value = value.replace(tzinfo=UTC)
         return value.isoformat().replace("+00:00", "Z")
     if isinstance(value, UUID):
         return str(value)
@@ -316,15 +316,14 @@ def validate_session_laps(table: str, values: dict[str, Any]):
 
 def crud_routes(resource: str, table: str, cols: tuple[str, ...], joins: str = "", select: str | None = None):
     # Names here are hard-coded contract identifiers, never user supplied SQL.
-    columns = ",".join(cols)
     projection = select or f"{table}.*"
     base = f"SELECT {projection} FROM {table} {joins}"
     prefix = f"/api/{resource}"
 
     @app.get(prefix)
     def listing(limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0), user=authenticated_user_dependency):
-        l, o = limit_offset(limit, offset)
-        return jsonable(list_crud_rows(base, l, o))
+        page_limit, page_offset = limit_offset(limit, offset)
+        return jsonable(list_crud_rows(base, page_limit, page_offset))
 
     @app.get(prefix + "/{item_id}")
     def get_item(item_id: UUID, user=authenticated_user_dependency):
@@ -398,7 +397,7 @@ async def session_action(session_id: UUID, body: Action, user=admin_steward_depe
     transitions = {"start": ("SCHEDULED", "ACTIVE"), "pause": ("ACTIVE", "PAUSED"), "resume": ("PAUSED", "ACTIVE"), "finish": (("ACTIVE", "PAUSED"), "COMPLETED"), "reset": (("ACTIVE", "PAUSED", "COMPLETED", "CANCELLED"), "SCHEDULED")}
     before, after = transitions[body.action]
     states = before if isinstance(before, tuple) else (before,)
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     if body.action == "reset":
         existing = fetch_one("SELECT state FROM race_sessions WHERE id=%s", (session_id,))
         if not existing:
@@ -420,7 +419,7 @@ async def session_action(session_id: UUID, body: Action, user=admin_steward_depe
     elif body.action == "finish":
         set_fields += ",ended_at=%s"; params.append(now)
     elif body.action == "reset":
-        set_fields += ",started_at=NULL,ended_at=NULL,safety_car=FALSE"; 
+        set_fields += ",started_at=NULL,ended_at=NULL,safety_car=FALSE"
     params.extend([session_id, list(states)])
     with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
         cur.execute(f"UPDATE race_sessions SET {set_fields} WHERE id=%s AND state=ANY(%s) RETURNING *", params)
@@ -644,7 +643,7 @@ def mongo_ready():
 
 
 def publish(session_id, kind, data):
-    bus.send(session_id,{"type":kind,"ts":datetime.now(timezone.utc).isoformat().replace("+00:00","Z"),"session_id":str(session_id),"data":jsonable(data)})
+    bus.send(session_id,{"type":kind,"ts":datetime.now(UTC).isoformat().replace("+00:00","Z"),"session_id":str(session_id),"data":jsonable(data)})
 
 
 app.include_router(
@@ -700,10 +699,10 @@ def _make_demo_race(cars: int | None = None, auto_repeat: bool = False):
     rng = random.Random(seed)  # noqa: S311 -- seeded race choices; seed is generated securely
     car_count = cars if cars is not None else rng.randint(8, 16)
     session_id, event_id = uuid4(), uuid4()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     given = ["Amelia", "Rafael", "Maya", "Theo", "Nina", "Luca", "Aisha", "Felix", "Sofia", "Ethan", "Leila", "Oscar", "Priya", "Mateo", "Zara", "Jonah", "Ines", "Kai", "Elena", "Arjun"]
     family = ["Bennett", "Costa", "Shah", "Moreau", "Kim", "Novak", "Singh", "Fischer", "Alvarez", "Tanaka", "Dubois", "Reed", "Petrov", "Okafor", "Lindholm", "Santos", "Kaur", "Weber", "Nakamura", "Clarke"]
-    names = [f"{a} {b}" for a, b in zip(rng.sample(given, car_count), rng.sample(family, car_count))]
+    names = [f"{a} {b}" for a, b in zip(rng.sample(given, car_count), rng.sample(family, car_count), strict=False)]
     try:
         generated, total_laps = create_demo_race_records(session_id, event_id, now, names, auto_repeat, seed=seed)
     except DemoRaceSetupError as exc:
@@ -742,7 +741,7 @@ app.include_router(create_demo_race_router(
 ))
 
 
-def restore_simulation_from_telemetry(sim: "Simulation"):
+def restore_simulation_from_telemetry(sim: Simulation):
     """Resume an active generated race without deleting its recorded laps."""
     col = mongo_ready()
     for driver in sim.drivers:
@@ -762,7 +761,7 @@ def restore_simulation_from_telemetry(sim: "Simulation"):
     sim.race_clock_ms = max(sim.elapsed_by_driver.values(), default=0)
 
 
-def restore_simulated_incidents(sim: "Simulation"):
+def restore_simulated_incidents(sim: Simulation):
     """Keep a restarted simulator from duplicating reports already in the archive."""
     sim.incident_laps_recorded = {
         row["lap"] for row in fetch_all(
@@ -1137,7 +1136,7 @@ async def simulation_loop(sim: Simulation):
             if session["state"] != "ACTIVE":
                 sim.status = "stopped"
                 return
-            timestamp = datetime.now(timezone.utc)
+            timestamp = datetime.now(UTC)
             pit_assignments = refresh_simulation_pit_state(sim, timestamp)
             packets, timing = advance_simulation_tick(sim, timestamp, safety_car=session["safety_car"], pit_assignments=pit_assignments)
             for packet in packets:
@@ -1165,7 +1164,7 @@ async def simulation_loop(sim: Simulation):
                         fastest_lap = driver_id == fastest_driver_id
                         cur.execute("INSERT INTO session_results(session_id,driver_id,position,lap_time_ms,pole,fastest_lap,classified) VALUES (%s,%s,%s,%s,%s,%s,TRUE) ON CONFLICT(session_id,driver_id) DO UPDATE SET position=excluded.position,lap_time_ms=excluded.lap_time_ms,pole=excluded.pole,fastest_lap=excluded.fastest_lap,classified=TRUE", (sim.session_id,driver_id,position,best_lap_ms,pole,fastest_lap))
                         rows.append({"driver_id":driver_id,"position":position,"lap_time_ms":best_lap_ms,"pole":pole,"fastest_lap":fastest_lap,"classified":True})
-                    cur.execute("UPDATE race_sessions SET state='COMPLETED',ended_at=%s WHERE id=%s AND state='ACTIVE' RETURNING *", (datetime.now(timezone.utc),sim.session_id))
+                    cur.execute("UPDATE race_sessions SET state='COMPLETED',ended_at=%s WHERE id=%s AND state='ACTIVE' RETURNING *", (datetime.now(UTC),sim.session_id))
                     completed = cur.fetchone()
                     if completed:
                         cur.execute("SELECT recalculate_standings(%s)", (session["championship_id"],))
@@ -1377,7 +1376,7 @@ def dbms_overview(user=admin_dependency):
         telemetry_samples = None
         mongo_status = "down"
     return jsonable({**counts, "telemetry_samples": telemetry_samples,
-      "postgres": "up", "mongodb": mongo_status, "updated_at": datetime.now(timezone.utc)})
+      "postgres": "up", "mongodb": mongo_status, "updated_at": datetime.now(UTC)})
 
 
 def public_dbms_tables():
@@ -1393,7 +1392,7 @@ def dbms_tables(user=admin_dependency):
         for name in names:
             cur.execute(sql.SQL("SELECT count(*) AS count FROM public.{}").format(sql.Identifier(name)))
             rows.append({"table_name": name, "row_count": cur.fetchone()["count"]})
-    return jsonable({"tables": rows, "updated_at": datetime.now(timezone.utc)})
+    return jsonable({"tables": rows, "updated_at": datetime.now(UTC)})
 
 
 @app.get("/api/dbms/tables/{table_name}")
@@ -1419,7 +1418,7 @@ def dbms_table_rows(table_name: str, limit: int = Query(50, ge=1, le=100),
         count = cur.fetchone()["count"]
     return jsonable({"table_name": table_name, "columns": visible_columns,
       "rows": rows, "total": count, "limit": limit, "offset": offset,
-      "updated_at": datetime.now(timezone.utc)})
+      "updated_at": datetime.now(UTC)})
 
 
 @app.get("/api/dbms/races")
@@ -1468,7 +1467,7 @@ def dbms_race(session_id: UUID, include_laps: bool = True, user=admin_dependency
     return jsonable({"session": session, "results": results, "incidents": incidents, "penalties": penalties,
       "pit_reservations": reservations, "drivers": drivers, "laps": laps, "laps_included": include_laps,
       "completed_driver_laps": completed_count[0]["count"] if completed_count else 0, "latest": latest,
-      "telemetry_count": col.count_documents(match), "updated_at": datetime.now(timezone.utc),
+      "telemetry_count": col.count_documents(match), "updated_at": datetime.now(UTC),
       "lap_source": lap_source})
 
 
@@ -1589,7 +1588,7 @@ def dbms_mongo_collections(user=admin_dependency):
                 "indexes": [{"name": index_name, **index} for index_name, index in indexes.items()],
             })
         return {"store": "MongoDB", "database": MONGODB_DATABASE, "collections": collections,
-                "updated_at": datetime.now(timezone.utc)}
+                "updated_at": datetime.now(UTC)}
     except HTTPException:
         raise
     except Exception as exc:
@@ -1622,7 +1621,7 @@ def dbms_mongo_collection_documents(
                        "id": str(document["_id"])} for document in cursor]
         return jsonable({"collection": collection_name, "filters": filters, "documents": documents,
                          "total": total, "limit": limit, "offset": offset,
-                         "updated_at": datetime.now(timezone.utc)})
+                         "updated_at": datetime.now(UTC)})
     except HTTPException:
         raise
     except Exception as exc:
@@ -1639,7 +1638,7 @@ def dbms_polyglot(user=admin_dependency):
       JOIN drivers d ON d.id=entry.driver_id JOIN users u ON u.id=d.user_id
       ORDER BY s.scheduled_at DESC LIMIT 50"""
     rows=jsonable(fetch_all(sql)); col=mongo_ready(); grouped={}
-    recent_cutoff=datetime.now(timezone.utc)-timedelta(days=30)
+    recent_cutoff=datetime.now(UTC)-timedelta(days=30)
     pipeline=[{"$match":{"ts":{"$gte":recent_cutoff}}},{"$sort":{"ts":-1}},{"$limit":5000},{"$group":{"_id":{"session_id":"$session_id","driver_id":"$driver_id"},"samples":{"$sum":1},"latest":{"$max":"$ts"}}}]
     for doc in col.aggregate(pipeline): grouped[(doc["_id"]["session_id"],doc["_id"]["driver_id"])]=doc
     return {"relational_rows":len(rows),"rows":[{**r,"telemetry":grouped.get((str(r["session_id"]),str(r["driver_id"])),{"samples":0})} for r in rows]}
@@ -1662,7 +1661,7 @@ def dbms_lock_demo(user=admin_dependency):
         target = fetch_one("SELECT b.id AS pit_box_id,s.id AS session_id,t.id AS team_id FROM pit_boxes b JOIN race_sessions s ON s.event_id=b.event_id CROSS JOIN teams t ORDER BY b.number,s.scheduled_at LIMIT 1")
         if not target:
             raise HTTPException(503, "Seeded pit box, session, or team is unavailable")
-        starts_at = datetime.now(timezone.utc) + timedelta(days=3650 + random.randrange(10000), seconds=random.randrange(86400))
+        starts_at = datetime.now(UTC) + timedelta(days=3650 + random.randrange(10000), seconds=random.randrange(86400))
         ends_at = starts_at + timedelta(minutes=2)
         ready = threading.Event()
         competitor = {"pid": None}
