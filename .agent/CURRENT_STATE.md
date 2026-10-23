@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: a893c67
+git_head: 41a5b46
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -67,3 +67,5 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 - T-44106 acceptedc6e5749: Completed API-test formatting and E501 cleanup; restored exact RNG pragma locations with unchanged AST. Verify exit0; 63 changed lines.
 
 - T-44108 accepteda893c67: Used equivalent UTC aliases and preserved all other test AST; two focused simulation tests pass. Verify exit0; 28 changed lines.
+
+- T-44105 accepted41a5b46: Resolved all remaining15 main E501 findings preserving AST and directives. Verify exit0; 62 changed lines.

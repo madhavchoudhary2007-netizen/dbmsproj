@@ -1555,9 +1555,7 @@ def test_dashboard_analytics_characterization(database_api_client):
     assert client.get("/api/analytics/drivers", headers=driver_headers).status_code == 200
 
 
-def test_dbms_mongo_collection_browser_lists_real_collections_and_pages_filtered_documents(
-    monkeypatch,
-):
+def _mongo_browser_cursor(docs):
     class Cursor:
         def __init__(self, docs):
             self.docs = docs
@@ -1576,6 +1574,13 @@ def test_dbms_mongo_collection_browser_lists_real_collections_and_pages_filtered
 
         def __iter__(self):
             return iter(self.docs)
+
+    return Cursor(docs)
+
+
+def test_dbms_mongo_collection_browser_lists_real_collections_and_pages_filtered_documents(
+    monkeypatch,
+):
 
     class Collection:
         docs = [
@@ -1615,7 +1620,7 @@ def test_dbms_mongo_collection_browser_lists_real_collections_and_pages_filtered
             )
 
         def find(self, query, projection=None):
-            return Cursor(
+            return _mongo_browser_cursor(
                 [
                     doc.copy()
                     for doc in self.docs
@@ -2549,17 +2554,7 @@ def test_generated_demo_race_persistence_contract(database_api_client):
     assert list(remaining.values()) == [0] * 8
 
 
-@pytest.mark.parametrize("blocked", [False, True])
-def test_demo_delete_waits_for_simulator_and_validates_before_stopping(monkeypatch, blocked):
-    from contextlib import contextmanager
-
-    from fastapi import HTTPException
-
-    from backend.app import main as main_module
-
-    session_id, event_id, championship_id = uuid4(), uuid4(), uuid4()
-    events = []
-
+def _demo_delete_cursor(session_id, event_id, championship_id, events, blocked):
     class Cursor:
         def __enter__(self):
             return self
@@ -2593,7 +2588,21 @@ def test_demo_delete_waits_for_simulator_and_validates_before_stopping(monkeypat
         def fetchall(self):
             return self.rows
 
-    cursor = Cursor()
+    return Cursor()
+
+
+@pytest.mark.parametrize("blocked", [False, True])
+def test_demo_delete_waits_for_simulator_and_validates_before_stopping(monkeypatch, blocked):
+    from contextlib import contextmanager
+
+    from fastapi import HTTPException
+
+    from backend.app import main as main_module
+
+    session_id, event_id, championship_id = uuid4(), uuid4(), uuid4()
+    events = []
+
+    cursor = _demo_delete_cursor(session_id, event_id, championship_id, events, blocked)
 
     class Connection:
         def cursor(self, **_):
