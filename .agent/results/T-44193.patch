@@ -1,0 +1,69 @@
+diff --git a/backend/tests/contract_compat.py b/backend/tests/contract_compat.py
+index 7f3108a..fa00192 100644
+--- a/backend/tests/contract_compat.py
++++ b/backend/tests/contract_compat.py
+@@ -37,6 +37,55 @@ def _check_enum(old, new):
+         raise AssertionError("schema enum values were removed")
+ 
+ 
++def _effective_parameters(path_item, operation):
++    parameters = {}
++    for parameter in path_item.get("parameters", []):
++        parameters[(parameter.get("in"), parameter.get("name"))] = parameter
++    for parameter in operation.get("parameters", []):
++        parameters[(parameter.get("in"), parameter.get("name"))] = parameter
++    return parameters
++
++
++def _check_parameters(old_item, old_operation, new_item, new_operation, path, method):
++    old_parameters = _effective_parameters(old_item, old_operation)
++    new_parameters = _effective_parameters(new_item, new_operation)
++    for key, parameter in new_parameters.items():
++        if parameter.get("required") and not old_parameters.get(key, {}).get("required"):
++            raise AssertionError(f"new required parameter: {method.upper()} {path} {key}")
++
++
++def _check_request_schema(old, new, old_doc, new_doc, seen):
++    old = _resolve(old, old_doc)
++    new = _resolve(new, new_doc)
++    pair = (id(old), id(new))
++    if pair in seen:
++        return
++    seen.add(pair)
++    if not set(new.get("required", ())) <= set(old.get("required", ())):
++        raise AssertionError("request schema added a required field")
++    new_properties = new.get("properties", {})
++    for name, old_property in old.get("properties", {}).items():
++        if name in new_properties:
++            _check_request_schema(old_property, new_properties[name], old_doc, new_doc, seen)
++    if "items" in old and "items" in new:
++        _check_request_schema(old["items"], new["items"], old_doc, new_doc, seen)
++
++
++def _check_request_body(old_operation, new_operation, old_doc, new_doc, path, method):
++    old_body = old_operation.get("requestBody", {})
++    new_body = new_operation.get("requestBody", {})
++    if new_body.get("required") and not old_body.get("required"):
++        raise AssertionError(f"new required request body: {method.upper()} {path}")
++    old_content = old_body.get("content", {})
++    new_content = new_body.get("content", {})
++    for media, old_media in old_content.items():
++        if media not in new_content:
++            continue
++        old_schema = old_media.get("schema", {})
++        new_schema = new_content[media].get("schema", {})
++        _check_request_schema(old_schema, new_schema, old_doc, new_doc, set())
++
++
+ def _schema_compatible(old, new, old_doc, new_doc, seen):
+     old = _resolve(old, old_doc)
+     new = _resolve(new, new_doc)
+@@ -75,6 +124,8 @@ def assert_compatible(expected: dict, actual: dict) -> None:
+             if method not in new_item:
+                 raise AssertionError(f"method was removed: {method.upper()} {path}")
+             new_operation = new_item[method]
++            _check_parameters(old_item, old_operation, new_item, new_operation, path, method)
++            _check_request_body(old_operation, new_operation, expected, actual, path, method)
+             new_responses = new_operation.get("responses", {})
+             for status, old_response in old_operation.get("responses", {}).items():
+                 if status not in new_responses:

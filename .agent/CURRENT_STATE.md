@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 2e9106e
+git_head: 9efac10
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -38,3 +38,9 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - Root corrected included-router probe/mypy namespace/C901estimate; worker placeholder Verify/count formats fixed before exact rerun. One accidental101-line display (no secrets), subsequent ranges capped80. Root authored0productlines.
 
 - T-44192 accepted2e9106e: Moved exact SQL table metadata handler with precise Connection/public-table callbacks;11 snapshot/runtime tests pass. Verify0.
+
+- T-44191 accepted9efac10: Added failing-first required-input regressions:9 clean assertion failures and2 positive controls, no import errors/skips. Verify0.
+
+- T44191red9efac10 accepted:9 missing-required-input assertions fail,2 positivecontrols pass; product/unit baseline intentionallyred untilW3T44193 helper repair. Tablemetadata2e9106e rootfull216 runs in its identical-source clone (before added testfile); finalrootfull227 required afterfix. T362hostbuild/lint/types0; browser85+4keyboard active, preservegeneratednextenv before any acceptance.
+
+- T44193 failed due root wrong Verify filename, not implementation: actualtest_contract_compat_unions.py. Reviewed51-line helper patch preserved; restored ownclonefile, repair1 requested with corrected path. T362host85axe+4keyboard PASS and build/lint/types0. No generatedfilechanges left.
