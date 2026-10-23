@@ -3,11 +3,6 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-446 — T-310 remaining small router lint
-- worker: W2 | priority: P1 | origin: bounded subdivision T-310
-- target_files: backend/app/user_router.py, backend/app/membership_router.py, backend/app/telemetry_router.py
-- contract: dependency-default cleanup and equivalent error map to meet C901, formatting; no wire/API changes
-- verify: .venv/bin/ruff check backend/app/user_router.py backend/app/membership_router.py backend/app/telemetry_router.py && .venv/bin/ruff format --check backend/app/user_router.py backend/app/membership_router.py backend/app/telemetry_router.py
 ### T-447 — T-311 database test format slice
 - worker: W3 | priority: P1 | origin: bounded subdivision T-311
 - target_files: backend/tests/test_database.py
@@ -20,6 +15,7 @@ phase: 1 honest green baseline
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-446 acceptedc9ab8a1; three routers Ruff/format0 and unchanged OpenAPI.
 - T-445 accepted2c4ffd3; SQL exception assertions narrowed, selected eight lint hits removed.
 - T-444 accepted87025ef; routers Ruff/format0, OpenAPI unchanged; full batch gate next.
 - T-443 accepted6cca3aa; frontend lint/typecheck+three existing scripts green; neo lint not yet present.

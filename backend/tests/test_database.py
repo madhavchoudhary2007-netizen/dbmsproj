@@ -4,6 +4,7 @@ Run with DATABASE_URL=postgresql://... pytest backend/tests/test_database.py
 Requires psycopg (v3) or psycopg2 and a PostgreSQL role allowed to create extensions
 pgcrypto and btree_gist plus temporary schemas.
 """
+
 import os
 import sys
 import uuid
@@ -14,11 +15,13 @@ import pytest
 
 try:
     import psycopg
+
     _connect = psycopg.connect
     _database_error = psycopg.DatabaseError
 except ImportError:
     try:
         import psycopg2
+
         _connect = psycopg2.connect
         _database_error = psycopg2.DatabaseError
     except ImportError:
@@ -74,7 +77,7 @@ def _auto_pit_fixture(cur):
         (team_id, now, now),
     )
     drivers = [row[0] for row in cur.fetchall()]
-    return now,event_id,session_id,team_id,drivers
+    return now, event_id, session_id, team_id, drivers
 
 
 @pytest.fixture
@@ -149,10 +152,15 @@ def test_penalty_insert_accumulates_once_and_bans_at_threshold(db):
     )
     cur.execute("SELECT eligibility FROM drivers WHERE id=%s", (driver_id,))
     assert cur.fetchone()[0] == "RACE_BANNED"
-    cur.execute("SELECT points FROM penalty_points WHERE driver_id=%s AND season=2026", (driver_id,))
+    cur.execute(
+        "SELECT points FROM penalty_points WHERE driver_id=%s AND season=2026", (driver_id,)
+    )
     assert cur.fetchone()[0] == 12
     with pytest.raises(_database_error):
-        cur.execute("INSERT INTO penalties(incident_id,driver_id,points) VALUES (%s,%s,3)", (incident2, driver_id))
+        cur.execute(
+            "INSERT INTO penalties(incident_id,driver_id,points) VALUES (%s,%s,3)",
+            (incident2, driver_id),
+        )
 
 
 def test_penalties_are_immutable_after_points_are_awarded(db):
@@ -161,12 +169,16 @@ def test_penalties_are_immutable_after_points_are_awarded(db):
     driver_id = cur.fetchone()[0]
     cur.execute("SELECT id FROM race_sessions WHERE session_type='RACE' LIMIT 1")
     session_id = cur.fetchone()[0]
-    cur.execute("""INSERT INTO incident_reports(session_id,driver_id,lap,description,state)
+    cur.execute(
+        """INSERT INTO incident_reports(session_id,driver_id,lap,description,state)
                     VALUES (%s,%s,7,'immutable penalty fixture','APPROVED') RETURNING id""",
-                (session_id, driver_id))
+        (session_id, driver_id),
+    )
     incident_id = cur.fetchone()[0]
-    cur.execute("INSERT INTO penalties(incident_id,driver_id,points) VALUES (%s,%s,4) RETURNING id",
-                (incident_id, driver_id))
+    cur.execute(
+        "INSERT INTO penalties(incident_id,driver_id,points) VALUES (%s,%s,4) RETURNING id",
+        (incident_id, driver_id),
+    )
     penalty_id = cur.fetchone()[0]
 
     with pytest.raises(Exception) as exc:
@@ -176,7 +188,9 @@ def test_penalties_are_immutable_after_points_are_awarded(db):
         cur.execute("DELETE FROM penalties WHERE id=%s", (penalty_id,))
     assert _sqlstate(exc.value) == "23514"
 
-    cur.execute("SELECT points FROM penalty_points WHERE driver_id=%s AND season=2026", (driver_id,))
+    cur.execute(
+        "SELECT points FROM penalty_points WHERE driver_id=%s AND season=2026", (driver_id,)
+    )
     assert cur.fetchone()[0] == 4
     cur.execute("SELECT points FROM penalties WHERE id=%s", (penalty_id,))
     assert cur.fetchone()[0] == 4
