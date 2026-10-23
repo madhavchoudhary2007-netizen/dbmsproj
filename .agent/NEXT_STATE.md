@@ -3,23 +3,23 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
+### T-459 — main bootstrap format slice
+- worker: W2 | priority: P1 | origin: bounded T-310 subdivision
+- target_files: backend/app/main.py
+- contract: range1-307 only, exact AST, <=150 changes
+- verify: .venv/bin/ruff format --check --range 1-307 backend/app/main.py && .venv/bin/python -c 'import ast,pathlib,subprocess; p="backend/app/main.py"; assert ast.dump(ast.parse(pathlib.Path(p).read_text())) == ast.dump(ast.parse(subprocess.check_output(["git","show","HEAD:"+p],text=True)))'
 ### T-460 — database test long literals
 - worker: W3 | priority: P1 | origin: bounded T-311 subdivision
 - target_files: backend/tests/test_database.py
 - contract: exact AST/SQL content, no suppressions, <=150 lines, full lint/format0
 - verify: .venv/bin/ruff check backend/tests/test_database.py && .venv/bin/ruff format --check backend/tests/test_database.py && .venv/bin/python -c 'import ast,pathlib,subprocess; p="backend/tests/test_database.py"; assert ast.dump(ast.parse(pathlib.Path(p).read_text())) == ast.dump(ast.parse(subprocess.check_output(["git","show","HEAD:"+p],text=True)))'
-### T-458 — safe CRUD identifiers and telemetry format
-- worker: W2 | priority: P1 | origin: bounded T-310 subdivision
-- target_files: backend/app/crud_repository.py, backend/app/telemetry_repository.py
-- contract: composable SQL identifiers, bound values, precise count interface, preserved behavior
-- verify: .venv/bin/ruff check backend/app/crud_repository.py backend/app/telemetry_repository.py && .venv/bin/ruff format --check backend/app/crud_repository.py backend/app/telemetry_repository.py
-
 ## Blocked
 - T-310/T-311 remain open until full parent Ruff/format/frontend-lint commands exit0; no intermediate count is a parent pass.
 - T-440 (O, before motion packets): align plan2.3/2.7 with owner100–300ms and display>=48px leading limits; those conflicting catalogue specifications are missing a correction task.
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-458 acceptedfe83d11; CRUD/telemetry Ruff+format0, full disposable gate running.
 - T-456 accepted6f866cc; database test entire format0/AST unchanged.
 - T-455 acceptedc457b0d; database middle format/AST0.
 - T-457 accepted72973d1; mechanical modernisation lint0/OpenAPI unchanged.

@@ -1,0 +1,194 @@
+diff --git a/backend/tests/test_database.py b/backend/tests/test_database.py
+index 3471dac..764305b 100644
+--- a/backend/tests/test_database.py
++++ b/backend/tests/test_database.py
+@@ -269,7 +269,8 @@ def test_unclassified_bonus_points_do_not_count(db):
+     _, cur = db
+     now = datetime.now(UTC)
+     cur.execute(
+-        "INSERT INTO championships(name,season) VALUES ('Unclassified bonus regression',2099) RETURNING id"
++        "INSERT INTO championships(name,season) VALUES "
++        "('Unclassified bonus regression',2099) RETURNING id"
+     )
+     championship_id = cur.fetchone()[0]
+     cur.execute("SELECT id FROM circuits WHERE name='Harbor Ring'")
+@@ -283,13 +284,15 @@ def test_unclassified_bonus_points_do_not_count(db):
+     )
+     event_id = cur.fetchone()[0]
+     cur.execute(
+-        """INSERT INTO race_sessions(event_id,session_type,state,scheduled_at,started_at,ended_at,total_laps)
++        """INSERT INTO race_sessions(event_id,session_type,state,scheduled_at,"""
++        """started_at,ended_at,total_laps)
+         VALUES (%s,'RACE','COMPLETED',%s,%s,%s,1) RETURNING id""",
+         (event_id, now, now, now),
+     )
+     session_id = cur.fetchone()[0]
+     cur.execute(
+-        """INSERT INTO session_results(session_id,driver_id,position,lap_time_ms,pole,fastest_lap,classified)
++        """INSERT INTO session_results(session_id,driver_id,position,lap_time_ms,pole,"""
++        """fastest_lap,classified)
+         VALUES (%s,%s,1,90000,true,true,false)""",
+         (session_id, driver_id),
+     )
+@@ -345,18 +348,21 @@ def test_incident_laps_stay_within_session_distance(db):
+     driver_id = cur.fetchone()[0]
+ 
+     cur.execute(
+-        "INSERT INTO incident_reports(session_id,driver_id,lap,description) VALUES (%s,%s,%s,'valid boundary')",
++        "INSERT INTO incident_reports(session_id,driver_id,lap,description) "
++        "VALUES (%s,%s,%s,'valid boundary')",
+         (session_id, driver_id, total_laps),
+     )
+     with pytest.raises(Exception) as exc:
+         cur.execute(
+-            "INSERT INTO incident_reports(session_id,driver_id,lap,description) VALUES (%s,%s,%s,'past distance')",
++            "INSERT INTO incident_reports(session_id,driver_id,lap,description) "
++            "VALUES (%s,%s,%s,'past distance')",
+             (session_id, driver_id, total_laps + 1),
+         )
+     assert _sqlstate(exc.value) == "23514"
+     with pytest.raises(Exception) as exc:
+         cur.execute(
+-            "INSERT INTO incident_reports(session_id,driver_id,lap,description) VALUES (%s,%s,73,'hard cap')",
++            "INSERT INTO incident_reports(session_id,driver_id,lap,description) "
++            "VALUES (%s,%s,73,'hard cap')",
+             (session_id, driver_id),
+         )
+     assert _sqlstate(exc.value) == "23514"
+@@ -378,7 +384,8 @@ def test_seed_has_scheduled_third_round_race(db):
+ def test_seed_does_not_write_historical_data_to_user_created_race(db):
+     _, cur = db
+     cur.execute(
+-        "SELECT e.id,e.start_date,d.id FROM race_events e CROSS JOIN drivers d WHERE e.round_number=1 AND d.number=1"
++        "SELECT e.id,e.start_date,d.id FROM race_events e CROSS JOIN drivers d "
++        "WHERE e.round_number=1 AND d.number=1"
+     )
+     event_id, start_date, driver_id = cur.fetchone()
+     cur.execute(
+@@ -399,7 +406,8 @@ def test_seed_does_not_write_historical_data_to_user_created_race(db):
+     assert cur.fetchone()[0] == 1
+     cur.execute(
+         """SELECT count(*) FROM incident_reports
+-                    WHERE session_id=%s AND description='Unsafe rejoin after leaving the circuit'""",
++                    WHERE session_id=%s AND description='Unsafe rejoin after leaving """
++        "the circuit'",
+         (session_id,),
+     )
+     assert cur.fetchone()[0] == 0
+@@ -468,7 +476,9 @@ def test_migration_backfills_four_pit_boxes_for_generated_event(db):
+     event_id = cur.fetchone()[0]
+     cur.execute(
+         """INSERT INTO race_sessions(event_id,session_type,state,scheduled_at,started_at,total_laps)
+-                    VALUES (%s,'RACE','ACTIVE','2026-10-05 12:00+00','2026-10-05 12:00+00',20) RETURNING id""",
++                    VALUES (%s,'RACE','ACTIVE','2026-10-05 12:00+00',"""
++        "'2026-10-05 12:00+00',20) RETURNING id"
++        "",
+         (event_id,),
+     )
+     session_id = cur.fetchone()[0]
+@@ -732,7 +742,8 @@ def test_concurrent_auto_allocations_serialize_on_event(db):
+ def test_session_state_guards_allow_api_lifecycle_and_reset(db):
+     _, cur = db
+     cur.execute(
+-        "SELECT s.id FROM race_sessions s JOIN race_events e ON e.id=s.event_id WHERE e.round_number=3 AND s.session_type='RACE'"
++        "SELECT s.id FROM race_sessions s JOIN race_events e ON e.id=s.event_id "
++        "WHERE e.round_number=3 AND s.session_type='RACE'"
+     )
+     session_id = cur.fetchone()[0]
+     with pytest.raises(Exception) as exc:
+@@ -753,7 +764,8 @@ def test_session_state_guards_allow_api_lifecycle_and_reset(db):
+         (session_id,),
+     )
+     cur.execute(
+-        "UPDATE race_sessions SET state='SCHEDULED',started_at=NULL,ended_at=NULL,safety_car=false WHERE id=%s",
++        "UPDATE race_sessions SET state='SCHEDULED',started_at=NULL,ended_at=NULL,"
++        "safety_car=false WHERE id=%s",
+         (session_id,),
+     )
+     cur.execute("SELECT state,started_at,ended_at FROM race_sessions WHERE id=%s", (session_id,))
+@@ -762,12 +774,15 @@ def test_session_state_guards_allow_api_lifecycle_and_reset(db):
+ 
+ def test_classified_positions_are_unique_per_session(db):
+     _, cur = db
+-    cur.execute("""SELECT s.id,occupied.position,target.id FROM race_sessions s
++    cur.execute(
++        """SELECT s.id,occupied.position,target.id FROM race_sessions s
+                     JOIN race_events e ON e.id=s.event_id
+-                    JOIN session_results occupied ON occupied.session_id=s.id AND occupied.classified
++                    JOIN session_results occupied ON occupied.session_id=s.id """
++        """AND occupied.classified
+                     JOIN session_results target ON target.session_id=s.id AND target.id<>occupied.id
+                     WHERE e.round_number=1 AND s.session_type='RACE'
+-                    ORDER BY occupied.position LIMIT 1""")
++                    ORDER BY occupied.position LIMIT 1"""
++    )
+     session_id, occupied_position, target_result_id = cur.fetchone()
+     with pytest.raises(Exception) as exc:
+         cur.execute(
+@@ -814,7 +829,8 @@ def test_driver_team_memberships_cannot_overlap(db):
+ def test_generated_race_markers_enforce_ownership_and_cascade(db):
+     _, cur = db
+     cur.execute(
+-        "SELECT s.id,s.event_id FROM race_sessions s WHERE s.session_type='RACE' ORDER BY s.scheduled_at LIMIT 1"
++        "SELECT s.id,s.event_id FROM race_sessions s WHERE s.session_type='RACE' "
++        "ORDER BY s.scheduled_at LIMIT 1"
+     )
+     session_id, event_id = cur.fetchone()
+     cur.execute("SELECT id FROM race_events WHERE id<>%s LIMIT 1", (event_id,))
+@@ -844,7 +860,8 @@ def test_generated_race_markers_enforce_ownership_and_cascade(db):
+     assert _sqlstate(exc.value) == "23505"
+     with pytest.raises(Exception) as exc:
+         cur.execute(
+-            "INSERT INTO demo_race_entries(session_id,driver_id,pace_offset_ms) VALUES (%s,%s,3001)",
++            "INSERT INTO demo_race_entries(session_id,driver_id,pace_offset_ms) "
++            "VALUES (%s,%s,3001)",
+             (session_id, driver_id),
+         )
+     assert _sqlstate(exc.value) == "23514"
+@@ -873,8 +890,10 @@ def test_migration_reruns_on_populated_schema_and_preserves_generated_race(db):
+     cur.execute("SELECT id FROM drivers WHERE number=1")
+     driver_id = cur.fetchone()[0]
+     cur.execute(
+-        """INSERT INTO race_sessions(event_id,session_type,state,scheduled_at,started_at,ended_at,total_laps)
+-        VALUES (%s,'RACE','COMPLETED','2026-06-01 14:00+00','2026-06-01 14:00+00','2026-06-01 16:00+00',24)
++        """INSERT INTO race_sessions(event_id,session_type,state,scheduled_at,started_at,"""
++        """ended_at,total_laps)
++        VALUES (%s,'RACE','COMPLETED','2026-06-01 14:00+00','2026-06-01 14:00+00','"""
++        """2026-06-01 16:00+00',24)
+         RETURNING id""",
+         (event_id,),
+     )
+@@ -887,12 +906,15 @@ def test_migration_reruns_on_populated_schema_and_preserves_generated_race(db):
+         (session_id, driver_id),
+     )
+     cur.execute(
+-        "INSERT INTO session_results(session_id,driver_id,position,lap_time_ms) VALUES (%s,%s,1,90000)",
++        "INSERT INTO session_results(session_id,driver_id,position,lap_time_ms) "
++        "VALUES (%s,%s,1,90000)",
+         (session_id, driver_id),
+     )
+     # Simulate an earlier deployment with the lookup-only index.
+     cur.execute(
+-        "CREATE INDEX idx_pit_reservations_driver_active ON pit_reservations(session_id,driver_id) WHERE status='RESERVED' AND driver_id IS NOT NULL"
++        "CREATE INDEX idx_pit_reservations_driver_active ON "
++        "pit_reservations(session_id,driver_id) WHERE status='RESERVED' "
++        "AND driver_id IS NOT NULL"
+     )
+ 
+     cur.execute((ROOT / "migrations/001_initial.sql").read_text())
+@@ -900,11 +922,13 @@ def test_migration_reruns_on_populated_schema_and_preserves_generated_race(db):
+     cur.execute("SELECT count(*) FROM drivers")
+     assert cur.fetchone()[0] == 10
+     cur.execute(
+-        "SELECT count(*) FROM pg_indexes WHERE schemaname=current_schema() AND indexname='idx_pit_reservations_driver_active'"
++        "SELECT count(*) FROM pg_indexes WHERE schemaname=current_schema() "
++        "AND indexname='idx_pit_reservations_driver_active'"
+     )
+     assert cur.fetchone()[0] == 0
+     cur.execute(
+-        "SELECT indexdef FROM pg_indexes WHERE schemaname=current_schema() AND indexname='uq_pit_reservations_active_driver'"
++        "SELECT indexdef FROM pg_indexes WHERE schemaname=current_schema() "
++        "AND indexname='uq_pit_reservations_active_driver'"
+     )
+     assert "UNIQUE INDEX" in cur.fetchone()[0]
+     cur.execute(

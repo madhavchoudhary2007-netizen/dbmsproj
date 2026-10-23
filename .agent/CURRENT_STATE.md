@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 6f866cc
+git_head: fe83d11
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -19,7 +19,7 @@ last_eval_score: no verified overhaul score; historical100 excludes new gates
 - Initial T-442 gate104passed/32failures had orphaned PID79496 holding runtime lease. lsof confirmed test ports15432/27018/18000 only, PPID1; graceful termination fixed rerun. No real database touched.
 - T-449 initial range200-400 exceeded150lines(188); clone reverted, repair200-300 accepted, full parent gate unchanged.
 - T-448 initial152lines exceeded150 despite scoped lint0. Clone reverted; repair now pit_repository+race_archive only, telemetry deferred. Last stale envelope repeated initial failure; fresh repair requested.
-- T-448 W2 and T-452 W3 are current independent packets; at most2 workers. Full parent T-310/T-311 gates remain OPEN, scoped children never presented as parent passes.
+- T-459 W2 and T-460 W3 are current independent packets; at most2 workers. Full parent T-310/T-311 gates remain OPEN, scoped children never presented as parent passes.
 
 ## Contracts and guardrails
 - Branch overhaul/neo-brutal only; preserve every feature/route/copy/hook/aria/state class/DBMS hash. API change needs its ADR/owner approval; no destructive operations/real DB data/schema writes, .env/secrets, recursive removal or gate weakening.
@@ -47,3 +47,5 @@ last_eval_score: no verified overhaul score; historical100 excludes new gates
 - T-455 acceptedc457b0d:97 test-format lines, exact whole-file AST, middle format0.
 - T-453 full disposable rerun exit0:136 passed,0 failed/skipped/xfailed; all live acceptance flows PASS.
 - T-456 accepted6f866cc:132 test-format lines, full database-test format0 and exact AST unchanged; full lint still has long literal debt.
+- T-458 acceptedfe83d11:72 lines, CRUD identifiers now psycopg composables with bound values, precise count protocol; telemetry AST unchanged. Scoped lint/format0; full disposable gate running.
+- T-460 envelope initially counted3 static checks as tests; corrected metadata to0 tests (no pytest collected), preserving actual verification command/status. No test pass fabricated.
