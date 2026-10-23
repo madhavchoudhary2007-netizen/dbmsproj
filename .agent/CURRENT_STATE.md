@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 5601bbd
+git_head: 4a3ab7f
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -51,3 +51,5 @@ last_eval_score: no verified overhaul score; historical100 excludes new gates
 - T-460 envelope initially counted3 static checks as tests; corrected metadata to0 tests (no pytest collected), preserving actual verification command/status. No test pass fabricated.
 - T-460 accepted12e8ea1:database tests full Ruff/format0 and exact AST preserved,68lines. T-458 full gate failed104passed/32failed: orphan11698 held test runtime lease. PPID1 and lsof confirmed ONLY test15432/27018/18000. Graceful termination authorized; script kills subshell instead of child. New T-4480 addresses cleanup without gate changes.
 - T-459 accepted5601bbd:46 main format lines, exact AST unchanged. Orphan11698 had already exited when TERM was attempted (no such process); no process was killed by that command. Cleanup must wait on actual API PID before next run.
+
+- T-4480 accepted4a3ab7f: Exec the API process so verifier cleanup waits for its shutdown. Verify exit0; 2 changed lines.
