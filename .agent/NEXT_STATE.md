@@ -3,16 +3,16 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-441 W3 — OPEN
-- target_files: frontend/e2e/palette.spec.ts, frontend/e2e/palette-measure.ts, frontend/e2e/palette-contrast.spec.ts
-- contract: heading contrast1 mustfail AA4.5; decorativeariahiddenexcluded, transparentancestorsresolved.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+### T-44116 W2 — OPEN
+- target_files: backend/app/main.py
+- contract: preserve finalizationdomain and event/SQLordering; C901strictdecrease.
+- verify: .venv/bin/python -c "import json,subprocess; r=subprocess.run(['.venv/bin/ruff','check','--select','C901','--output-format','json','backend/app/main.py'],capture_output=True,text=True);d=json.loads(r.stdout);assert all('simulation_loop' not in x['message'] or int(x['message'].split('(')[1].split()[0])<16 for x in d);assert all('_finalize_simulation_results' not in x['message'] for x in d)" && .venv/bin/ruff format --check backend/app/main.py
 
 ## Blocked
 - T-310 remains open until full app Ruff/format exit0; T-311 accepted8570e58; no intermediate count is a parent pass.
-- T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-441 accepteda49641c; verify0.
 - T-44115 accepted0224127; verify0.
 - T-44114 accepted8969b47; verify0.
 - T-440 accepted5248d21; catalogue alignment verify0.

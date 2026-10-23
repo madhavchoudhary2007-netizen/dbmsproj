@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 0224127
+git_head: a49641c
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -78,3 +78,7 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 - T-44114 accepted8969b47: Inlined driver selection and validation into _start_session_simulation, leaving only the start operation extraction. Verify exit0; 108 changed lines.
 
 - T-44115 accepted0224127: Extracted reset operation and consolidated pause/resume status handling; numstat 29 added, 22 removed. Static checks: C901 and format passed. Verify exit0; 51 changed lines.
+
+- T-441 accepteda49641c: Extracted shared palette measurement, count every real heading, resolve transparent backgrounds through ancestors, and added offline contrast regressions. Browser run is orchestrator-owned. Verify exit0; 126 changed lines.
+
+- T-441 root Chromium3PASS withoutserver; shared measurement now includescontrast1, excludesariahidden, resolvestransparentancestors. Roottypecheck/lint/spacing/banned/motion0; neo lint absent untilT360. T-44115 fullgate136PASS/livePASS (cleanup completion checked next).
