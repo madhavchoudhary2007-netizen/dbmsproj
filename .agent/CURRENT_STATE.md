@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: ad19d48
+git_head: fd18bfd
 branch: overhaul/neo-brutal
 architect_sha256: c05eeb0c03461c7292c04802ce8f4814efccd0a3ec78e84cba0ab993c10b3d24
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -36,3 +36,5 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 - ADR00834dbb99 accepted forplannedT323: keep existingopaquejti/CSRF, maptoUUIDrevocationkey, additive004onlydisposablestack, no-jticompatibility. Currentlockc05eeb0c. Realbackendcontainer hasno sourcebindmount, so editingrepo cannotautoreloaditsdatabase.
 - P3legacytoolreturns0butcountsroot+pageonly; shared/layoutassets omitted, do notclaimbudgetuntilT44132fix. LighthouseCLIabsent(P1/P2NOT_RUN). FPS17ms checkdoesnotprove16.7msuntilT413.
 - Ownacceptanceboundaryerrors fromgeneratednext-env andprematureparallelpatch application were reconciled by restoringonlyowngenerateddiff/deferringsecondpatch; workeroutputsinscope.
+
+- T-44123 acceptedfd18bfd: Recorded fresh functional evidence for F-1 through F-9 with the required IDs and weights; retained the F-4 and F-8 failures and disclosed npm moderate vulnerabilities. Verify exit0; 58 changed lines.
