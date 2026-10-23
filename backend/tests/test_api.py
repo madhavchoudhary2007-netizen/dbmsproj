@@ -980,17 +980,25 @@ def test_constraint_demo_reports_only_the_expected_driver_number_check(monkeypat
             return SimpleNamespace(constraint_name="drivers_number_check")
 
     class Cursor:
-        def __init__(self): self.statements = []
-        def __enter__(self): return self
-        def __exit__(self, *_args): return False
+        def __init__(self):
+            self.statements = []
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
         def execute(self, statement):
             self.statements.append(statement)
             if statement.startswith("INSERT INTO drivers"):
                 raise ExpectedCheckViolation("invalid driver number")
 
     cursor = Cursor()
+
     class Connection:
-        def cursor(self, **_kwargs): return cursor
+        def cursor(self, **_kwargs):
+            return cursor
 
     monkeypatch.setattr(main_module, "connection", lambda: nullcontext(Connection()))
     result = main_module.constraint_demo(user={"role": "ADMIN"})
@@ -1012,14 +1020,19 @@ def test_constraint_demo_does_not_report_an_unrelated_check_as_success(monkeypat
             return SimpleNamespace(constraint_name="some_other_check")
 
     class Cursor:
-        def __enter__(self): return self
-        def __exit__(self, *_args): return False
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
         def execute(self, statement):
             if statement.startswith("INSERT INTO drivers"):
                 raise UnexpectedCheckViolation("unexpected check")
 
     class Connection:
-        def cursor(self, **_kwargs): return Cursor()
+        def cursor(self, **_kwargs):
+            return Cursor()
 
     monkeypatch.setattr(main_module, "connection", lambda: nullcontext(Connection()))
     with pytest.raises(HTTPException) as error:
@@ -1031,14 +1044,23 @@ def test_constraint_demo_rolls_back_if_the_database_accepts_invalid_data(monkeyp
     from contextlib import nullcontext
 
     class Cursor:
-        def __init__(self): self.statements = []
-        def __enter__(self): return self
-        def __exit__(self, *_args): return False
-        def execute(self, statement): self.statements.append(statement)
+        def __init__(self):
+            self.statements = []
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def execute(self, statement):
+            self.statements.append(statement)
 
     cursor = Cursor()
+
     class Connection:
-        def cursor(self, **_kwargs): return cursor
+        def cursor(self, **_kwargs):
+            return cursor
 
     monkeypatch.setattr(main_module, "connection", lambda: nullcontext(Connection()))
     with pytest.raises(HTTPException) as error:
@@ -1051,30 +1073,79 @@ def test_constraint_demo_rolls_back_if_the_database_accepts_invalid_data(monkeyp
 def test_pit_strategy_reports_pending_live_decision_and_historical_stops(monkeypatch):
     from backend.app import main as main_module
     from backend.app import pit_repository
+
     session_id = uuid4()
     driver_id = uuid4()
     box_id = uuid4()
-    driver = {"driver_id": driver_id, "driver_name": "A Driver", "driver_number": 17,
-              "team_id": uuid4(), "team_name": "Team"}
-    monkeypatch.setattr(main_module, "fetch_one", lambda *_: {
-        "id": session_id, "state": "ACTIVE", "total_laps": 30, "generated": True,
-        "scheduled_at": datetime(2026, 10, 5, tzinfo=timezone.utc),
-    })
-    monkeypatch.setattr(pit_repository, "fetch_one",
-                        lambda *args: main_module.fetch_one(*args), raising=False)
-    monkeypatch.setattr(main_module, "fetch_all", lambda query, _params: [driver] if "demo_race_entries" in query else [{
-        "id": box_id, "driver_id": driver_id, "box_number": 2, "status": "COMPLETED",
-        "starts_at": datetime(2026, 10, 5, 1, tzinfo=timezone.utc),
-        "ends_at": datetime(2026, 10, 5, 1, 1, tzinfo=timezone.utc),
-    }])
-    monkeypatch.setattr(pit_repository, "fetch_all",
-                        lambda query, params: main_module.fetch_all(query, params))
+    driver = {
+        "driver_id": driver_id,
+        "driver_name": "A Driver",
+        "driver_number": 17,
+        "team_id": uuid4(),
+        "team_name": "Team",
+    }
+    monkeypatch.setattr(
+        main_module,
+        "fetch_one",
+        lambda *_: {
+            "id": session_id,
+            "state": "ACTIVE",
+            "total_laps": 30,
+            "generated": True,
+            "scheduled_at": datetime(2026, 10, 5, tzinfo=timezone.utc),
+        },
+    )
+    monkeypatch.setattr(
+        pit_repository, "fetch_one", lambda *args: main_module.fetch_one(*args), raising=False
+    )
+    monkeypatch.setattr(
+        main_module,
+        "fetch_all",
+        lambda query, _params: (
+            [driver]
+            if "demo_race_entries" in query
+            else [
+                {
+                    "id": box_id,
+                    "driver_id": driver_id,
+                    "box_number": 2,
+                    "status": "COMPLETED",
+                    "starts_at": datetime(2026, 10, 5, 1, tzinfo=timezone.utc),
+                    "ends_at": datetime(2026, 10, 5, 1, 1, tzinfo=timezone.utc),
+                }
+            ]
+        ),
+    )
+    monkeypatch.setattr(
+        pit_repository, "fetch_all", lambda query, params: main_module.fetch_all(query, params)
+    )
+
     class Collection:
-        def find(self, *_args): return self
-        def sort(self, *_args): return self
-        def limit(self, *_args): return iter([{"driver_id": str(driver_id), "lap": 8, "tire_compound": "SOFT",
-            "tire_age_laps": 15, "tire_wear_pct": 71, "pit_reservation_id": str(box_id), "pit_state": "IN_PIT", "sector": 3}])
-        def aggregate(self, _pipeline): return iter([{"_id": str(box_id), "lap": 8, "compound": "SOFT"}])
+        def find(self, *_args):
+            return self
+
+        def sort(self, *_args):
+            return self
+
+        def limit(self, *_args):
+            return iter(
+                [
+                    {
+                        "driver_id": str(driver_id),
+                        "lap": 8,
+                        "tire_compound": "SOFT",
+                        "tire_age_laps": 15,
+                        "tire_wear_pct": 71,
+                        "pit_reservation_id": str(box_id),
+                        "pit_state": "IN_PIT",
+                        "sector": 3,
+                    }
+                ]
+            )
+
+        def aggregate(self, _pipeline):
+            return iter([{"_id": str(box_id), "lap": 8, "compound": "SOFT"}])
+
     monkeypatch.setattr(main_module, "mongo_ready", lambda: Collection())
     sim = Simulation(session_id, [{"id": driver_id, "number": 17}], 2, total_laps=30)
     sim.is_generated = True
@@ -1089,10 +1160,17 @@ def test_pit_strategy_reports_pending_live_decision_and_historical_stops(monkeyp
     assert row["recommended_stop_lap"] == 9
     assert row["stops"][0]["lap"] == 8
 
-    monkeypatch.setattr(main_module, "fetch_one", lambda *_: {
-        "id": session_id, "state": "COMPLETED", "total_laps": 30, "generated": True,
-        "scheduled_at": datetime(2026, 10, 5, tzinfo=timezone.utc),
-    })
+    monkeypatch.setattr(
+        main_module,
+        "fetch_one",
+        lambda *_: {
+            "id": session_id,
+            "state": "COMPLETED",
+            "total_laps": 30,
+            "generated": True,
+            "scheduled_at": datetime(2026, 10, 5, tzinfo=timezone.utc),
+        },
+    )
     historical = pit_strategy(session_id, user={"id": uuid4(), "role": "ADMIN"})
     assert historical["source"] == "history"
     assert historical["strategy"][0]["status"] == "NO_FUTURE_STOP"
