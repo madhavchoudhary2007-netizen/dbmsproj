@@ -3,20 +3,21 @@ updated_at: 2026-10-23
 phase: 3 API contract guard (Phases0–2 complete; baseline score51.2974)
 
 ## Queue
+### T-330 Orchestrator — OPEN
+- target_files: backend/tests/test_contract_snapshot.py, backend/tests/test_contract_goldens.py, backend/tests/contract_compat.py
+- contract: Close OpenAPI and ten real GET golden contract guard from accepted W3 children. Thirty focused tests pass; full isolated suite has 214 passed, zero skips, with live acceptance passed.
+- verify: env APEXGRID_TEST_STACK=1 APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:15432/apexgrid MONGODB_URL=mongodb://localhost:27018 .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_contract_compat_unions.py backend/tests/test_contract_goldens.py
+
 ### T-44150 W3 — OPEN
 - target_files: scripts/eval/lint-neobrutal.sh, scripts/eval/rules/radius.good.css, scripts/eval/rules/radius.bad.css
 - contract: Phase5 T360 boundedchild1, allowedinterleavewithbackendperplan§4: create lint-neobrutal.sh foundation enforcingONLYradius sofar, plusonegood/bad radiusfixture. LaterchildrenaddotherADR007rules; don'tclaimwholeT360complete. DefaultscanactualSRC_DIRS viaexisting_dirs.sh, targetedfileargsforverification, --self-test usescommittedfixtures and exits0 onlycorrectgood0/badnonzero. NormalcurrentrepoexpectedFAILoldradiusbaseline; reporthitsnochangeUI.
 - verify: bash scripts/eval/lint-neobrutal.sh --self-test
 
-### T-44149 W3 — OPEN
-- target_files: backend/tests/test_contract_goldens.py, backend/tests/snapshots/get-responses.json
-- contract: T330 child3: commit captured real-response golden JSON from providedrootartifact and test all TENGETcontracts using contract_fixture.capture_contracts(). ActualDBchecksROOTonly, workerverifies pure comparisonself-tests andcollection. Never recapture/rebaseline goldenJSON; copyprovideddata exactly andcomparebaseline retainedvalues/fields allowingadditiveobjectkeys perplan.
-- verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/pytest -q backend/tests/test_contract_goldens.py -k comparison && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest --collect-only -q backend/tests/test_contract_goldens.py && .venv/bin/ruff check backend/tests/test_contract_goldens.py && .venv/bin/ruff format --check backend/tests/test_contract_goldens.py
-
 ## Blocked
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44149 accepted62443d0; verify0.
 - T-44148 accepteda5535b2; verify0.
 - T-44147 accepted6ae5e39; verify0.
 - T-44146 accepted5b0b7e4; verify0.
