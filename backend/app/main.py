@@ -1796,8 +1796,8 @@ dbms_sql_router, dbms_sql_handlers = create_dbms_sql_router(
     lambda v: jsonable(v),
     admin_dependency,
     lambda: connection(),
-    lambda: public_dbms_tables(),
 )
+public_dbms_tables = dbms_sql_handlers["public_dbms_tables"]
 dbms_tables = dbms_sql_handlers["dbms_tables"]
 dbms_schema = dbms_sql_handlers["dbms_schema"]
 dbms_indexes = dbms_sql_handlers["dbms_indexes"]
@@ -1826,14 +1826,6 @@ dbms_mongo_collections = dbms_mongo_handlers["dbms_mongo_collections"]
 dbms_mongo_collection_documents = dbms_mongo_handlers["dbms_mongo_collection_documents"]
 dbms_polyglot = dbms_mongo_handlers["dbms_polyglot"]
 app.include_router(dbms_mongo_router)
-
-
-def public_dbms_tables():
-    return [
-        row["table_name"]
-        for row in fetch_all("""SELECT table_name FROM information_schema.tables
-      WHERE table_schema='public' AND table_type='BASE TABLE' ORDER BY table_name""")
-    ]
 
 
 @app.get("/api/dbms/races/{session_id}")

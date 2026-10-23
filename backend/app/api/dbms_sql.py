@@ -164,9 +164,15 @@ def create_dbms_sql_router(
     jsonable: Callable[[Any], Any],
     admin_dependency: Any,
     connection: Callable[[], AbstractContextManager[Connection[DatabaseRow]]],
-    public_dbms_tables: Callable[[], list[str]],
 ) -> tuple[APIRouter, dict[str, Callable[..., Any]]]:
     router = APIRouter()
+
+    def public_dbms_tables() -> list[str]:
+        return [
+            row["table_name"]
+            for row in fetch_all("""SELECT table_name FROM information_schema.tables
+      WHERE table_schema='public' AND table_type='BASE TABLE' ORDER BY table_name""")
+        ]
 
     @router.get("/api/dbms/schema")
     def dbms_schema(user=admin_dependency):
@@ -270,6 +276,7 @@ def create_dbms_sql_router(
         "dbms_eer": dbms_eer,
         "dbms_explain": dbms_explain,
         "dbms_races": dbms_races,
+        "public_dbms_tables": public_dbms_tables,
         **demo_handlers,
         **table_handlers,
         **table_row_handlers,
