@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 882e5ed
+git_head: 7768158
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -51,3 +51,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T-44154 accepted882e5ed: Moved four unchanged exception handlers and retained main aliases with all seven registrations. Envelope command normalized to packet literal before root rerun. Verify exit0; 69 changed lines.
 
 - T44154 worker Verify field summarized instead of literal; root normalized envelope format, accepted only after actual command rerun0. No re-dispatch needed per failed-format rule. Full isolated rerun in progress. T44155 staged theme token file W1 running; not imported until Tailwind4 integration.
+
+- T-44155 accepted7768158: Added staged Tailwind4 theme tokens and approved nb aliases; not yet imported and no route rendering changes. Four static commands, zero test cases. Verify exit0; 63 changed lines.
