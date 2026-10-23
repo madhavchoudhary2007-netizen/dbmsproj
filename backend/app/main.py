@@ -4,7 +4,6 @@ import asyncio
 import hmac
 import logging
 import random
-import secrets
 import threading
 import time
 from collections.abc import Callable
@@ -15,7 +14,6 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Literal
 from uuid import UUID, uuid4
 
-import bcrypt
 import jwt
 from bson import ObjectId
 from fastapi import (
@@ -41,13 +39,13 @@ from pymongo.errors import PyMongoError
 from starlette.middleware.base import RequestResponseEndpoint
 
 from .analytics_router import create_analytics_router
-from .auth_cookie import clear_auth_cookies, create_csrf_token, set_auth_cookies, verify_csrf_token
+from .auth_cookie import clear_auth_cookies, verify_csrf_token
+from .auth_router import create_auth_router
 from .config import (
     APP_ENV,
     AUTO_DEMO_RACE,
     CORS_ORIGINS,
     JWT_ALGORITHM,
-    JWT_MINUTES,
     JWT_SECRET,
     MONGODB_DATABASE,
     MONGODB_URL,
@@ -81,7 +79,6 @@ from .pit_router import create_pit_router
 from .pit_strategy_router import create_pit_strategy_router
 from .pit_strategy_service import project_pit_strategy
 from .runtime_lease import acquire_runtime_lease, check_runtime_lease
-from .schemas_auth import Login, UserCreate, UserPatch
 from .schemas_competition import MembershipIn, MembershipPatch, ResultIn
 from .schemas_operations import Action, AutoReservationIn, Decision, IncidentIn, ReservationIn
 from .schemas_simulation import DemoRaceCreate, SimulationControl
@@ -398,52 +395,14 @@ def update_membership(membership_id: UUID, body: MembershipPatch, user=Depends(r
     return jsonable(row)
 
 
-@app.post("/api/auth/login")
-def login(body: Login, response: Response, request: Request):
-    require_allowed_origin(request)
-    try:
-        user = fetch_one(
-            "SELECT id,email,password_hash,full_name,role "
-            "FROM users WHERE lower(email)=lower(%s)",
-            (body.email,),
-        )
-    except Exception:
-        raise HTTPException(503, "PostgreSQL is unavailable")
-    try:
-        valid_password = bool(
-            user
-            and bcrypt.checkpw(
-                body.password.encode(), user["password_hash"].encode()
-            )
-        )
-    except (ValueError, TypeError):
-        valid_password = False
-    if not valid_password:
-        raise HTTPException(401, "Invalid email or password")
-    expiry = datetime.now(timezone.utc) + timedelta(minutes=JWT_MINUTES)
-    session_id = secrets.token_urlsafe(32)
-    token = jwt.encode(
-        {
-            "sub": str(user["id"]),
-            "role": user["role"],
-            "exp": expiry,
-            "jti": session_id,
-        },
-        JWT_SECRET,
-        algorithm=JWT_ALGORITHM,
+app.include_router(
+    create_auth_router(
+        require_allowed_origin,
+        lambda: fetch_one,
+        jsonable,
+        lambda: APP_ENV != "local",
     )
-    csrf_token = create_csrf_token(session_id, JWT_SECRET)
-    set_auth_cookies(response, token, csrf_token, secure=APP_ENV != "local")
-    user_data = jsonable(
-        {key: user[key] for key in ("id", "email", "full_name", "role")}
-    )
-    if request.headers.get("origin"):
-        return {"user": user_data}
-    return {
-        "access_token": token,
-        "token_type": "bearer",
-        "user": user_data,
-    }
+)
 
 
 @app.get("/api/auth/me")

@@ -3,10 +3,10 @@ updated_at: 2026-10-22T20:54:39Z
 loop_iteration: 1 of 5
 
 ## Queue (top-down; <=3 target files and <=150 changed lines per task)
-### T-156 — Extract auth routes into APIRouter
+### T-156 — Extract login route into APIRouter
 - worker: W2 | priority: P2 | after: T-155
 - target_files: backend/app/main.py, backend/app/auth_router.py
-- contract: move login/me/logout handlers into a typed router while preserving cookie, bearer, Origin and main.fetch_one monkeypatch behavior
+- contract: move login handler into a typed router while preserving cookie, bearer, Origin and main.fetch_one monkeypatch behavior; me/logout stay for the next packet
 - verify: existing auth/cookie characterization tests; Ruff <=553, mypy <=226
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
