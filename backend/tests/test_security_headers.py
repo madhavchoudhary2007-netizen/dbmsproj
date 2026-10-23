@@ -1,0 +1,148 @@
+import json
+import subprocess
+import sys
+from importlib import import_module, util
+from pathlib import Path
+from types import SimpleNamespace
+
+import pytest
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+
+def _raise_runtime(*_args, **_kwargs):
+    raise RuntimeError
+
+
+def _fail_probe(*_args, **_kwargs):
+    pytest.fail("dependency probe called")
+
+
+@pytest.fixture
+def app_client(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "local")
+    from backend.app import main
+
+    monkeypatch.setattr(main, "fetch_one", lambda *_args, **_kwargs: {"ok": 1})
+    mongo = SimpleNamespace(admin=SimpleNamespace(command=lambda *_a, **_kw: {"ok": 1}))
+    monkeypatch.setattr(main, "mongo_client", mongo)
+    monkeypatch.setattr(main, "check_runtime_lease", lambda *_args: None)
+    monkeypatch.setattr(main.app.state, "runtime_lease", object(), raising=False)
+    return main, TestClient(main.app)
+
+
+def _config_import(overrides):
+    root = Path(__file__).resolve().parents[2]
+    env = dict(
+        APP_ENV="local",
+        PYTHONPATH=str(root),
+        DATABASE_URL="postgresql://127.0.0.1:1/unreachable",
+        MONGODB_URI="mongodb://127.0.0.1:1/unreachable",
+        **overrides,
+    )
+    code = (
+        "from backend.app.config import CORS_ORIGINS; import json; print(json.dumps(CORS_ORIGINS))"
+    )
+    return subprocess.run(  # noqa: S603 - fixed Python executable and constant import snippet
+        [sys.executable, "-c", code],
+        cwd=root,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+
+
+def test_cors_default_origins_include_localhost_and_loopback():
+    result = _config_import({})
+    assert result.returncode == 0, result.stderr
+    assert json.loads(result.stdout) == ["http://localhost:3000", "http://127.0.0.1:3000"]
+
+
+def test_cors_wildcard_is_rejected_at_config_import():
+    result = _config_import({"CORS_ORIGINS": "*"})
+    assert result.returncode != 0, "AssertionError: wildcard CORS_ORIGINS import succeeded"
+    assert "CORS_ORIGINS" in result.stderr
+
+
+def test_unknown_credentialed_cors_preflight_is_rejected(app_client):
+    _, client = app_client
+    response = client.options(
+        "/unknown",
+        headers={
+            "Origin": "https://attacker.example",
+            "Access-Control-Request-Method": "GET",
+            "Access-Control-Request-Headers": "authorization",
+        },
+    )
+    assert response.status_code == 400
+    assert "access-control-allow-origin" not in response.headers
+
+
+def test_normal_404_has_security_headers(app_client):
+    _, client = app_client
+    response = client.get("/missing-security-test-route")
+    assert response.status_code == 404
+    assert response.headers.get("x-content-type-options") == "nosniff"
+    assert response.headers.get("referrer-policy") == "strict-origin-when-cross-origin"
+    assert response.headers.get("x-frame-options") == "DENY"
+    assert response.headers.get("permissions-policy") == "camera=(), microphone=(), geolocation=()"
+    assert response.headers.get("content-security-policy") == (
+        "default-src 'none'; frame-ancestors 'none'"
+    )
+
+
+@pytest.mark.parametrize("secure", [False, True])
+def test_security_middleware_hsts_matches_secure_mode(secure):
+    assert util.find_spec("backend.app.security_headers") is not None
+    module = import_module("backend.app.security_headers")
+    app = FastAPI()
+    app.add_middleware(module.SecurityHeadersMiddleware, secure=secure)
+
+    @app.get("/")
+    def root():
+        return {"ok": True}
+
+    response = TestClient(app).get("/")
+    assert response.status_code == 200
+    if secure:
+        assert response.headers.get("strict-transport-security") == (
+            "max-age=31536000; includeSubDomains"
+        )
+    else:
+        assert response.headers.get("strict-transport-security") is None
+
+
+def test_health_live_stays_alive_when_dependencies_and_lease_fail(app_client, monkeypatch):
+    main, client = app_client
+    monkeypatch.setattr(main, "fetch_one", _fail_probe)
+    monkeypatch.setattr(main.mongo_client.admin, "command", _fail_probe)
+    monkeypatch.setattr(main.app.state, "runtime_lease", object(), raising=False)
+    monkeypatch.setattr(main, "check_runtime_lease", _raise_runtime)
+    response = client.get("/health/live")
+    assert (response.status_code, response.json()) == (200, {"status": "alive"})
+
+
+@pytest.mark.parametrize("failure", [None, "postgres", "mongodb", "runtime_lease", "missing_lease"])
+def test_health_ready_reports_each_dependency_state(app_client, monkeypatch, failure):
+    main, client = app_client
+    if failure == "postgres":
+        monkeypatch.setattr(main, "fetch_one", _raise_runtime)
+    if failure == "mongodb":
+        monkeypatch.setattr(main.mongo_client.admin, "command", _raise_runtime)
+    if failure == "runtime_lease":
+        monkeypatch.setattr(main, "check_runtime_lease", _raise_runtime)
+    if failure == "missing_lease":
+        monkeypatch.setattr(main.app.state, "runtime_lease", None, raising=False)
+    response = client.get("/health/ready")
+    services = {key: "up" for key in ("postgres", "mongodb", "runtime_lease")}
+    if failure in services:
+        services[failure] = "down"
+    status = 200 if failure is None else 503
+    expected = {
+        "status": "ready" if status == 200 else "not_ready",
+        "services": services,
+    }
+    assert (response.status_code, response.json()) == (status, expected)

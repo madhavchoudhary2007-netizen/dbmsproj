@@ -3,15 +3,21 @@ updated_at: 2026-10-23
 phase: 2 security (Phase1 complete; baseline score51.2974)
 
 ## Queue
-### T-44130 O — IN_REVIEW
-- target_files: .agent/adr/ADR-011-health-probes.md, .agent/ARCHITECT.md, DECISIONS.md
-- contract: additivehealthonly, existingAPIsretained; focusedC/lock.
-- verify: bash scripts/agent/verify-lock.sh && bash scripts/agent/budget.sh
+### T-44134 W3 — OPEN
+- target_files: backend/tests/test_logout_revocation.py
+- contract: testfirstmissingsecurityfeatures, actualassertionfailures0errors/skips; neverlabelproductchecksPASS.
+- verify: .venv/bin/ruff check backend/tests/test_logout_revocation.py && .venv/bin/ruff format --check --output-format concise backend/tests/test_logout_revocation.py && .venv/bin/python .agent/check-red-tests.py T-44134 backend/tests/test_logout_revocation.py
+
+### T-44133 W3 — OPEN
+- target_files: backend/tests/test_security_headers.py
+- contract: testfirstmissingsecurityfeatures, actualassertionfailures0errors/skips; neverlabelproductchecksPASS.
+- verify: .venv/bin/ruff check backend/tests/test_security_headers.py && .venv/bin/ruff format --check --output-format concise backend/tests/test_security_headers.py && .venv/bin/python .agent/check-red-tests.py T-44133 backend/tests/test_security_headers.py
 
 ## Blocked
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44130 acceptedce4b44b; verify0.
 - T-44126 acceptedc2eb8d2; verify0.
 - T-44125 accepted4eed78c; verify0.
 - T-44124 accepted1d5cb48; verify0.

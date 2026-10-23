@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: c2eb8d2
+git_head: ce4b44b
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -44,3 +44,7 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T-44125 accepted4eed78c: Recorded all six performance checks with their specified weights and evidence-based results; artifact is 40 lines. Verify exit0; 40 changed lines.
 
 - T-44126 acceptedc2eb8d2: Recorded fresh edge-check evidence from the current E2E specs and full rerun; E-1 and E-2 remain false because coverage is incomplete. Verify exit0; 34 changed lines.
+
+- T-44130 acceptedce4b44b: Recorded additive health ADR011 and early health dependency slice with focused architecture review and lock. Verify exit0; 37 changed lines.
+
+- T44134 firstresultFAILED because orchestrator-created redrecorder was not yet committed into clone. Product/testdiffinscope; infrastructure-only failure. Root linked read-only helper into bothsecuritytestclones, willrerun exactverify ratherthan re-dispatch (packets failed-result rule).
