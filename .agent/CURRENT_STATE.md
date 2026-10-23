@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 31a3bd4
+git_head: 6c04161
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -37,3 +37,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - Root rejected T44167 beforeaccept: solid bg arbitrary utility falsely countedgradient. Repair1 plus exactform counts requested. Root rejected T44169 beforeaccept: prose object string/lineheight900 falsepositives, conditional font-black missed. Repair1 requested; both diffs remain isolated/referenced in clones.
 
 - T-44170 accepted31a3bd4: Moved legacy health handler into API module with live getter/callback bindings and original normalized body.21 tests/route identity proof pass. Verify0.
+
+- T-44167 accepted6c04161: Gradient rule with exact allowed path, solid-utility controls and24selftestcases. Verify0.

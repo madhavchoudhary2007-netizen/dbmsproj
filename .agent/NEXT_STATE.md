@@ -8,15 +8,11 @@ phase: 3 API contract guard (Phases0–2 complete; baseline score51.2974)
 - contract: T360 weight-rule child: implement typed font-weight900 lint with one good and one bad fixture. Catch CSS font-weight:900, font shorthand weight900, JS fontWeight:900 (quoted numeric values/keys too), and Tailwind font-black/font-[900] variants. Keep700/500/400 valid. No product edits; shared scanner wiring follows.
 - verify: env PYTHONPATH=. .venv/bin/python scripts/eval/neo_weight.py --self-test && .venv/bin/ruff check scripts/eval/neo_weight.py && .venv/bin/ruff format --check scripts/eval/neo_weight.py && .venv/bin/mypy --strict scripts/eval/neo_weight.py
 
-### T-44167 W3 — OPEN
-- target_files: scripts/eval/neo_gradient.py, scripts/eval/rules/gradient.good.css, scripts/eval/rules/gradient.bad.css
-- contract: T360 gradient-rule child: add typed gradient-location checker with good and bad fixtures. CSS gradients and gradient utilities are allowed only in the exact frontend/app/styles/textures.css file. All other product paths must reject gradient declarations and Tailwind gradient utilities; no broad basename or substring exception.
-- verify: env PYTHONPATH=. .venv/bin/python scripts/eval/neo_gradient.py --self-test && .venv/bin/ruff check scripts/eval/neo_gradient.py && .venv/bin/ruff format --check scripts/eval/neo_gradient.py && .venv/bin/mypy --strict scripts/eval/neo_gradient.py
-
 ## Deferred
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44167 accepted6c04161; verify0.
 - T-44170 accepted31a3bd4; verify0.
 - T-44168 accepted4e8f466; verify0.
 - T-44166 accepted64214d6; verify0.

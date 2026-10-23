@@ -1,0 +1,1 @@
+.valid { font-weight: 700; font: 500 1rem/1.5 sans-serif; width: 900px; } /* font-weight: 900 */ .content::before { content: "font-weight: 900"; }
