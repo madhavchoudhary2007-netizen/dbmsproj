@@ -3,10 +3,10 @@ updated_at: 2026-10-23T08:25:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-209 — add perf-fps.spec.ts for 600-frame animation timing
-- worker: W3 | priority: P1 | origin: EVAL score P-5
-- target_files: frontend/e2e/perf-fps.spec.ts
-- contract: add perf-fps.spec.ts testing p95 frame <= 16.7ms and heap growth <= 1MB over 600 frames on /live
+### T-210 — record P-5 passed in performance.json
+- worker: Orchestrator | priority: P1 | origin: EVAL score P-5
+- target_files: .agent/eval/performance.json
+- contract: record P-5 passed based on perf-fps.spec.ts passing 600-frame animation timing and heap growth checks
 - verify: PLAYWRIGHT_PORT=32145 npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts perf-fps.spec.ts --project=desktop-1440 && git checkout -- frontend/next-env.d.ts frontend/AGENTS.md
 
 ## Blocked
