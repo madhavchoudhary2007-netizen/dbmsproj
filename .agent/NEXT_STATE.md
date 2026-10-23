@@ -8,15 +8,11 @@ phase: 3 T331 extraction; Phase5 T360 lints / T361accepted (Phases0–2 complete
 - contract: T360 integrate accepted CSS motion validator into lint-motion.sh while preserving original assertions; add offline selftest/explicit file mode.
 - verify: bash -n scripts/eval/lint-motion.sh && bash scripts/eval/lint-motion.sh --self-test && bash scripts/eval/lint-motion.sh scripts/eval/rules/motion.good.css && ! bash scripts/eval/lint-motion.sh scripts/eval/rules/motion.bad.css
 
-### T-44181 W2 — OPEN
-- target_files: backend/app/api/dbms_mongo.py, backend/app/main.py
-- contract: T331 move unchanged DBMS overview and telemetry inspection into new Mongo router module.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,importlib,inspect,subprocess; old=ast.parse(subprocess.check_output(["git","show","c64e793:backend/app/main.py"],text=True)); module=importlib.import_module("backend.app.api.dbms_mongo"); tree=ast.parse(inspect.getsource(module)); main=importlib.import_module("backend.app.main"); routes=[r for outer in main.app.routes for r in (outer.original_router.routes if hasattr(outer,"original_router") else [outer])]; names=("dbms_overview","dbms_telemetry"); original={n.name:n for n in old.body if isinstance(n,ast.FunctionDef) and n.name in names}; moved={n.name:n for n in ast.walk(tree) if isinstance(n,ast.FunctionDef) and n.name in names}; [(setattr(original[n],"decorator_list",[]),setattr(moved[n],"decorator_list",[])) for n in names]; assert all(ast.dump(original[n])==ast.dump(moved[n]) for n in names); assert all(sum(getattr(r,"endpoint",None) is getattr(main,n) for r in routes)==1 for n in names); print("PASS exact overview/telemetry handlers and aliases")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py && .venv/bin/ruff check backend/app/main.py backend/app/api/dbms_mongo.py && .venv/bin/ruff format --check backend/app/main.py backend/app/api/dbms_mongo.py
-
 ## Deferred
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44181 accepted20466aa; verify0.
 - T-44179 acceptedc64e793; verify0.
 - T-44180 accepted7c6c086; verify0.
 - T-44178 acceptedb886991; verify0.

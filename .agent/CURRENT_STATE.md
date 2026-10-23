@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: c64e793
+git_head: 20466aa
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -34,3 +34,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - Health/SQL pure moves through7c6c086 preserve AST/main aliases. Full214PASS0skip/livePASS through EXPLAIN; latest rollback-demo rootrun active. Ruff0/mypy217errors16/43files. Typed temporary factory helpers required by C901; T332 replaces them.
 - T360 shadow66c4550/contrastd0e50ef/wiringb549015/motionc64e793 accepted with regression repairs. Shared neo actual10legacyCSSviolations; motion wrapper next. No thresholds weakened. Counts/static boundary not delivery proof.
 - Root corrected FastAPI included-router probe, mypy namespace, and underestimated C901 (typed helper retained after observed11>10). Worker placeholder Verify formats normalized then exact command rerun.
+
+- T-44181 accepted20466aa: Moved unchanged overview/telemetry handlers into typed Mongo factory with main aliases and late callbacks. Verify0.
