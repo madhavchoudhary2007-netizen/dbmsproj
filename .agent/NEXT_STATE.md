@@ -3,11 +3,6 @@ updated_at: 2026-10-23
 phase: 3 T331 extraction; Phase5 T360/T361accepted, T362 next (Phases0–2 complete; baseline51.2974)
 
 ## Queue
-### T-44192 W2 — OPEN
-- target_files: backend/app/api/dbms_sql.py, backend/app/main.py
-- contract: T331 move unchanged SQL table-count metadata handler into typed SQL router registration.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,importlib,inspect,subprocess; old=ast.parse(subprocess.check_output(["git","show","cdd4ad2:backend/app/main.py"],text=True)); a=next(n for n in old.body if isinstance(n,ast.FunctionDef) and n.name=="dbms_tables"); a.decorator_list=[]; module=importlib.import_module("backend.app.api.dbms_sql"); b=next(n for n in ast.walk(ast.parse(inspect.getsource(module))) if isinstance(n,ast.FunctionDef) and n.name=="dbms_tables"); b.decorator_list=[]; assert ast.dump(a)==ast.dump(b); main=importlib.import_module("backend.app.main"); routes=[r for outer in main.app.routes for r in (outer.original_router.routes if hasattr(outer,"original_router") else [outer])]; assert sum(getattr(r,"endpoint",None) is main.dbms_tables for r in routes)==1; print("PASS exact table metadata handler and alias")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app/main.py backend/app/api/dbms_sql.py && .venv/bin/ruff format --check backend/app/main.py backend/app/api/dbms_sql.py
-
 ### T-44191 W3 — OPEN
 - target_files: backend/tests/test_contract_requests.py
 - contract: T330 P1 failing-first request contract regressions: reject new required query/header/body requirements that existing compatibility checker currently misses.
@@ -17,6 +12,7 @@ phase: 3 T331 extraction; Phase5 T360/T361accepted, T362 next (Phases0–2 compl
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44192 accepted2e9106e; verify0.
 - T-44190 acceptedcdd4ad2; verify0.
 - T-362 acceptedc0781f9; verify0.
 - T-360 accepted2ad337f; verify0.

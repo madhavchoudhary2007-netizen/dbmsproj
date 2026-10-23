@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: cdd4ad2
+git_head: 2e9106e
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -36,3 +36,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - Polyglotcdd4ad2 exactAST/alias+11snapshot/runtimePASS; rootfullrerun pending. Mypy216 latest beforepolyglot, strictzeroT339. Precise Collection/Connection/Database callbacks; transitional factory/helpers are T332 debt, C901 unchanged.
 - T362c0781f9 fonts+44px yellow first-focus skiplink+realmain landmarks accepted offline; root hostbuild/85axe/keyboard pending beforeT363. Taste: existingprimary unchanged, no newclutter/motion/shadow. Legacy giantfiles plannedcleanup.
 - Root corrected included-router probe/mypy namespace/C901estimate; worker placeholder Verify/count formats fixed before exact rerun. One accidental101-line display (no secrets), subsequent ranges capped80. Root authored0productlines.
+
+- T-44192 accepted2e9106e: Moved exact SQL table metadata handler with precise Connection/public-table callbacks;11 snapshot/runtime tests pass. Verify0.
