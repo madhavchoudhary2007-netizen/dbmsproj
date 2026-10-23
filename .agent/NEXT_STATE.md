@@ -3,15 +3,16 @@ updated_at: 2026-10-23
 phase: 2 security (Phase1 complete; baseline score51.2974)
 
 ## Queue
-### T-44143 W3 — OPEN
-- target_files: backend/tests/test_token_revocation_db.py, scripts/eval/db-baseline.sh
-- contract: Add real disposable-PostgreSQL tests for ADR008 repository and migration004. Worker verifies syntax/lint only offline; ROOT runs real tests on apexgrid-test before acceptance. No skip/xfail; explicitguard rejects non-testURL (port15432/dbapexgrid/localhost or127.0.0.1 and APEXGRID_TEST_STACK=1). Never run DB tests yourself.
-- verify: .venv/bin/ruff check backend/tests/test_token_revocation_db.py && .venv/bin/ruff format --check backend/tests/test_token_revocation_db.py && .venv/bin/python -m py_compile backend/tests/test_token_revocation_db.py
+### T-44144 W3 — OPEN
+- target_files: backend/tests/test_docs_security.py
+- contract: Record failing-first regression for T322 preserving documented interactiveAPI docs. API CSPdefaultnone currentlyalsoappliesSwagger/ReDocHTML, blocking theirCDNs/inlinebootstrap and breakingREADMEfeature. Add parametrized GET /docs,/redoc,/docs/oauth2-redirect tests status200, nosniff+XFrameDENY retained, noContent-Security-Policy ontheseexactlegacyHTMLpaths. API JSON /api/missing-security-test MUSTretainstrictCSPdefaultnone/frameancestorsnone. RootW2willlimitAPI-onlyCSPfor3exactHTMLpaths; nootherheadermodification.
+- verify: .venv/bin/ruff check backend/tests/test_docs_security.py && .venv/bin/ruff format --check backend/tests/test_docs_security.py && .venv/bin/python .agent/check-red-tests.py T-44144 backend/tests/test_docs_security.py
 
 ## Blocked
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44143 accepted9b8322c; verify0.
 - T-325 accepted2bff831; verify0.
 - T-44142 accepted42f0a46; verify0.
 - T-324 accepted61643df; verify0.
