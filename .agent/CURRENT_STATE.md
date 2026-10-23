@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 9731af5
+git_head: c728e2a
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex
@@ -41,3 +41,5 @@ last_eval_score: historical 100 claim is not a verified baseline for this overha
 - T-446 acceptedc9ab8a1:three routers Ruff+format0,67 changed lines, OpenAPI unchanged; full gate follows batch.
 - T-447 accepted9731af5:30 changed test lines, range format0 and exact whole-file AST preserved. Phase1 Ruff remaining494 (app335/tests159); parent gates still open.
 - T-449 first result FAILED:200-400 formatting exceeded150 cap(188). Worker narrowed edits to98 lines but original verify failed. Reverted clone target; repair packet200-300 retains full parent gate.
+- T-449 repair acceptedc728e2a:98 changed lines, exact AST unchanged, range-format0. Initial cap failure logged; no weakened parent check.
+- T-446/447 full disposable suite/live gate exit0:136 passed,0 skipped, all acceptance flows passed.
