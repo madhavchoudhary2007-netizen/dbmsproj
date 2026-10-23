@@ -74,6 +74,12 @@ from .demo_race_router import (
     run_demo_race_create,
     run_demo_race_delete,
 )
+from .membership_repository import (
+    create_membership as create_membership_row,
+    list_driver_memberships,
+    list_team_memberships,
+    update_membership as update_membership_row,
+)
 from .pit_repository import PIT_RESERVATION_SELECT, load_pit_strategy_rows, load_pit_telemetry
 from .pit_router import create_pit_router
 from .pit_strategy_router import create_pit_strategy_router
@@ -367,30 +373,24 @@ crud_routes("sessions", "race_sessions", ("id", "event_id", "session_type", "sch
 
 @app.get("/api/drivers/{driver_id}/memberships")
 def driver_memberships(driver_id: UUID, user=Depends(current_user)):
-    return jsonable(fetch_all("SELECT m.*,t.name AS team_name FROM team_memberships m JOIN teams t ON t.id=m.team_id WHERE m.driver_id=%s ORDER BY m.start_date DESC", (driver_id,)))
+    return jsonable(list_driver_memberships(driver_id))
 
 
 @app.get("/api/teams/{team_id}/memberships")
 def team_memberships(team_id: UUID, user=Depends(current_user)):
-    return jsonable(fetch_all("SELECT m.*,u.full_name AS driver_name,d.number,d.licence_number FROM team_memberships m JOIN drivers d ON d.id=m.driver_id LEFT JOIN users u ON u.id=d.user_id WHERE m.team_id=%s ORDER BY m.start_date DESC", (team_id,)))
+    return jsonable(list_team_memberships(team_id))
 
 
 @app.post("/api/team-memberships", status_code=201)
 def create_membership(body: MembershipIn, user=Depends(roles("ADMIN"))):
-    with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-        cur.execute("INSERT INTO team_memberships(driver_id,team_id,start_date,end_date) VALUES (%s,%s,%s,%s) RETURNING *", (body.driver_id,body.team_id,body.start_date,body.end_date))
-        row=cur.fetchone()
-    return jsonable(row)
+    return jsonable(create_membership_row(body))
 
 
 @app.patch("/api/team-memberships/{membership_id}")
 def update_membership(membership_id: UUID, body: MembershipPatch, user=Depends(roles("ADMIN"))):
-    values=body.model_dump(exclude_unset=True)
-    if not values: raise HTTPException(422,"At least one field is required")
-    fields=list(values)
-    with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-        cur.execute("UPDATE team_memberships SET "+",".join(f"{f}=%s" for f in fields)+" WHERE id=%s RETURNING *",[values[f] for f in fields]+[membership_id])
-        row=cur.fetchone()
+    if not body.model_dump(exclude_unset=True):
+        raise HTTPException(422,"At least one field is required")
+    row = update_membership_row(membership_id, body)
     if not row: raise HTTPException(404,"Membership not found")
     return jsonable(row)
 
