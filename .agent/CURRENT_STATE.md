@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 265c60d
+git_head: 7789fde
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -31,3 +31,7 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 
 ## Orchestrator direct edits
 - Requested modelprofilelines; architecture/ADR/docs/state/packets/envelopes/orchestrationhelpers only. T440 docs15lines. No authored productcode; integrating workerpatches is not bulkcode authorship.
+
+- T-44117 accepted7789fde: Applied Ruff canonical formatting to all three target files; 133 changed lines total. AST and canonical-content proofs passed for each file. Verify exit0; 133 changed lines.
+
+- Orchestrator integration boundary failure: own productionbuild regenerated next-env.d.ts; restored onlygenerateddiff, deferred T44118patch untilT44117accepted. Workeroutputs wereinscope; firstacceptfailures were orchestrator overlap, now repaired. Buildexit0.

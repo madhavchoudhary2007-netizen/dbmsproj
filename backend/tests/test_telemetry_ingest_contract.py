@@ -29,26 +29,30 @@ def _packet(session_id, driver_id, latest_packet):
     lap_time_ms = 90123
     latest_ts = datetime.fromisoformat(latest_packet["ts"].replace("Z", "+00:00"))
     return {
-        "session_id": session_id, "driver_id": driver_id,
+        "session_id": session_id,
+        "driver_id": driver_id,
         "ts": (latest_ts + timedelta(milliseconds=lap_time_ms)).isoformat().replace("+00:00", "Z"),
-        "lap": latest_packet["lap"] + 1, "sector": 0,
-        "elapsed_ms": latest_packet["elapsed_ms"] + lap_time_ms, "lap_time_ms": lap_time_ms,
-        "sector_ms": [30100, 30000, 30023], "position": 1,
-        "speed_kph": 210.5, "throttle_pct": 82.0, "brake_pct": 3.0,
-        "tire_compound": "MEDIUM", "tire_age_laps": 2,
-        "tire_wear_pct": 4.5, "tire_temp_c": [80.0, 82.0, 79.0, 81.0],
+        "lap": latest_packet["lap"] + 1,
+        "sector": 0,
+        "elapsed_ms": latest_packet["elapsed_ms"] + lap_time_ms,
+        "lap_time_ms": lap_time_ms,
+        "sector_ms": [30100, 30000, 30023],
+        "position": 1,
+        "speed_kph": 210.5,
+        "throttle_pct": 82.0,
+        "brake_pct": 3.0,
+        "tire_compound": "MEDIUM",
+        "tire_age_laps": 2,
+        "tire_wear_pct": 4.5,
+        "tire_temp_c": [80.0, 82.0, 79.0, 81.0],
         "pit_state": "TRACK",
     }
 
 
 def _latest_packet(client, admin, session_id, driver_id):
-    current = client.get(
-        f"/api/telemetry?session_id={session_id}", headers=admin
-    )
+    current = client.get(f"/api/telemetry?session_id={session_id}", headers=admin)
     assert current.status_code == 200, current.text
-    driver_packets = [
-        row for row in current.json() if row["driver_id"] == driver_id
-    ]
+    driver_packets = [row for row in current.json() if row["driver_id"] == driver_id]
     assert driver_packets, "generated race should have current driver telemetry"
     return max(
         driver_packets,
@@ -57,11 +61,30 @@ def _latest_packet(client, admin, session_id, driver_id):
 
 
 PACKET_KEYS = {
-    "id", "session_id", "driver_id", "ts", "lap", "sector", "elapsed_ms",
-    "lap_time_ms", "last_lap_ms", "sector_ms", "position", "speed_kph",
-    "throttle_pct", "brake_pct", "tire_compound", "tire_age_laps",
-    "tire_wear_pct", "tire_temp_c", "pit_state", "pit_reservation_id",
-    "pit_box_number", "pit_team_id", "pit_starts_at", "pit_ends_at",
+    "id",
+    "session_id",
+    "driver_id",
+    "ts",
+    "lap",
+    "sector",
+    "elapsed_ms",
+    "lap_time_ms",
+    "last_lap_ms",
+    "sector_ms",
+    "position",
+    "speed_kph",
+    "throttle_pct",
+    "brake_pct",
+    "tire_compound",
+    "tire_age_laps",
+    "tire_wear_pct",
+    "tire_temp_c",
+    "pit_state",
+    "pit_reservation_id",
+    "pit_box_number",
+    "pit_team_id",
+    "pit_starts_at",
+    "pit_ends_at",
 }
 
 
@@ -85,9 +108,7 @@ def _assert_persisted_and_readable(client, admin, collection, packet, response, 
     assert stored["lap"] == packet["lap"]
     assert stored["elapsed_ms"] == packet["elapsed_ms"]
 
-    listed = client.get(
-        f"/api/telemetry?session_id={packet['session_id']}", headers=admin
-    )
+    listed = client.get(f"/api/telemetry?session_id={packet['session_id']}", headers=admin)
     assert listed.status_code == 200, listed.text
     matching = [row for row in listed.json() if row["id"] == str(inserted_id)]
     assert len(matching) == 1
@@ -101,7 +122,8 @@ def _assert_inactive_rejected(client, admin, packet):
     inactive = next((row for row in sessions.json() if row["state"] != "ACTIVE"), None)
     if inactive:
         rejected = client.post(
-            "/api/telemetry/ingest", headers=admin,
+            "/api/telemetry/ingest",
+            headers=admin,
             json={**packet, "session_id": inactive["id"]},
         )
         assert rejected.status_code == 409
@@ -134,9 +156,7 @@ def test_seeded_telemetry_ingest_write_contract(database_api_client):
         accepted = client.post("/api/telemetry/ingest", headers=admin, json=packet)
         assert accepted.status_code == 202, accepted.text
         inserted_id = ObjectId(accepted.json()["packet"]["id"])
-        _assert_persisted_and_readable(
-            client, admin, collection, packet, accepted, inserted_id
-        )
+        _assert_persisted_and_readable(client, admin, collection, packet, accepted, inserted_id)
         _assert_inactive_rejected(client, admin, packet)
     finally:
         if collection is not None and inserted_id is not None:

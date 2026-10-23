@@ -41,7 +41,8 @@ class FakeCollection:
 
     def find(self, query):
         return FakeCursor(
-            row for row in self.documents
+            row
+            for row in self.documents
             if all(row.get(key) == value for key, value in query.items())
         )
 
@@ -86,9 +87,7 @@ def setup_api(monkeypatch):
             jsonable=lambda value: value,
             mongo_ready=lambda: collection,
             roles=lambda *_roles: lambda: "ADMIN",
-            telemetry_ws_payload=lambda document, packet_id: {
-                **document, "id": str(packet_id)
-            },
+            telemetry_ws_payload=lambda document, packet_id: {**document, "id": str(packet_id)},
             publish=lambda *event: events.append(event),
         )
     )
@@ -97,11 +96,20 @@ def setup_api(monkeypatch):
 
 def packet(driver=DRIVER_A, lap=1, sector=1, elapsed=1000, speed=200):
     return {
-        "session_id": str(SESSION), "driver_id": str(driver),
-        "ts": "2026-10-23T12:00:00Z", "lap": lap, "sector": sector,
-        "elapsed_ms": elapsed, "speed_kph": speed, "throttle_pct": 80,
-        "brake_pct": 0, "tire_compound": "MEDIUM", "tire_age_laps": 1,
-        "tire_wear_pct": 2, "tire_temp_c": [80], "pit_state": "TRACK",
+        "session_id": str(SESSION),
+        "driver_id": str(driver),
+        "ts": "2026-10-23T12:00:00Z",
+        "lap": lap,
+        "sector": sector,
+        "elapsed_ms": elapsed,
+        "speed_kph": speed,
+        "throttle_pct": 80,
+        "brake_pct": 0,
+        "tire_compound": "MEDIUM",
+        "tire_age_laps": 1,
+        "tire_wear_pct": 2,
+        "tire_temp_c": [80],
+        "pit_state": "TRACK",
     }
 
 
@@ -147,10 +155,12 @@ def test_older_and_conflicting_packets_are_rejected_without_side_effects(monkeyp
 def test_driver_streams_advance_independently_and_publish_once_per_new_packet(monkeypatch):
     client, collection, events = setup_api(monkeypatch)
     assert client.post("/api/telemetry/ingest", json=packet()).status_code == 202
-    assert client.post(
-        "/api/telemetry/ingest", json=packet(DRIVER_B, lap=0, elapsed=50)
-    ).status_code == 202
-    assert client.post(
-        "/api/telemetry/ingest", json=packet(DRIVER_B, lap=0, elapsed=40)
-    ).status_code == 409
+    assert (
+        client.post("/api/telemetry/ingest", json=packet(DRIVER_B, lap=0, elapsed=50)).status_code
+        == 202
+    )
+    assert (
+        client.post("/api/telemetry/ingest", json=packet(DRIVER_B, lap=0, elapsed=40)).status_code
+        == 409
+    )
     assert len(collection.documents) == len(events) == 2

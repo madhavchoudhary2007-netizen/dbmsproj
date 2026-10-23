@@ -8,15 +8,11 @@ phase: 1 honest green baseline
 - contract: canonical format only, exactAST preserved, <=150lines.
 - verify: .venv/bin/ruff check backend/tests/test_telemetry_ingest_contract.py backend/tests/test_telemetry_ordering.py backend/tests/test_telemetry_router_contract.py && .venv/bin/ruff format --check --output-format concise backend/tests/test_telemetry_ingest_contract.py backend/tests/test_telemetry_ordering.py backend/tests/test_telemetry_router_contract.py && .venv/bin/python .agent/check-format-progress.py backend/tests/test_telemetry_ingest_contract.py && .venv/bin/python .agent/check-format-progress.py backend/tests/test_telemetry_ordering.py && .venv/bin/python .agent/check-format-progress.py backend/tests/test_telemetry_router_contract.py
 
-### T-44117 W2 — OPEN
-- target_files: backend/app/pit_strategy_service.py, backend/app/membership_repository.py, backend/app/user_repository.py
-- contract: canonical format only, exactAST preserved, <=150lines.
-- verify: .venv/bin/ruff check backend/app/pit_strategy_service.py backend/app/membership_repository.py backend/app/user_repository.py && .venv/bin/ruff format --check --output-format concise backend/app/pit_strategy_service.py backend/app/membership_repository.py backend/app/user_repository.py && .venv/bin/python .agent/check-format-progress.py backend/app/pit_strategy_service.py && .venv/bin/python .agent/check-format-progress.py backend/app/membership_repository.py && .venv/bin/python .agent/check-format-progress.py backend/app/user_repository.py
-
 ## Blocked
 - T-310 remains open until full app Ruff/format exit0; T-311 accepted8570e58; no intermediate count is a parent pass.
 
 ## Done
+- T-44117 accepted7789fde; verify0.
 - T-44116 accepted265c60d; verify0.
 - T-441 accepteda49641c; verify0.
 - T-44115 accepted0224127; verify0.

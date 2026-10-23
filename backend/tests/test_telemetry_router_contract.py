@@ -50,10 +50,24 @@ def test_seeded_telemetry_and_live_read_contract(database_api_client):
     inserted_ids = []
     base = datetime(9998, 1, 1, tzinfo=UTC)
     packet_keys = {
-        "id", "session_id", "driver_id", "ts", "lap", "sector", "elapsed_ms",
-        "lap_time_ms", "sector_ms", "position", "speed_kph", "throttle_pct",
-        "brake_pct", "tire_compound", "tire_age_laps", "tire_wear_pct",
-        "tire_temp_c", "pit_state",
+        "id",
+        "session_id",
+        "driver_id",
+        "ts",
+        "lap",
+        "sector",
+        "elapsed_ms",
+        "lap_time_ms",
+        "sector_ms",
+        "position",
+        "speed_kph",
+        "throttle_pct",
+        "brake_pct",
+        "tire_compound",
+        "tire_age_laps",
+        "tire_wear_pct",
+        "tire_temp_c",
+        "pit_state",
     }
     samples = [
         (driver_ids[0], 1),
@@ -97,15 +111,14 @@ def test_seeded_telemetry_and_live_read_contract(database_api_client):
             assert limited.status_code == 200
             assert limited.json()[0]["id"] == str(inserted_ids[-1])
 
-            filtered = client.get(
-                f"{telemetry_url}&driver_id={driver_ids[0]}", headers=headers
-            )
+            filtered = client.get(f"{telemetry_url}&driver_id={driver_ids[0]}", headers=headers)
             assert filtered.status_code == 200
             tagged_filtered = [
                 row for row in filtered.json() if row["id"] in {str(i) for i in inserted_ids}
             ]
             assert [row["id"] for row in tagged_filtered] == [
-                str(inserted_ids[2]), str(inserted_ids[0])
+                str(inserted_ids[2]),
+                str(inserted_ids[0]),
             ]
 
             live = client.get(live_url, headers=headers)
