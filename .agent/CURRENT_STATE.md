@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: b1fec1c
+git_head: 4c4f401
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -52,3 +52,7 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T-44162 accepted9335c83: Integrated installed Tailwind4 adapter/token import and removed obsolete config; all legacy CSS rules preserved. Offline build/lint/types0. Verify0.
 
 - T-44163 acceptedb1fec1c: Wired gray/neutral checks into shared scanner and selftest, added inline JS style positive/negative controls.32gray assertions plus radius controls pass. Verify0.
+
+- T-44164 accepted4c4f401: Moved pure liveness handler to API router; retained main function/model aliases.21 focused tests and exact body proof pass. Verify0.
+
+- T44165root rejected before acceptance: bare blur utility and comma-containing filter-before-blur bypassed checker. Repair1 requested with regressions; no root product/test patch applied.
