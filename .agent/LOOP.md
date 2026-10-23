@@ -7,10 +7,16 @@
 - At most 15 more tasks before the first full evaluation. Then write the final report.
 
 branch: perfection-loop
-phase: 2 — structure, in progress
+harness: antigravity (Gemini 3.8 Flash, high thinking)
+phase: defect loop (evaluation score & ratchets)
 cycle: 0 of 8
-score: NOT_RUN
+score: 15.41
 
+- First full evaluation scored by T-177..T-180 and `scripts/eval/score.sh`: aggregate 15.41 (functional 30, aesthetic 13.33, performance 0, edge 15.38; failed gates: F-3, F-4, P-6; not_run: P-1, P-2). Defect loop begins focusing on highest-weight failed checks and ratchets (explicit any 45, ruff 540, mypy 222).
+- T-180 accepted: scored edge dimension E-1..E-5 honestly; responsive 320/5120 checks pass, other checks open.
+- T-179 accepted: scored performance dimension P-1..P-6 honestly; Lighthouse not installed (NOT_RUN), bundle/invariants/axe full viewports open.
+- T-178 accepted: scored aesthetic dimension A-1..A-7; spacing lint 154 hits, banned/motion scripts clean, palette/focal/reducedMotion open.
+- T-177 accepted: recorded evidence-based functional F-1..F-6 results; typecheck and build pass, lint and coverage replay open.
 - First full evaluation command `bash scripts/eval/full-gates.sh` ran after the 15-task cap: 11 gates, 6 failed. PASS: JWT deployment check, disposable DB backend/live acceptance, frontend typecheck/build, browser E2E. FAIL: Ruff 540, Ruff format, mypy 222, frontend strict lint 45, coverage replay (APP_ENV omitted in that separate invocation), npm audit (0 critical/7 high/2 moderate). Motion and banned lints pass; spacing lint fails on existing CSS values. Four W3 dimension packets T-177..180 then `score.sh` are queued.
 - T-176 accepted: deterministic simulation S311 exceptions justified narrowly; focused replay 4/4, Ruff back to 540, mypy 222. Fifteen owner-priority tasks accepted before first full evaluation, so no further product task dispatch until evaluation.
 - T-175 accepted: new generated races persist cryptographic seed and use stable per-driver/progress sector RNG; active restore loads seed. Four unmarked replay tests pass. Ruff rose 540→542 from two S311 findings on intentional deterministic RNG; T-176 queued to restore ratchet. Fourteen owner-priority tasks before evaluation; full isolated gate pending.
