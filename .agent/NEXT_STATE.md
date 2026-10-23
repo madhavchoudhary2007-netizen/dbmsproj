@@ -8,17 +8,13 @@ phase: 1 honest green baseline
 - target_files: backend/tests/test_api.py
 - contract: final format, E5014 and existing S311 pragma locations; identical AST, <=150
 - verify: .venv/bin/ruff check --select E501,S311 backend/tests/test_api.py && .venv/bin/ruff format --check backend/tests/test_api.py && .venv/bin/python -c 'import ast,pathlib,subprocess; p="backend/tests/test_api.py"; assert ast.dump(ast.parse(pathlib.Path(p).read_text())) == ast.dump(ast.parse(subprocess.check_output(["git","show","HEAD:"+p],text=True)))'
-### T-44103 — main long literal/comment cleanup
-- worker: W2 | priority: P1 | origin: bounded T-310 subdivision
-- target_files: backend/app/main.py
-- contract: unchanged AST/SQL/directives, strictly less E501, <=150 lines
-- verify: .venv/bin/python .agent/check-lint-progress.py backend/app/main.py E501
 ## Blocked
 - T-310/T-311 remain open until full parent Ruff/format/frontend-lint commands exit0; no intermediate count is a parent pass.
 - T-440 (O, before motion packets): align plan2.3/2.7 with owner100–300ms and display>=48px leading limits; those conflicting catalogue specifications are missing a correction task.
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-44103 accepted307771a; verify0.
 - T-44104 accepted639e5a9; verify0.
 - T-44102 accepted111241c; verify0.
 - T-44101 accepted19620dd; verify0.

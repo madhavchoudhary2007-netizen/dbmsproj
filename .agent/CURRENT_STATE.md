@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 639e5a9
+git_head: 307771a
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -61,3 +61,5 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 
 - T-44104 accepted639e5a9: Advanced142 lines of canonical API-test formatting with identical AST and canonical contents. Verify exit0; 142 changed lines.
 - Formatter moved four existing test RNG noqa pragmas away from offending call lines; narrow S311 findings resurfaced without behavior/AST change. T-44106 restores precise pragma placement while finishing format/E501; no new ignored rule.
+
+- T-44103 accepted307771a: Resolved26 main E501 findings preserving AST and directives; format remains green. Verify exit0; 150 changed lines.

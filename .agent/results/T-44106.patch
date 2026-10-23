@@ -1,0 +1,147 @@
+diff --git a/backend/tests/test_api.py b/backend/tests/test_api.py
+index 68cb768..8aa7f9e 100644
+--- a/backend/tests/test_api.py
++++ b/backend/tests/test_api.py
+@@ -1329,13 +1329,15 @@ def test_safety_car_slowdown_and_reserved_pit_state_are_applied():
+     normal = Simulation("session-1", [driver], 2)
+     safety = Simulation("session-1", [driver], 2)
+     normal_packets, _ = advance_simulation_tick(
+-        normal, datetime.now(timezone.utc), random.Random(4)
+-    )  # noqa: S311 -- seeded RNG makes paired safety-car simulation deterministic
++        normal,
++        datetime.now(timezone.utc),
++        random.Random(4),  # noqa: S311 -- seeded RNG makes paired safety-car simulation deterministic
++    )
+     safety_packets, timing = advance_simulation_tick(
+         safety,
+         datetime.now(timezone.utc),
+-        random.Random(4),
+-        safety_car=True,  # noqa: S311 -- seeded RNG keeps safety-car comparison on the same simulation path
++        random.Random(4),  # noqa: S311 -- seeded RNG keeps safety-car comparison on the same simulation path
++        safety_car=True,
+         pit_driver_ids={"driver-1"},
+     )
+     assert safety_packets[0]["sector_ms"][0] > normal_packets[0]["sector_ms"][0]
+@@ -1364,8 +1366,8 @@ def test_assigned_pit_metadata_is_scoped_to_the_assigned_driver():
+     packets, timing = advance_simulation_tick(
+         sim,
+         start,
+-        random.Random(9),
+-        pit_assignments={"driver-1": assignment},  # noqa: S311 -- seeded RNG makes assigned-pit simulation repeatable
++        random.Random(9),  # noqa: S311 -- seeded RNG makes assigned-pit simulation repeatable
++        pit_assignments={"driver-1": assignment},
+     )
+     by_driver = {packet["driver_id"]: packet for packet in packets}
+     assert by_driver["driver-1"]["pit_state"] == "IN_PIT"
+@@ -2326,10 +2328,10 @@ def test_admin_user_management_and_protected_driver_session_fields(database_api_
+             json={
+                 "user_id": user_id,
+                 "licence_number": f"TEST-{suffix}",
+-                "number": 900 + random.randrange(100),
++                "number": 900 + random.randrange(100),  # noqa: S311 -- seeded pseudo-random driver number is non-security API test data
+                 "eligibility": "RACE_BANNED",
+             },
+-        )  # noqa: S311 -- seeded pseudo-random driver number is non-security API test data
++        )
+         assert created_driver.status_code == 201, created_driver.text
+         driver = created_driver.json()
+         driver_id = driver["id"]
+@@ -2463,31 +2465,46 @@ def test_generated_demo_race_create_list_and_scoped_delete(database_api_client):
+             == 404
+         )
+         from backend.app.database import fetch_one
+-        assert fetch_one("SELECT count(*) AS count FROM pit_boxes WHERE event_id=%s", (event_id,))["count"] == 4
++
++        assert (
++            fetch_one("SELECT count(*) AS count FROM pit_boxes WHERE event_id=%s", (event_id,))[
++                "count"
++            ]
++            == 4
++        )
+     finally:
+         deleted = client.delete(f"/api/demo-races/{session_id}", headers=headers)
+         assert deleted.status_code == 204, deleted.text
+-    assert all(row["session_id"] != session_id for row in client.get("/api/demo-races", headers=headers).json())
++    assert all(
++        row["session_id"] != session_id
++        for row in client.get("/api/demo-races", headers=headers).json()
++    )
+     from backend.app.main import mongo_ready
+-    assert mongo_ready().count_documents({"session_id":session_id}) == 0
++
++    assert mongo_ready().count_documents({"session_id": session_id}) == 0
+     from backend.app.database import fetch_one
++
+     assert fetch_one("SELECT 1 FROM pit_boxes WHERE event_id=%s", (event_id,)) is None
+ 
+ 
+ @pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
+ def test_generated_demo_race_persistence_contract(database_api_client):
+     client = database_api_client
+-    login = client.post("/api/auth/login", json={"email":"admin@apexgrid.test", "password":"ApexGrid2026!"})
++    login = client.post(
++        "/api/auth/login", json={"email": "admin@apexgrid.test", "password": "ApexGrid2026!"}
++    )
+     assert login.status_code == 200, login.text
+-    headers = {"Authorization":"Bearer "+login.json()["access_token"]}
+-    created = client.post("/api/demo-races", headers=headers, json={"cars":6})
++    headers = {"Authorization": "Bearer " + login.json()["access_token"]}
++    created = client.post("/api/demo-races", headers=headers, json={"cars": 6})
+     assert created.status_code == 201, created.text
+     race = created.json()
+     session_id, event_id = race["session_id"], race["event_id"]
+     from backend.app.database import fetch_all, fetch_one
++
+     driver_ids, user_ids = [], []
+     try:
+-        persisted = fetch_one("""SELECT e.championship_id, rs.session_type, rs.state,
++        persisted = fetch_one(
++            """SELECT e.championship_id, rs.session_type, rs.state,
+             (SELECT count(*) FROM demo_race_entries
+                 WHERE session_id=d.session_id) AS entries,
+             (SELECT count(DISTINCT driver_id) FROM demo_race_entries
+@@ -2529,7 +2546,8 @@ def test_generated_demo_race_persistence_contract(database_api_client):
+         (SELECT count(*) FROM drivers WHERE id=ANY(%s)) AS drivers,
+         (SELECT count(*) FROM users WHERE id=ANY(%s)) AS users,
+         (SELECT count(*) FROM team_memberships WHERE driver_id=ANY(%s)) AS memberships""",
+-        (session_id, session_id, session_id, event_id, event_id, driver_ids, user_ids, driver_ids))
++        (session_id, session_id, session_id, event_id, event_id, driver_ids, user_ids, driver_ids),
++    )
+     assert list(remaining.values()) == [0] * 8
+ 
+ 
+@@ -2588,7 +2606,8 @@ def test_demo_delete_waits_for_simulator_and_validates_before_stopping(monkeypat
+         yield Connection()
+ 
+     class Collection:
+-        def delete_many(self, _query): events.append("mongo-delete")
++        def delete_many(self, _query):
++            events.append("mongo-delete")
+ 
+     async def exercise():
+         async def simulator():
+@@ -2596,6 +2615,7 @@ def test_demo_delete_waits_for_simulator_and_validates_before_stopping(monkeypat
+                 await asyncio.Future()
+             finally:
+                 events.append("simulator-stopped")
++
+         task = asyncio.create_task(simulator())
+         await asyncio.sleep(0)
+         sim = Simulation(session_id, [], 2, task=task, status="running")
+@@ -2623,10 +2643,13 @@ def test_demo_delete_waits_for_simulator_and_validates_before_stopping(monkeypat
+ @pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a seeded PostgreSQL database")
+ def test_auto_demo_race_keeps_archive_and_starts_new_session(database_api_client):
+     from backend.app.main import mongo_ready
++
+     client = database_api_client
+-    login = client.post("/api/auth/login", json={"email":"admin@apexgrid.test", "password":"ApexGrid2026!"})
+-    headers = {"Authorization":"Bearer "+login.json()["access_token"]}
+-    created = client.post("/api/demo-races", headers=headers, json={"cars":6})
++    login = client.post(
++        "/api/auth/login", json={"email": "admin@apexgrid.test", "password": "ApexGrid2026!"}
++    )
++    headers = {"Authorization": "Bearer " + login.json()["access_token"]}
++    created = client.post("/api/demo-races", headers=headers, json={"cars": 6})
+     assert created.status_code == 201, created.text
+     session_id = created.json()["session_id"]
+     sim = simulations[session_id]
