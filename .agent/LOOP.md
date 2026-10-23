@@ -11,6 +11,7 @@ phase: 2 — structure, in progress
 cycle: 0 of 8
 score: NOT_RUN
 
+- First full evaluation command `bash scripts/eval/full-gates.sh` ran after the 15-task cap: 11 gates, 6 failed. PASS: JWT deployment check, disposable DB backend/live acceptance, frontend typecheck/build, browser E2E. FAIL: Ruff 540, Ruff format, mypy 222, frontend strict lint 45, coverage replay (APP_ENV omitted in that separate invocation), npm audit (0 critical/7 high/2 moderate). Motion and banned lints pass; spacing lint fails on existing CSS values. Four W3 dimension packets T-177..180 then `score.sh` are queued.
 - T-176 accepted: deterministic simulation S311 exceptions justified narrowly; focused replay 4/4, Ruff back to 540, mypy 222. Fifteen owner-priority tasks accepted before first full evaluation, so no further product task dispatch until evaluation.
 - T-175 accepted: new generated races persist cryptographic seed and use stable per-driver/progress sector RNG; active restore loads seed. Four unmarked replay tests pass. Ruff rose 540→542 from two S311 findings on intentional deterministic RNG; T-176 queued to restore ratchet. Fourteen owner-priority tasks before evaluation; full isolated gate pending.
 - T-167 accepted: idempotent nullable migration 003 and repository seed persistence/dedicated grid RNG, focused two --runxfail cases pass. Ruff 540 (from 543), mypy 222. Thirteen owner-priority tasks accepted before evaluation; simulator/restore T-175 next.

@@ -1,8 +1,28 @@
 # NEXT_STATE
-updated_at: 2026-10-23T07:40:00Z
+updated_at: 2026-10-23T08:00:00Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
+### T-177 — first evaluation functional dimension
+- worker: W3 | priority: P1 | origin: EVAL first full-gates
+- target_files: .agent/eval/functional.json
+- contract: score F-1..F-6 from first full-gates and browser coverage evidence, mark unproven as false, NOT_RUN only unavailable tool
+- verify: jq -e '([.checks[].id] | sort)==(["F-1","F-2","F-3","F-4","F-5","F-6"] | sort)' .agent/eval/functional.json
+### T-178 — first evaluation aesthetic dimension
+- worker: W3 | priority: P1 | origin: EVAL first full-gates
+- target_files: .agent/eval/aesthetic.json
+- contract: score A-1..A-7 from three lint scripts and browser evidence; A-5/A-6 false pending orchestrator Taste review
+- verify: jq -e '([.checks[].id] | sort)==(["A-1","A-2","A-3","A-4","A-5","A-6","A-7"] | sort)' .agent/eval/aesthetic.json
+### T-179 — first evaluation performance dimension
+- worker: W3 | priority: P1 | origin: EVAL first full-gates
+- target_files: .agent/eval/performance.json
+- contract: score P-1..P-6; Lighthouse missing tool may be NOT_RUN, axe matrix from browser gate
+- verify: jq -e '([.checks[].id] | sort)==(["P-1","P-2","P-3","P-4","P-5","P-6"] | sort)' .agent/eval/performance.json
+### T-180 — first evaluation edge dimension
+- worker: W3 | priority: P1 | origin: EVAL first full-gates
+- target_files: .agent/eval/edge.json
+- contract: score E-1..E-5 from state/viewport/journey tests and actual gate results
+- verify: jq -e '([.checks[].id] | sort)==(["E-1","E-2","E-3","E-4","E-5"] | sort)' .agent/eval/edge.json
 
 ## Blocked
 - T-006: twice FAILED. Initial packet omitted `special-pages.tsx`; retry asserted empty/partial states without a screen-specific filter/list contract. No test accepted; requires a route-specific applicability matrix before new work.
