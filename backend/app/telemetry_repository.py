@@ -51,6 +51,9 @@ def insert_telemetry(
         query = {"session_id": str(session_id), "driver_id": str(driver_id)}
         try:
             existing = list(collection.find(query))
+            for persisted in existing:
+                if {key: value for key, value in persisted.items() if key != "_id"} == document:
+                    return TelemetryIngestResult(persisted, False)
             latest = max(
                 existing,
                 key=lambda row: (
@@ -60,8 +63,6 @@ def insert_telemetry(
                 default=None,
             )
             if latest is not None:
-                if {key: value for key, value in latest.items() if key != "_id"} == document:
-                    return TelemetryIngestResult(latest, False)
                 previous_position = (latest.get("lap", -1), latest.get("sector", -1))
                 incoming_position = (document["lap"], document["sector"])
                 if (
