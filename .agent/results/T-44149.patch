@@ -1,0 +1,67 @@
+diff --git a/backend/tests/snapshots/get-responses.json b/backend/tests/snapshots/get-responses.json
+new file mode 100644
+index 0000000..6edbc26
+--- /dev/null
++++ b/backend/tests/snapshots/get-responses.json
+@@ -0,0 +1 @@
++{"/api/auth/me":{"email":"contract-admin@example.invalid","full_name":"Contract Admin","id":"52047cfe-8a68-5899-a30e-dc677087a688","role":"ADMIN"},"/api/championships/b51a28b1-19fb-58da-8a31-7b2379950109":{"id":"b51a28b1-19fb-58da-8a31-7b2379950109","name":"Contract Championship","season":2026},"/api/circuits/98a936df-8af2-54b3-ac84-c2b5cc2b5080":{"country":"Fixtureland","id":"98a936df-8af2-54b3-ac84-c2b5cc2b5080","length_km":5.2,"name":"Contract Circuit"},"/api/drivers/3f4694fa-2294-534a-a8e4-19e2557d05dd":{"eligibility":"ACTIVE","email":"contract-driver@example.invalid","full_name":"Contract Driver","id":"3f4694fa-2294-534a-a8e4-19e2557d05dd","licence_number":"CONTRACT-001","number":91,"team_name":"Contract Team","user_id":"64001fae-19ac-59f4-86c4-de774611e991"},"/api/events/1a3e35e0-2c41-52fa-b2a9-3431efaf2001":{"championship_id":"b51a28b1-19fb-58da-8a31-7b2379950109","championship_name":"Contract Championship","circuit_country":"Fixtureland","circuit_id":"98a936df-8af2-54b3-ac84-c2b5cc2b5080","circuit_name":"Contract Circuit","id":"1a3e35e0-2c41-52fa-b2a9-3431efaf2001","name":"Contract Event","round_number":1,"start_date":"2026-01-01T00:00:00Z"},"/api/sessions/9f6dc8ba-2a44-5150-8807-e9f35202379f":{"circuit_name":"Contract Circuit","ended_at":null,"event_id":"1a3e35e0-2c41-52fa-b2a9-3431efaf2001","event_name":"Contract Event","id":"9f6dc8ba-2a44-5150-8807-e9f35202379f","safety_car":false,"scheduled_at":"2026-01-01T00:00:00Z","session_type":"RACE","started_at":null,"state":"SCHEDULED","total_laps":5},"/api/sessions/9f6dc8ba-2a44-5150-8807-e9f35202379f/laps":{"incidents":[],"laps":[],"pit_reservations":[],"session_id":"9f6dc8ba-2a44-5150-8807-e9f35202379f"},"/api/sessions/9f6dc8ba-2a44-5150-8807-e9f35202379f/live":{"drivers":[],"packets":[],"session":{"ended_at":null,"event_id":"1a3e35e0-2c41-52fa-b2a9-3431efaf2001","id":"9f6dc8ba-2a44-5150-8807-e9f35202379f","safety_car":false,"scheduled_at":"2026-01-01T00:00:00Z","session_type":"RACE","started_at":null,"state":"SCHEDULED","total_laps":5}},"/api/teams/047691b4-c669-5417-b85d-a465f850b89a":{"id":"047691b4-c669-5417-b85d-a465f850b89a","name":"Contract Team","principal_name":null,"principal_user_id":null},"/api/users/52047cfe-8a68-5899-a30e-dc677087a688":{"email":"contract-admin@example.invalid","full_name":"Contract Admin","id":"52047cfe-8a68-5899-a30e-dc677087a688","role":"ADMIN"}}
+diff --git a/backend/tests/test_contract_goldens.py b/backend/tests/test_contract_goldens.py
+new file mode 100644
+index 0000000..b455fd8
+--- /dev/null
++++ b/backend/tests/test_contract_goldens.py
+@@ -0,0 +1,54 @@
++import json
++import sys
++from pathlib import Path
++
++import pytest
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
++
++from backend.tests.contract_fixture import capture_contracts
++
++SNAPSHOT = Path(__file__).parent / "snapshots" / "get-responses.json"
++EXPECTED = json.loads(SNAPSHOT.read_text())
++
++
++def _assert_golden(expected, actual):
++    assert type(expected) is type(actual)
++    if isinstance(expected, dict):
++        assert expected.keys() <= actual.keys()
++        for key, value in expected.items():
++            _assert_golden(value, actual[key])
++    elif isinstance(expected, list):
++        assert len(expected) == len(actual)
++        for old_value, new_value in zip(expected, actual, strict=True):
++            _assert_golden(old_value, new_value)
++    else:
++        assert expected == actual
++
++
++@pytest.fixture(scope="module")
++def actual_responses():
++    return capture_contracts()
++
++
++@pytest.mark.parametrize("path", sorted(EXPECTED))
++def test_get_response_matches_golden(path, actual_responses):
++    assert path in actual_responses
++    _assert_golden(EXPECTED[path], actual_responses[path])
++
++
++def test_comparison_allows_additive_object_keys():
++    _assert_golden({"retained": {"id": 1}}, {"retained": {"id": 1, "added": True}})
++
++
++@pytest.mark.parametrize(
++    ("expected", "actual"),
++    [
++        ({"retained": 1, "removed": 2}, {"retained": 1}),
++        ({"value": 1}, {"value": 2}),
++        ({"value": 1}, {"value": True}),
++    ],
++)
++def test_comparison_rejects_removed_or_changed_values(expected, actual):
++    with pytest.raises(AssertionError):
++        _assert_golden(expected, actual)

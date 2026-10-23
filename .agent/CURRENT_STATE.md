@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 6ae5e39
+git_head: a5535b2
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -29,3 +29,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 ## Orchestrator direct edits
 - Requested modelprofilelines; architecture/ADR/docs/state/packets/envelopes/orchestrationhelpers only. T440 docs15lines. No authored productcode; integrating workerpatches is not bulkcode authorship.
 
+
+- T-44148 accepteda5535b2: Updated the disposable fixture to read MONGODB_URL, use PyJWT with a ten-minute token, insert users through the real connection, and close TestClient after capture. Verify exit0; 141 changed lines.
