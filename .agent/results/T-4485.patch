@@ -1,0 +1,264 @@
+diff --git a/backend/tests/test_api.py b/backend/tests/test_api.py
+index cec80e3..56cee5f 100644
+--- a/backend/tests/test_api.py
++++ b/backend/tests/test_api.py
+@@ -64,8 +64,13 @@ def auth_characterization_client():
+ 
+ 
+ def auth_characterization_user(password_hash=None):
+-    return {"id": 42, "email": "driver@example.test", "full_name": "Test Driver",
+-            "role": "DRIVER", "password_hash": password_hash}
++    return {
++        "id": 42,
++        "email": "driver@example.test",
++        "full_name": "Test Driver",
++        "role": "DRIVER",
++        "password_hash": password_hash,
++    }
+ 
+ 
+ def auth_characterization_fetch(monkeypatch, user):
+@@ -75,6 +80,7 @@ def auth_characterization_fetch(monkeypatch, user):
+         if "WHERE id=%s" in query and str(params[0]) == str(user["id"]):
+             return {key: user[key] for key in ("id", "email", "full_name", "role")}
+         return None
++
+     monkeypatch.setattr(main_module, "fetch_one", fetch_one)
+ 
+ 
+@@ -138,6 +144,7 @@ def test_auth_characterization_me_rejects_bad_or_expired_token(
+         access_token = auth_characterization_expired_token()
+     else:
+         import bcrypt
++
+         user["password_hash"] = bcrypt.hashpw(b"valid", bcrypt.gensalt()).decode()
+         signed = auth_characterization_login(auth_characterization_client, user, "valid")
+         token_value = signed.json()["access_token"]
+@@ -225,7 +232,8 @@ def test_cookie_auth_browser_shape(auth_characterization_client, monkeypatch):
+     user = auth_characterization_user(bcrypt.hashpw(b"correct horse", bcrypt.gensalt()).decode())
+     auth_characterization_fetch(monkeypatch, user)
+     response = auth_characterization_client.post(
+-        "/api/auth/login", json={"email": user["email"], "password": "correct horse"},
++        "/api/auth/login",
++        json={"email": user["email"], "password": "correct horse"},
+         headers={"Origin": "http://localhost:3000"},
+     )
+     assert response.status_code == 200
+@@ -276,9 +284,14 @@ def test_cookie_auth_logout_accepts_csrf_and_clears_both_cookies(
+     )
+     assert response.status_code in {200, 204}
+     headers = [value.lower() for value in response.headers.get_list("set-cookie")]
+-    cleared = {name for name in ("apexgrid_session", "apexgrid_csrf")
+-               if any(value.startswith(f"{name}=") and ("max-age=0" in value or "expires=" in value)
+-                      for value in headers)}
++    cleared = {
++        name
++        for name in ("apexgrid_session", "apexgrid_csrf")
++        if any(
++            value.startswith(f"{name}=") and ("max-age=0" in value or "expires=" in value)
++            for value in headers
++        )
++    }
+     assert cleared == {"apexgrid_session", "apexgrid_csrf"}
+ 
+ 
+@@ -330,7 +343,8 @@ def test_cookie_auth_guard_rejects_login_from_disallowed_origin(
+     user = auth_characterization_user(bcrypt.hashpw(b"correct horse", bcrypt.gensalt()).decode())
+     auth_characterization_fetch(monkeypatch, user)
+     response = auth_characterization_client.post(
+-        "/api/auth/login", json={"email": user["email"], "password": "correct horse"},
++        "/api/auth/login",
++        json={"email": user["email"], "password": "correct horse"},
+         headers={"Origin": "https://unapproved.example"},
+     )
+     assert response.status_code == 403
+@@ -441,18 +455,37 @@ def test_historical_archive_fills_missing_laps_without_replacing_recorded_data()
+ 
+     class Connection:
+         def execute(self, query, _params=None):
+-            return type("Result", (), {"fetchall": lambda _self: [session] if "SELECT s.*" in query else results})()
++            return type(
++                "Result",
++                (),
++                {"fetchall": lambda _self: [session] if "SELECT s.*" in query else results},
++            )()
++
++    recorded = {
++        "session_id": str(session_id),
++        "driver_id": str(first_driver),
++        "lap": 1,
++        "sector": 3,
++        "lap_time_ms": 123456,
++        "source": "recorded_telemetry",
++    }
++    partial = {
++        "session_id": str(session_id),
++        "driver_id": str(second_driver),
++        "lap": 1,
++        "sector": 1,
++        "lap_time_ms": None,
++        "source": "recorded_telemetry",
++    }
+ 
+-    recorded = {"session_id": str(session_id), "driver_id": str(first_driver), "lap": 1,
+-                "sector": 3, "lap_time_ms": 123456, "source": "recorded_telemetry"}
+-    partial = {"session_id": str(session_id), "driver_id": str(second_driver), "lap": 1,
+-               "sector": 1, "lap_time_ms": None, "source": "recorded_telemetry"}
+     class Collection:
+         def __init__(self):
+             self.inserted = []
++
+         def find(self, query, _projection):
+             assert query == {"session_id": str(session_id)}
+             return [recorded, partial]
++
+         def insert_many(self, docs):
+             self.inserted.extend(docs)
+ 
+@@ -501,11 +534,15 @@ def test_session_lap_limits_and_simulation_never_exceeds_72():
+     emitted = []
+     for tick in range(10 * 73):
+         packets, _ = advance_simulation_tick(
+-            sim, datetime(2026, 10, 5, 10, 0, tzinfo=timezone.utc), random.Random(tick),  # noqa: S311 -- tick-seeded RNG produces reproducible non-security simulation packets
++            sim,
++            datetime(2026, 10, 5, 10, 0, tzinfo=timezone.utc),
++            random.Random(tick),  # noqa: S311 -- tick-seeded RNG produces reproducible non-security simulation packets
+         )
+         emitted.append(packets[0])
+     assert max(packet["lap"] for packet in emitted) == 72
+-    sector_three_laps = [packet["lap"] for packet in emitted if packet["sector"] == 3 and packet["lap_time_ms"]]
++    sector_three_laps = [
++        packet["lap"] for packet in emitted if packet["sector"] == 3 and packet["lap_time_ms"]
++    ]
+     assert sector_three_laps == list(range(1, 73))
+ 
+ 
+@@ -759,23 +796,34 @@ def test_websocket_bus_keeps_newest_when_client_falls_behind():
+         assert q.get_nowait() == {"n": 5}
+         bus.unsubscribe("session-a", q)
+         assert not bus.clients["session-a"]
++
+     asyncio.run(exercise())
+ 
+ 
+ def test_contract_routes_are_registered():
+     paths = set(app.openapi()["paths"])
+     expected = {
+-        "/api/auth/login", "/api/auth/me", "/api/sessions/{session_id}/action",
+-        "/api/incidents/{incident_id}/decision", "/api/pit-reservations",
+-        "/api/telemetry/ingest", "/api/sessions/{session_id}/live",
+-        "/api/dbms/schema", "/api/dbms/polyglot", "/api/drivers/{driver_id}/memberships",
+-        "/api/teams/{team_id}/memberships", "/api/team-memberships/{membership_id}",
++        "/api/auth/login",
++        "/api/auth/me",
++        "/api/sessions/{session_id}/action",
++        "/api/incidents/{incident_id}/decision",
++        "/api/pit-reservations",
++        "/api/telemetry/ingest",
++        "/api/sessions/{session_id}/live",
++        "/api/dbms/schema",
++        "/api/dbms/polyglot",
++        "/api/drivers/{driver_id}/memberships",
++        "/api/teams/{team_id}/memberships",
++        "/api/team-memberships/{membership_id}",
+         "/api/sessions/{session_id}/simulate",
+         "/api/sessions/{session_id}/pit-strategy",
+-        "/api/demo-races", "/api/demo-races/{session_id}",
++        "/api/demo-races",
++        "/api/demo-races/{session_id}",
+         "/api/dbms/lock-demo",
+-        "/api/users", "/api/users/{user_id}",
+-        "/api/dashboard", "/api/analytics/drivers",
++        "/api/users",
++        "/api/users/{user_id}",
++        "/api/dashboard",
++        "/api/analytics/drivers",
+     }
+     assert expected <= paths
+ 
+@@ -1202,16 +1250,22 @@ def test_dashboard_analytics_characterization(database_api_client):
+     assert filtered.status_code == 200, filtered.text
+     filtered_rows = filtered.json()
+     assert len(filtered_rows) == 1 and filtered_rows[0]["driver_id"] == str(related["driver_id"])
+-    next_page = client.get("/api/analytics/drivers" + query.replace("offset=0", "offset=1"), headers=headers)
++    next_page = client.get(
++        "/api/analytics/drivers" + query.replace("offset=0", "offset=1"), headers=headers
++    )
+     assert next_page.status_code == 200 and next_page.json() == []
+     for params in ("limit=0", "offset=-1"):
+         invalid = client.get("/api/analytics/drivers?" + params, headers=headers)
+         assert invalid.status_code == 422, invalid.text
+ 
+     client.cookies.clear()
+-    driver_login = client.post("/api/auth/login", json={
+-        "email": "driver01@apexgrid.test", "password": "ApexGrid2026!",
+-    })
++    driver_login = client.post(
++        "/api/auth/login",
++        json={
++            "email": "driver01@apexgrid.test",
++            "password": "ApexGrid2026!",
++        },
++    )
+     assert driver_login.status_code == 200, driver_login.text
+     driver_headers = {"Authorization": "Bearer " + driver_login.json()["access_token"]}
+     client.cookies.clear()
+@@ -1219,27 +1273,54 @@ def test_dashboard_analytics_characterization(database_api_client):
+     assert client.get("/api/analytics/drivers", headers=driver_headers).status_code == 200
+ 
+ 
+-def test_dbms_mongo_collection_browser_lists_real_collections_and_pages_filtered_documents(monkeypatch):
++def test_dbms_mongo_collection_browser_lists_real_collections_and_pages_filtered_documents(
++    monkeypatch,
++):
+     class Cursor:
+         def __init__(self, docs):
+             self.docs = docs
++
+         def sort(self, key, direction):
+             self.docs.sort(key=lambda doc: doc.get(key), reverse=direction < 0)
+             return self
++
+         def skip(self, count):
+             self.docs = self.docs[count:]
+             return self
++
+         def limit(self, count):
+             self.docs = self.docs[:count]
+             return self
++
+         def __iter__(self):
+             return iter(self.docs)
+ 
+     class Collection:
+         docs = [
+-            {"_id": ObjectId(), "session_id": "race-a", "driver_id": "driver-a", "lap": 1, "sector": 3, "ts": 1},
+-            {"_id": ObjectId(), "session_id": "race-a", "driver_id": "driver-b", "lap": 1, "sector": 3, "ts": 2},
+-            {"_id": ObjectId(), "session_id": "race-b", "driver_id": "driver-a", "lap": 2, "sector": 2, "ts": 3},
++            {
++                "_id": ObjectId(),
++                "session_id": "race-a",
++                "driver_id": "driver-a",
++                "lap": 1,
++                "sector": 3,
++                "ts": 1,
++            },
++            {
++                "_id": ObjectId(),
++                "session_id": "race-a",
++                "driver_id": "driver-b",
++                "lap": 1,
++                "sector": 3,
++                "ts": 2,
++            },
++            {
++                "_id": ObjectId(),
++                "session_id": "race-b",
++                "driver_id": "driver-a",
++                "lap": 2,
++                "sector": 2,
++                "ts": 3,
++            },
+         ]
+         def count_documents(self, query):
+             return len([doc for doc in self.docs if all(doc.get(key) == value for key, value in query.items())])
