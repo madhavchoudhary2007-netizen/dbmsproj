@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 8f721ae
+git_head: 4789586
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -39,3 +39,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T44144testcaughtSwagger/ReDocbreakfromAPIdefaultnonepolicy; T44145 8f721ae exemptsONLY3legacyHTMLdocspaths, retainsAPI/404strictCSP,16testsPASS/mypy0. NoAPIshapechange. Rootfullrerunpending.
 - T44146Phase3OpenAPIguardpacketprepared, NOTdispatcheduntilPhase2closure. T33010GETgoldens follows; no refactorbeforeguard.
 - Ownacceptancehelper preservesNextgeneratednext-env bytes finally duringbuild (same3gates rerun); rootdidnot authorproductcode. Allsourcechecks/proofs in .agent/results/*.raw.log; onlyacceptedchildmetadata/state tracked.
+
+- T-320 accepted4789586: Close failing-first security milestone from accepted W3 children T-44133/T-44134 and their recorded red baselines; current 18 focused assertions pass after accepted implementations. Verify exit0; 0 changed lines.
