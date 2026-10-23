@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 5b0b7e4
+git_head: 6ae5e39
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -8,10 +8,13 @@ archetype: Neo-Brutal Motorsport (light); ADR007 approved
 last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF4; NOT_RUN P1/P2; notpresentable
 
 ## Phase and verified facts
-- Phase0 completeT300e465e89/T30113e6100/T30259a180e. ADR007 activated after owner approval; lock9010959b verifies, boot0. Work through all12phases per owner's latest instruction.
-- Phase1 T31035578c9/T3118570e58 accepted: WHOLEapp/testsRuff0 and43filesformatted; no remainingC901. T312e0f7adf selected3filesmypy0; freshglobal227 ->218 belowplan222. T3134089fb6 CIvalidator0; hostedCI NOT_RUN. T314c0c8061 scorer accepted;8regressionsPASS, F7/F8/F9+hardF2, missing/duplicate/unknown/reweighted/null evidence blocks delivery. All four freshdimension artifacts acceptedT44123..26; score51.2974 exit1honestbaseline, notdeliverable. Phase1complete; Phase2 implementation complete, finalchecks running.
-- Phase1 fullisolated144passed0failed/skipped/xfail and liveacceptanceallflowsPASS; browser1005PASS/all5projects after2originmockfixesT44128ad19d48. Typecheck/lint/build/Ruff44formatted/audit-high0; npm3moderate. Strictmypy218errors11/31files remainsT339. APIbaseline60d831ab5cc96051d2fa2caa9b4a2f25d89a6444c05c2a5ceed0aaf8c660346b capturedphase2.openapi-before.raw.json. CIvalidator0,hostedNOT_RUN.
-- Phase1 accepted child details live in git and phase1.evidence.json. Score51.2974 is baselineonly; F4realbrowserjourney, F8typing,A3/A5/A6lightdesign/bloat,P1/P2Lighthouse,P3assetgraph,P5FPS,E1/E2coverage stillgaps. No pass claim for incompletechecks.
+- Phases0–2 complete under approvedADR007; ownerwantsall12phases. Phase3 T330APIguard inprogress; no refactoruntilOpenAPI+10GETgoldenscomplete. Phase5foundationmayinterleaveperplan§4.
+- Phase1 T31035578c9/T3118570e58/T312e0f7adf/T3134089fb6/T314c0c8061 accepted. Full144PASS/livePASS; browser1005PASS(all5projects), rootbuild/lint/types0. HostedCI NOT_RUN. Exactchildhistoryin git andphase1.evidence.json.
+- Phase2 T3204789586/T321caf033f/T322a12bc68/T3233146736/T32461643df/T3252bff831 acceptedwithboundedchildren. ADR008JWTrevocation/004onlydisposablestack, logoutreuse401/WS4401, legacycompat/CSRF/outage/malformed tests. ADR011healthprocess/readiness6casesPASS. AlloldOpenAPIpaths/schemasunchanged; only2approvedhealthpathsadded. No realstacksourcebindmount/reload.
+- Phase2full184PASS0failed/skipped/xfail/livePASS twice inclT323accept. T324rootbuild/lint/types0+85axe/reducedmotionPASS, productionCSPsanitizedHTTPS/WSS/noeval. Bootstrapinlineunsafe-inline retainedcompatibility; evaldevonly. T441458f721ae preserves3legacyHTMLdocspathsfromAPI-onlyCSP; 16testsPASS, API/404strictretained.
+- Phase3 T441465b0b7e4 snapshot+9tests, full193PASS/livePASS. T441476ae5e39 union/ref/enumguard+7regressions16PASS, full200PASS/livePASS. Rootreproduced4pre-fixFAIL2PASSagainstoldhelper; firstrootprobefilenameimportfailedthenfixed, logged. Generatedredlogexcludedfromcommittedchangeenvelope, preservedseparately.
+- LatestRuffall0,55filesformatted, strictmypy217errors11/33files(T339). ThreeCSSlints0; neo lintNOT_RUN(notcreateduntilT360). Pip audit0; npmhighaudit0 with3moderate. P3missinglayout/sharedassetsT44132; LighthouseabsentP1/P2NOT_RUN; FPS17msnot16.7untilT413. Currentdarkvisualdesignnotyetapprovedlightimplementation; nofinishedscoreclaim.
+- T44148fixture141linesrootcaptured10realGETresponsestwiceidentically; transactionrollbackleft0ownusers/sessions. FirstcapturecaughtwrongMongoenv/ConnectionAPI; repairedonce, importsPyJWT/dynamicexpiry/clientclose. Goldencomparisonchildnext; noDBschema/handler/resultmock.
 
 ## Execution contracts
 - Only overhaul/neo-brutal; no merge/force/historyrewrite. Only accept.sh commits; rerun every Verify. <=3files/150changedlines perpacket. Atmost2 packet-only customworkers in ignoredsharedclones .agent/workspaces, dependency symlinks; workers nevercommit. Integrate sequentially, updatestate everyaccept.
@@ -26,22 +29,3 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 ## Orchestrator direct edits
 - Requested modelprofilelines; architecture/ADR/docs/state/packets/envelopes/orchestrationhelpers only. T440 docs15lines. No authored productcode; integrating workerpatches is not bulkcode authorship.
 
-- T44128ad19d48 fixes2hardcoded API mock origins withoutassertionchanges. Initialbrowser980PASS/25mock-originfail, focusedrepair25PASS, fullrerun1005PASS(3.1m) across5projects. Productionrebuild0; own generatednext-env diff restored.
-- ADR00834dbb99 accepted forplannedT323: keep existingopaquejti/CSRF, maptoUUIDrevocationkey, additive004onlydisposablestack, no-jticompatibility. Currentlockc05eeb0c. Realbackendcontainer hasno sourcebindmount, so editingrepo cannotautoreloaditsdatabase.
-- P3legacytoolreturns0butcountsroot+pageonly; shared/layoutassets omitted, do notclaimbudgetuntilT44132fix. LighthouseCLIabsent(P1/P2NOT_RUN). FPS17ms checkdoesnotprove16.7msuntilT413.
-- Ownacceptanceboundaryerrors fromgeneratednext-env andprematureparallelpatch application were reconciled by restoringonlyowngenerateddiff/deferringsecondpatch; workeroutputsinscope.
-
-- Phase1 fresh dimension artifactsT44123..26 accepted; historical commit detail in git. ADR011T44130/lockdb26; only2newhealthpaths acceptedT44129a3c0554 with6PASS and exactexistingOpenAPI preservation. T44136 fixed missingleaseexpecteddown testbug beforeacceptance.
-- Phase2 T44133/T44134 redtests accepted; T321CORS3PASS; T44135repo5red thenT44137repository/migration37lines5PASS/mypy0. T322all12header/CORS/healthPASS,mypy0. Migration004appliedonlydisposableapexgrid-test; realDBunchanged. No authoredorchestratorproductlines.
-
-- Phase2 accepted T321caf033f,T322a12bc68,T32461643df,T3252bff831 andboundedchildren in git. Revocationruntime12edd4e focused23PASS; edges3bb47c9 8PASS; realrepo9b8322c root4PASS transactionsrollback; 004appliedonlyapexgrid-test. Full180PASS0skip/livePASS beforedocsregressionfix; final184passed0failed/skipped/xfail+livePASS; T323accept rerun184PASS/livePASS.
-- T44142types42f0a46 fixesnewerrors; globalmypy217errors11/33files (T339), nofresherrorsleft. AlloldOpenAPIentriesunchanged; onlyADR011healthpathsadded. T324rootbuild/lint/types0+85axe/reducedmotionPASS; productionCSPsanitizedHTTPS/WSS/noevalcheck0. Inlinebootstrapcompatibilityrequiresunsafe-inline, dev-onlyunsafe-eval.
-- T44144testcaughtSwagger/ReDocbreakfromAPIdefaultnonepolicy; T44145 8f721ae exemptsONLY3legacyHTMLdocspaths, retainsAPI/404strictCSP,16testsPASS/mypy0. NoAPIshapechange. Rootfull184PASS/livePASS afterfix.
-- T44146Phase3OpenAPIguardpacketprepared, NOTdispatcheduntilPhase2closure. T33010GETgoldens follows; no refactorbeforeguard.
-- Ownacceptancehelper preservesNextgeneratednext-env bytes finally duringbuild (same3gates rerun); rootdidnot authorproductcode. Allsourcechecks/proofs in .agent/results/*.raw.log; onlyacceptedchildmetadata/state tracked.
-
-- T-320 accepted4789586: Close failing-first security milestone from accepted W3 children T-44133/T-44134 and their recorded red baselines; current 18 focused assertions pass after accepted implementations. Verify exit0; 0 changed lines.
-
-- T-323 accepted3146736: Close JWT revocation from accepted repository, additive migration, HTTP/WS enforcement and edge-test children. Root isolated full suite: 184 passed, zero skips, and live acceptance passed. Verify exit0; 0 changed lines.
-
-- T-44146 accepted5b0b7e4: Added an OpenAPI compatibility guard, captured the current schema snapshot, and added regression cases for breaking and additive changes. Verify exit0; 144 changed lines.

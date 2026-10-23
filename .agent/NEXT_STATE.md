@@ -3,15 +3,16 @@ updated_at: 2026-10-23
 phase: 3 API contract guard (Phases0–2 complete; baseline score51.2974)
 
 ## Queue
-### T-44147 W3 — OPEN
-- target_files: backend/tests/contract_compat.py, backend/tests/test_contract_compat_unions.py
-- contract: T330 guard gap found duringrootreview: current comparator ignores responsefields/types behind anyOf/oneOf/allOf and enumvalues, so nestedrequiredfieldremovalcanpass. Add failing tests first for union/ref nestedfield/type/enum removals, record actual red then fix ONLY testhelper; no productedits. Preserve existing9cases. Additivepaths/properties/unionbranches/refrenameequivalence stillpass. No refactoruntilallguardgapsclosed.
-- verify: env APP_ENV=local PYTHONPATH=backend DATABASE_URL=postgresql://127.0.0.1:1/unreachable MONGODB_URL=mongodb://127.0.0.1:1 .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_contract_compat_unions.py && .venv/bin/ruff check backend/tests/contract_compat.py backend/tests/test_contract_compat_unions.py && .venv/bin/ruff format --check backend/tests/contract_compat.py backend/tests/test_contract_compat_unions.py
+### T-44148 W3 — OPEN
+- target_files: backend/tests/contract_fixture.py
+- contract: T330 child2: add isolated real-store fixture/capture helper for TEN deterministic GET goldenresponses; no mocks ofSQL/results/handlers. Rootaloneexecutescapture ondisposable stackbeforeacceptance. All fixtureSQL inserts remain in one transaction alwaysrolledback; fakepool adapter routes REAL API SQL onto that same realconnection (no commits). No seeddata dependence, no persistedwrites, no startup/simulator/lifespan.
+- verify: .venv/bin/ruff check backend/tests/contract_fixture.py && .venv/bin/ruff format --check backend/tests/contract_fixture.py && .venv/bin/python -m py_compile backend/tests/contract_fixture.py
 
 ## Blocked
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44147 accepted6ae5e39; verify0.
 - T-44146 accepted5b0b7e4; verify0.
 - T-323 accepted3146736; verify0.
 - T-320 accepted4789586; verify0.
