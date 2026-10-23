@@ -1,13 +1,19 @@
 from collections.abc import Callable
-from typing import Any
+from contextlib import AbstractContextManager
+from typing import Any, Literal
 
 from fastapi import APIRouter
+from psycopg import Connection
+from psycopg.rows import tuple_row
+
+from ..database import DatabaseRow
 
 
 def create_dbms_sql_router(
     fetch_all: Callable[..., Any],
     jsonable: Callable[[Any], Any],
     admin_dependency: Any,
+    connection: Callable[[], AbstractContextManager[Connection[DatabaseRow]]],
 ) -> tuple[APIRouter, dict[str, Callable[..., Any]]]:
     router = APIRouter()
 
@@ -68,9 +74,26 @@ def create_dbms_sql_router(
         )
         return {"columns": columns, "relationships": relationships}
 
+    @router.get("/api/dbms/explain")
+    def dbms_explain(query: Literal["leaderboard", "licence"], user=admin_dependency):
+        sql = {
+            "leaderboard": (
+                "SELECT driver_id,lap_time_ms FROM session_results WHERE session_id=(S"
+                "ELECT id FROM race_sessions WHERE session_type='RACE' ORDER BY schedu"
+                "led_at LIMIT 1) AND lap_time_ms IS NOT NULL ORDER BY session_id,lap_t"
+                "ime_ms LIMIT 20"
+            ),
+            "licence": "SELECT id,licence_number FROM drivers WHERE licence_number='APX-DEMO'",
+        }[query]
+        with connection() as conn, conn.cursor(row_factory=tuple_row) as cur:
+            cur.execute("EXPLAIN (FORMAT JSON) " + sql)
+            plan = cur.fetchone()[0]
+        return {"query": query, "plan": plan}
+
     return router, {
         "dbms_schema": dbms_schema,
         "dbms_indexes": dbms_indexes,
         "dbms_locks": dbms_locks,
         "dbms_eer": dbms_eer,
+        "dbms_explain": dbms_explain,
     }

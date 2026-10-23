@@ -14,7 +14,7 @@ from concurrent.futures import Future, ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeout
 from contextlib import asynccontextmanager, suppress
 from datetime import UTC, datetime, timedelta
-from typing import Any, Literal
+from typing import Any
 from uuid import UUID, uuid4
 
 import jwt
@@ -1794,11 +1794,13 @@ dbms_sql_router, dbms_sql_handlers = create_dbms_sql_router(
     lambda *a, **kw: fetch_all(*a, **kw),
     lambda v: jsonable(v),
     admin_dependency,
+    lambda: connection(),
 )
 dbms_schema = dbms_sql_handlers["dbms_schema"]
 dbms_indexes = dbms_sql_handlers["dbms_indexes"]
 dbms_locks = dbms_sql_handlers["dbms_locks"]
 dbms_eer = dbms_sql_handlers["dbms_eer"]
+dbms_explain = dbms_sql_handlers["dbms_explain"]
 app.include_router(dbms_sql_router)
 
 
@@ -2084,23 +2086,6 @@ def session_laps(session_id: UUID, user=authenticated_user_dependency):
     return jsonable(
         {"session_id": session_id, "laps": laps, "incidents": incidents, "pit_reservations": stops}
     )
-
-
-@app.get("/api/dbms/explain")
-def dbms_explain(query: Literal["leaderboard", "licence"], user=admin_dependency):
-    sql = {
-        "leaderboard": (
-            "SELECT driver_id,lap_time_ms FROM session_results WHERE session_id=(S"
-            "ELECT id FROM race_sessions WHERE session_type='RACE' ORDER BY schedu"
-            "led_at LIMIT 1) AND lap_time_ms IS NOT NULL ORDER BY session_id,lap_t"
-            "ime_ms LIMIT 20"
-        ),
-        "licence": "SELECT id,licence_number FROM drivers WHERE licence_number='APX-DEMO'",
-    }[query]
-    with connection() as conn, conn.cursor(row_factory=tuple_row) as cur:
-        cur.execute("EXPLAIN (FORMAT JSON) " + sql)
-        plan = cur.fetchone()[0]
-    return {"query": query, "plan": plan}
 
 
 @app.post("/api/dbms/constraint-demo")
