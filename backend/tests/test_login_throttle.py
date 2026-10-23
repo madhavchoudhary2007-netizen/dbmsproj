@@ -1,10 +1,8 @@
 """Database independent contract tests for login attempt throttling."""
 
-import pytest
+from app.auth_router import create_auth_router
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-
-from app.auth_router import create_auth_router
 
 
 def _client(monkeypatch, *, users=None, host="192.0.2.1"):
@@ -43,7 +41,6 @@ def test_invalid_credentials_keep_existing_response(monkeypatch):
     )
 
 
-@pytest.mark.xfail(strict=True, reason="F-ACE01")
 def test_sixth_attempt_for_normalized_account_is_limited_across_sources(monkeypatch):
     client = _client(monkeypatch)
     for attempt in range(5):
@@ -55,7 +52,6 @@ def test_sixth_attempt_for_normalized_account_is_limited_across_sources(monkeypa
     assert "Retry-After" in response.headers
 
 
-@pytest.mark.xfail(strict=True, reason="F-ACE01")
 def test_sixth_attempt_for_source_is_limited_across_accounts_and_proxy_headers(monkeypatch):
     client = _client(monkeypatch)
     for attempt in range(5):
@@ -74,7 +70,6 @@ def test_sixth_attempt_for_source_is_limited_across_accounts_and_proxy_headers(m
     assert "Retry-After" in response.headers
 
 
-@pytest.mark.xfail(strict=True, reason="F-ACE01")
 def test_unknown_accounts_are_limited_and_recover_after_window(monkeypatch):
     import time
 

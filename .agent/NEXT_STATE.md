@@ -1,12 +1,17 @@
 # NEXT_STATE
-updated_at: 2026-10-23T05:01:33Z
+updated_at: 2026-10-23T05:04:42Z
 loop_iteration: 0 of 8
 
 ## Queue (owner override; top-down; <=3 target files and <=150 changed lines per task)
-### T-163 — F-ACE01 enforced login throttling
-- worker: W2 | priority: P2 | after: T-162
+### T-168 — F-ACE01 successful-login regression
+- worker: W3 | priority: P2 | origin: full isolated gate after T-163
+- target_files: backend/tests/test_login_throttle.py
+- contract: strict xfail proving repeated valid logins and shared-source valid users remain allowed; preserve prior throttle assertions
+- verify: APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_login_throttle.py
+### T-169 — F-ACE01 count failed attempts only
+- worker: W2 | priority: P2 | after: T-168
 - target_files: backend/app/auth_router.py, backend/app/login_limiter.py
-- contract: atomic bounded 5-attempt/60s per-account and per-source limiter using trusted client address; 429 Retry-After; no account existence leak
+- contract: reserve atomically, release successful attempts by own token, retain per-account/source failed-attempt throttle
 - verify: APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q --runxfail backend/tests/test_login_throttle.py
 ### T-164 — F-DOM-04 ordered telemetry reproduction
 - worker: W3 | priority: P2 | after: F-E02
@@ -36,6 +41,7 @@ loop_iteration: 0 of 8
 - T-014: split into ADR-002 backend/frontend/browser/acceptance packets T-050..055; implementation follows reproducing tests.
 
 ## Done this iteration (recent; older accepted evidence in git/LOOP.md)
+- T-163 ✓ 2bb95f8; focused 4/4, full isolated 90 pass/35 fail from counting successful logins; repair T-168/169.
 - T-162 ✓ 6963b4f; 1 pass/3 strict xfails; --runxfail proved 3 missing-429 failures.
 - T-161 ✓ 97c7268; session action characterization passed.
 - T-160 ✓ 8b60194; membership router/repository split accepted, full isolated backend 120/0/0.
