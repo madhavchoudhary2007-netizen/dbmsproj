@@ -13,15 +13,11 @@ phase: 3 T331 extraction; Phase5 T360/T361accepted, T362 next (Phases0–2 compl
 - contract: T331 move unchanged incident-list endpoint into API stewards module.
 - verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,importlib,inspect,subprocess; old=ast.parse(subprocess.check_output(["git","show","5898b4f:backend/app/main.py"],text=True)); a=next(n for n in old.body if isinstance(n,ast.FunctionDef) and n.name=="get_incidents"); a.decorator_list=[]; mod=importlib.import_module("backend.app.api.stewards"); b=next(n for n in ast.walk(ast.parse(inspect.getsource(mod))) if isinstance(n,ast.FunctionDef) and n.name==a.name); b.decorator_list=[]; assert ast.dump(a)==ast.dump(b); m=importlib.import_module("backend.app.main"); routes=[r for outer in m.app.routes for r in (outer.original_router.routes if hasattr(outer,"original_router") else [outer])]; assert sum(getattr(r,"endpoint",None) is m.get_incidents for r in routes)==1; print("PASS exact incident list and alias")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app/main.py backend/app/api/stewards.py && .venv/bin/ruff format --check backend/app/main.py backend/app/api/stewards.py
 
-### T-44199 W2 — OPEN
-- target_files: frontend/lib/cn.ts, frontend/lib/use-reduced-motion.ts
-- contract: T364 first foundations: dependency-free class join helper and SSR-safe reduced-motion subscription.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
 ## Deferred
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44199 acceptedf9dc8e6; verify0.
 - T-44198 accepted5898b4f; verify0.
 - T-44197 accepted8c03959; verify0.
 - T-44196 acceptedd0bb56a; verify0.
