@@ -3,14 +3,15 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-313 W3 — OPEN
-- target_files: .github/workflows/ci.yml
-- contract: RequiredCIgates with servicecontainers; temporarymypyexceptiononly.
-- verify: npx --offline --yes @action-validator/cli .github/workflows/ci.yml
+### T-314 W3 — OPEN
+- target_files: scripts/eval/score.sh, .agent/protocol/evaluation.md, backend/tests/test_score.py
+- contract: ADR007 newweights/hardF2, rejectmissing/duplicate/reweighted/null evidence fordelivery.
+- verify: .venv/bin/pytest -q backend/tests/test_score.py && .venv/bin/ruff check backend/tests/test_score.py && .venv/bin/ruff format --check --output-format concise backend/tests/test_score.py
 
 ## Blocked
 
 ## Done
+- T-313 accepted4089fb6; verify0.
 - T-312 acceptede0f7adf; verify0.
 - T-310 accepted35578c9; verify0.
 - T-44122 accepted024f663; verify0.
