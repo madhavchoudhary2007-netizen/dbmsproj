@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-23
-git_head: 518b4b4
+git_head: b069dab
 branch: overhaul/neo-brutal
 architect_sha256: 9010959b1dacd9fc6b7d9af9afb9ee57fcd7a4753ea9557e397c90ca6982e1a0
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high
@@ -64,3 +64,7 @@ last_eval_score: no verified overhaul score; historical100 omits new gates
 
 
 - T-44112 accepted518b4b4: Merged two lock-demo context pairs; normalized With AST and ordering identical. Verify exit0; 138 changed lines.
+
+- T-44111 acceptedb069dab: Composed CRUD and session action SQL with psycopg.sql; used static action SET fragments and reused CRUD 404 checks while preserving action flow. Verify exit0; 62 changed lines.
+
+- T-44111 worker envelope counts27/23 corrected from git numstat35/27 before acceptance; actual62lines in scope, verify0. Full isolated rerun pending.

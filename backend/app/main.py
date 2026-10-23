@@ -741,14 +741,18 @@ def decide_incident(incident_id: UUID, body: Decision, user=admin_steward_depend
 app.include_router(create_pit_router(current_user, jsonable))
 
 
-@app.post("/api/pit-reservations", status_code=201)
-def reserve_pit(body: ReservationIn, user=admin_steward_principal_dependency):
+def _require_principal_own_team(team_id: UUID, user: dict[str, Any]) -> None:
     if user["role"] == "PRINCIPAL":
         own_team = fetch_one(
-            "SELECT id FROM teams WHERE id=%s AND principal_user_id=%s", (body.team_id, user["id"])
+            "SELECT id FROM teams WHERE id=%s AND principal_user_id=%s", (team_id, user["id"])
         )
         if not own_team:
             raise HTTPException(403, "Principals may reserve pit boxes only for their own team")
+
+
+@app.post("/api/pit-reservations", status_code=201)
+def reserve_pit(body: ReservationIn, user=admin_steward_principal_dependency):
+    _require_principal_own_team(body.team_id, user)
     try:
         with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
@@ -775,12 +779,7 @@ def reserve_pit(body: ReservationIn, user=admin_steward_principal_dependency):
 
 @app.post("/api/pit-reservations/auto", status_code=201)
 def reserve_pit_auto(body: AutoReservationIn, user=admin_steward_principal_dependency):
-    if user["role"] == "PRINCIPAL":
-        own_team = fetch_one(
-            "SELECT id FROM teams WHERE id=%s AND principal_user_id=%s", (body.team_id, user["id"])
-        )
-        if not own_team:
-            raise HTTPException(403, "Principals may reserve pit boxes only for their own team")
+    _require_principal_own_team(body.team_id, user)
     session = fetch_one("SELECT state FROM race_sessions WHERE id=%s", (body.session_id,))
     if not session:
         raise HTTPException(404, "Session not found")

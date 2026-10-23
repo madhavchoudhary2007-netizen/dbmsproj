@@ -3,10 +3,10 @@ updated_at: 2026-10-23
 phase: 1 honest green baseline
 
 ## Queue
-### T-44111 W2 — OPEN
+### T-44113 W2 — OPEN
 - target_files: backend/app/main.py
-- contract: preserve SQL/action behavior; S6080/session_action C9010.
-- verify: .venv/bin/ruff check --select S608 backend/app/main.py && .venv/bin/python -c "import ast,subprocess; p='backend/app/main.py'; s=open(p).read(); n=next(n for n in ast.parse(s).body if isinstance(n,ast.AsyncFunctionDef) and n.name=='session_action'); subprocess.run(['.venv/bin/ruff','check','--select','C901','--stdin-filename',p,'-'],input=ast.get_source_segment(s,n),text=True,check=True)" && .venv/bin/ruff format --check backend/app/main.py
+- contract: share equivalent principal own-team authorization guard, preserve order/errors.
+- verify: .venv/bin/python -c "import ast,subprocess; p='backend/app/main.py'; s=open(p).read(); n=next(n for n in ast.parse(s).body if isinstance(n,ast.FunctionDef) and n.name=='reserve_pit_auto'); subprocess.run(['.venv/bin/ruff','check','--select','C901','--stdin-filename',p,'-'],input=ast.get_source_segment(s,n),text=True,check=True)" && .venv/bin/ruff format --check backend/app/main.py
 
 ## Blocked
 - T-310 remains open until full app Ruff/format exit0; T-311 accepted8570e58; no intermediate count is a parent pass.
@@ -14,6 +14,7 @@ phase: 1 honest green baseline
 - T-441 (W3, before T-360 palette change): add heading-contrast regression for real contrast<=1, preserving4.5 threshold and excluding aria-hidden decorative duplicates only; current >1 filter omits failures.
 
 ## Done
+- T-44111 acceptedb069dab; verify0.
 - T-44112 accepted518b4b4; verify0.
 - T-44110 acceptedfd42784; verify0.
 - T-44107 accepted2429939; verify0.
