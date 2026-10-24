@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 14da91f
+git_head: 869f5aa
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -40,3 +40,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - T-44259 accepted905b786: Stage typed result-write router with explicit helper dependencies and AST-identical implementation; no main wiring yet. Verify0.
 
 - T-44260 accepted14da91f: Correct four remaining measured light-shell contrast selectors using approved ink/yellow surfaces and token spacing. Verify0.
+
+- T-44261 accepted869f5aa: Wire result-write router with late-bound dependencies, legacy save_results alias and explicit ResultIn reexport. Verify0.

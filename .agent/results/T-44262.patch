@@ -1,0 +1,22 @@
+diff --git a/frontend/app/styles/shell.css b/frontend/app/styles/shell.css
+index ec32c9f..ad9dec6 100644
+--- a/frontend/app/styles/shell.css
++++ b/frontend/app/styles/shell.css
+@@ -110,7 +110,7 @@
+ .nb-shell .user-info b { font-size: 14px; }
+ .nb-shell .user-info small { font-size: 12px; }
+ .nb-shell .user-tile > button {
+-  width: 44px; height: 44px; display: grid; flex: 0 0 44px; place-items: center;
++  width: 48px; height: 48px; display: grid; flex: 0 0 48px; place-items: center;
+   padding: 0; color: var(--nb-ink); border: var(--nb-border); background: var(--nb-paper);
+ }
+ 
+@@ -206,7 +206,7 @@
+     display: inline-flex; width: 48px; height: 48px; flex: 0 0 48px;
+   }
+   .nb-shell .close-nav {
+-    display: inline-flex; width: 44px; height: 44px; flex: 0 0 44px;
++    display: inline-flex; width: 48px; height: 48px; flex: 0 0 48px;
+     margin-left: auto;
+   }
+   .nb-shell .mobile-menu:focus-visible,
