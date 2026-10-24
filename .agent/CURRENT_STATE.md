@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: ad1383a
+git_head: 145c55f
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -50,3 +50,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 
 - T-44253 accepted2aa2b87: Rename reserved local module variable while preserving real-source VM execution and every mapper assertion. Verify0.
 
+
+- T-44254 accepted145c55f: Stage typed results-read/standings/recalculation router with identical handler bodies and explicit legacy map; main not wired yet. Verify0.
