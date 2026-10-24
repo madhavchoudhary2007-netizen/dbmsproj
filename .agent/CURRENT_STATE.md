@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 60cc688
+git_head: 86d745b
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -17,7 +17,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - Preserve legacy main aliases and late-bound callbacks: Decision removal caused7 failures fixed5ee4710. OpenAPI alone cannot prove Python alias/runtime uniqueness compatibility.
 
 ## Next work
-- T380 staged LoginArt/CSS622aafa; T44268 wiring6590437 accepted with mobile240px/contrast/copy fixes and unused legacy CSS removal. T44271 form primitives a98c95c accepted; browser65pass5palettefail initially; W1T44275 lightbody/redfeed12449c7 and W3T44278 realform/font/finite-animation synchronization3bade73 accepted, rerun70PASS; post-cleanup c16e5bb/b6fa4ad again70PASS T44283.browser.raw.log. Dashboard hook d7ece24 exactlogic and exactpage copy1f7a2d7 wired b8d5460; Session data hook7cb29bf accepted; remaining T379 page splits pending. Auth logic untouched. Pit reservation servicee5507c9 exact3bodies staged; T44269 thinrouter ed34d9d accepted; T44270 wiring298fef5 accepted. Full pit gate repaired by W3T44274 recursive discovery only (original STEWARD assertion retained):231pass0skip/livePASS. Restore helpers48bdf7b full231pass0skip/livePASS; auto restore097578f exactAST moved, full running.
+- T380 staged LoginArt/CSS622aafa; T44268 wiring6590437 accepted with mobile240px/contrast/copy fixes and unused legacy CSS removal. T44271 form primitives a98c95c accepted; browser65pass5palettefail initially; W1T44275 lightbody/redfeed12449c7 and W3T44278 realform/font/finite-animation synchronization3bade73 accepted, rerun70PASS; post-cleanup c16e5bb/b6fa4ad again70PASS T44283.browser.raw.log. Dashboard hook d7ece24 exactlogic and exactpage copy1f7a2d7 wired b8d5460; Session data hook7cb29bf accepted; remaining T379 page splits pending. Auth logic untouched. Pit reservation servicee5507c9 exact3bodies staged; T44269 thinrouter ed34d9d accepted; T44270 wiring298fef5 accepted. Full pit gate repaired by W3T44274 recursive discovery only (original STEWARD assertion retained):231pass0skip/livePASS. Restore helpers48bdf7b full231pass0skip/livePASS; auto restore097578f exactAST moved and full231pass0skip/livePASS T44280.full.raw.log.
 - Phase6 parent T370/T371 accepted da5a72d/current HEAD. Root481 browser checks PASS in combined evidence T370.evidence.raw.json:85axe,20edge,15feed,10drawer,80routes,75targets,80primary,20auth,96responsive. Build/types/lint/fourCSS gates0. Cache4 and mapper3 offline cases pass. Shell retains routes/auth/copy/hash hooks; real next_event additive ADR012 in place.
 - Start Phase7 login/dashboard before resources/live/session/stewards/pits/standings/analytics/DBMS. Use docs/overhaul-plan.md graph; DBMS showcase also requires Phase4. T331 backend continues in parallel; keep main aliases/latecallbacks and run full disposable suite after each wiring.
 - Palette across redesigned routes remains unverified; no band widening. Final score only atT430. Phase5 primitives60 browser cases passed; development guide hidden in production.
@@ -34,12 +34,6 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - Worker review caught nested main/dead modal control (corrected), accidental root demo hook (removed only worker-owned unaccepted copy), and T44232 complexity suppression/locals namespace tricks (rejected, standard explicit helper accepted). No other work reverted; no test weakened.
 
 ## Orchestrator direct edits
-- T-44250: 8 additions/4 removals in shell.tsx as cross-worker glue connecting accepted W1 presenters and W2 hook/mapper; no bulk implementation. Metadata, architecture/config/ADRs, packets/state/envelopes/root acceptance helpers and approved installs only. Applying worker patches is integration, not authorship. No new dependencies this continuation.
+- T-44250: 8 additions/4 removals in shell.tsx as cross-worker glue connecting accepted W1 presenters and W2 hook/mapper; no bulk implementation. Metadata, architecture/config/ADRs, packets/state/envelopes/root acceptance helpers and approved installs only. Applying worker patches is integration, not authorship. No new dependencies this continuation. Root build/types/lint afterinitiallogin cleanup0 (T44283.build.raw.log); final login repair build pending.
 
-- TASTE login screenshot T44283: broken AG wrap/lime, tiny checker, card5sizes/textovergrid. T44284 scoped type/brand/checker/backing repair in progress; no threshold changes. T44285 SessionPage operations move in progress.
-
-- T-44285 accepted58aad6d: Extract three SessionPage async operations with typed callbacks and exact request/error ordering; JSX unchanged. Verify0.
-
-- T-44284 accepted27ee284: Fix measured login taste defects:44px yellow AG mark, three form type tiers, solid text backing and full-width checker texture. Verify0.
-
-- T-44286 accepted60cc688: Stage three typed session write operations with unchanged serialization, modal updates and busy/error handling. Verify0.
+- TASTE login screenshot T44283: broken AG wrap/lime, tiny checker, card5sizes/textovergrid. T44284 scoped type/brand/checker/backing27ee284 accepted,70browserPASS; settled375 screenshotstillclipsmotifs, W1T44289 repair and W3T44290 containment/busytests in progress. T44285 SessionPage operations58aad6d moved, T44286 writes60cc688 staged; simulatorpresentationT44288 stage acceptance pending.

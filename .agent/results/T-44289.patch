@@ -1,0 +1,24 @@
+diff --git a/frontend/app/styles/login.css b/frontend/app/styles/login.css
+index 214b971..53d0d66 100644
+--- a/frontend/app/styles/login.css
++++ b/frontend/app/styles/login.css
+@@ -50,8 +50,9 @@ html:has(.nb-login), body:has(.nb-login) { color-scheme: light; background: var(
+   .nb-login.login-screen { grid-template-columns: 1fr; }
+   .nb-login .login-visual { min-height: 240px; height: 240px; padding: 16px; border-inline-end: 4px solid var(--nb-ink, #000000); border-block-end: 0; }
+   .nb-login .login-brand, .nb-login .visual-footer { display: none; }
+-  .nb-login .nb-login-art-body { gap: 4px; }
++  .nb-login .nb-login-art-body { min-height: 0; gap: 4px; }
+   .nb-login .nb-login-display { font-size: clamp(2rem, 12vw, 3rem); }
++  .nb-login .nb-login-display-stack, .nb-login .visual-copy { padding: 0; }
+   .nb-login .visual-copy { display: block; margin: 0; }
+   .nb-login .nb-login-hero-copy { display: block; }
+   .nb-login .visual-copy > p:last-child { display: none; }
+@@ -61,6 +62,8 @@ html:has(.nb-login), body:has(.nb-login) { color-scheme: light; background: var(
+   .nb-login .nb-login-art-row { gap: 8px; }
+   .nb-login .nb-login-sticker { max-width: 42%; min-width: 0; font-size: 0.625rem; line-height: 1.1; }
+   .nb-login .nb-login-sticker-icon { width: 20px; height: 20px; }
++  .nb-login .nb-login-marquee { display: flex; min-height: 44px; overflow-x: auto; overflow-y: hidden; flex-wrap: nowrap; padding: 8px; }
++  .nb-login .nb-login-marquee li { flex: 0 0 auto; white-space: nowrap; }
+   .nb-login .login-main { min-height: 0; margin: 24px; padding: 32px 24px; }
+   .nb-login .login-copyright { margin-top: 32px; }
+   .nb-login .nb-login-checker { width: calc(100% + 32px); margin-inline: -16px; }
