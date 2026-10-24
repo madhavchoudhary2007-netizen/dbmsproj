@@ -29,11 +29,11 @@ Workspace: {clone}; work only here.
 ## Acceptance criteria
 {criteria}
 ## Boundaries
-At most3 target files/150 changed lines. Read only listed files, <=100 lines at once. No .env/secret reads or prints, real database/schema/data/volume writes, network/dependencies/fixed-port servers, recursive removal, API path/method/response changes, assertion weakening, blanket type-ignore/noqa. W1 never stores/fetch/APItypes/tests; W2 never markup/classes/tokens/tests; W3 never product. Preserve all routes/features/copy/data hooks/aria/stateclasses/hashroutes. Need more context: FAILED requesting exact path. Verify offline, no real database connection.
+At most 3 target files and 150 changed lines. Read only listed files, <=100 lines at once. No .env/secret reads or prints, real database/schema/data/volume writes, network/dependencies/fixed-port servers, recursive removal, API path/method/response changes, assertion weakening, blanket type-ignore/noqa. W1 never edits stores/fetch/API types/tests; W2 never edits markup/classes/tokens/tests; W3 never edits product code. Preserve all routes/features/copy/data hooks/aria/stateclasses/hashroutes. Need more context: FAILED requesting exact path. Verify offline, no real database connection.
 ## Verify
 {verify}
 ## Output
-Only JSON envelope: task_id,status PASSED|FAILED,files_modified[{{path,lines_added,lines_removed}}],diff_summary<=400chars,verification{{command,exit_code,tests_passed,tests_failed,duration_ms}},unresolved_blockers[]. Use exact Verify, PASSED only exit0. Static commands/collection are not passing test cases.
+Only JSON envelope: task_id,status PASSED|FAILED,files_modified[{{path,lines_added,lines_removed}}],diff_summary<=400chars,verification{{command,exit_code,tests_passed,tests_failed,duration_ms}},unresolved_blockers[]. Use exact Verify, PASSED only exit0. tests_passed and tests_failed are integers, 0 for static checks or collection. Do not add envelope keys. Static commands/collection are not passing test cases.
 '''
     (ROOT/'.agent/packets'/f'{tid}.md').write_text(packet)
     subprocess.run(['git','clone','--quiet','--shared','--branch','overhaul/neo-brutal','.',str(clone)],check=True)
