@@ -8,11 +8,6 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - contract: T365 repair hidden guide route: leading underscore folder is private in Next, must escape first underscore.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
-### T-44227 W2 — OPEN
-- target_files: backend/app/core/lock_demo.py
-- contract: T331 stage exact lock-demo transaction helpers in focused core module.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,subprocess; old=ast.parse(subprocess.check_output(["git","show","ef0dee3:backend/app/main.py"],text=True)); new=ast.parse(open("backend/app/core/lock_demo.py").read()); names={"_competing_lock_demo_reservation","_cleanup_lock_demo"}; a={n.name:ast.dump(n) for n in ast.walk(old) if isinstance(n,ast.FunctionDef) and n.name in names}; b={n.name:ast.dump(n) for n in ast.walk(new) if isinstance(n,ast.FunctionDef) and n.name in names}; assert a==b and len(a)==2; print("PASS exact lock helper ASTs")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app/core/lock_demo.py && .venv/bin/ruff format --check backend/app/core/lock_demo.py
-
 ### T-44226 W3 — OPEN
 - target_files: frontend/e2e/motion-hooks.spec.ts
 - contract: T364/T366 real mounted hook browser tests through local guide fixture.
@@ -30,6 +25,7 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44227 accepted225b2b8; verify0.
 - T-44224 acceptedef0dee3; verify0.
 - T-44222 accepted24fae87; verify0.
 - T-44223 accepted818ff70; verify0.

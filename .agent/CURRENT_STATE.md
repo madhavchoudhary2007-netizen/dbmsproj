@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: ef0dee3
+git_head: 225b2b8
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; customworkers gpt-5.6-luna/high (owner override); cap2
@@ -39,3 +39,5 @@ last_eval_score: baseline51.2974358974359, obsolete forcurrentcode, NOTpresentab
 
 
 
+
+- T-44227 accepted225b2b8: Staged exact lock transaction helpers in focused typed factory; next atomic task wires aliases and removes main bodies. Verify0.
