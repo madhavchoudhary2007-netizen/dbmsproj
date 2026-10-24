@@ -3,10 +3,15 @@ updated_at: 2026-10-24
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44284 W1 — OPEN
-- target_files: frontend/app/styles/login.css, frontend/components/login-art.tsx
-- contract: T380 TASTE-login fix measured form type clutter, broken legacy logo and checker strip sizing while retaining all copy and layout.
-- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+### T-44288 W1 — OPEN
+- target_files: frontend/components/pages/session-simulator.tsx
+- contract: T379 stage exact presentational SessionSimulator region into its own component, no wiring or redesign yet.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
+### T-44286 W2 — OPEN
+- target_files: frontend/lib/session-writes.ts
+- contract: T379 stage typed SessionPage write operations with exact existing bodies, no wiring yet.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
@@ -15,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44284 accepted27ee284; verify0.
 - T-44285 accepted58aad6d; verify0.
 - T-44282 accepted7cb29bf; verify0.
 - T-44281 acceptedb6fa4ad; verify0.

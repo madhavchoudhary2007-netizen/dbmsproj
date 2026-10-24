@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 58aad6d
+git_head: 27ee284
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -39,3 +39,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - TASTE login screenshot T44283: broken AG wrap/lime, tiny checker, card5sizes/textovergrid. T44284 scoped type/brand/checker/backing repair in progress; no threshold changes. T44285 SessionPage operations move in progress.
 
 - T-44285 accepted58aad6d: Extract three SessionPage async operations with typed callbacks and exact request/error ordering; JSX unchanged. Verify0.
+
+- T-44284 accepted27ee284: Fix measured login taste defects:44px yellow AG mark, three form type tiers, solid text backing and full-width checker texture. Verify0.
