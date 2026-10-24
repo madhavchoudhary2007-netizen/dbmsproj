@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 097578f
+git_head: b6fa4ad
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -39,3 +39,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - T-44279 acceptedc16e5bb: Remove97 obsolete global desktop login rules, retain necessary geometry under scoped nb-login styles; no markup/auth changes. Verify0.
 
 - T-44280 accepted097578f: Extract exact seeded auto-demo restore/create lifecycle into typed helper with late-bound legacy main wrapper. Verify0.
+
+- T-44281 acceptedb6fa4ad: Remove remaining mobile/shared login global selectors and keep scoped ink brand typography; primitives retain native paper/focus styling. Verify0.

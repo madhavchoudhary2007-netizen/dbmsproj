@@ -22,6 +22,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import { api, asArray, listAll, Row, pretty, API_BASE } from "@/lib/api";
+import { useSessionData } from "@/lib/use-session-data";
 import {
   AddButton,
   Button,
@@ -38,14 +39,9 @@ import { DbmsWorkspace } from "./dbms-workspace";
 export { Dashboard } from "@/components/pages/dashboard";
 
 export function SessionPage() {
-  const [rows, setRows] = useState<Row[]>([]),
-    [events, setEvents] = useState<Row[]>([]),
-    [drivers, setDrivers] = useState<Row[]>([]),
-    [resultModal, setResultModal] = useState(false),
+  const [resultModal, setResultModal] = useState(false),
     [editModal, setEditModal] = useState(false),
     [resultsLoaded, setResultsLoaded] = useState(false),
-    [err, setErr] = useState(""),
-    [loading, setLoading] = useState(true),
     [selected, setSelected] = useState(""),
     [actionMsg, setActionMsg] = useState(""),
     [modal, setModal] = useState(false),
@@ -55,30 +51,10 @@ export function SessionPage() {
     [simRate, setSimRate] = useState(5),
     [simMessage, setSimMessage] = useState(""),
     [results, setResults] = useState<Row[]>([]);
+  const { rows, events, drivers, err, loading, load } = useSessionData();
   const { user } = useAuth();
   const canManage = user?.role === "ADMIN";
   const canControl = user?.role === "ADMIN" || user?.role === "STEWARD";
-  const load = useCallback(async () => {
-    setLoading(true);
-    setErr("");
-    try {
-      const [s, e, d] = await Promise.all([
-        listAll("/sessions"),
-        listAll("/events"),
-        listAll("/drivers"),
-      ]);
-      setRows(asArray(s));
-      setEvents(asArray(e));
-      setDrivers(asArray(d));
-    } catch (x) {
-      setErr(x instanceof Error ? x.message : "Unable to load");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-  useEffect(() => {
-    void load();
-  }, [load]);
   useEffect(() => {
     if (simCarsInitialized || !drivers.length) return;
     const eligible = drivers.filter((d) => d.eligibility === "ACTIVE").length;

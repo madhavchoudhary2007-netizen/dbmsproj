@@ -8,11 +8,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T379 extract SessionPage initial list loading into typed useSessionData hook, retaining all other logic and JSX.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
-### T-44281 W1 — OPEN
-- target_files: frontend/app/globals.css, frontend/app/styles/login.css
-- contract: T380 finish login legacy cleanup: remove remaining mobile/shared global login selectors and retain required scoped presentation.
-- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
 
@@ -20,6 +15,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44281 acceptedb6fa4ad; verify0.
 - T-44280 accepted097578f; verify0.
 - T-44279 acceptedc16e5bb; verify0.
 - T-44278 accepted3bade73; verify0.
