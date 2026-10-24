@@ -95,6 +95,7 @@ from .crud_repository import (
     update_crud_row,
 )
 from .database import close_pool, connection, fetch_all, fetch_one, get_pool, open_pool
+from .demo_names import generate_demo_names
 from .demo_race_repository import (
     DemoRaceDeleteConflict,
     DemoRaceSetupError,
@@ -616,54 +617,7 @@ def _make_demo_race(cars: int | None = None, auto_repeat: bool = False):
     car_count = cars if cars is not None else rng.randint(8, 16)
     session_id, event_id = uuid4(), uuid4()
     now = datetime.now(UTC)
-    given = [
-        "Amelia",
-        "Rafael",
-        "Maya",
-        "Theo",
-        "Nina",
-        "Luca",
-        "Aisha",
-        "Felix",
-        "Sofia",
-        "Ethan",
-        "Leila",
-        "Oscar",
-        "Priya",
-        "Mateo",
-        "Zara",
-        "Jonah",
-        "Ines",
-        "Kai",
-        "Elena",
-        "Arjun",
-    ]
-    family = [
-        "Bennett",
-        "Costa",
-        "Shah",
-        "Moreau",
-        "Kim",
-        "Novak",
-        "Singh",
-        "Fischer",
-        "Alvarez",
-        "Tanaka",
-        "Dubois",
-        "Reed",
-        "Petrov",
-        "Okafor",
-        "Lindholm",
-        "Santos",
-        "Kaur",
-        "Weber",
-        "Nakamura",
-        "Clarke",
-    ]
-    names = [
-        f"{a} {b}"
-        for a, b in zip(rng.sample(given, car_count), rng.sample(family, car_count), strict=False)
-    ]
+    names = generate_demo_names(rng, car_count)
     try:
         generated, total_laps = create_demo_race_records(
             session_id, event_id, now, names, auto_repeat, seed=seed
