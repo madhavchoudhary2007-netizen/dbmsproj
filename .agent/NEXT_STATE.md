@@ -3,10 +3,15 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44312 W2 — OPEN
-- target_files: backend/app/simulation_incidents.py, backend/app/main.py
-- contract: T331 extract exact generated-race incident recording into typed persistence helper with main compatibility wrapper.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "incident or seeded" && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/simulation_incidents.py
+### T-44314 W2 — OPEN
+- target_files: backend/app/simulation_pit.py, backend/app/main.py
+- contract: T331 move exact automatic pit cancellation persistence into existing simulation_pit module.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "pit or simulation_stop" && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/simulation_pit.py
+
+### T-44313 W1 — OPEN
+- target_files: frontend/components/pages/steward-sanctions.tsx, frontend/components/special-pages.tsx
+- contract: T379 extract exact steward sanction number fields and explanation into focused presentation.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
@@ -15,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44312 acceptedb0972ed; verify0.
 - T-44311 accepted3989f9d; verify0.
 - T-44310 acceptedf51818a; verify0.
 - T-44309 accepted8ac6fa2; verify0.
