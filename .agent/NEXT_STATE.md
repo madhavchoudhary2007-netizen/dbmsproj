@@ -3,11 +3,6 @@ updated_at: 2026-10-23
 phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phases0–2 complete; baseline51.2974)
 
 ## Queue
-### T-44207 Orchestrator — REVIEW
-- target_files: .codex/agents/w1-ui.toml, .codex/agents/w2-state.toml, .codex/agents/w3-eval.toml
-- contract: Owner-authorized GPT5.6Luna/high worker profile switch; cap2/orchestrator unchanged.
-- verify: export HARNESS=codex; source .agent/models.env && bash scripts/agent/boot.sh
-
 ### T-44205 W2 — OPEN
 - target_files: backend/app/main.py, backend/app/api/stewards.py
 - contract: T331 move unchanged incident-create endpoint into existing stewards router.
@@ -30,6 +25,7 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44207 accepted2bc94fb; verify0.
 - T-44206 accepted35ba591; verify0.
 - T-44200 accepted47c0408; verify0.
 - T-363 accepted13f614a; verify0.
