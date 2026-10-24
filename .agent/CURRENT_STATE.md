@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: e4a3f6c
+git_head: 89c82af
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (owner override); cap2
@@ -34,3 +34,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T44205 incidentcreate65bd176 exactAST/snapshot/runtime11+rootlateconnection sentinel0; full227PASS0skip/livePASS. T44209 decisionreadyreviewed exactAST; temporarytypedregistration helper avoidsC901increase, T332 replaces it. Currentmypy212errors18/45files, no relaxedgate.
 - T44208 formcandidate reviewFAIL1: redbodytext onwhite contrast~2.8; own2newfilesreset, rawpatch referenced; repair1ink/red-errorblock required. Noaccepteddefect or weakenedtest. Rootauthor0productlines.
 - SharedhooksT364 accepted47c0408 inclcancelcleanup, runtimeT366 pending. T36313f614a complete: fourCSSlints0/rootproductionbuild0/85axe+4keyboardPASS after2colorcontrastfix. Currentdarkpalette remainsFAIL untilPh7; no fullcompletion claim.
+
+- T-44209 accepted89c82af: Moved exact incident decision and preserved alias/late callbacks; typed registration helper retains C901 gate,11 contract/runtime checks pass. Verify0.
