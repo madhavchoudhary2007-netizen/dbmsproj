@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 3cda000
+git_head: 43ce7cc
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -28,7 +28,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - .agent/orchestrate.py persists queue/clone/integrate/mark. Worker envelopes require actual stats/integer static counts0, no extra keys. All features/routes/copy/hooks/aria/stateclasses/dbms hashes retained; five states/44px/token spacing/reduced motion mandatory.
 
 ## Open risks
-- T370 broad browser batch:260 PASS/80FAIL.75 axe cases fail mixed legacy dark/light contrast plus status visible-label/name mismatch;5 E5 failures are ambiguous substring Refresh selector. W1 T44257/W3 T44258 repaired label/Refresh/mostcontrast. Rerun110 PASS20FAIL narrowed to4 legacy text selectors; fixed14da91f. Next129PASS1FAIL floating44px translated geometry, fixed48px46af416 without threshold change. Latest130PASS including all85axe cases, feed, drawer, edge (T44262.browser.raw.log). No API/copy/threshold changes.
+- T370 broad browser batch:260 PASS/80FAIL.75 axe cases fail mixed legacy dark/light contrast plus status visible-label/name mismatch;5 E5 failures are ambiguous substring Refresh selector. W1 T44257/W3 T44258 repaired label/Refresh/mostcontrast. Rerun110 PASS20FAIL narrowed to4 legacy text selectors; fixed14da91f. Next129PASS1FAIL floating44px translated geometry, fixed48px46af416. Latest130PASS all85axe/feed/drawer/edge (T44262.browser.raw.log). Remaining route/primary/touch/auth253PASS2FAIL at768 old700px helper; T44264 updates tests to approved<1000 without removing assertions, responsive96/auth20 reruns pending. No API/copy/threshold changes.
 - T44248 first acceptance caught reserved module variable in new mapper test; W3 renamed binding2aa2b87, all3 assertions+global lint pass. Saved W1/root patches reapplied, acceptdfcf8ac/e765662 both0; no assertion weakened.
 - T331 giant main/transitional factories; strict mypy212 errors/24files (T44256.mypy.raw.log); zero required T339. No thresholds relaxed.
 - T44132 bundle checker omits layout/shared assets; fix before P3. Lighthouse absent, FPS gate17ms until T41316.7, hosted CI unverified. Final score>=95/all hard gates/no NOT_RUN required; never present obsolete score as current.
@@ -45,4 +45,3 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 
 - T-44262 accepted46af416: Use48px drawer close/signout targets so translated geometry remains above unchanged44px gate. Verify0.
 
-- T-44263 accepted3cda000: Stage exact session lifecycle body with explicit typed dependency injection; reset cancellation and transaction behavior preserved. Verify0.

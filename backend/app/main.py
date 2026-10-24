@@ -54,6 +54,7 @@ from .api.laps import race_lap_measurements as race_lap_measurements
 from .api.race_archive import create_race_archive_router
 from .api.results_read import create_results_read_router
 from .api.results_write import create_results_write_router
+from .api.session_action import create_session_action_router
 from .api.stewards import create_stewards_router
 from .auth_cookie import verify_csrf_token
 from .auth_router import create_auth_router
@@ -122,8 +123,8 @@ from .schemas_competition import ResultIn as ResultIn
 from .schemas_health import HealthReport as HealthReport
 from .schemas_health import LivenessReport as LivenessReport
 from .schemas_health import ReadinessReport as ReadinessReport
+from .schemas_operations import Action as Action
 from .schemas_operations import (
-    Action,
     AutoReservationIn,
     ReservationIn,
     ReservationStatus,
@@ -454,70 +455,21 @@ app.include_router(
 app.include_router(create_user_router(roles, jsonable))
 
 
-@app.post("/api/sessions/{session_id}/action")
-async def session_action(session_id: UUID, body: Action, user=admin_steward_dependency):
-    transitions = {
-        "start": (("SCHEDULED",), "ACTIVE"),
-        "pause": (("ACTIVE",), "PAUSED"),
-        "resume": (("PAUSED",), "ACTIVE"),
-        "finish": (("ACTIVE", "PAUSED"), "COMPLETED"),
-        "reset": (("ACTIVE", "PAUSED", "COMPLETED", "CANCELLED"), "SCHEDULED"),
-    }
-    states, after = transitions[body.action]
-    now = datetime.now(UTC)
-    if body.action == "reset":
-        existing = _require_crud_record(
-            fetch_one("SELECT state FROM race_sessions WHERE id=%s", (session_id,)),
-            "Session not found",
-        )
-        if existing["state"] not in states:
-            raise HTTPException(409, "Invalid session state transition")
-        ensure_session_reset_allowed(session_id)
-        sim = simulations.get(str(session_id))
-        task = sim.task if sim else None
-        if sim:
-            sim.status = "stopped"
-        if task is not None and not task.done():
-            task.cancel()
-        if task is not None and not task.done():
-            await asyncio.gather(task, return_exceptions=True)
-    set_fragments = {
-        "start": ("started_at=%s,ended_at=NULL", [now]),
-        "pause": ("", []),
-        "resume": ("", []),
-        "finish": ("ended_at=%s", [now]),
-        "reset": ("started_at=NULL,ended_at=NULL,safety_car=FALSE", []),
-    }
-    set_fragment, action_params = set_fragments[body.action]
-    set_fields = "state=%s" + (f",{set_fragment}" if set_fragment else "")
-    params: list[Any] = [after, *action_params, session_id, list(states)]
-    with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-        cur.execute(
-            sql.SQL("UPDATE race_sessions SET {} WHERE id=%s AND state=ANY(%s) RETURNING *")
-            .format(sql.SQL(set_fields))
-            .as_string(),
-            params,
-        )
-        row = cur.fetchone()
-    if not row:
-        _require_crud_record(
-            fetch_one("SELECT id FROM race_sessions WHERE id=%s", (session_id,)),
-            "Session not found",
-        )
-        raise HTTPException(409, "Invalid session state transition")
-    if body.action == "reset":
-        clear_session_measurements(session_id)
-        sync_simulation_lifecycle(session_id, "reset")
-    else:
-        sync_simulation_lifecycle(session_id, body.action)
-        if body.action == "finish":
-            cancel_automatic_pit_reservations(session_id)
-            sim = simulations.get(str(session_id))
-            if sim:
-                sim.pit_reservations_by_driver.clear()
-    result = jsonable(row)
-    publish(session_id, "session.state", result)
-    return result
+session_action_router, session_action_handlers = create_session_action_router(
+    lambda *a, **kw: _require_crud_record(*a, **kw),
+    lambda *a, **kw: fetch_one(*a, **kw),
+    lambda *a, **kw: ensure_session_reset_allowed(*a, **kw),
+    lambda: simulations,
+    lambda *a, **kw: connection(*a, **kw),
+    lambda *a, **kw: clear_session_measurements(*a, **kw),
+    lambda *a, **kw: sync_simulation_lifecycle(*a, **kw),
+    lambda *a, **kw: cancel_automatic_pit_reservations(*a, **kw),
+    lambda value: jsonable(value),
+    lambda *a, **kw: publish(*a, **kw),
+    admin_steward_dependency,
+)
+session_action = session_action_handlers["session_action"]
+app.include_router(session_action_router)
 
 
 results_read_router, results_read_handlers = create_results_read_router(

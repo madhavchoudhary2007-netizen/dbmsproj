@@ -3,10 +3,10 @@ updated_at: 2026-10-24
 phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 
 ## Queue
-### T-44264 W3 — OPEN
-- target_files: frontend/e2e/auth-cookie.spec.ts, frontend/e2e/responsive.spec.ts
-- contract: Update browser navigation helpers from old700px breakpoint to the approved shell drawer boundary below1000px, preserving all assertions.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/auth-cookie.spec.ts e2e/responsive.spec.ts --list
+### T-44265 W2 — OPEN
+- target_files: backend/app/api/session_action.py, backend/app/main.py
+- contract: T331 add thin session-action router and wire staged exact lifecycle service, retaining main.session_action and all legacy dependency aliases.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "session_lap_limits or simulation_accepts_zero or decision or incident" && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/api/session_action.py
 
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
@@ -16,6 +16,7 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44264 accepted43ce7cc; verify0.
 - T-44263 accepted3cda000; verify0.
 - T-44262 accepted46af416; verify0.
 - T-44261 accepted869f5aa; verify0.
