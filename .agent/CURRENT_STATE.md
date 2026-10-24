@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: c2616e0
+git_head: fdb63e2
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; customworkers gpt-5.6-luna/high (owner override); cap2
@@ -42,3 +42,5 @@ last_eval_score: baseline51.2974358974359, obsolete forcurrentcode, NOTpresentab
 
 
 
+
+- T-44230 acceptedfdb63e2: Enforced explicit44px button/modal/guide target dimensions with56px large faces; preserved all hooks, variants and copy. Verify0.
