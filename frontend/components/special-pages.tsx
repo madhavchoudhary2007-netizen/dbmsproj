@@ -35,14 +35,7 @@ import {
 } from "./ui";
 import { useAuth } from "./auth";
 import { DbmsWorkspace } from "./dbms-workspace";
-interface DashboardData {
-  active_sessions?: unknown;
-  scheduled_events?: unknown;
-  open_incidents?: unknown;
-  drivers?: unknown;
-  active_session?: Record<string, unknown>;
-  [key: string]: unknown;
-}
+import { DashboardData, readDashboardFeed } from "@/lib/dashboard-feed";
 interface HealthData {
   services?: Record<string, unknown>;
   status?: unknown;
@@ -54,10 +47,13 @@ export function Dashboard() {
     [health, setHealth] = useState<HealthData | null>(null),
     [err, setErr] = useState(""),
     [load, setLoad] = useState(true);
+  const initialLoad = useRef(true);
   const fetchData = useCallback(() => {
+    const useCache = initialLoad.current;
+    initialLoad.current = false;
     setLoad(true);
     setErr("");
-    Promise.all([api<DashboardData>("/dashboard"), api<HealthData>("/health")])
+    Promise.all([readDashboardFeed({ force: !useCache }), api<HealthData>("/health")])
       .then(([d, h]) => {
         setData(d);
         setHealth(h);

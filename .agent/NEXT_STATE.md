@@ -3,10 +3,10 @@ updated_at: 2026-10-24
 phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 
 ## Queue
-### T-44246 W3 — OPEN
-- target_files: backend/tests/test_dashboard_next_event_db.py
-- contract: Correct ADR012 DB fixture UUID construction to match its explicit fixed-prefix expectation; preserve all assertions.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'from backend.tests.test_dashboard_next_event_db import _add; from uuid import UUID; from unittest.mock import MagicMock; c=MagicMock(); result=_add(c,1,"lower","RACE","SCHEDULED",None); assert result==UUID("10000000-0000-0000-0000-000000000001"); calls=c.execute.call_args_list; assert calls[1].args[1][0]==UUID("20000000-0000-0000-0000-000000000001"); print("PASS fixture UUID prefixes; database not contacted")' && .venv/bin/ruff check backend/tests/test_dashboard_next_event_db.py && .venv/bin/ruff format --check backend/tests/test_dashboard_next_event_db.py
+### T-44247 W1 — OPEN
+- target_files: frontend/app/styles/shell.css
+- contract: T370 stage compact season/status header and forty-pixel ticker CSS for upcoming presentation wiring.
+- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ### T-44245 W2 — OPEN
 - target_files: frontend/lib/use-race-control-feed.ts, frontend/components/special-pages.tsx
@@ -21,6 +21,7 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44246 accepted35b904f; verify0.
 - T-44244 acceptedef2f899; verify0.
 - T-44243 accepted246f2f6; verify0.
 - T-44242 accepted5627293; verify0.
