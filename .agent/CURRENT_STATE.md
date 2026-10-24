@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: e5507c9
+git_head: 622aafa
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -17,6 +17,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - Preserve legacy main aliases and late-bound callbacks: Decision removal caused7 failures fixed5ee4710. OpenAPI alone cannot prove Python alias/runtime uniqueness compatibility.
 
 ## Next work
+- T380 staged LoginArt/CSS622aafa; T44268 wiring with mobile240px/contrast/copy fixes and unused legacy CSS removal in progress. Auth logic untouched. Pit reservation servicee5507c9 exact3bodies staged; T44269 thinrouter in progress, mainnotwired.
 - Phase6 parent T370/T371 accepted da5a72d/current HEAD. Root481 browser checks PASS in combined evidence T370.evidence.raw.json:85axe,20edge,15feed,10drawer,80routes,75targets,80primary,20auth,96responsive. Build/types/lint/fourCSS gates0. Cache4 and mapper3 offline cases pass. Shell retains routes/auth/copy/hash hooks; real next_event additive ADR012 in place.
 - Start Phase7 login/dashboard before resources/live/session/stewards/pits/standings/analytics/DBMS. Use docs/overhaul-plan.md graph; DBMS showcase also requires Phase4. T331 backend continues in parallel; keep main aliases/latecallbacks and run full disposable suite after each wiring.
 - Palette across redesigned routes remains unverified; no band widening. Final score only atT430. Phase5 primitives60 browser cases passed; development guide hidden in production.
@@ -28,8 +29,6 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - .agent/orchestrate.py persists queue/clone/integrate/mark. Worker envelopes require actual stats/integer static counts0, no extra keys. All features/routes/copy/hooks/aria/stateclasses/dbms hashes retained; five states/44px/token spacing/reduced motion mandatory.
 
 ## Open risks
-- Resolved Phase6 regression history:260 PASS/80FAIL.75 axe cases fail mixed legacy dark/light contrast plus status visible-label/name mismatch;5 E5 failures are ambiguous substring Refresh selector. W1 T44257/W3 T44258 repaired label/Refresh/mostcontrast. Rerun110 PASS20FAIL narrowed to4 legacy text selectors; fixed14da91f. Next129PASS1FAIL floating44px translated geometry, fixed48px46af416. Latest130PASS all85axe/feed/drawer/edge (T44262.browser.raw.log). Remaining route/primary/touch/auth253PASS2FAIL at768 old700px helper; T44264 updates tests to approved<1000 without removing assertions, responsive96/auth20 reruns pending. No API/copy/threshold changes.
-- T44248 first acceptance caught reserved module variable in new mapper test; W3 renamed binding2aa2b87, all3 assertions+global lint pass. Saved W1/root patches reapplied, acceptdfcf8ac/e765662 both0; no assertion weakened.
 - T331 giant main/transitional factories; strict mypy212 errors/24files (T44256.mypy.raw.log); zero required T339. No thresholds relaxed.
 - T44132 bundle checker omits layout/shared assets; fix before P3. Lighthouse absent, FPS gate17ms until T41316.7, hosted CI unverified. Final score>=95/all hard gates/no NOT_RUN required; never present obsolete score as current.
 - Worker review caught nested main/dead modal control (corrected), accidental root demo hook (removed only worker-owned unaccepted copy), and T44232 complexity suppression/locals namespace tricks (rejected, standard explicit helper accepted). No other work reverted; no test weakened.
@@ -53,3 +52,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - T-371 accepted8e498d7: Close shared feed milestone: visible polling, cache dedupe, cancellation, five states and offline recovery verified. Verify0.
 
 - T-44267 acceptede5507c9: Stage exact manual/automatic/update reservation bodies with explicit dependencies, unchanged locking, SQL errors and publication. Verify0.
+
+- T-44266 accepted622aafa: Stage presentational login art/motifs and scoped60/40 desktop/240px mobile layout without changing current auth route. Verify0.

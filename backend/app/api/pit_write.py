@@ -1,0 +1,72 @@
+from __future__ import annotations
+
+from collections.abc import Callable, Mapping
+from typing import Any
+from uuid import UUID
+
+from fastapi import APIRouter
+
+from ..pit_reservation_service import (
+    run_reserve_pit,
+    run_reserve_pit_auto,
+    run_update_pit_reservation,
+)
+from ..schemas_operations import AutoReservationIn, ReservationIn, ReservationStatus
+
+
+def create_pit_write_router(
+    _require_principal_own_team: Callable[[UUID, dict[str, Any]], None],
+    connection: Callable[..., Any],
+    jsonable: Callable[[Any], Any],
+    publish: Callable[[UUID, str, Any], Any],
+    fetch_one: Callable[..., dict[str, Any] | None],
+    simulations_provider: Callable[[], Mapping[str, Any]],
+    create_automatic_reservation: Callable[..., Any],
+    admin_steward_principal_dependency: Any,
+) -> tuple[APIRouter, dict[str, Callable[..., Any]]]:
+    router = APIRouter()
+
+    @router.post("/api/pit-reservations", status_code=201)
+    def reserve_pit(body: ReservationIn, user=admin_steward_principal_dependency):
+        return run_reserve_pit(
+            body,
+            user,
+            _require_principal_own_team,
+            connection,
+            jsonable,
+            publish,
+        )
+
+    @router.post("/api/pit-reservations/auto", status_code=201)
+    def reserve_pit_auto(body: AutoReservationIn, user=admin_steward_principal_dependency):
+        return run_reserve_pit_auto(
+            body,
+            user,
+            _require_principal_own_team,
+            fetch_one,
+            simulations_provider(),
+            create_automatic_reservation,
+            jsonable,
+            publish,
+        )
+
+    @router.patch("/api/pit-reservations/{reservation_id}")
+    def update_pit_reservation(
+        reservation_id: UUID,
+        body: ReservationStatus,
+        user=admin_steward_principal_dependency,
+    ):
+        return run_update_pit_reservation(
+            reservation_id,
+            body,
+            user,
+            connection,
+            jsonable,
+            publish,
+        )
+
+    return router, {
+        "reserve_pit": reserve_pit,
+        "reserve_pit_auto": reserve_pit_auto,
+        "update_pit_reservation": update_pit_reservation,
+    }
