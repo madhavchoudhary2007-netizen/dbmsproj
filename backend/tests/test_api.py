@@ -1488,12 +1488,14 @@ def test_dashboard_analytics_characterization(database_api_client):
         "open_incidents",
         "drivers",
         "active_session",
+        "next_event",
     }
     for key in ("active_sessions", "scheduled_events", "open_incidents", "drivers"):
         assert isinstance(dashboard_data[key], int)
     assert dashboard_data["active_session"] is None or isinstance(
         dashboard_data["active_session"], dict
     )
+    assert dashboard_data["next_event"] is None or isinstance(dashboard_data["next_event"], dict)
 
     default = client.get("/api/analytics/drivers", headers=headers)
     assert default.status_code == 200, default.text
