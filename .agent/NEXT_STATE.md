@@ -3,10 +3,10 @@ updated_at: 2026-10-23
 phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phases0–2 complete; baseline51.2974)
 
 ## Queue
-### T-44214 W2 — OPEN
-- target_files: backend/app/main.py
-- contract: Repair T331 model re-export compatibility exposed by full backend suite: restore Decision and IncidentIn exports in main.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k 'incident_decisions_always_return_current_driver_state or unsupported_sanction_fields_are_rejected_with_guidance or unsupported_sanction_zero_and_points_only_decisions_remain_valid' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app/main.py && .venv/bin/ruff format --check backend/app/main.py
+### T-44213 W2 — OPEN
+- target_files: frontend/lib/use-delayed-flag.ts, frontend/lib/use-native-dialog.ts, frontend/lib/use-nb-demo.ts
+- contract: T365 state helpers required by accessible primitives and the development-only style guide.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ### T-44211 W2 — OPEN
 - target_files: backend/app/core/simulation_tick.py
@@ -25,6 +25,7 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44214 accepted5ee4710; verify0.
 - T-44208 accepted72a5b82; verify0.
 - T-44209 accepted89c82af; verify0.
 - T-44204 acceptede4a3f6c; verify0.
