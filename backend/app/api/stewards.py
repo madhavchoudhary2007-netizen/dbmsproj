@@ -8,7 +8,71 @@ from psycopg import Connection
 from psycopg.rows import dict_row
 
 from ..database import DatabaseRow
-from ..schemas_operations import IncidentIn
+from ..schemas_operations import Decision, IncidentIn
+
+
+def _register_decide_incident(
+    router: APIRouter,
+    jsonable: Callable[[Any], Any],
+    connection: Callable[[], AbstractContextManager[Connection[DatabaseRow]]],
+    publish: Callable[[UUID | str, str, Any], Any],
+    admin_steward_dependency: Any,
+) -> Callable[..., Any]:
+    @router.post("/api/incidents/{incident_id}/decision")
+    def decide_incident(incident_id: UUID, body: Decision, user=admin_steward_dependency):
+        with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
+            cur.execute("SELECT * FROM incident_reports WHERE id=%s FOR UPDATE", (incident_id,))
+            incident = cur.fetchone()
+            if not incident:
+                raise HTTPException(404, "Incident not found")
+            if incident["state"] != "OPEN":
+                raise HTTPException(409, "Incident has already been decided")
+            state = "APPROVED" if body.approve else "REJECTED"
+            cur.execute(
+                (
+                    "UPDATE incident_reports SET state=%s,decided_by=%s,decision_notes=%s "
+                    "WHERE id=%s RETURNING *"
+                ),
+                (state, user["id"], body.notes, incident_id),
+            )
+            updated = cur.fetchone()
+            penalty = None
+            if body.approve and (body.points or body.time_seconds or body.grid_places):
+                cur.execute(
+                    (
+                        "INSERT INTO penalties(incident_id,driver_id,points,time_seconds,"
+                        "grid_places)"
+                        " VALUES (%s,%s,%s,%s,%s) RETURNING *"
+                    ),
+                    (
+                        incident_id,
+                        incident["driver_id"],
+                        body.points,
+                        body.time_seconds,
+                        body.grid_places,
+                    ),
+                )
+                penalty = cur.fetchone()
+            cur.execute(
+                (
+                    "SELECT d.eligibility,COALESCE((SELECT pp.points FROM penalty_points pp JOIN "
+                    "championships c ON c.season=pp.season JOIN race_events e ON "
+                    "e.championship_id=c.id JOIN race_sessions s ON s.event_id=e.id WHERE "
+                    "s.id=%s AND pp.driver_id=d.id LIMIT 1),0) AS season_points FROM drivers "
+                    "d WHERE d.id=%s"
+                ),
+                (incident["session_id"], incident["driver_id"]),
+            )
+            driver = cur.fetchone()
+        out = {
+            "incident": jsonable(updated),
+            "penalty": jsonable(penalty),
+            "driver": jsonable(driver),
+        }
+        publish(incident["session_id"], "incident.update", out)
+        return out
+
+    return decide_incident
 
 
 def create_stewards_router(
@@ -75,4 +139,12 @@ def create_stewards_router(
         publish(body.session_id, "incident.update", result)
         return result
 
-    return router, {"get_incidents": get_incidents, "create_incident": create_incident}
+    decide_incident = _register_decide_incident(
+        router, jsonable, connection, publish, admin_steward_dependency
+    )
+
+    return router, {
+        "get_incidents": get_incidents,
+        "create_incident": create_incident,
+        "decide_incident": decide_incident,
+    }

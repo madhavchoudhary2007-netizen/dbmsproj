@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 65bd176
+git_head: e4a3f6c
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (owner override); cap2
@@ -29,23 +29,8 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 ## Orchestrator direct edits
 - Architecture/ADRs/docs/state/packets/envelopes/orchestration helpers and root-owned planned dependency installs only. Zero authored product lines; integrating worker patches is not product authorship. Canonical lock operation bypassed autoGit tail only to honor accept-only; independently verified.
 
-## Recent acceptance / review
-- T363 children d0bb56a textures/8c03959 componentsCSS, no currentroute redesign. Rootbuild/lint/types0. Initial85axe run72PASS13contrastFAIL after gradient cleanup exposed old lowcontrast labels. T44202 159692d corrected exactly2colors toexistingmuted; repeat85axePASS+4keyboardPASS, noassertion/gate change. Taste noextra primary/clutter/motion; computed primitive testsT366 stillrequired.
-- T331 SQL rowbrowserdc48751/provider5898b4f exactmoves eachrootfull227PASS0skip/livePASS. Stewardslistfa39f5d exactAST/11snapshot+runtimePASS; rootfull227PASS0skip/livePASS. Ruffall0; strictmypy212errors18/45files. Temporarytyped factories removedinT332.
-- T44189 3343d87 exposed duplicateMongo route; corrected7eeb81d, permanenttest_route_registration gate. T44191 required-inputRED9fail2controls fixed2c78430 (27focusedPASS, full2270skip/livePASS); helper coversrequiredfields, notallconstraint changes. Older214green lackedthesechecks.
-- T364 helper/reduced subscriptionf9dc8e6 acceptedoffline; T44200 FLIP/flash47c0408 accepted aftercancelcleanuprepair; T44203 W1 interrupted byaccountlimit beforefinalenvelope. No workers running. WorkerreportedplaceholderVerify/counts normalized androotrerun; no scopeviolations. Rootauthor0productlines.
-
-- T-363 accepted13f614a: Closed shared texture/component CSS foundation; four source-wide gates0, production build0,85axe and4keyboard checks pass after two-color contrast repair. Verify0.
-
-- T44200 reviewFAILED despitetypecheck0: external Animation.cancel lacked oncancel cleanup in bothhooks. Candidate preservedrawpatch, only2ownunaccepted newfiles reset; repair1 queued. No source accepted or testsweakened.
-
-- T44203 reviewrepair1 foromittedplan danger!icon/clientboundary; rootpacket hadomittedicon, recordedoversight. Bothownunacceptednewfiles reset, candidate retainedrawpatch. Envelope staticcounts arrays correctedtointegers onnextresult.
-
-- T-44200 accepted47c0408: Added bounded FLIP and coalesced cell flash hooks; repair1 adds guarded finish/cancel cleanup and reduced-motion handling. Runtime coverage remains T366. Verify0.
-
-## Current recovery / next work
-- Owner switched workers toGPT5.6Luna/high: models.env+3profiles2bc94fb accepted; customtoolmetadata5.6/high, actualfreshW1completed6eefdaa. W2alsoresponding; noquota blocker now. Cap2/orchestrator unchanged.
-- T44203 button/card accepted6eefdaa; no routeusesyet, runtimecomputedchecksT366 pending. T44204 badges W1 running. T44205createincident W2 repair1: directconnectioncallback froze monkeypatching, candidate savedrawpatch/own2filesreset; requirelateboundlambda. No APIchanges.
-- T364 hookscn/reduced+FLIP/flash accepted; runtimeT366 pending. Rootlatestbuild/lint/types0;full227PASS0skip/livePASS;85axe+4keyboardPASS;allfourglobalCSSgates0.
-
-- T-44205 accepted65bd176: Moved exact incident-create endpoint into stewards API, preserving late-bound connection/publish and main alias;11 route contract checks pass. Verify0.
+## Recent acceptance / next
+- Ownerworker overrideGPT5.6Luna/high: profile2bc94fb, toolbinding5.6/high andcompletedfreshresultsconfirmavailability. Noquota blocker; cap2/orchestratorunchanged. T44203 button/card6eefdaa andT44204 badges e4a3f6c acceptedoffline; runtimeT366 pending. Badges repairedgenericnamedspan toroleimg.
+- T44205 incidentcreate65bd176 exactAST/snapshot/runtime11+rootlateconnection sentinel0; full227PASS0skip/livePASS. T44209 decisionreadyreviewed exactAST; temporarytypedregistration helper avoidsC901increase, T332 replaces it. Currentmypy212errors18/45files, no relaxedgate.
+- T44208 formcandidate reviewFAIL1: redbodytext onwhite contrast~2.8; own2newfilesreset, rawpatch referenced; repair1ink/red-errorblock required. Noaccepteddefect or weakenedtest. Rootauthor0productlines.
+- SharedhooksT364 accepted47c0408 inclcancelcleanup, runtimeT366 pending. T36313f614a complete: fourCSSlints0/rootproductionbuild0/85axe+4keyboardPASS after2colorcontrastfix. Currentdarkpalette remainsFAIL untilPh7; no fullcompletion claim.

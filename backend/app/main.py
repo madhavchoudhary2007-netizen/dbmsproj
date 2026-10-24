@@ -117,7 +117,6 @@ from .schemas_health import ReadinessReport as ReadinessReport
 from .schemas_operations import (
     Action,
     AutoReservationIn,
-    Decision,
     ReservationIn,
     ReservationStatus,
 )
@@ -621,56 +620,8 @@ stewards_router, stewards_handlers = create_stewards_router(
 )
 get_incidents = stewards_handlers["get_incidents"]
 create_incident = stewards_handlers["create_incident"]
+decide_incident = stewards_handlers["decide_incident"]
 app.include_router(stewards_router)
-
-
-@app.post("/api/incidents/{incident_id}/decision")
-def decide_incident(incident_id: UUID, body: Decision, user=admin_steward_dependency):
-    with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-        cur.execute("SELECT * FROM incident_reports WHERE id=%s FOR UPDATE", (incident_id,))
-        incident = cur.fetchone()
-        if not incident:
-            raise HTTPException(404, "Incident not found")
-        if incident["state"] != "OPEN":
-            raise HTTPException(409, "Incident has already been decided")
-        state = "APPROVED" if body.approve else "REJECTED"
-        cur.execute(
-            (
-                "UPDATE incident_reports SET state=%s,decided_by=%s,decision_notes=%s WHERE id=%s"
-                " RETURNING *"
-            ),
-            (state, user["id"], body.notes, incident_id),
-        )
-        updated = cur.fetchone()
-        penalty = None
-        if body.approve and (body.points or body.time_seconds or body.grid_places):
-            cur.execute(
-                (
-                    "INSERT INTO penalties(incident_id,driver_id,points,time_seconds,grid_places)"
-                    " VALUES (%s,%s,%s,%s,%s) RETURNING *"
-                ),
-                (
-                    incident_id,
-                    incident["driver_id"],
-                    body.points,
-                    body.time_seconds,
-                    body.grid_places,
-                ),
-            )
-            penalty = cur.fetchone()
-        cur.execute(
-            (
-                "SELECT d.eligibility,COALESCE((SELECT pp.points FROM penalty_points pp JOIN cham"
-                "pionships c ON c.season=pp.season JOIN race_events e ON e.championship_id=c.id J"
-                "OIN race_sessions s ON s.event_id=e.id WHERE s.id=%s AND pp.driver_id=d.id LIMIT"
-                " 1),0) AS season_points FROM drivers d WHERE d.id=%s"
-            ),
-            (incident["session_id"], incident["driver_id"]),
-        )
-        driver = cur.fetchone()
-    out = {"incident": jsonable(updated), "penalty": jsonable(penalty), "driver": jsonable(driver)}
-    publish(incident["session_id"], "incident.update", out)
-    return out
 
 
 app.include_router(create_pit_router(current_user, jsonable))
