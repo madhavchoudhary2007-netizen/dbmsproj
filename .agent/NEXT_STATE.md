@@ -3,10 +3,10 @@ updated_at: 2026-10-24
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44272 W2 — OPEN
-- target_files: frontend/lib/use-dashboard.ts, frontend/components/special-pages.tsx
-- contract: T379 prepare Dashboard move by extracting only its state/fetch lifecycle into typed useDashboard hook; exact existing behavior, JSX untouched.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && node --experimental-vm-modules --test frontend/e2e/runtime/dashboard-feed.test.mjs frontend/e2e/runtime/race-control-items.test.mjs
+### T-44273 W1 — OPEN
+- target_files: frontend/components/pages/dashboard.tsx
+- contract: T379 stage an exact copy of the Dashboard component in its own page module; no redesign and no wiring yet.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
@@ -15,6 +15,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44272 acceptedd7ece24; verify0.
 - T-44271 accepteda98c95c; verify0.
 - T-44270 accepted298fef5; verify0.
 - T-44268 accepted6590437; verify0.
