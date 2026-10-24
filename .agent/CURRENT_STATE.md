@@ -1,8 +1,8 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 683c6b5
+git_head: 63aa0ad
 branch: overhaul/neo-brutal
-architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
+architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
 archetype: Neo-Brutal Motorsport (light), ADR007 approved
 last_eval_score: obsolete baseline51.2974358974359; no current score; final evaluation T430
@@ -39,3 +39,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - T-44234 acceptedac0a46e: Staged scoped shell CSS with correct plinth host sizing, brand fit and readable typography; imported after legacy CSS without activation. Verify0.
 
 - T-44235 accepted683c6b5: Staged responsive shell widths,200ms drawer/reduced fallback, mobile44/48px controls and token spacing; no activation yet. Verify0.
+
+- T-44236 accepted63aa0ad: Added10-second shared dashboard cache with deduplicated reads, force refresh, per-consumer cancellation and stale-flight protection. Verify0.

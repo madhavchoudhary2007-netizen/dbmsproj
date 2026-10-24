@@ -1,7 +1,7 @@
 <!-- LOCK:BEGIN -->
 > STATUS: LOCKED
-> SHA256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
-> LOCKED_AT: 2026-10-23T18:47:02Z
+> SHA256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
+> LOCKED_AT: 2026-10-24T11:56:02Z
 > LOCKED_BY: orchestrator
 <!-- LOCK:END -->
 # ApexGrid architecture — existing system, improvement in place
@@ -49,7 +49,7 @@ API groups live in `backend/app/main.py`. Existing test commands shown here are 
 | API-06 | pit boxes, manual/auto reservations and strategy | `.venv/bin/pytest -q backend/tests/test_database.py -k 'pit or reservation'` |
 | API-07 | telemetry ingest/query and authenticated WebSocket | `.venv/bin/pytest -q backend/tests/test_api.py -k 'telemetry or websocket'` |
 | API-08 | generated race create/list/delete/auto-repeat | `.venv/bin/pytest -q backend/tests/test_api.py -k 'demo_race or demo_delete'` |
-| API-09 | dashboard, analytics and health | `.venv/bin/pytest -q backend/tests/test_api.py -k 'contract_routes'` (dedicated cases needed) |
+| API-09 | dashboard, analytics and health; ADR-012 nullable next_event (T-44240 focused tests) | `.venv/bin/pytest -q backend/tests/test_api.py -k 'contract_routes'` (dedicated cases needed) |
 | API-10 | DBMS SQL schema/tables/races/EER/indexes/plans/locks | `.venv/bin/pytest -q backend/tests/test_api.py -k 'dbms_workspace or admin_lock_demo'` |
 | API-11 | DBMS Mongo collections/documents and cross-store | `.venv/bin/pytest -q backend/tests/test_api.py -k 'dbms_mongo'` (cross-store case needed) |
 | API-12 | DBMS constraint, transaction, lock, recalculate | `.venv/bin/pytest -q backend/tests/test_api.py -k 'constraint_demo or admin_lock_demo'` (transaction/recalculate cases needed) |
@@ -125,6 +125,8 @@ type PitReservation = { id: UUID; pit_box_id: UUID; session_id: UUID; team_id: U
 type Telemetry = { session_id: UUID; driver_id: UUID; ts: UTC; lap: number; sector: number; elapsed_ms: number; lap_time_ms?: number | null; sector_ms: number[]; position?: number | null; speed_kph: number; throttle_pct: number; brake_pct: number; tire_compound: "SOFT" | "MEDIUM" | "HARD" | "INTERMEDIATE" | "WET"; tire_age_laps: number; tire_wear_pct: number; tire_temp_c: number[]; pit_state: string; pit_reservation_id?: UUID | null; pit_box_number?: number | null };
 type LiveEvent = { type: "session.state" | "timing.update" | "telemetry.sample" | "pit.update" | "incident.update"; ts: UTC; session_id: UUID; data: unknown };
 type RaceArchive = { session: Session; results: unknown[]; incidents: unknown[]; pit_reservations: PitReservation[]; laps?: Telemetry[]; laps_included?: boolean; completed_driver_laps?: number; telemetry_count: number; updated_at: UTC };
+// ADR-012 permits one additive dashboard field; implementation/tests pending.
+type DashboardNextEvent = { id: UUID; name: string; session_id: UUID; scheduled_at: UTC; circuit_name: string } | null;
 type DataState<T> = { kind: "empty" } | { kind: "loading"; previous?: T } | { kind: "populated"; data: T } | { kind: "error"; message: string; retry: () => void } | { kind: "partial"; data: T; message: string; retry: () => void };
 ```
 
@@ -292,3 +294,7 @@ The five-lens trace, opaque-jti/UUID compatibility amendment and zero-amendment 
 ## ADR-011 focused Phase C: health-probe dependency slice
 
 ADR-011 adds only GET /health/live (200/status alive, no external probes) and GET /health/ready (200/ready or503/not_ready, services postgres/mongodb/runtime_lease up/down). Existing /api/health is unchanged. T-320 owns offline failing-first tests; T-44129 implements only the health slice of T-338 before T-323 full acceptance, resolving the phase dependency. The five lenses and zero-amendment second pass are in ADR-011. New probe paths bypass only the global lease middleware: readiness checks ownership itself, liveness reports process availability during dependency failure. All existing auth/API/WS fail-closed behavior remains. No runtime change is enacted by this amendment.
+
+## ADR-012 focused Phase C: next-event ticker
+
+A.2 API-09 and B.3 permit only the nullable next_event field specified in ADR-012. Existing fields and scheduled_events count semantics remain unchanged. Earliest future scheduled RACE session is selected by database UTC time and stable scheduled_at/session-id ordering. W3 owns failing-first selection/null/exclusion/compatibility tests, W2 the read-only repository query, root the full disposable suite. Shell and dashboard are the two planned consumers; no dependency, schema, auth or unrelated API change. All five focused lenses and the zero-amendment second pass are recorded in ADR-012; no passing implementation is implied.

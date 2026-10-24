@@ -53,3 +53,5 @@ Perfection loop authorizations: `.agent/adr/ADR-001-perfection-loop-authorizatio
 - ADR-008 JWT logout revocation: .agent/adr/ADR-008-jwt-revocation.md (planned additive disposable-stack store; existing opaque jti and API contracts retained).
 
 - ADR-011 health probes: .agent/adr/ADR-011-health-probes.md; additive liveness/readiness only, health slice moved before T-323 to satisfy T-320 tests.
+
+- ADR-012 dashboard next event: .agent/adr/ADR-012-dashboard-next-event.md; additive read-only nullable field for plan T-370, existing fields retained.
