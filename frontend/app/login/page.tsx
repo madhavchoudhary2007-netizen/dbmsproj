@@ -3,6 +3,10 @@ import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth";
 import { LoginArt } from "@/components/login-art";
+import { NbButton } from "@/components/nb/button";
+import { NbCard } from "@/components/nb/card";
+import { NbField } from "@/components/nb/field";
+import { NbInput } from "@/components/nb/input";
 import { ArrowUpRight } from "lucide-react";
 export default function Login() {
   const { login, user, ready } = useAuth(),
@@ -33,38 +37,47 @@ export default function Login() {
   return (
     <div className="login-screen nb-login">
       <LoginArt />
-      <div className="login-main">
+      <NbCard tone="paper" shadow={12} className="login-main">
         <form className="login-form" onSubmit={submit}>
           <div className="eyebrow">AUTHENTICATED ACCESS</div>
           <h1>Sign in to ApexGrid</h1>
           <p>Use your assigned operations account to continue.</p>
-          <label>
-            Email address
-            <input
+          <NbField id="email" label="Email address">
+            <NbInput
               type="email"
               autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={busy}
               placeholder="name@team.com"
+              aria-describedby={error ? "form-error" : undefined}
             />
-          </label>
-          <label>
-            Password
-            <input
+          </NbField>
+          <NbField id="password" label="Password">
+            <NbInput
               type="password"
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={busy}
               placeholder="Enter your password"
+              aria-describedby={error ? "form-error" : undefined}
             />
-          </label>
-          {error && <div className="form-error">{error}</div>}
-          <button disabled={busy} data-primary="true" className="button primary login-submit">
+          </NbField>
+          {error && <div id="form-error" className="form-error" role="alert">{error}</div>}
+          <NbButton
+            type="submit"
+            variant="primary"
+            disabled={busy}
+            aria-busy={busy || undefined}
+            data-primary="true"
+            className="login-submit"
+          >
             {busy ? "Authenticating…" : "Sign in"}
             <ArrowUpRight size={16} />
-          </button>
+          </NbButton>
           <small className="api-address">
             API · {process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}
             /api
@@ -73,7 +86,7 @@ export default function Login() {
         <div className="login-copyright">
           APEXGRID MOTORSPORT OPERATIONS · SECURE ACCESS
         </div>
-      </div>
+      </NbCard>
     </div>
   );
 }
