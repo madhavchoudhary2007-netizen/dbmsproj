@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 13f614a
+git_head: 47c0408
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -13,7 +13,6 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - Phase2 parents T3204789586/T321caf033f/T322a12bc68/T3233146736/T32461643df/T3252bff831 accepted. JWTrevocation ADR008/migration004 onlydisposable; logoutreuse401/WS4401, CSRF/legacy/outage/expiry tests. ADR011 live/ready probes. Full184PASS0skip/livePASS twice. CSPbuild/lint/types0+85axePASS. Inlinebootstrap unsafe-inline compatibility retained; unsafe-eval devonly. T441458f721ae preserves exact3HTMLdocs routes,16testsPASS, APIs strict.
 - T3303afff87 complete: snapshot9+union7+realGETgoldens14=30PASS; full214PASS0skip/livePASS. Fixture captures own SQLtransaction, rolls back0own users/sessions. Existing API snapshot permanent gate. No API/schema changes in current moves.
 - T331 pure moves accepted: EventBus462ea55, JSON/parser47fc39d, errors882e5ed, validation049a179, models0adc5bb, livenessrouter4c4f401, domainhelpers64214d6. AST/alias proofs and snapshot9PASS each. Latest rootfull227PASS0skip/livePASS. Ruffall0; latest mypy212errors18/45files; fullzeroT339.
-- T44156 introduced1implicitexport error; repaircec7835 restored direct constant import/baseline217. No thresholds loosened. Some worker envelopes used placeholder Verify or inaccurate counts; root corrected format/counts and reranactualVerify beforeaccept, logged in childenvelopes.
 - T361 accepted1e61efd from tokens7768158/rootinstall553ed00/config9335c83: Tailwind4.3.3 +@tailwindcss/postcss4.3.3, autoprefixer removed. Rootbuild/lint/types0,audit0vulnerabilities,925nonpalettebrowserchecksPASS5projects. npm-generatedlock1183changedlines separately from authored<=150workerpackets; ownerexplicitplaninstall, no handwritten product/lock lines.
 - T360 lightgate4f53ecd activated>=0.85, AA4.5 unchanged,80cases collected. Actual dashboarddesktop1FAIL expected on currentdarkUI; never skipped. Radius4c707d9/maskera1eea31, gray10b17c4/wiringb1fec1c selftests0; good0/bad1 fixtures. All seven visual families and motion wired; actual1440 role gate030459a added using scorerf385ea8. Shadow utility fix3c10f63 accepted; allfourglobalCSSlints0 afterT44195.
 
@@ -32,12 +31,20 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 
 ## Recent acceptance / review
 - T363 children d0bb56a textures/8c03959 componentsCSS, no currentroute redesign. Rootbuild/lint/types0. Initial85axe run72PASS13contrastFAIL after gradient cleanup exposed old lowcontrast labels. T44202 159692d corrected exactly2colors toexistingmuted; repeat85axePASS+4keyboardPASS, noassertion/gate change. Taste noextra primary/clutter/motion; computed primitive testsT366 stillrequired.
-- T331 SQL rowbrowserdc48751/provider5898b4f exactmoves eachrootfull227PASS0skip/livePASS. Currentstewardslistfa39f5d exactAST/11snapshot+runtimePASS; rootfull227 running. Ruffall0; strictmypy212errors18/45files. Temporarytyped factories removedinT332.
+- T331 SQL rowbrowserdc48751/provider5898b4f exactmoves eachrootfull227PASS0skip/livePASS. Stewardslistfa39f5d exactAST/11snapshot+runtimePASS; rootfull227PASS0skip/livePASS. Ruffall0; strictmypy212errors18/45files. Temporarytyped factories removedinT332.
 - T44189 3343d87 exposed duplicateMongo route; corrected7eeb81d, permanenttest_route_registration gate. T44191 required-inputRED9fail2controls fixed2c78430 (27focusedPASS, full2270skip/livePASS); helper coversrequiredfields, notallconstraint changes. Older214green lackedthesechecks.
-- T364 helper/reduced subscriptionf9dc8e6 acceptedoffline; T44200 FLIP/flash W2 andT44203 button/card W1 runningisolated, cap2. WorkerreportedplaceholderVerify/counts normalized androotrerun; no scopeviolations. Rootauthor0productlines.
+- T364 helper/reduced subscriptionf9dc8e6 acceptedoffline; T44200 FLIP/flash47c0408 accepted aftercancelcleanuprepair; T44203 W1 interrupted byaccountlimit beforefinalenvelope. No workers running. WorkerreportedplaceholderVerify/counts normalized androotrerun; no scopeviolations. Rootauthor0productlines.
 
 - T-363 accepted13f614a: Closed shared texture/component CSS foundation; four source-wide gates0, production build0,85axe and4keyboard checks pass after two-color contrast repair. Verify0.
 
 - T44200 reviewFAILED despitetypecheck0: external Animation.cancel lacked oncancel cleanup in bothhooks. Candidate preservedrawpatch, only2ownunaccepted newfiles reset; repair1 queued. No source accepted or testsweakened.
 
 - T44203 reviewrepair1 foromittedplan danger!icon/clientboundary; rootpacket hadomittedicon, recordedoversight. Bothownunacceptednewfiles reset, candidate retainedrawpatch. Envelope staticcounts arrays correctedtointegers onnextresult.
+
+- T-44200 accepted47c0408: Added bounded FLIP and coalesced cell flash hooks; repair1 adds guarded finish/cancel cleanup and reduced-motion handling. Runtime coverage remains T366. Verify0.
+
+## Execution blocker
+- Requiredw1-ui terminated: You’ve hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/settings/usage to purchase more credits or try again at 7:00 AM.
+- T44203 repaircandidate130lines retained only .agent/workspaces/T44203 and interrupted.raw.patch; unaccepted, no productrootchanges. Resume freshw1-ui onupdatedpacket, reviewcandidate/rerunVerify, returnvalidJSON, thenrootaccept. Do notsubstitutemodels orclaimcompletion. PreparedT44204/T44205 queuedbutNOTdispatched. T364runtime/T366 andremainingPhases3–11 unfinished.
+
+- Finalrootcheck47c0408: productionbuild/lint/types0 (T44206.build.raw.log); fourglobalCSSgates0. T44203 isolatedcandidate Verify0 but nofinalworkerJSON, remainsunaccepted. Requiredworkeravailability is soleexecutionstop; noownerdecisionrequested.
