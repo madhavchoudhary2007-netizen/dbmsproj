@@ -3,10 +3,15 @@ updated_at: 2026-10-24
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44303 W1 — OPEN
-- target_files: frontend/components/pages/session-controls.tsx, frontend/components/special-pages.tsx
-- contract: T379 extract unchanged session lifecycle action row into presentational component.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+### T-380 O — OPEN
+- target_files: none
+- contract: Close login route milestone using independently run80browserchecks, settledscreenshots andproductionbuild.
+- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
+### T-44305 W2 — OPEN
+- target_files: backend/app/simulation_pit.py, backend/app/main.py
+- contract: T331 extract exact simulator pit state refresh into typed module and preserve main compatibility wrapper.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "pit or sector_lap_elapsed" && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/simulation_pit.py
 
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
@@ -15,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44303 accepted6e88345; verify0.
 - T-44302 accepted8e88bb7; verify0.
 - T-44301 accepted2f422c0; verify0.
 - T-44299 acceptedbd3f9c2; verify0.

@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 8e88bb7
+git_head: 6e88345
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (owner override2bc94fb), cap2
@@ -48,3 +48,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44301 accepted2f422c0: Extract exact result/editor dialogs with original field/copy/permission contracts and precise ResourceEditor callback props, no casts. Verify0.
 
 - T-44302 accepted8e88bb7: Extract exact generated-race runtime creation body into typed service with compatibility imports/defaults and current callback bindings. Verify0.
+
+- T-44303 accepted6e88345: Extract exact session lifecycle controls with unchanged action predicates, permission guards, icons and callback props. Verify0.
