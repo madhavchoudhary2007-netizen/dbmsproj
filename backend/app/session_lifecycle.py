@@ -1,0 +1,92 @@
+from __future__ import annotations
+
+import asyncio
+from collections.abc import Callable, Mapping
+from datetime import UTC, datetime
+from typing import Any
+from uuid import UUID
+
+from fastapi import HTTPException
+from psycopg import sql
+from psycopg.rows import dict_row
+
+from .schemas_operations import Action
+
+
+async def run_session_action(
+    session_id: UUID,
+    body: Action,
+    user: Any,
+    _require_crud_record: Callable[[Any, str], Any],
+    fetch_one: Callable[[str, tuple[Any, ...]], Any],
+    ensure_session_reset_allowed: Callable[[UUID], Any],
+    simulations: Mapping[str, Any],
+    connection: Callable[[], Any],
+    clear_session_measurements: Callable[[UUID], Any],
+    sync_simulation_lifecycle: Callable[[UUID, str], Any],
+    cancel_automatic_pit_reservations: Callable[[UUID], Any],
+    jsonable: Callable[[Any], Any],
+    publish: Callable[[UUID, str, Any], Any],
+) -> Any:
+    transitions = {
+        "start": (("SCHEDULED",), "ACTIVE"),
+        "pause": (("ACTIVE",), "PAUSED"),
+        "resume": (("PAUSED",), "ACTIVE"),
+        "finish": (("ACTIVE", "PAUSED"), "COMPLETED"),
+        "reset": (("ACTIVE", "PAUSED", "COMPLETED", "CANCELLED"), "SCHEDULED"),
+    }
+    states, after = transitions[body.action]
+    now = datetime.now(UTC)
+    if body.action == "reset":
+        existing = _require_crud_record(
+            fetch_one("SELECT state FROM race_sessions WHERE id=%s", (session_id,)),
+            "Session not found",
+        )
+        if existing["state"] not in states:
+            raise HTTPException(409, "Invalid session state transition")
+        ensure_session_reset_allowed(session_id)
+        sim = simulations.get(str(session_id))
+        task = sim.task if sim else None
+        if sim:
+            sim.status = "stopped"
+        if task is not None and not task.done():
+            task.cancel()
+        if task is not None and not task.done():
+            await asyncio.gather(task, return_exceptions=True)
+    set_fragments = {
+        "start": ("started_at=%s,ended_at=NULL", [now]),
+        "pause": ("", []),
+        "resume": ("", []),
+        "finish": ("ended_at=%s", [now]),
+        "reset": ("started_at=NULL,ended_at=NULL,safety_car=FALSE", []),
+    }
+    set_fragment, action_params = set_fragments[body.action]
+    set_fields = "state=%s" + (f",{set_fragment}" if set_fragment else "")
+    params: list[Any] = [after, *action_params, session_id, list(states)]
+    with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            sql.SQL("UPDATE race_sessions SET {} WHERE id=%s AND state=ANY(%s) RETURNING *")
+            .format(sql.SQL(set_fields))
+            .as_string(),
+            params,
+        )
+        row = cur.fetchone()
+    if not row:
+        _require_crud_record(
+            fetch_one("SELECT id FROM race_sessions WHERE id=%s", (session_id,)),
+            "Session not found",
+        )
+        raise HTTPException(409, "Invalid session state transition")
+    if body.action == "reset":
+        clear_session_measurements(session_id)
+        sync_simulation_lifecycle(session_id, "reset")
+    else:
+        sync_simulation_lifecycle(session_id, body.action)
+        if body.action == "finish":
+            cancel_automatic_pit_reservations(session_id)
+            sim = simulations.get(str(session_id))
+            if sim:
+                sim.pit_reservations_by_driver.clear()
+    result = jsonable(row)
+    publish(session_id, "session.state", result)
+    return result

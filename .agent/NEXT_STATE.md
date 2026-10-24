@@ -3,10 +3,15 @@ updated_at: 2026-10-24
 phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 
 ## Queue
-### T-44262 W1 — OPEN
-- target_files: frontend/app/styles/shell.css
-- contract: Ensure mobile drawer close/signout controls remain above44px during translated animation by using48px dimensions, preserving the strict gate.
-- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+### T-44264 W3 — OPEN
+- target_files: frontend/e2e/auth-cookie.spec.ts, frontend/e2e/responsive.spec.ts
+- contract: Update browser navigation helpers from old700px breakpoint to the approved shell drawer boundary below1000px, preserving all assertions.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/auth-cookie.spec.ts e2e/responsive.spec.ts --list
+
+### T-44263 W2 — OPEN
+- target_files: backend/app/session_lifecycle.py
+- contract: T331 stage exact async session lifecycle implementation with explicit injected dependencies, no router/main wiring yet.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,pathlib,subprocess; a=ast.parse(subprocess.check_output(["git","show","HEAD:backend/app/main.py"],text=True)); b=ast.parse(pathlib.Path("backend/app/session_lifecycle.py").read_text()); x=next(n for n in a.body if isinstance(n,ast.AsyncFunctionDef) and n.name=="session_action"); y=next(n for n in b.body if isinstance(n,ast.AsyncFunctionDef) and n.name=="run_session_action"); assert ast.dump(ast.Module(body=x.body,type_ignores=[]))==ast.dump(ast.Module(body=y.body,type_ignores=[])); print("PASS exact lifecycle handler body")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/session_lifecycle.py
 
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
@@ -16,6 +21,7 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44262 accepted46af416; verify0.
 - T-44261 accepted869f5aa; verify0.
 - T-44260 accepted14da91f; verify0.
 - T-44259 accepted905b786; verify0.
