@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 818ff70
+git_head: 24fae87
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; customworkers gpt-5.6-luna/high (owner override); cap2
@@ -42,3 +42,5 @@ last_eval_score: baseline51.2974358974359, obsolete forcurrentcode, NOTpresentab
 - T-44220 accepted324c60b: Added accessible five-state fixtures for state, table and chart primitives; preserves scoped hooks and action callbacks. Verify0.
 
 - T-44223 accepted818ff70: Staged exact lap aggregation helper and two typed lap endpoint registrations; original main wiring remains for next atomic task. Verify0.
+
+- T-44222 accepted24fae87: Added dev-only component guide covering variants, five states, forms, tabs, native modal and actual FLIP/flash hooks; production returns404. Verify0.

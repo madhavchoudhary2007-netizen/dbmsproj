@@ -8,11 +8,6 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - contract: T331 wire staged lap routes and pure helper, remove old bodies from main.
 - verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "decision or incident" && .venv/bin/ruff check backend/app/main.py backend/app/api/laps.py && .venv/bin/ruff format --check backend/app/main.py backend/app/api/laps.py
 
-### T-44222 W1 — OPEN
-- target_files: frontend/components/nb/style-guide.tsx, frontend/app/__nb/page.tsx
-- contract: T365 dev-only style-guide route exercising every shared primitive variant plus real motion hooks.
-- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
 
@@ -20,6 +15,7 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44222 accepted24fae87; verify0.
 - T-44223 accepted818ff70; verify0.
 - T-44220 accepted324c60b; verify0.
 - T-44221 accepted2e5c5a4; verify0.
