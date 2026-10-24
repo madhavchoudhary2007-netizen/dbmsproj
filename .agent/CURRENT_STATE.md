@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 2aa2b87
+git_head: dfcf8ac
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -49,3 +49,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 
 
 - T-44253 accepted2aa2b87: Rename reserved local module variable while preserving real-source VM execution and every mapper assertion. Verify0.
+
+- T-44248 accepteddfcf8ac: Add compact truthful polling status/retry and five-state real-data ticker with retained partial data, no empty red band and delayed loading skeleton. Verify0.

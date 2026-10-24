@@ -24,6 +24,9 @@ import {
 import { useAuth } from "./auth";
 import { useEffect } from "react";
 import { useNavigationDrawer } from "../lib/use-navigation-drawer";
+import { useRaceControlFeed } from "../lib/use-race-control-feed";
+import { raceControlItems } from "../lib/race-control-items";
+import { ShellFeedStatus, ShellRaceControl } from "./shell-feed";
 
 type NavItem = [href: string, name: string, icon: LucideIcon];
 interface NavGroup {
@@ -75,6 +78,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       backgroundRef,
       menuButtonRef,
     } = useNavigationDrawer(Boolean(user && ready));
+  const feed = useRaceControlFeed(Boolean(user && ready));
   useEffect(() => {
     if (!ready) return;
     if (!user && path !== "/" && path !== "/login") router.replace("/login");
@@ -172,13 +176,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
               "OVERVIEW"}
           </div>
           <div className="top-meta">
-            <span className="system-status">
-              <i /> API SESSION
-            </span>
+            <span className="season-sticker">2026 SEASON</span>
+            <span className="system-status"><ShellFeedStatus connection={feed.connection} error={feed.error} onRefresh={feed.refresh} /></span>
             <span className="divider" />
-            {user.role}
+            <span className="header-role">{user.role}</span>
           </div>
         </header>
+        <ShellRaceControl items={raceControlItems(feed.data)} status={feed.status} error={feed.error} onRefresh={feed.refresh} />
         <main className="content" id="main-content" tabIndex={-1}>{children}</main>
         <footer className="footer">
           <span>APEXGRID MOTORSPORT OPERATIONS</span>

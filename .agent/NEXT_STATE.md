@@ -8,11 +8,6 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - contract: Connect accepted hook/mapper/presenters, no new behavior or API.
 - verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
-### T-44248 W1 — OPEN
-- target_files: frontend/components/shell-feed.tsx, frontend/app/styles/shell.css
-- contract: T370 create presentational header feed status and real-data ticker components; root will wire existing W2 hook afterward as small cross-worker glue.
-- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
 
@@ -21,6 +16,7 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44248 accepteddfcf8ac; verify0.
 - T-44253 accepted2aa2b87; verify0.
 - T-44252 accepted39f2e59; verify0.
 - T-44249 accepted939fea6; verify0.
