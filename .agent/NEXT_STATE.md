@@ -1,11 +1,16 @@
 # NEXT_STATE
-updated_at: 2026-10-24
+updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44310 W1 — OPEN
-- target_files: frontend/components/pages/steward-report.tsx, frontend/components/special-pages.tsx
-- contract: T379 extract exact StewardDesk incident-report editor presentation, no redesign.
+### T-44312 W2 — OPEN
+- target_files: backend/app/simulation_incidents.py, backend/app/main.py
+- contract: T331 extract exact generated-race incident recording into typed persistence helper with main compatibility wrapper.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "incident or seeded" && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/simulation_incidents.py
+
+### T-44311 W2 — OPEN
+- target_files: frontend/components/special-pages.tsx
+- contract: T379 activate staged exact useStewardDesk hook, removing duplicate orchestration only.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Blocked
@@ -15,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44310 acceptedf51818a; verify0.
 - T-44309 accepted8ac6fa2; verify0.
 - T-44308 accepted304ebe7; verify0.
 - T-44307 accepted03ab0d5; verify0.
