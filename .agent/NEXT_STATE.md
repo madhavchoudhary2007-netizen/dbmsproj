@@ -3,11 +3,6 @@ updated_at: 2026-10-24
 phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 
 ## Queue
-### T-370 O — Shell parent acceptance
-- target_files: none
-- contract: Accepted W1/W2 children plus root481 browser checks:85axe,20edge,15feed,10drawer,80routes,75targets,80primary,20auth,96responsive; build0.
-- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
 ### T-371 O — Feed parent acceptance
 - target_files: none
 - contract: Visible30s polling/shared10s cache/abort/five states; root15browser+7offline cases pass, E4 request count unchanged.
@@ -21,6 +16,7 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-370 acceptedda5a72d; verify0.
 - T-44265 accepted94a7009; verify0.
 - T-44264 accepted43ce7cc; verify0.
 - T-44263 accepted3cda000; verify0.

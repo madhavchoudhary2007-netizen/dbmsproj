@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 94a7009
+git_head: da5a72d
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -47,3 +47,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 
 
 - T-44265 accepted94a7009: Wire session action through exact lifecycle service, preserving legacy Action/handler aliases and late-bound callbacks. Verify0.
+
+- T-370 acceptedda5a72d: Close shell milestone with481 root browser checks and build passing; UI controls, contrast, mobile and auth verified. Verify0.
