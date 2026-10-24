@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: db3cf1b
+git_head: ac0a46e
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -8,7 +8,7 @@ archetype: Neo-Brutal Motorsport (light), ADR007 approved
 last_eval_score: obsolete baseline51.2974358974359; no current score; final evaluation T430
 
 ## Verified milestones
-- Phases0–2 and5 COMPLETE (4 of12). Phase3 T331 extraction remains; main1746 lines, target<=120. Phase4 and6–11 unfinished. Owner requests autonomous completion of all12, no routine questions.
+- Phases0–2 and5 COMPLETE (4 of12). Phase3 T331 extraction remains; main1671 lines, target<=120. Phase4 and6–11 unfinished. Owner requests autonomous completion of all12, no routine questions.
 - Phase5 T3602ad337f/T3611e61efd/T362c0781f9/T36313f614a/T364d666cf6/T365b90911f/T366b18819f accepted through accept.sh. Tailwind4.3.3, SpaceGrotesk500/700 + SpaceMono400/700, scoped tokens/textures/plinth and complete shared primitives. Existing production routes adopt them in Phases6–7.
 - Root60 browser cases PASS across320/375/768/1440/5120 (T366.matrix.browser.raw.log). Parent accept reruns: motion30 PASS, primitive30 PASS, axe375/1440 2 PASS; keyboard/font4 per runner. Build/lint/types0 and four CSS lints0. /__nb dev200, production not-found visible + noindex + guide absent + zero writes. Next streamed notFound HTTP200 is documented behavior; do not substitute status-only checks (.agent/check-guide-production.py).
 - Corrected missing route: Next app/__nb is private; escaped app/%5F_nb restores /__nb (6b9c6f7). Browser found43.5px controls fixed with explicit44px dimensions fdb63e2. FLIP incorrectly animated mount/scroll; container-relative/key-order guard e6efcc1 passes actual mounted tests. Finite-animation/fonts readiness before axe preserves thresholds; reduced-motion still zero immediately.
@@ -17,7 +17,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - Legacy Decision import removal caused7 failures;5ee4710 restored explicit main.Decision/IncidentIn exports, full227 green. Preserve all legacy main aliases and late-bound callbacks in further moves. OpenAPI alone does not prove route uniqueness or Python aliases.
 
 ## Next work
-- No workers currently running. Queue T44233 W2 wire staged lock endpoints and T44234 W1 shell CSS foundation (T370), disjoint clones. Then shell markup/data hook T371, with root existing route/responsive/a11y/touch/hash/auth checks. Remaining task graph is docs/overhaul-plan.md.
+- Backend lock endpoints wireddb3cf1b: root227 PASS0skip/live PASS (T44233.full.raw.log). Shell CSS ac0a46e staged dormant; responsive CSS and shared cache under review. Next drawer hook/markup and T371 cache/poll integration, then existing route/responsive/a11y/touch/hash/auth checks. Missing next_event field for planned ticker requires own additive ADR/tests (T44240); no fabricated event. Remaining graph docs/overhaul-plan.md.
 - Four CSS lint gates0; production routes still legacy dark, light palette FAIL expected until Phase7, never skip/widen it. Last existing-route axe85 and non-palette925 before new shell. Phase5 guide60 now green; do not imply real-route redesign complete.
 
 ## Safety / workflow
@@ -35,3 +35,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - Zero authored product lines. Metadata, architecture/config/ADRs, packets/state/envelopes/root acceptance helpers and approved installs only. Applying worker patches is integration, not authorship. No new dependencies this continuation.
 
 - T-44233 accepteddb3cf1b: Wired lock/recalculate router with preserved aliases, late-bound callbacks, existing guard/auth and explicit legacy runtime reexports. Verify0.
+
+- T-44234 acceptedac0a46e: Staged scoped shell CSS with correct plinth host sizing, brand fit and readable typography; imported after legacy CSS without activation. Verify0.

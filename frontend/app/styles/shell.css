@@ -111,3 +111,72 @@
   position: fixed; inset: 0; z-index: 35; border: 0;
   background: var(--nb-cream); opacity: 0.9;
 }
+
+@media (max-width: 999px) {
+  .nb-shell .sidebar {
+    width: min(264px, calc(100vw - 32px)); max-height: 100dvh;
+    transform: translateX(-100%); transition: transform 200ms ease-out;
+  }
+  .nb-shell .sidebar.show { transform: translateX(0); }
+  .nb-shell .main-shell { margin-left: 0; }
+  .nb-shell .mobile-menu,
+  .nb-shell .close-nav {
+    align-items: center; justify-content: center; padding: 0;
+    color: var(--nb-ink); border: var(--nb-border); background: var(--nb-paper);
+  }
+  .nb-shell .mobile-menu {
+    display: inline-flex; width: 48px; height: 48px; flex: 0 0 48px;
+  }
+  .nb-shell .close-nav {
+    display: inline-flex; width: 44px; height: 44px; flex: 0 0 44px;
+    margin-left: auto;
+  }
+  .nb-shell .mobile-menu:focus-visible,
+  .nb-shell .close-nav:focus-visible {
+    outline: 4px solid var(--nb-ink); outline-offset: 4px;
+    background: var(--nb-yellow);
+  }
+  .nb-shell .mobile-scrim {
+    background: var(--nb-cream); opacity: 0.9;
+  }
+}
+
+@media (min-width: 1000px) {
+  .nb-shell .sidebar { transform: none; }
+  .nb-shell .main-shell { margin-left: var(--nb-nav-width); }
+  .nb-shell .mobile-menu,
+  .nb-shell .close-nav { display: none; }
+}
+
+@media (min-width: 1000px) and (max-width: 1199px) {
+  .nb-shell { --nb-nav-width: 232px; }
+}
+
+@media (min-width: 1200px) {
+  .nb-shell { --nb-nav-width: 264px; }
+}
+
+@media (max-width: 767px) {
+  .nb-shell .topbar { gap: 8px; padding: 0 16px; }
+  .nb-shell .crumb { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  .nb-shell .top-meta { flex-shrink: 0; gap: 8px; white-space: nowrap; }
+  .nb-shell .divider { display: none; }
+  .nb-shell .content { padding: 16px; }
+  .nb-shell .footer { gap: 8px; padding: 16px; }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .nb-shell .content { padding: 24px; }
+}
+
+@media (min-width: 1200px) {
+  .nb-shell .content { padding: 32px; }
+}
+
+.nb-shell .footer > * {
+  min-width: 0; overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nb-shell .sidebar { transition: none; }
+}
