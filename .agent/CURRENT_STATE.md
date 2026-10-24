@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 3e902c2
+git_head: a84550c
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -53,3 +53,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 
 
 
+
+- T-44258 accepteda84550c: Strengthen dashboard Refresh selector to exact accessible name while preserving every offline-recovery assertion. Verify0.

@@ -1,5 +1,7 @@
 "use client";
 
+import { useId } from "react";
+
 import { NbMarquee } from "@/components/nb/marquee";
 import { NbSkeleton } from "@/components/nb/skeleton";
 
@@ -15,15 +17,25 @@ export interface ShellFeedStatusProps {
 }
 
 export function ShellFeedStatus({ connection, error, onRefresh }: ShellFeedStatusProps) {
+  const labelId = useId();
+  const actionLabelId = `${labelId}-action`;
+  const connectionLabelId = `${labelId}-connection`;
   const statusDescription = error ? `${connection}: ${error}` : connection;
   const statusTitle = `${statusDescription}. ${sessionDescription}`;
 
   return (
     <div className="feed-status" data-connection={connection}>
       <span className="sr-only">API SESSION. {statusTitle}</span>
-      <button type="button" aria-label="Refresh race control feed" title={statusTitle} onClick={onRefresh}>
+      <button
+        type="button"
+        aria-label="Refresh race control feed"
+        aria-labelledby={`${actionLabelId} ${connectionLabelId}`}
+        title={statusTitle}
+        onClick={onRefresh}
+      >
+        <span id={actionLabelId} className="sr-only">Refresh race control feed</span>
         <span aria-hidden="true" className="status-dot" />
-        <span className="feed-connection">{connection}</span>
+        <span id={connectionLabelId} className="feed-connection">{connection}</span>
       </button>
     </div>
   );

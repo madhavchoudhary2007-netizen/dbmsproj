@@ -3,11 +3,6 @@ updated_at: 2026-10-24
 phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 
 ## Queue
-### T-44258 W3 — OPEN
-- target_files: frontend/e2e/edge-resilience.spec.ts
-- contract: Disambiguate existing dashboard Refresh selector after addition of separately named feed refresh button; strengthen exact-name match without weakening any recovery assertion.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/edge-resilience.spec.ts --list
-
 ### T-44257 W1 — OPEN
 - target_files: frontend/components/shell-feed.tsx, frontend/app/styles/shell.css
 - contract: Fix measured light-shell integration accessibility regressions and remove legacy1480px content cap, without redesigning route markup.
@@ -21,6 +16,7 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44258 accepteda84550c; verify0.
 - T-44256 accepted3e902c2; verify0.
 - T-44251 accepted3483224; verify0.
 - T-44254 accepted145c55f; verify0.

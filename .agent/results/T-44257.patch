@@ -1,0 +1,78 @@
+diff --git a/frontend/app/styles/shell.css b/frontend/app/styles/shell.css
+index d86755d..bac3b77 100644
+--- a/frontend/app/styles/shell.css
++++ b/frontend/app/styles/shell.css
+@@ -1,9 +1,32 @@
+ .nb-shell {
+   --nb-nav-width: 264px; min-height: 100dvh;
+-  background: var(--nb-cream); color: var(--nb-ink);
++  --bg: var(--nb-cream); --panel: var(--nb-paper); --line: var(--nb-ink);
++  --text: var(--nb-ink); --muted: var(--nb-ink); --acid: var(--nb-yellow); --red: var(--nb-red);
++  color-scheme: light; background: var(--nb-cream); color: var(--nb-ink);
+   font-size: var(--fs-body); font-family: var(--font-sans); line-height: 1.5;
+ }
+ 
++.nb-shell .page-head p, .nb-shell .eyebrow, .nb-shell .muted, .nb-shell .table-note,
++.nb-shell .record-count, .nb-shell .form-hint, .nb-shell .panel .muted,
++.nb-shell .stat-card span { color: var(--nb-ink); }
++.nb-shell .panel, .nb-shell .table-wrap, .nb-shell .toolbar, .nb-shell .state,
++.nb-shell .filter-panel, .nb-shell .modal { color: var(--nb-ink); background: var(--nb-paper); border-color: var(--nb-ink); }
++.nb-shell .panel h2, .nb-shell .panel-heading h2, .nb-shell .panel h3,
++.nb-shell th, .nb-shell td, .nb-shell .state, .nb-shell .form-grid label,
++.nb-shell .decision-form label, .nb-shell .login-form label, .nb-shell .filter-panel label,
++.nb-shell .toolbar label { color: var(--nb-ink); }
++.nb-shell th { background: var(--nb-cream); border-color: var(--nb-ink); }
++.nb-shell td { color: var(--nb-ink); border-color: var(--nb-ink); }
++.nb-shell .toolbar, .nb-shell .search, .nb-shell .form-grid input, .nb-shell .form-grid select,
++.nb-shell .decision-form input, .nb-shell .decision-form textarea, .nb-shell .filter-panel input,
++.nb-shell .filter-panel select, .nb-shell .toolbar select, .nb-shell .inline-form input,
++.nb-shell .inline-form select, .nb-shell .login-form input { color: var(--nb-ink); background: var(--nb-paper); border-color: var(--nb-ink); }
++.nb-shell .search input { color: var(--nb-ink); }
++.nb-shell .button.secondary { color: var(--nb-ink); background: var(--nb-cream); border-color: var(--nb-ink); }
++.nb-shell .header-actions, .nb-shell .topbar, .nb-shell .modal > header { color: var(--nb-ink); background: var(--nb-paper); }
++.nb-shell .state.error { color: var(--nb-ink); background: var(--nb-red); border-color: var(--nb-ink); }
++.nb-shell .content { width: 100%; max-width: none; margin: 0; }
++
+ .nb-shell .sidebar {
+   position: fixed; inset: 0 auto 0 0; z-index: 40;
+   display: flex; width: var(--nb-nav-width); flex-direction: column;
+diff --git a/frontend/components/shell-feed.tsx b/frontend/components/shell-feed.tsx
+index ad6e66a..c0dde37 100644
+--- a/frontend/components/shell-feed.tsx
++++ b/frontend/components/shell-feed.tsx
+@@ -1,5 +1,7 @@
+ "use client";
+ 
++import { useId } from "react";
++
+ import { NbMarquee } from "@/components/nb/marquee";
+ import { NbSkeleton } from "@/components/nb/skeleton";
+ 
+@@ -15,15 +17,25 @@ export interface ShellFeedStatusProps {
+ }
+ 
+ export function ShellFeedStatus({ connection, error, onRefresh }: ShellFeedStatusProps) {
++  const labelId = useId();
++  const actionLabelId = `${labelId}-action`;
++  const connectionLabelId = `${labelId}-connection`;
+   const statusDescription = error ? `${connection}: ${error}` : connection;
+   const statusTitle = `${statusDescription}. ${sessionDescription}`;
+ 
+   return (
+     <div className="feed-status" data-connection={connection}>
+       <span className="sr-only">API SESSION. {statusTitle}</span>
+-      <button type="button" aria-label="Refresh race control feed" title={statusTitle} onClick={onRefresh}>
++      <button
++        type="button"
++        aria-label="Refresh race control feed"
++        aria-labelledby={`${actionLabelId} ${connectionLabelId}`}
++        title={statusTitle}
++        onClick={onRefresh}
++      >
++        <span id={actionLabelId} className="sr-only">Refresh race control feed</span>
+         <span aria-hidden="true" className="status-dot" />
+-        <span className="feed-connection">{connection}</span>
++        <span id={connectionLabelId} className="feed-connection">{connection}</span>
+       </button>
+     </div>
+   );
