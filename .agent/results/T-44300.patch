@@ -1,0 +1,25 @@
+diff --git a/frontend/app/styles/login.css b/frontend/app/styles/login.css
+index 53d0d66..7ae7eac 100644
+--- a/frontend/app/styles/login.css
++++ b/frontend/app/styles/login.css
+@@ -24,6 +24,7 @@ html:has(.nb-login), body:has(.nb-login) { color-scheme: light; background: var(
+ .nb-login .nb-login-sticker { display: inline-flex; flex-shrink: 0; align-items: center; gap: 8px; min-height: 44px; }
+ .nb-login .nb-login-sticker-icon { width: 24px; height: 24px; }
+ .nb-login .nb-login-marquee { min-width: 0; flex: 1; }
++.nb-login .nb-login-marquee:focus-visible { outline: 4px solid var(--nb-ink, #000000); outline-offset: 4px; }
+ .nb-login .visual-footer { display: flex; width: fit-content; max-width: 100%; justify-content: space-between; gap: 16px; padding: 8px; color: var(--nb-ink, #000000); font-family: var(--font-space-mono), ui-monospace, monospace; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; }
+ .nb-login .nb-login-checker { position: relative; z-index: 1; display: block; width: calc(100% + 64px); height: 16px; margin-inline: -32px; flex-shrink: 0; background-position: 0 0; background-repeat: repeat; }
+ .nb-login .login-main { position: relative; z-index: 0; display: flex; min-height: 0; margin: 32px; flex-direction: column; justify-content: center; align-items: center; padding: 32px; }
+diff --git a/frontend/components/login-art.tsx b/frontend/components/login-art.tsx
+index 97f1035..c9e726c 100644
+--- a/frontend/components/login-art.tsx
++++ b/frontend/components/login-art.tsx
+@@ -38,6 +38,8 @@ export function LoginArt() {
+           </NbSticker>
+           <NbMarquee
+             className="nb-login-marquee"
++            tabIndex={0}
++            aria-label="Race control topics"
+             items={["RACE CONTROL", "TELEMETRY", "STEWARDS", "PIT WALL", "STANDINGS"]}
+             tone="red"
+           />

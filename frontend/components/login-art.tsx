@@ -38,6 +38,8 @@ export function LoginArt() {
           </NbSticker>
           <NbMarquee
             className="nb-login-marquee"
+            tabIndex={0}
+            aria-label="Race control topics"
             items={["RACE CONTROL", "TELEMETRY", "STEWARDS", "PIT WALL", "STANDINGS"]}
             tone="red"
           />
