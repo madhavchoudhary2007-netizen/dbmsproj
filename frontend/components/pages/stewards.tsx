@@ -1,0 +1,149 @@
+"use client";
+
+import { Check } from "lucide-react";
+import {
+  AddButton,
+  Button,
+  DataTable,
+  Modal,
+  PageHeader,
+  StateMessage,
+} from "../ui";
+import { StewardReport } from "./steward-report";
+import { StewardSanctions } from "./steward-sanctions";
+import { useStewardDesk } from "@/lib/use-steward-desk";
+
+export function StewardDesk() {
+  const {
+    rows,
+    drivers,
+    sessions,
+    error,
+    loading,
+    active,
+    setActive,
+    busy,
+    notes,
+    setNotes,
+    points,
+    setPoints,
+    seconds,
+    setSeconds,
+    grid,
+    setGrid,
+    message,
+    canSteward,
+    load,
+    report,
+    decide,
+  } = useStewardDesk();
+  return (
+    <>
+      <PageHeader
+        eyebrow="RACE CONTROL / STEWARDING"
+        title="Steward desk"
+        description="Review reported incidents and record decisions. Approved penalties update driver points and eligibility in PostgreSQL."
+        action={
+          canSteward ? (
+            <AddButton
+              onClick={() => setActive({ __new: true })}
+              children="Report incident"
+            />
+          ) : null
+        }
+      />
+      <StateMessage error={error} loading={loading} retry={() => void load()} />
+      {!error && !loading && (
+        <DataTable
+          rows={rows.map((r) => ({
+            ...r,
+            driver_name:
+              r.driver_name ||
+              drivers.find((d) => d.id === r.driver_id)?.full_name,
+            session_label:
+              r.session_name ||
+              sessions.find((s) => s.id === r.session_id)?.session_type,
+          }))}
+          columns={[
+            "reported_at",
+            "session_label",
+            "driver_name",
+            "lap",
+            "description",
+            "state",
+          ]}
+          onSelect={(r) => {
+            setActive(r);
+            setNotes("");
+            setPoints(0);
+            setSeconds(0);
+            setGrid(0);
+          }}
+        />
+      )}
+      {message && <div className="notice">{message}</div>}
+      {active && canSteward && (
+        <Modal
+          title={active.__new ? "Report incident" : "Incident review"}
+          close={() => setActive(undefined)}
+        >
+          {active.__new ? (
+            <StewardReport
+              sessions={sessions}
+              drivers={drivers}
+              report={report}
+              busy={busy}
+            />
+          ) : (
+            <div className="decision-form">
+              <p>
+                <b>
+                  {String(active.description || "Incident details unavailable")}
+                </b>
+              </p>
+              <p className="muted">
+                Lap {String(active.lap)} · {String(active.state)}
+              </p>
+              {active.state !== "OPEN" && (
+                <div className="notice">
+                  This incident already has a decision recorded.
+                </div>
+              )}
+              <label>
+                Decision notes
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                />
+              </label>
+              <StewardSanctions
+                points={points}
+                seconds={seconds}
+                grid={grid}
+                setPoints={setPoints}
+                setSeconds={setSeconds}
+                setGrid={setGrid}
+              />
+              <div className="form-actions">
+                <Button
+                  disabled={busy || active.state !== "OPEN"}
+                  onClick={() => void decide(false)}
+                  kind="secondary"
+                >
+                  Reject report
+                </Button>
+                <Button
+                  disabled={busy || active.state !== "OPEN"}
+                  onClick={() => void decide(true)}
+                  kind="danger"
+                >
+                  <Check size={15} /> Approve penalty
+                </Button>
+              </div>
+            </div>
+          )}
+        </Modal>
+      )}
+    </>
+  );
+}
