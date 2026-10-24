@@ -3,10 +3,15 @@ updated_at: 2026-10-24
 phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 
 ## Queue
-### T-44265 W2 — OPEN
-- target_files: backend/app/api/session_action.py, backend/app/main.py
-- contract: T331 add thin session-action router and wire staged exact lifecycle service, retaining main.session_action and all legacy dependency aliases.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "session_lap_limits or simulation_accepts_zero or decision or incident" && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/api/session_action.py
+### T-370 O — Shell parent acceptance
+- target_files: none
+- contract: Accepted W1/W2 children plus root481 browser checks:85axe,20edge,15feed,10drawer,80routes,75targets,80primary,20auth,96responsive; build0.
+- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
+### T-371 O — Feed parent acceptance
+- target_files: none
+- contract: Visible30s polling/shared10s cache/abort/five states; root15browser+7offline cases pass, E4 request count unchanged.
+- verify: npm --prefix frontend run typecheck && node --experimental-vm-modules --test frontend/e2e/runtime/dashboard-feed.test.mjs && node --test frontend/e2e/runtime/race-control-items.test.mjs
 
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
@@ -16,6 +21,7 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44265 accepted94a7009; verify0.
 - T-44264 accepted43ce7cc; verify0.
 - T-44263 accepted3cda000; verify0.
 - T-44262 accepted46af416; verify0.
