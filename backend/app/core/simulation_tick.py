@@ -1,0 +1,137 @@
+from __future__ import annotations
+
+import hashlib
+import random
+from datetime import datetime
+from typing import Any
+
+from ..simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
+
+
+def advance_simulation_tick(
+    sim: Simulation,
+    timestamp: datetime,
+    rng=None,
+    safety_car: bool = False,
+    pit_driver_ids: set[str] | None = None,
+    pit_assignments: dict[str, dict[str, Any]] | None = None,
+):
+    """Advance every car by one sector and return internally consistent packets and timing."""
+    injected_rng = rng
+    pit_driver_ids = pit_driver_ids or set()
+    pit_assignments = pit_assignments or {}
+    compounds = ("SOFT", "MEDIUM", "HARD")
+    current: list[dict[str, Any]] = []
+    race_clock = sim.race_clock_ms
+    for driver in sim.drivers:
+        driver_id = str(driver["id"])
+        previous_sector = sim.sector_by_driver.get(driver_id, 0)
+        lap = sim.lap_by_driver.get(driver_id, 1)
+        lap_limit = min(sim.total_laps or MAX_SESSION_LAPS, MAX_SESSION_LAPS)
+        frozen = previous_sector == 3 and lap >= lap_limit
+        due = sim.next_sector_due_by_driver.get(driver_id, 0)
+        advancing = not frozen and race_clock >= due
+        if previous_sector == 3 and advancing:
+            lap += 1
+            sim.sector_splits_by_driver[driver_id] = []
+        sector = 3 if frozen else previous_sector % 3 + 1 if advancing else previous_sector
+        sim.lap_by_driver[driver_id] = lap
+        sim.sector_by_driver[driver_id] = sector
+        prior_elapsed = sim.elapsed_by_driver.get(driver_id, 0)
+        if injected_rng is not None:
+            driver_rng = injected_rng
+        elif sim.seed is not None:
+            progress = f"{sim.seed}:{driver_id}:{lap}:{sector}:{prior_elapsed}".encode()
+            driver_rng = random.Random(int.from_bytes(hashlib.sha256(progress).digest(), "big"))  # noqa: S311 -- deterministic telemetry stream
+        else:
+            driver_rng = random
+
+        number = int(driver.get("number") or 1)
+        pace_offset = sim.pace_offsets_ms.get(driver_id, (number % 7 - 3) * 95)
+        assignment = pit_assignments.get(driver_id)
+        in_pit = (driver_id in pit_driver_ids) or bool(
+            assignment and assignment["starts_at"] <= timestamp < assignment["ends_at"]
+        )
+        sector_ms, throttle, brake, speed = calculate_sector_performance(
+            sector, pace_offset, safety_car, in_pit, driver_rng
+        )
+
+        splits = sim.sector_splits_by_driver.setdefault(driver_id, [])
+        if advancing:
+            splits.append(sector_ms)
+            sim.elapsed_by_driver[driver_id] = sim.elapsed_by_driver.get(driver_id, 0) + sector_ms
+            sim.next_sector_due_by_driver[driver_id] = due + sector_ms
+        tire_age = sim.tire_age_by_driver.setdefault(driver_id, 0)
+        wear = sim.tire_wear_by_driver.setdefault(driver_id, 0.0)
+        if sector == 3 and advancing:
+            tire_age += 1
+            wear = min(100.0, wear + (0.65 if safety_car else 0.9 if in_pit else 1.1))
+            sim.tire_age_by_driver[driver_id] = tire_age
+            sim.tire_wear_by_driver[driver_id] = wear
+
+        compound = sim.compound_by_driver.setdefault(driver_id, compounds[number % len(compounds)])
+        lap_time_ms = sum(splits) if sector == 3 and advancing else None
+        if lap_time_ms is not None:
+            sim.last_lap_by_driver[driver_id] = lap_time_ms
+        current.append(
+            {
+                "session_id": str(sim.session_id),
+                "driver_id": driver_id,
+                "ts": timestamp,
+                "lap": lap,
+                "sector": sector,
+                "elapsed_ms": sim.elapsed_by_driver[driver_id],
+                "lap_time_ms": lap_time_ms,
+                "last_lap_ms": sim.last_lap_by_driver.get(driver_id),
+                "sector_ms": list(splits),
+                "speed_kph": speed,
+                "throttle_pct": round(throttle, 1),
+                "brake_pct": round(brake, 1),
+                "tire_compound": compound,
+                "tire_age_laps": tire_age,
+                "tire_wear_pct": round(wear, 1),
+                "tire_temp_c": [
+                    round(70 + speed * 0.09 + wear * 0.12 + driver_rng.uniform(-2, 2), 1)
+                    for _ in range(4)
+                ],
+                "pit_state": "IN_PIT" if in_pit else "PIT_SCHEDULED" if assignment else "TRACK",
+                "pit_reservation_id": str(assignment["id"])
+                if assignment and assignment.get("id")
+                else None,
+                "pit_box_number": assignment.get("box_number") if assignment else None,
+                "pit_team_id": str(assignment["team_id"])
+                if assignment and assignment.get("team_id")
+                else None,
+                "pit_starts_at": assignment.get("starts_at") if assignment else None,
+                "pit_ends_at": assignment.get("ends_at") if assignment else None,
+            }
+        )
+
+    ordered = sorted(
+        current, key=lambda packet: (-packet["lap"], -packet["sector"], packet["elapsed_ms"])
+    )
+    positions = {packet["driver_id"]: position for position, packet in enumerate(ordered, start=1)}
+    for packet in current:
+        packet["position"] = positions[packet["driver_id"]]
+    timing = [
+        {
+            key: packet[key]
+            for key in (
+                "driver_id",
+                "position",
+                "lap",
+                "sector",
+                "elapsed_ms",
+                "lap_time_ms",
+                "last_lap_ms",
+                "sector_ms",
+                "pit_state",
+                "pit_reservation_id",
+                "pit_box_number",
+                "pit_team_id",
+            )
+        }
+        for packet in ordered
+    ]
+    sim.race_clock_ms += 15_000
+    return current, {"cars": timing, "safety_car": safety_car}

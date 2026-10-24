@@ -3,10 +3,10 @@ updated_at: 2026-10-23
 phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phases0–2 complete; baseline51.2974)
 
 ## Queue
-### T-44213 W2 — OPEN
-- target_files: frontend/lib/use-delayed-flag.ts, frontend/lib/use-native-dialog.ts, frontend/lib/use-nb-demo.ts
-- contract: T365 state helpers required by accessible primitives and the development-only style guide.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+### T-44215 W1 — OPEN
+- target_files: frontend/components/nb/skeleton.tsx, frontend/components/nb/state.tsx
+- contract: T365 delayed dimension-reserving skeleton and exhaustive five-state presentation boundary.
+- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ### T-44211 W2 — OPEN
 - target_files: backend/app/core/simulation_tick.py
@@ -20,6 +20,7 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44213 accepted471cb56; verify0.
 - T-44210 accepted8ba857e; verify0.
 - T-44214 accepted5ee4710; verify0.
 - T-44208 accepted72a5b82; verify0.

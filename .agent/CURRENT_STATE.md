@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 8ba857e
+git_head: 471cb56
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (owner override); cap2
@@ -44,3 +44,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T-44214 accepted5ee4710: Restored explicit Decision/IncidentIn legacy exports after7full-suite failures; all18focused contract/regression cases pass unchanged. Verify0.
 
 - T-44210 accepted8ba857e: Added decorative motifs with solid checker backing, static accessible marquee entry and stat tile direction cues; static gates pass. Verify0.
+
+- T-44213 accepted471cb56: Added SSR-safe delayed loading, native dialog lifecycle/stale-event guard and isolated demo state; accidental root file copy removed before acceptance. Verify0.
