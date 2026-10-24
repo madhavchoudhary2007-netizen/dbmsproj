@@ -9,7 +9,7 @@ const user = {
 const apiPattern = "**/api/**";
 
 async function openNavigationForMobile(page: import("@playwright/test").Page) {
-  if ((page.viewportSize()?.width ?? 1024) > 700) return;
+  if ((page.viewportSize()?.width ?? 1024) >= 1000) return;
   const openNavigation = page.getByRole("button", { name: "Open navigation" });
   if (await openNavigation.getAttribute("aria-expanded") !== "true") {
     await openNavigation.click();

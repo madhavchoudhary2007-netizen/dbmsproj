@@ -62,7 +62,7 @@ for (const [id, route] of routes) {
       let action;
       if (route === "/login") {
         action = page.locator("form button.login-submit");
-      } else if (width <= 700) {
+      } else if (width < 1000) {
         action = mobileMenu;
         await expect(action, `${id} ${route} at ${width}px mobile menu must become visible`).toBeVisible();
       } else {

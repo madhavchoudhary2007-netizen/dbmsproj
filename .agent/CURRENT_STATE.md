@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 46af416
+git_head: 3cda000
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -44,3 +44,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - T-44261 accepted869f5aa: Wire result-write router with late-bound dependencies, legacy save_results alias and explicit ResultIn reexport. Verify0.
 
 - T-44262 accepted46af416: Use48px drawer close/signout targets so translated geometry remains above unchanged44px gate. Verify0.
+
+- T-44263 accepted3cda000: Stage exact session lifecycle body with explicit typed dependency injection; reset cancellation and transaction behavior preserved. Verify0.
