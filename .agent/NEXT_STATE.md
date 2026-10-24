@@ -8,11 +8,6 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - contract: T365 typed five-state table with preserved selection and internal scrolling, plus skeleton row-count passthrough.
 - verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
-### T-44216 W1 — OPEN
-- target_files: frontend/components/nb/modal.tsx, frontend/components/nb/tabs.tsx
-- contract: T365 native modal and controlled accessible folder tabs, using existing lifecycle hook.
-- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
 ## Blocked
 - Previous6Luna usage-limit blocker superseded byowner5.6/high authorization; availability pendingfirstdispatch.
 
@@ -20,6 +15,7 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44216 accepted38ae29f; verify0.
 - T-44212 accepted46129c0; verify0.
 - T-44215 accepted0bd674b; verify0.
 - T-44211 accepted8275aab; verify0.

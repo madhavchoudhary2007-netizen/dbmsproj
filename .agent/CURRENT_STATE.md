@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 46129c0
+git_head: 38ae29f
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (owner override); cap2
@@ -52,3 +52,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T-44215 accepted0bd674b: Added dimension-reserving delayed skeleton and exhaustive five-state presentation, preserving copy/retry/partial data and legacy error classes. Verify0.
 
 - T-44212 accepted46129c0: Wired exact core simulation tick and removed duplicate main body, preserving legacy model and sector-helper exports;22 regression cases pass. Verify0.
+
+- T-44216 accepted38ae29f: Added centered native modal with focus-safe close control and controlled folder tabs with roving keyboard navigation. Verify0.

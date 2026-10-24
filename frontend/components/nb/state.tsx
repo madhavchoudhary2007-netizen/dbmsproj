@@ -19,6 +19,7 @@ export type NbStateProps<T> = {
   shownCount?: number;
   sourceMessage?: string;
   loadingLabel?: string;
+  skeletonRows?: number;
 };
 
 const stateCardStyle: CSSProperties = {
@@ -37,10 +38,11 @@ export function NbState<T>({
   shownCount,
   sourceMessage,
   loadingLabel,
+  skeletonRows,
 }: NbStateProps<T>) {
   switch (state.status) {
     case "loading":
-      return <NbSkeleton className={className} label={loadingLabel} data-testid="state-loading" />;
+      return <NbSkeleton className={className} label={loadingLabel} rows={skeletonRows} data-testid="state-loading" />;
     case "populated":
       return (
         <div className={className} data-testid="state-populated">
