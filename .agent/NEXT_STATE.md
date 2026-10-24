@@ -8,11 +8,6 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - contract: T371 shared dashboard read cache with10-second TTL and independent consumer cancellation.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh
 
-### T-44235 W1 — OPEN
-- target_files: frontend/app/styles/shell.css
-- contract: T370 stage responsive shell drawer and reduced-motion CSS before markup activation.
-- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
 
@@ -21,6 +16,7 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44235 accepted683c6b5; verify0.
 - T-44234 acceptedac0a46e; verify0.
 - T-44233 accepteddb3cf1b; verify0.
 - Phase5 T360–T366 complete; parent d666cf6/b90911f/b18819f, root60 browser PASS, build/lint/types/CSS gates0, production guide hidden.
