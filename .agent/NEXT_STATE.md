@@ -6,12 +6,7 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 ### T-44232 W2 — OPEN
 - target_files: backend/app/api/dbms_lock.py
 - contract: T331 stage exact DBMS lock demo and recalculation endpoints in focused API factory.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,subprocess; old=ast.parse(subprocess.check_output(["git","show","c2616e0:backend/app/main.py"],text=True)); new=ast.parse(open("backend/app/api/dbms_lock.py").read()); names={"dbms_lock_demo","dbms_recalculate"}; a={n.name:n for n in ast.walk(old) if isinstance(n,ast.FunctionDef) and n.name in names}; b={n.name:n for n in ast.walk(new) if isinstance(n,ast.FunctionDef) and n.name in names}; assert a.keys()==b.keys()==names; [setattr(n,"decorator_list",[]) for n in [*a.values(),*b.values()]]; assert all(ast.dump(a[k])==ast.dump(b[k]) for k in names); print("PASS exact lock/recalculate endpoint ASTs")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app/api/dbms_lock.py && .venv/bin/ruff format --check backend/app/api/dbms_lock.py
-
-### T-44226 W3 — OPEN
-- target_files: frontend/e2e/motion-hooks.spec.ts
-- contract: T364/T366 real mounted hook browser tests through local guide fixture.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/motion-hooks.spec.ts --list
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,subprocess; old=ast.parse(subprocess.check_output(["git","show","c2616e0:backend/app/main.py"],text=True)); new=ast.parse(open("backend/app/api/dbms_lock.py").read()); a={n.name:n for n in ast.walk(old) if isinstance(n,ast.FunctionDef)}; b={n.name:n for n in ast.walk(new) if isinstance(n,ast.FunctionDef)}; assert [ast.dump(n) for n in a["dbms_lock_demo"].body]==[ast.dump(n) for n in b["_run_lock_demo"].body]; a["dbms_recalculate"].decorator_list=[]; b["dbms_recalculate"].decorator_list=[]; assert ast.dump(a["dbms_recalculate"])==ast.dump(b["dbms_recalculate"]); assert not any(isinstance(n,ast.ClassDef) for n in ast.walk(new)); print("PASS exact lock body, recalculate endpoint and no namespace class")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app/api/dbms_lock.py && .venv/bin/ruff format --check backend/app/api/dbms_lock.py
 
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
@@ -20,6 +15,7 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44226 accepted4b35c7a; verify0.
 - T-44225 accepted54449f5; verify0.
 - T-44231 acceptede6efcc1; verify0.
 - T-44230 acceptedfdb63e2; verify0.

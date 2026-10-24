@@ -1,0 +1,143 @@
+diff --git a/backend/app/api/dbms_lock.py b/backend/app/api/dbms_lock.py
+new file mode 100644
+index 0000000..c81d643
+--- /dev/null
++++ b/backend/app/api/dbms_lock.py
+@@ -0,0 +1,137 @@
++import random
++import threading
++import time
++from _thread import LockType
++from collections.abc import Callable
++from concurrent.futures import ThreadPoolExecutor
++from concurrent.futures import TimeoutError as FutureTimeout
++from contextlib import AbstractContextManager
++from datetime import UTC, datetime, timedelta
++from typing import Any
++from uuid import UUID
++
++from fastapi import APIRouter, HTTPException
++from psycopg import Connection
++
++from ..database import DatabaseRow
++
++
++def _run_lock_demo(
++    fetch_one: Callable[..., DatabaseRow | None],
++    connection: Callable[[], AbstractContextManager[Connection[DatabaseRow]]],
++    _competing_lock_demo_reservation: Callable[..., dict[str, Any]],
++    _cleanup_lock_demo: Callable[..., None],
++    lock_demo_guard: LockType,
++) -> dict[str, Any]:
++    """Demonstrate two real transactions contending on a pit box row."""
++    if not lock_demo_guard.acquire(blocking=False):
++        raise HTTPException(409, "A lock demonstration is already running")
++    first_reservation_id = None
++    second_reservation_id = None
++    future = None
++    worker = None
++    outcome = None
++    try:
++        target = fetch_one(
++            "SELECT b.id AS pit_box_id,s.id AS session_id,t.id AS team_id FROM pit_boxes b JO"
++            "IN race_sessions s ON s.event_id=b.event_id CROSS JOIN teams t ORDER BY b.number"
++            ",s.scheduled_at LIMIT 1"
++        )
++        if not target:
++            raise HTTPException(503, "Seeded pit box, session, or team is unavailable")
++        starts_at = datetime.now(UTC) + timedelta(
++            # Non-security randomized demonstration reservation window.
++            days=3650 + random.randrange(10000),  # noqa: S311
++            seconds=random.randrange(86400),  # noqa: S311
++        )
++        ends_at = starts_at + timedelta(minutes=2)
++        ready = threading.Event()
++        competitor = {"pid": None}
++        worker = ThreadPoolExecutor(max_workers=1, thread_name_prefix="apexgrid-lock-demo")
++
++        wait_observed = False
++        with connection() as owner, owner.transaction():
++            owner.execute("SET LOCAL lock_timeout='8s'")
++            first_reservation_id = owner.execute(
++                "SELECT reserve_pit_box(%s,%s,%s,%s,%s) AS id",
++                (
++                    target["pit_box_id"],
++                    target["session_id"],
++                    target["team_id"],
++                    starts_at,
++                    ends_at,
++                ),
++            ).fetchone()["id"]
++            future = worker.submit(
++                _competing_lock_demo_reservation, target, starts_at, ends_at, ready, competitor
++            )
++            if not ready.wait(timeout=2):
++                raise HTTPException(503, "Second database connection did not become ready")
++            # The worker publishes its backend PID just before it issues the blocking function.
++            # Observe the database wait itself before committing the first reservation.
++            deadline = time.monotonic() + 3
++            while time.monotonic() < deadline:
++                lock_row = owner.execute(
++                    "SELECT wait_event_type FROM pg_stat_activity WHERE pid=%s",
++                    (competitor["pid"],),
++                ).fetchone()
++                if lock_row and lock_row["wait_event_type"] == "Lock":
++                    wait_observed = True
++                    break
++                time.sleep(0.025)
++        try:
++            outcome = future.result(timeout=9) if future else None
++        except FutureTimeout as exc:
++            raise HTTPException(504, "Competing reservation did not finish before timeout") from exc
++        second_reservation_id = outcome.get("reservation_id") if outcome else None
++        if not outcome or outcome["outcome"] != "rejected" or outcome["sqlstate"] != "23P01":
++            raise HTTPException(500, "Overlapping reservation was not rejected as expected")
++        if not wait_observed:
++            raise HTTPException(
++                503, "Database did not report the competitor waiting on the pit box lock"
++            )
++        return {
++            "pit_box_id": str(target["pit_box_id"]),
++            "lock_wait_observed": True,
++            "lock_wait_ms": outcome["wait_ms"],
++            "first_reservation": "committed",
++            "overlapping_reservation": "rejected",
++            "rejection_sqlstate": outcome["sqlstate"],
++        }
++    finally:
++        try:
++            _cleanup_lock_demo(worker, future, outcome, first_reservation_id, second_reservation_id)
++        finally:
++            lock_demo_guard.release()
++
++
++def create_dbms_lock_router(
++    fetch_one: Callable[..., DatabaseRow | None],
++    connection: Callable[[], AbstractContextManager[Connection[DatabaseRow]]],
++    _competing_lock_demo_reservation: Callable[..., dict[str, Any]],
++    _cleanup_lock_demo: Callable[..., None],
++    lock_demo_guard: LockType,
++    recalculate: Callable[..., Any],
++    admin_dependency: Any,
++) -> tuple[APIRouter, dict[str, Callable[..., Any]]]:
++    router = APIRouter()
++
++    @router.post("/api/dbms/lock-demo")
++    def dbms_lock_demo(user=admin_dependency):
++        return _run_lock_demo(
++            fetch_one,
++            connection,
++            _competing_lock_demo_reservation,
++            _cleanup_lock_demo,
++            lock_demo_guard,
++        )
++
++    @router.post("/api/dbms/recalculate")
++    def dbms_recalculate(championship_id: UUID, user=admin_dependency):
++        return recalculate(championship_id, user)
++
++    handlers: dict[str, Callable[..., Any]] = {
++        "dbms_lock_demo": dbms_lock_demo,
++        "dbms_recalculate": dbms_recalculate,
++    }
++    return router, handlers
