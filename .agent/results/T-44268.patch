@@ -1,0 +1,161 @@
+diff --git a/frontend/app/globals.css b/frontend/app/globals.css
+index c300fbf..e430e13 100644
+--- a/frontend/app/globals.css
++++ b/frontend/app/globals.css
+@@ -984,17 +984,6 @@ tbody tr:hover {
+   background: var(--bg);
+   border-inline-end: 1px solid var(--line);
+ }
+-.login-visual:after {
+-  content: "";
+-  position: absolute;
+-  width: 70vw;
+-  height: 70vw;
+-  border: 1px solid #a1c32c21;
+-  border-radius: 0;
+-  top: 22%;
+-  left: 18%;
+-  box-shadow: none;
+-}
+ .login-brand {
+   display: flex;
+   align-items: center;
+@@ -1012,15 +1001,6 @@ tbody tr:hover {
+   gap: 8px;
+   color: #a8bc54;
+ }
+-.visual-copy h1 {
+-  font-size: clamp(44px, 6vw, 82px);
+-  line-height: 0.98;
+-  letter-spacing: -4px;
+-  margin: 24px 0;
+-}
+-.visual-copy h1 span {
+-  color: var(--acid);
+-}
+ .visual-copy p {
+   color: #9ba5af;
+   font-size: 13px;
+@@ -1246,11 +1226,6 @@ tbody tr:hover {
+   .visual-copy {
+     margin: 24px 0 0;
+   }
+-  .visual-copy h1 {
+-    font-size: 43px;
+-    letter-spacing: -2px;
+-    margin: 12px 0;
+-  }
+   .visual-copy p {
+     display: none;
+   }
+diff --git a/frontend/app/login/page.tsx b/frontend/app/login/page.tsx
+index 87a6f43..9bdbe3a 100644
+--- a/frontend/app/login/page.tsx
++++ b/frontend/app/login/page.tsx
+@@ -2,7 +2,8 @@
+ import { FormEvent, useEffect, useState } from "react";
+ import { useRouter } from "next/navigation";
+ import { useAuth } from "@/components/auth";
+-import { Activity, ArrowUpRight } from "lucide-react";
++import { LoginArt } from "@/components/login-art";
++import { ArrowUpRight } from "lucide-react";
+ export default function Login() {
+   const { login, user, ready } = useAuth(),
+     router = useRouter(),
+@@ -30,40 +31,12 @@ export default function Login() {
+     }
+   };
+   return (
+-    <div className="login-screen">
+-      <div className="login-visual">
+-        <div className="login-brand">
+-          <div className="brand-mark">
+-            A<span>G</span>
+-          </div>
+-          <div>
+-            <b>APEXGRID</b>
+-            <small>RACE OPERATIONS</small>
+-          </div>
+-        </div>
+-        <div className="visual-copy">
+-          <div className="eyebrow">
+-            <Activity size={13} /> MOTORSPORT CONTROL SYSTEM
+-          </div>
+-          <h1>
+-            Every lap.
+-            <br />
+-            <span>Under control.</span>
+-          </h1>
+-          <p>
+-            Race weekend operations, championship data, and live telemetry in
+-            one place.
+-          </p>
+-        </div>
+-        <div className="visual-footer">
+-          <span>RACE CONTROL PLATFORM</span>
+-          <span>01 — 06</span>
+-        </div>
+-      </div>
++    <div className="login-screen nb-login">
++      <LoginArt />
+       <div className="login-main">
+         <form className="login-form" onSubmit={submit}>
+           <div className="eyebrow">AUTHENTICATED ACCESS</div>
+-          <h2>Sign in to ApexGrid</h2>
++          <h1>Sign in to ApexGrid</h1>
+           <p>Use your assigned operations account to continue.</p>
+           <label>
+             Email address
+diff --git a/frontend/app/styles/login.css b/frontend/app/styles/login.css
+index ad84b81..1b5bdf1 100644
+--- a/frontend/app/styles/login.css
++++ b/frontend/app/styles/login.css
+@@ -10,8 +10,8 @@
+ .nb-login .nb-login-display-stroke { position: absolute; inset: 0; z-index: -1; color: transparent; -webkit-text-stroke: 2px var(--nb-ink, #000000); transform: translate(8px, 8px); }
+ .nb-login .visual-copy { max-width: 36rem; }
+ .nb-login .visual-copy .eyebrow { display: flex; align-items: center; gap: 8px; color: var(--nb-ink, #000000); font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif; font-size: clamp(0.75rem, 0.7rem + 0.2vw, 0.875rem); font-weight: 700; letter-spacing: 0.08em; }
+-.nb-login .nb-login-hero-copy { margin: 16px 0; color: var(--nb-ink, #000000); font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif; font-size: clamp(2rem, 1.2rem + 3vw, 4rem); font-weight: 700; line-height: 1; letter-spacing: -0.04em; }
+-.nb-login .nb-login-hero-copy span { color: var(--nb-red, #FF6B6B); }
++.nb-login .nb-login-hero-copy { margin: 16px 0; color: var(--nb-ink, #000000); font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif; font-size: clamp(2rem, 1.2rem + 3vw, 4rem); font-weight: 700; line-height: 1.2; letter-spacing: -0.04em; }
++.nb-login .nb-login-hero-copy span { color: var(--nb-ink, #000000); }
+ .nb-login .visual-copy > p:last-child { max-width: 36ch; color: var(--nb-ink, #000000); font-family: var(--font-space-mono), ui-monospace, monospace; font-size: 0.875rem; line-height: 1.5; }
+ .nb-login .nb-login-art-row { display: flex; min-width: 0; align-items: center; gap: 16px; }
+ .nb-login .nb-login-sticker { display: inline-flex; flex-shrink: 0; align-items: center; gap: 8px; min-height: 44px; }
+@@ -21,20 +21,32 @@
+ .nb-login .nb-login-checker { position: relative; z-index: 1; width: 100%; height: 16px; flex-shrink: 0; }
+ .nb-login .login-main { position: relative; z-index: 0; min-height: 0; margin: 32px; justify-content: center; padding: 32px; background: var(--nb-paper, #FFFFFF); }
+ .nb-login .login-main::after { content: ""; position: absolute; inset: 12px -12px -12px 12px; z-index: -1; border: 4px solid var(--nb-ink, #000000); background: var(--nb-ink, #000000); pointer-events: none; }
++.nb-login .login-form, .nb-login .login-form label, .nb-login .login-form p, .nb-login .login-copyright, .nb-login .api-address { color: var(--nb-ink, #000000); }
++.nb-login .login-form input { color: var(--nb-ink, #000000); background: var(--nb-paper, #FFFFFF); border-color: var(--nb-ink, #000000); }
++.nb-login .login-form input::placeholder { color: var(--nb-ink, #000000); opacity: 0.7; }
+ .nb-login .login-form { width: min(100%, 32rem); min-width: 0; }
+ .nb-login .login-form input, .nb-login .login-submit { min-height: 48px; }
+ .nb-login .login-form input { width: 100%; min-width: 0; }
+ @media (max-width: 999px) {
+   .nb-login.login-screen { grid-template-columns: 1fr; }
+-  .nb-login .login-visual { min-height: 240px; padding: 24px; border-inline-end: 4px solid var(--nb-ink, #000000); border-block-end: 0; }
+-  .nb-login .nb-login-art-body { gap: 16px; }
+-  .nb-login .nb-login-display { font-size: clamp(3rem, 14vw, 5rem); }
+-  .nb-login .visual-copy { display: none; }
++  .nb-login .login-visual { min-height: 240px; height: 240px; padding: 16px; border-inline-end: 4px solid var(--nb-ink, #000000); border-block-end: 0; }
++  .nb-login .login-brand, .nb-login .visual-footer { display: none; }
++  .nb-login .nb-login-art-body { gap: 4px; }
++  .nb-login .nb-login-display { font-size: clamp(2rem, 12vw, 3rem); }
++  .nb-login .visual-copy { display: block; margin: 0; }
++  .nb-login .nb-login-hero-copy { display: block; }
++  .nb-login .visual-copy > p:last-child { display: none; }
++  .nb-login .visual-copy .eyebrow { gap: 4px; font-size: 0.6875rem; }
++  .nb-login .visual-copy .eyebrow svg { width: 14px; height: 14px; }
++  .nb-login .nb-login-hero-copy { margin: 4px 0; font-size: clamp(1.5rem, 7vw, 2rem); line-height: 1.2; }
++  .nb-login .nb-login-art-row { gap: 8px; }
++  .nb-login .nb-login-sticker { max-width: 42%; min-width: 0; font-size: 0.625rem; line-height: 1.1; }
++  .nb-login .nb-login-sticker-icon { width: 20px; height: 20px; }
+   .nb-login .login-main { min-height: 0; margin: 24px; padding: 32px 24px; }
+   .nb-login .login-main::after { inset: 8px -8px -8px 8px; }
+ }
+ @media (max-width: 511px) {
+-  .nb-login .nb-login-art-row { align-items: stretch; flex-direction: column; }
++  .nb-login .nb-login-art-row { align-items: center; flex-direction: row; }
+   .nb-login .nb-login-marquee { width: 100%; }
+   .nb-login .visual-footer { font-size: 0.6875rem; }
+ }

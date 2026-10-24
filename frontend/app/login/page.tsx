@@ -2,7 +2,8 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth";
-import { Activity, ArrowUpRight } from "lucide-react";
+import { LoginArt } from "@/components/login-art";
+import { ArrowUpRight } from "lucide-react";
 export default function Login() {
   const { login, user, ready } = useAuth(),
     router = useRouter(),
@@ -30,40 +31,12 @@ export default function Login() {
     }
   };
   return (
-    <div className="login-screen">
-      <div className="login-visual">
-        <div className="login-brand">
-          <div className="brand-mark">
-            A<span>G</span>
-          </div>
-          <div>
-            <b>APEXGRID</b>
-            <small>RACE OPERATIONS</small>
-          </div>
-        </div>
-        <div className="visual-copy">
-          <div className="eyebrow">
-            <Activity size={13} /> MOTORSPORT CONTROL SYSTEM
-          </div>
-          <h1>
-            Every lap.
-            <br />
-            <span>Under control.</span>
-          </h1>
-          <p>
-            Race weekend operations, championship data, and live telemetry in
-            one place.
-          </p>
-        </div>
-        <div className="visual-footer">
-          <span>RACE CONTROL PLATFORM</span>
-          <span>01 — 06</span>
-        </div>
-      </div>
+    <div className="login-screen nb-login">
+      <LoginArt />
       <div className="login-main">
         <form className="login-form" onSubmit={submit}>
           <div className="eyebrow">AUTHENTICATED ACCESS</div>
-          <h2>Sign in to ApexGrid</h2>
+          <h1>Sign in to ApexGrid</h1>
           <p>Use your assigned operations account to continue.</p>
           <label>
             Email address

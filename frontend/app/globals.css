@@ -984,17 +984,6 @@ tbody tr:hover {
   background: var(--bg);
   border-inline-end: 1px solid var(--line);
 }
-.login-visual:after {
-  content: "";
-  position: absolute;
-  width: 70vw;
-  height: 70vw;
-  border: 1px solid #a1c32c21;
-  border-radius: 0;
-  top: 22%;
-  left: 18%;
-  box-shadow: none;
-}
 .login-brand {
   display: flex;
   align-items: center;
@@ -1011,15 +1000,6 @@ tbody tr:hover {
   align-items: center;
   gap: 8px;
   color: #a8bc54;
-}
-.visual-copy h1 {
-  font-size: clamp(44px, 6vw, 82px);
-  line-height: 0.98;
-  letter-spacing: -4px;
-  margin: 24px 0;
-}
-.visual-copy h1 span {
-  color: var(--acid);
 }
 .visual-copy p {
   color: #9ba5af;
@@ -1245,11 +1225,6 @@ tbody tr:hover {
   }
   .visual-copy {
     margin: 24px 0 0;
-  }
-  .visual-copy h1 {
-    font-size: 43px;
-    letter-spacing: -2px;
-    margin: 12px 0;
   }
   .visual-copy p {
     display: none;

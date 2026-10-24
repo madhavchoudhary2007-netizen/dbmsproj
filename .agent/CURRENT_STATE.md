@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 622aafa
+git_head: ed34d9d
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -54,3 +54,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - T-44267 acceptede5507c9: Stage exact manual/automatic/update reservation bodies with explicit dependencies, unchanged locking, SQL errors and publication. Verify0.
 
 - T-44266 accepted622aafa: Stage presentational login art/motifs and scoped60/40 desktop/240px mobile layout without changing current auth route. Verify0.
+
+- T-44269 accepteded34d9d: Stage typed thin manual/automatic/update pit router preserving201 defaults, input schemas and exact accepted services. Verify0.
