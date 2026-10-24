@@ -8,11 +8,6 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - contract: Fix the four remaining measured light-shell contrast selectors without changing source copy or tests.
 - verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
-### T-44259 W2 — OPEN
-- target_files: backend/app/api/results_write.py
-- contract: T331 stage exact save_results implementation and thin typed router factory without wiring main yet.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,pathlib,subprocess; a=ast.parse(subprocess.check_output(["git","show","HEAD:backend/app/main.py"],text=True)); b=ast.parse(pathlib.Path("backend/app/api/results_write.py").read_text()); x=next(n for n in a.body if isinstance(n,ast.FunctionDef) and n.name=="save_results"); y=next(n for n in b.body if isinstance(n,ast.FunctionDef) and n.name=="_save_results"); assert ast.dump(ast.Module(body=x.body,type_ignores=[]))==ast.dump(ast.Module(body=y.body,type_ignores=[])); print("PASS exact save-results implementation body")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/api/results_write.py
-
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
 
@@ -21,6 +16,7 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44259 accepted905b786; verify0.
 - T-44257 accepted20b39b4; verify0.
 - T-44258 accepteda84550c; verify0.
 - T-44256 accepted3e902c2; verify0.
