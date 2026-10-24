@@ -40,7 +40,7 @@ def disposable_db():
 
 
 def _add(conn, n, name, kind, state, when):
-    ids = [UUID(f"{i:08d}-0000-0000-0000-{n:012d}") for i in (1, 2, 3)]
+    ids = [UUID(int=((i * 0x10000000) << 96) | n) for i in (1, 2, 3)]
     conn.execute("INSERT INTO circuits VALUES (%s, %s)", (ids[2], "Harbor Ring"))
     conn.execute("INSERT INTO race_events VALUES (%s, %s, %s)", (ids[1], name, ids[2]))
     conn.execute(
