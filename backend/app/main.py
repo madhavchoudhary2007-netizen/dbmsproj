@@ -9,7 +9,8 @@ import secrets
 import threading
 import time
 from collections.abc import Callable
-from concurrent.futures import Future, ThreadPoolExecutor
+from concurrent.futures import Future as Future
+from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeout
 from contextlib import asynccontextmanager, suppress
 from datetime import UTC, datetime, timedelta
@@ -69,6 +70,7 @@ from .core.errors import (
     reference_conflict_handler,
 )
 from .core.events import EventBus
+from .core.lock_demo import create_lock_demo_helpers
 from .core.security import websocket_bearer
 from .core.serialization import jsonable, telemetry_ws_payload
 from .core.simulation_tick import advance_simulation_tick as advance_simulation_tick
@@ -1650,75 +1652,9 @@ def mongo_database_ready():
 
 lock_demo_guard = threading.Lock()
 
-
-def _competing_lock_demo_reservation(
-    target: dict[str, UUID],
-    starts_at: datetime,
-    ends_at: datetime,
-    ready: threading.Event,
-    competitor: dict[str, int | None],
-) -> dict[str, Any]:
-    with connection() as conn, conn.transaction():
-        conn.execute("SET LOCAL lock_timeout='8s'")
-        pid = conn.execute("SELECT pg_backend_pid() AS pid").fetchone()["pid"]
-        competitor["pid"] = pid
-        ready.set()
-        started = time.perf_counter()
-        try:
-            row = conn.execute(
-                "SELECT reserve_pit_box(%s,%s,%s,%s,%s) AS id",
-                (
-                    target["pit_box_id"],
-                    target["session_id"],
-                    target["team_id"],
-                    starts_at,
-                    ends_at,
-                ),
-            ).fetchone()
-            return {
-                "outcome": "reserved",
-                "reservation_id": row["id"],
-                "sqlstate": None,
-                "wait_ms": round((time.perf_counter() - started) * 1000, 2),
-                "pid": pid,
-            }
-        except ExclusionViolation as exc:
-            return {
-                "outcome": "rejected",
-                "reservation_id": None,
-                "sqlstate": exc.sqlstate,
-                "wait_ms": round((time.perf_counter() - started) * 1000, 2),
-                "pid": pid,
-            }
-        except Exception as exc:
-            return {
-                "outcome": "error",
-                "reservation_id": None,
-                "sqlstate": getattr(exc, "sqlstate", None),
-                "wait_ms": round((time.perf_counter() - started) * 1000, 2),
-                "pid": pid,
-                "error": type(exc).__name__,
-            }
-
-
-def _cleanup_lock_demo(
-    worker: ThreadPoolExecutor | None,
-    future: Future[dict[str, Any]] | None,
-    outcome: dict[str, Any] | None,
-    first_reservation_id: UUID | None,
-    second_reservation_id: UUID | None,
-) -> None:
-    if worker:
-        worker.shutdown(wait=True, cancel_futures=True)
-    if future and future.done() and outcome is None:
-        with suppress(Exception):
-            outcome = future.result()
-    if outcome:
-        second_reservation_id = outcome.get("reservation_id")
-    reservation_ids = [rid for rid in (first_reservation_id, second_reservation_id) if rid]
-    if reservation_ids:
-        with connection() as conn:
-            conn.execute("DELETE FROM pit_reservations WHERE id=ANY(%s)", (reservation_ids,))
+_competing_lock_demo_reservation, _cleanup_lock_demo = create_lock_demo_helpers(
+    lambda: connection()
+)
 
 
 @app.post("/api/dbms/lock-demo")

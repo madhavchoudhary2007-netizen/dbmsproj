@@ -3,10 +3,10 @@ updated_at: 2026-10-23
 phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phases0–2 complete; baseline51.2974)
 
 ## Queue
-### T-44228 W1 — OPEN
-- target_files: frontend/app/__nb/page.tsx, frontend/app/%5F_nb/page.tsx
-- contract: T365 repair hidden guide route: leading underscore folder is private in Next, must escape first underscore.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+### T-44229 W2 — OPEN
+- target_files: backend/app/main.py
+- contract: T331 wire staged lock transaction helpers, preserving late-bound main symbols.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "decision or incident" && .venv/bin/ruff check backend/app/main.py backend/app/core/lock_demo.py && .venv/bin/ruff format --check backend/app/main.py backend/app/core/lock_demo.py
 
 ### T-44226 W3 — OPEN
 - target_files: frontend/e2e/motion-hooks.spec.ts
@@ -25,6 +25,7 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44228 accepted6b9c6f7; verify0.
 - T-44227 accepted225b2b8; verify0.
 - T-44224 acceptedef0dee3; verify0.
 - T-44222 accepted24fae87; verify0.
