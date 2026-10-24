@@ -3,18 +3,24 @@ updated_at: 2026-10-23
 phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phases0–2 complete; baseline51.2974)
 
 ## Queue
-### T-44217 W1 — OPEN
-- target_files: frontend/components/nb/table.tsx, frontend/components/nb/state.tsx
-- contract: T365 typed five-state table with preserved selection and internal scrolling, plus skeleton row-count passthrough.
+### T-44219 W2 — OPEN
+- target_files: backend/app/api/race_archive.py
+- contract: T331 stage exact race archive handler in focused API module; separate next packet wires/removes original.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,subprocess; old=ast.parse(subprocess.check_output(["git","show","46129c0:backend/app/main.py"],text=True)); a=next(n for n in old.body if isinstance(n,ast.FunctionDef) and n.name=="dbms_race"); a.decorator_list=[]; new=ast.parse(open("backend/app/api/race_archive.py").read()); b=next(n for n in ast.walk(new) if isinstance(n,ast.FunctionDef) and n.name==a.name); b.decorator_list=[]; assert ast.dump(a)==ast.dump(b); print("PASS exact staged race archive handler AST")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app/api/race_archive.py && .venv/bin/ruff format --check backend/app/api/race_archive.py
+
+### T-44218 W1 — OPEN
+- target_files: frontend/components/nb/chart-frame.tsx, frontend/components/nb/chart-theme.ts
+- contract: T365 chart presentation frame, square active marker, accessible tooltip and visual theme tokens.
 - verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Blocked
-- Previous6Luna usage-limit blocker superseded byowner5.6/high authorization; availability pendingfirstdispatch.
+- None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
 
 ## Deferred
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44217 accepted0e166fc; verify0.
 - T-44216 accepted38ae29f; verify0.
 - T-44212 accepted46129c0; verify0.
 - T-44215 accepted0bd674b; verify0.
