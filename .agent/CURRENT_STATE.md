@@ -1,41 +1,34 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 0d7dd28
+git_head: c659147
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
-harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
-archetype: Neo-Brutal Motorsport (light), ADR007 approved
-last_eval_score: obsolete baseline51.2974358974359; no current score; final evaluation T430
+harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (owner override2bc94fb), cap2
+archetype: Neo-Brutal Motorsport light, approved ADR007
+last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 
 ## Verified milestones
-- Phases0–2,5–6 COMPLETE (5 of12). Phase3 T331 extraction remains; main1424 lines, target<=120. Phase4 and7–11 unfinished. Owner requests autonomous completion of all12, no routine questions.
-- Phase5 T3602ad337f/T3611e61efd/T362c0781f9/T36313f614a/T364d666cf6/T365b90911f/T366b18819f accepted through accept.sh. Tailwind4.3.3, SpaceGrotesk500/700 + SpaceMono400/700, scoped tokens/textures/plinth and complete shared primitives. Existing production routes adopt them in Phases6–7.
-- Root60 browser cases PASS across320/375/768/1440/5120 (T366.matrix.browser.raw.log). Parent accept reruns: motion30 PASS, primitive30 PASS, axe375/1440 2 PASS; keyboard/font4 per runner. Build/lint/types0 and four CSS lints0. /__nb dev200, production not-found visible + noindex + guide absent + zero writes. Next streamed notFound HTTP200 is documented behavior; do not substitute status-only checks (.agent/check-guide-production.py).
-- Phase5 fixes: escaped %5F_nb route6b9c6f7, explicit44px controlsfdb63e2, FLIP mount/scroll guarde6efcc1. Browser tests wait fonts/finite animations for axe without relaxing thresholds; reduced motion asserts immediately.
-- Backend latest root full231 PASS,0 failed/skipped, live acceptance PASS after session lifecycle wiring94a7009 (T44265.full.raw.log). Earlier archive/lap wiring also227 PASS. API snapshot9 + runtime uniqueness2 are permanent; required-input regressions27 and seeded GET goldens14 retained. No API/schema changes in current moves.
-- T331 extracted core tick46129c0, stewards89c82af, DBMS SQL/Mongo/archive2e5c5a4 and lapsef0dee3; lock helpers225b2b8 wiredc2616e0. api/dbms_lock.py stagedc6787b1 and wireddb3cf1b; originals removed. Exact lock body retained as module-level _run_lock_demo with explicit typed dependencies, thin public wrapper; no suppression/locals/classes. Factories/globals are transitional T332 debt.
-- Preserve legacy main aliases and late-bound callbacks: Decision removal caused7 failures fixed5ee4710. OpenAPI alone cannot prove Python alias/runtime uniqueness compatibility.
+- Phases0–2,5–6 COMPLETE (5/12); Phase3 T331 extraction ongoing, main1378lines target<=120. Phase4 and7–11 unfinished. Owner requests autonomous all12 completion, no routine questions.
+- Phase5 T360–366 complete: Tailwind4.3.3/SpaceGrotesk500,700/SpaceMono400,700, tokens/textures/plinth/primitives. Root60 browser cases and production guide-hidden/noindex/zero-write checks pass; build/static0. Evidence T366.matrix.browser.raw.log and prior Git/results.
+- Phase6 T370 da5a72d/T3718e498d7 complete. Root481 browser checks:85axe,20edge,15feed,10drawer,80routes,75targets,80primary,20auth,96responsive. Build/types/lint/fourCSS0. Dashboard cache4/mapper3 offline cases pass. Shared feed visible30s polling, request dedupe, cancellation and five states verified. ADR012 next_event additive query/tests implemented; no other current API changes.
+- Latest full backend after auto-restore097578f:231PASS,0fail/skip/xfailed + live acceptance PASS (T44280.full.raw.log). Pit298fef5 and restore48bdf7b also full231/live green. T44274 repaired nested runtime route discovery retaining STEWARD assertion. API snapshot9/runtime uniqueness2, required-input27, seeded GET goldens14 retained.
+- T331 results read/write, session action, pit writes, DBMS SQL/Mongo/locks/archive/laps/core tick/stewards extracted. Preserve legacy main Python aliases and late-bound callbacks; Decision removal once caused7failures, fixed5ee4710. Standard typed services only, no locals/proxy/class/suppression tricks. Factories/global DI transitional T332 debt.
 
-## Next work
-- T380 staged LoginArt/CSS622aafa; T44268 wiring6590437 accepted with mobile240px/contrast/copy fixes and unused legacy CSS removal. T44271 form primitives a98c95c accepted; browser65pass5palettefail initially; W1T44275 lightbody/redfeed12449c7 and W3T44278 realform/font/finite-animation synchronization3bade73 accepted, rerun70PASS; post-cleanup c16e5bb/b6fa4ad again70PASS T44283.browser.raw.log. Dashboard hook d7ece24 exactlogic and exactpage copy1f7a2d7 wired b8d5460; Session data hook7cb29bf accepted; remaining T379 page splits pending. Auth logic untouched. Pit reservation servicee5507c9 exact3bodies staged; T44269 thinrouter ed34d9d accepted; T44270 wiring298fef5 accepted. Full pit gate repaired by W3T44274 recursive discovery only (original STEWARD assertion retained):231pass0skip/livePASS. Restore helpers48bdf7b full231pass0skip/livePASS; auto restore097578f exactAST moved and full231pass0skip/livePASS T44280.full.raw.log.
-- Phase6 parent T370/T371 accepted da5a72d/current HEAD. Root481 browser checks PASS in combined evidence T370.evidence.raw.json:85axe,20edge,15feed,10drawer,80routes,75targets,80primary,20auth,96responsive. Build/types/lint/fourCSS gates0. Cache4 and mapper3 offline cases pass. Shell retains routes/auth/copy/hash hooks; real next_event additive ADR012 in place.
-- Start Phase7 login/dashboard before resources/live/session/stewards/pits/standings/analytics/DBMS. Use docs/overhaul-plan.md graph; DBMS showcase also requires Phase4. T331 backend continues in parallel; keep main aliases/latecallbacks and run full disposable suite after each wiring.
-- Palette across redesigned routes remains unverified; no band widening. Final score only atT430. Phase5 primitives60 browser cases passed; development guide hidden in production.
+## Active work / evidence
+- T380 login route now uses LoginArt/NbCard/NbField/NbInput/NbButton,60/40 desktop/art240mobile; auth logic unchanged. Legacy desktop/mobile/shared login CSS removed c16e5bb/b6fa4ad. Root70 generic login checks pass after type/brand/checker/textbacking27ee284 (T44284.browser.raw.log). T44283 build/types/lint0; final build pending.
+- Settled screenshot caught mobile motif clipping missed by generic checks:523cd33 fixes internal44px horizontal feed. New actual geometry/busy test6d32c9e initially failed native aria-busy override and wrong test ink fixture17instead0; product0d7dd28 preserves calleraria-busy, testc659147 exactblack correction. Root2case rerun T44294.browser.raw.log running; no assertions/gates weakened.
+- T379 Dashboard exact module move b8d5460 and typed data hookd7ece24 done. Session loader7cb29bf, async operations58aad6d, writes60cc688 wired3e715d5, simulator86d745b wired52e84a0; original behavior/copy/JSX retained. W2T44295 orchestration hook staging and W1T44296 results view extraction in progress, disjoint targets. Remaining page splits required before redesigns.
+- T44292 driver name generation1a2b573: root12 seed/carcount output+RNGstate parity checks pass; main1378. Full disposable suite T44292.full.raw.log running. No backend integration until it ends.
 
 ## Safety / workflow
-- Only overhaul/neo-brutal; commits only accept.sh; max2 custom-role workers, fresh packet-only clones, no per-call overrides. Profiles/models.env2bc94fb bind5.6/high after owner request; successful workers and tool role metadata confirm availability. No quota blocker.
-- <=3 target files and150 changed lines/task, exact worker Verify independently rerun. Workers offline/no fixed ports; root owns browser/network/disposable checks. Integrate one patch then accept before another. Never accept concurrently with another Next build/dev check; helpers restore next-env and kill only their own temporary loopback servers.
-- Never .env/secrets, recursive deletion, real database/schema/volumes. Only disposable apexgrid-test (PG15432/Mongo27018), project labels guarded, one db-baseline runner at a time on18000. Real backend has no source bind/reload. Owner status.sh and scripts/agent/status.sh excluded and untouched; preserve run-loop.sh owner edits.
-- .agent/orchestrate.py persists queue/clone/integrate/mark. Worker envelopes require actual stats/integer static counts0, no extra keys. All features/routes/copy/hooks/aria/stateclasses/dbms hashes retained; five states/44px/token spacing/reduced motion mandatory.
+- Branch only overhaul/neo-brutal; commits only accept.sh, independently rerun exact Verify; max2 custom-role packet-only workers, no model/effort overrides. Isolated clones via .agent/orchestrate.py; <=3files/150 changedlines/task. Metadata state/envelopes normalized with realstats and integercounts.
+- Worker checks offline/no fixed-port servers; root owns network/browser/DB. Never accept during root Next build/dev process; helpers restore next-env and kill only own loopback processgroups. One db-baseline at a time,18000 API; apexgrid-test only (PG15432/Mongo27018), projectlabels guarded. Never realDB/schema/data/volumes, .env/secrets, recursive removal. Owner status.sh/scripts/agent/status.sh excluded untouched; preserve run-loop edits.
+- All routes/features/copy/charts/modals/aria/data/stateclasses/DBMS hashes retained; five states/44targets/token spacing/reduced motion. Palette bands unchanged, correct layout not thresholds. All details and accepted envelopes in Git/.agent/results; .agent/check-login-visual.py captures settled screens/geometry using temporary root server.
 
-## Open risks
-- T331 giant main/transitional factories; strict mypy212 errors/24files (T44256.mypy.raw.log); zero required T339. No thresholds relaxed.
-- T44132 bundle checker omits layout/shared assets; fix before P3. Lighthouse absent, FPS gate17ms until T41316.7, hosted CI unverified. Final score>=95/all hard gates/no NOT_RUN required; never present obsolete score as current.
-- Worker review caught nested main/dead modal control (corrected), accidental root demo hook (removed only worker-owned unaccepted copy), and T44232 complexity suppression/locals namespace tricks (rejected, standard explicit helper accepted). No other work reverted; no test weakened.
+## Open risks / next
+- T331 main still1378; strict mypy212errors/24files at T44256, zero required T339. Coverage/DI/batched simulator writes/DBMS showcase and final evaluation pending.
+- T44132 bundle checker misses layout/shared assets; fix before P3 (170KB unchanged). Lighthouse absent, FPS17ms until T41316.7, hostedCI unverified. Final aggregate>=95/allhardgates/no NOT_RUN required; never claim obsolete score current.
+- Finish T380 geometry/build and parent acceptance, remaining T379 splits, then dashboard/resources/live/session/stewards/pit/standings/analytics/DBMS according to plan. DBMS redesign also needs Phase4. Keep backend T331 progressing in parallel and full suite after each wiring.
 
 ## Orchestrator direct edits
-- T-44250: 8 additions/4 removals in shell.tsx as cross-worker glue connecting accepted W1 presenters and W2 hook/mapper; no bulk implementation. Metadata, architecture/config/ADRs, packets/state/envelopes/root acceptance helpers and approved installs only. Applying worker patches is integration, not authorship. No new dependencies this continuation. Root build/types/lint afterinitiallogin cleanup0 (T44283.build.raw.log); final login repair build pending.
-
-- TASTE login screenshot T44283: broken AG wrap/lime, tiny checker, card5sizes/textovergrid. T44284 scoped type/brand/checker/backing27ee284 accepted,70browserPASS; settled375 screenshotstillclipsmotifs, W1T44289 cliprepair523cd33 and W3T44290 tests6d32c9e accepted. Rootnewtests expose nativearia-busy override (W1T44293fix) and wrong testinkfixture17instead0 (W3T44294fix); mobile geometrypass. T44285 SessionPage operations58aad6d moved, T44286 writes60cc688 staged; simulatorpresentation86d745b wired52e84a0; session writes3e715d5 wired.
-
-- T-44293 accepted0d7dd28: Forward native caller aria-busy while internal busy=true still forces true; preserve original children/copy. Verify0.
+- T44250 shell glue8add/4remove (12productlines this turn), logged and accepted e765662; all other product implementation delegated. Metadata/config/ADRs/packets/state/root verification helpers only. No new dependencies this continuation.

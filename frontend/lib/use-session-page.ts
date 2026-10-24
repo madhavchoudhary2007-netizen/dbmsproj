@@ -1,0 +1,131 @@
+import { useEffect, useState } from "react";
+import { Row } from "@/lib/api";
+import { useAuth } from "@/components/auth";
+import { useSessionData } from "@/lib/use-session-data";
+import {
+  performSessionAction,
+  readSessionResults,
+  simulateSession,
+} from "@/lib/session-actions";
+import {
+  deleteSessionRecord,
+  saveSession,
+  saveSessionResult,
+} from "@/lib/session-writes";
+
+export function useSessionPage() {
+  const [resultModal, setResultModal] = useState(false),
+    [editModal, setEditModal] = useState(false),
+    [resultsLoaded, setResultsLoaded] = useState(false),
+    [selected, setSelected] = useState(""),
+    [actionMsg, setActionMsg] = useState(""),
+    [modal, setModal] = useState(false),
+    [busy, setBusy] = useState(false),
+    [simCars, setSimCars] = useState(10),
+    [simCarsInitialized, setSimCarsInitialized] = useState(false),
+    [simRate, setSimRate] = useState(5),
+    [simMessage, setSimMessage] = useState(""),
+    [results, setResults] = useState<Row[]>([]);
+  const { rows, events, drivers, err, loading, load } = useSessionData();
+  const { user } = useAuth();
+  const canManage = user?.role === "ADMIN";
+  const canControl = user?.role === "ADMIN" || user?.role === "STEWARD";
+  useEffect(() => {
+    if (simCarsInitialized || !drivers.length) return;
+    const eligible = drivers.filter((d) => d.eligibility === "ACTIVE").length;
+    setSimCars(Math.max(1, Math.min(10, eligible || 1)));
+    setSimCarsInitialized(true);
+  }, [drivers, simCarsInitialized]);
+  const current = rows.find((r) => r.id === selected);
+  const perform = async (action: string) =>
+    performSessionAction(action, selected, setActionMsg, load);
+  const saveResult = async (v: Row) =>
+    saveSessionResult(
+      v,
+      selected,
+      setBusy,
+      setResults,
+      setResultsLoaded,
+      setResultModal,
+    );
+  const simulate = async (action: string) =>
+    simulateSession(action, selected, setSimMessage, simCars, simRate, load);
+  const getResults = async () =>
+    readSessionResults(selected, setResults, setResultsLoaded, setSimMessage);
+  const fields = [
+    {
+      name: "event_id",
+      required: true,
+      options: events.map((e) => ({
+        value: String(e.id),
+        label: `${String(e.name || "Event")} · round ${String(e.round_number ?? "—")}`,
+      })),
+    },
+    {
+      name: "session_type",
+      required: true,
+      options: ["PRACTICE", "QUALIFYING", "RACE"],
+    },
+    { name: "scheduled_at", type: "datetime-local", required: true },
+    { name: "total_laps", type: "number", min: 1, max: 72 },
+    { name: "safety_car", options: ["false", "true"] },
+  ];
+  const save = async (v: Row) =>
+    saveSession(
+      v,
+      fields,
+      editModal,
+      selected,
+      setBusy,
+      setModal,
+      setEditModal,
+      load,
+    );
+  const deleteSession = async () =>
+    deleteSessionRecord(
+      selected,
+      setBusy,
+      setSelected,
+      setResults,
+      load,
+      setActionMsg,
+    );
+  return {
+    resultModal,
+    setResultModal,
+    editModal,
+    setEditModal,
+    resultsLoaded,
+    setResultsLoaded,
+    selected,
+    setSelected,
+    actionMsg,
+    setActionMsg,
+    modal,
+    setModal,
+    busy,
+    simCars,
+    setSimCars,
+    simRate,
+    setSimRate,
+    simMessage,
+    results,
+    setResults,
+    rows,
+    events,
+    drivers,
+    err,
+    loading,
+    load,
+    canManage,
+    canControl,
+    current,
+    perform,
+    saveResult,
+    simulate,
+    getResults,
+    fields,
+    save,
+    deleteSession,
+  };
+}

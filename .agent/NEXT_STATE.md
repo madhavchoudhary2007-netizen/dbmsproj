@@ -3,9 +3,19 @@ updated_at: 2026-10-24
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44294 W3 — OPEN
+### T-44297 W3 — OPEN
 - target_files: frontend/e2e/login-layout.spec.ts
-- contract: T380 correct newly added login test ink fixture to the actual approved pure black palette.
+- contract: T380 correct new regression error target/copy to match existing API normalization and Next route announcer.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
+### T-44296 W1 — OPEN
+- target_files: frontend/components/pages/session-results.tsx, frontend/components/special-pages.tsx
+- contract: T379 extract existing session results presentation into focused component, no redesign.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
+### T-44295 W2 — OPEN
+- target_files: frontend/lib/use-session-page.ts
+- contract: T379 stage SessionPage orchestration hook from accepted extracted data/actions/writes, no main wiring yet.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Blocked
@@ -15,6 +25,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44294 acceptedc659147; verify0.
 - T-44293 accepted0d7dd28; verify0.
 - T-44292 accepted1a2b573; verify0.
 - T-44291 accepted52e84a0; verify0.
