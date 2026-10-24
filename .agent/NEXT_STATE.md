@@ -3,11 +3,6 @@ updated_at: 2026-10-24
 phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 
 ## Queue
-### T-44240 O — ADR-012 dashboard next-event contract
-- target_files: DECISIONS.md
-- contract: Additive nullable next-event authorization and focused five-lens review; no product change.
-- verify: bash scripts/agent/verify-lock.sh
-
 ### T-44238 W3 — OPEN
 - target_files: frontend/e2e/runtime/dashboard-feed.test.mjs
 - contract: Test the actual shared dashboard cache offline, including deduplication, TTL, cancellation and stale-flight races.
@@ -26,6 +21,7 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44240 acceptedc93ec77; verify0.
 - T-44236 accepted63aa0ad; verify0.
 - T-44235 accepted683c6b5; verify0.
 - T-44234 acceptedac0a46e; verify0.

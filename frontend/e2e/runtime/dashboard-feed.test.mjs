@@ -1,0 +1,137 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import * as vm from "node:vm";
+
+const require = createRequire(import.meta.url);
+const typescript = require("../../node_modules/typescript");
+const source = readFileSync(new URL("../../lib/dashboard-feed.ts", import.meta.url), "utf8");
+
+function deferredApi() {
+  const requests = [];
+  const api = (_path, { signal } = {}) => new Promise((resolve, reject) => {
+    const request = { resolve, reject, signal, aborts: 0 };
+    signal?.addEventListener("abort", () => { request.aborts += 1; });
+    requests.push(request);
+  });
+  api.requests = requests;
+  return api;
+}
+
+async function loadFeed(clock, api) {
+  const context = vm.createContext({ console, Promise, AbortController });
+  context.Date = { now: () => clock.value };
+  const output = typescript.transpileModule(source, {
+    compilerOptions: { module: typescript.ModuleKind.ESNext, target: typescript.ScriptTarget.ES2022 },
+  }).outputText;
+  const mockedApi = new vm.SyntheticModule(["api"], function () {
+    this.setExport("api", api);
+  }, { context, identifier: "./api" });
+  const feed = new vm.SourceTextModule(output, {
+    context,
+    identifier: "./dashboard-feed.ts",
+  });
+  await feed.link(async (specifier) => {
+    if (specifier === "./api") return mockedApi;
+    throw new Error(`Unexpected import: ${specifier}`);
+  });
+  await feed.evaluate();
+  return feed.namespace.readDashboardFeed;
+}
+
+test("shares requests, honors the exact TTL boundary, and force joins in-flight work", async () => {
+  const clock = { value: 0 };
+  const api = deferredApi();
+  const read = await loadFeed(clock, api);
+  const first = read({ force: true });
+  const joined = read();
+  assert.equal(api.requests.length, 1);
+  api.requests[0].resolve({ revision: 1 });
+  assert.deepEqual(await Promise.all([first, joined]), [{ revision: 1 }, { revision: 1 }]);
+
+  clock.value = 9_999;
+  assert.deepEqual(await read(), { revision: 1 });
+  assert.equal(api.requests.length, 1);
+  clock.value = 10_000;
+  const expired = read();
+  assert.equal(api.requests.length, 2);
+  api.requests[1].resolve({ revision: 2 });
+  assert.deepEqual(await expired, { revision: 2 });
+
+  const forced = read({ force: true });
+  const forceJoined = read({ force: true });
+  assert.equal(api.requests.length, 3);
+  api.requests[2].resolve({ revision: 3 });
+  assert.deepEqual(await Promise.all([forced, forceJoined]), [{ revision: 3 }, { revision: 3 }]);
+});
+
+test("rejects already-aborted consumers and isolates consumer cancellation", async () => {
+  const clock = { value: 0 };
+  const api = deferredApi();
+  const read = await loadFeed(clock, api);
+  const alreadyAborted = new AbortController();
+  alreadyAborted.abort();
+  await assert.rejects(read({ signal: alreadyAborted.signal }), (error) => error?.name === "AbortError");
+  assert.equal(api.requests.length, 0);
+
+  const firstSignal = new AbortController();
+  const secondSignal = new AbortController();
+  const first = read({ signal: firstSignal.signal });
+  const second = read({ signal: secondSignal.signal });
+  assert.equal(api.requests.length, 1);
+  firstSignal.abort();
+  await assert.rejects(first, (error) => error?.name === "AbortError");
+  assert.equal(api.requests[0].aborts, 0);
+  api.requests[0].resolve({ revision: 4 });
+  assert.deepEqual(await second, { revision: 4 });
+});
+
+test("cancels the last consumer and protects a replacement from stale completion", async () => {
+  const clock = { value: 0 };
+  const api = deferredApi();
+  const read = await loadFeed(clock, api);
+  const signal = new AbortController();
+  const cancelled = read({ signal: signal.signal });
+  signal.abort();
+  await assert.rejects(cancelled, (error) => error?.name === "AbortError");
+  assert.equal(api.requests[0].signal.aborted, true);
+  assert.equal(api.requests[0].aborts, 1);
+
+  const replacement = read();
+  assert.equal(api.requests.length, 2);
+  let replacementSettled = false;
+  replacement.then(() => { replacementSettled = true; });
+  api.requests[0].resolve({ revision: "stale" });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(replacementSettled, false);
+  api.requests[1].resolve({ revision: 5 });
+  assert.deepEqual(await replacement, { revision: 5 });
+  assert.deepEqual(await read(), { revision: 5 });
+  assert.equal(api.requests.length, 2);
+
+  const secondSignal = new AbortController();
+  const abandoned = read({ force: true, signal: secondSignal.signal });
+  secondSignal.abort();
+  await assert.rejects(abandoned, (error) => error?.name === "AbortError");
+  const replacementAfterCache = read({ force: true });
+  assert.equal(api.requests.length, 4);
+  api.requests[3].resolve({ revision: 7 });
+  assert.deepEqual(await replacementAfterCache, { revision: 7 });
+  api.requests[2].resolve({ revision: "late-stale" });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(await read(), { revision: 7 });
+});
+
+test("does not cache failures and retries with a new request", async () => {
+  const clock = { value: 0 };
+  const api = deferredApi();
+  const read = await loadFeed(clock, api);
+  const failed = read();
+  api.requests[0].reject(new Error("offline"));
+  await assert.rejects(failed, /offline/);
+  const retry = read();
+  assert.equal(api.requests.length, 2);
+  api.requests[1].resolve({ revision: 6 });
+  assert.deepEqual(await retry, { revision: 6 });
+});

@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 63aa0ad
+git_head: c93ec77
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -41,3 +41,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - T-44235 accepted683c6b5: Staged responsive shell widths,200ms drawer/reduced fallback, mobile44/48px controls and token spacing; no activation yet. Verify0.
 
 - T-44236 accepted63aa0ad: Added10-second shared dashboard cache with deduplicated reads, force refresh, per-consumer cancellation and stale-flight protection. Verify0.
+
+- T-44240 acceptedc93ec77: Record ADR-012 additive nullable next-event contract and relock focused architecture; implementation remains pending. Verify0.
