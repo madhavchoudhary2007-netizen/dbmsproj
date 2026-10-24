@@ -38,6 +38,7 @@ import { useAuth } from "./auth";
 import { DbmsWorkspace } from "./dbms-workspace";
 import { SessionResults } from "./pages/session-results";
 import { SessionSimulator } from "./pages/session-simulator";
+import { SessionEditorModal, SessionResultModal } from "./pages/session-modals";
 export { Dashboard } from "@/components/pages/dashboard";
 
 export function SessionPage() {
@@ -210,48 +211,24 @@ export function SessionPage() {
             </div>
           )}
           {resultModal && canControl && (
-            <Modal
-              title="Add or update session result"
-              close={() => setResultModal(false)}
-            >
-              <ResourceEditor
-                fields={[
-                  {
-                    name: "driver_id",
-                    required: true,
-                    options: drivers.map((d) => ({
-                      value: String(d.id),
-                      label: `${String(d.number || "#—")} · ${String(d.full_name || "Driver")}`,
-                    })),
-                  },
-                  { name: "position", type: "number", required: true },
-                  { name: "lap_time_ms", type: "number" },
-                  { name: "pole", options: ["false", "true"] },
-                  { name: "fastest_lap", options: ["false", "true"] },
-                  { name: "classified", options: ["true", "false"] },
-                ]}
-                save={saveResult}
-                busy={busy}
-              />
-            </Modal>
+            <SessionResultModal
+              drivers={drivers}
+              busy={busy}
+              saveResult={saveResult}
+              setResultModal={setResultModal}
+            />
           )}
         </div>
       )}
       {modal && canManage && (
-        <Modal
-          title={editModal ? "Edit session" : "Schedule session"}
-          close={() => setModal(false)}
-        >
-          <div className="form-hint">
-            Event IDs are taken from the event records loaded above.
-          </div>
-          <ResourceEditor
-            fields={fields}
-            initial={editModal ? current : undefined}
-            save={save}
-            busy={busy}
-          />
-        </Modal>
+        <SessionEditorModal
+          editModal={editModal}
+          current={current}
+          fields={fields}
+          save={save}
+          busy={busy}
+          setModal={setModal}
+        />
       )}
     </>
   );

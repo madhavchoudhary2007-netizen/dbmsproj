@@ -1,0 +1,162 @@
+diff --git a/frontend/components/special-pages.tsx b/frontend/components/special-pages.tsx
+index 8575de4..5f60f1e 100644
+--- a/frontend/components/special-pages.tsx
++++ b/frontend/components/special-pages.tsx
+@@ -38,6 +38,7 @@ import { useAuth } from "./auth";
+ import { DbmsWorkspace } from "./dbms-workspace";
+ import { SessionResults } from "./pages/session-results";
+ import { SessionSimulator } from "./pages/session-simulator";
++import { SessionEditorModal, SessionResultModal } from "./pages/session-modals";
+ export { Dashboard } from "@/components/pages/dashboard";
+ 
+ export function SessionPage() {
+@@ -210,48 +211,24 @@ export function SessionPage() {
+             </div>
+           )}
+           {resultModal && canControl && (
+-            <Modal
+-              title="Add or update session result"
+-              close={() => setResultModal(false)}
+-            >
+-              <ResourceEditor
+-                fields={[
+-                  {
+-                    name: "driver_id",
+-                    required: true,
+-                    options: drivers.map((d) => ({
+-                      value: String(d.id),
+-                      label: `${String(d.number || "#—")} · ${String(d.full_name || "Driver")}`,
+-                    })),
+-                  },
+-                  { name: "position", type: "number", required: true },
+-                  { name: "lap_time_ms", type: "number" },
+-                  { name: "pole", options: ["false", "true"] },
+-                  { name: "fastest_lap", options: ["false", "true"] },
+-                  { name: "classified", options: ["true", "false"] },
+-                ]}
+-                save={saveResult}
+-                busy={busy}
+-              />
+-            </Modal>
++            <SessionResultModal
++              drivers={drivers}
++              busy={busy}
++              saveResult={saveResult}
++              setResultModal={setResultModal}
++            />
+           )}
+         </div>
+       )}
+       {modal && canManage && (
+-        <Modal
+-          title={editModal ? "Edit session" : "Schedule session"}
+-          close={() => setModal(false)}
+-        >
+-          <div className="form-hint">
+-            Event IDs are taken from the event records loaded above.
+-          </div>
+-          <ResourceEditor
+-            fields={fields}
+-            initial={editModal ? current : undefined}
+-            save={save}
+-            busy={busy}
+-          />
+-        </Modal>
++        <SessionEditorModal
++          editModal={editModal}
++          current={current}
++          fields={fields}
++          save={save}
++          busy={busy}
++          setModal={setModal}
++        />
+       )}
+     </>
+   );
+diff --git a/frontend/components/pages/session-modals.tsx b/frontend/components/pages/session-modals.tsx
+new file mode 100644
+index 0000000..469c439
+--- /dev/null
++++ b/frontend/components/pages/session-modals.tsx
+@@ -0,0 +1,81 @@
++"use client";
++
++import type { ComponentProps } from "react";
++import type { Row } from "@/lib/api";
++import { Modal, ResourceEditor } from "../ui";
++
++type SessionResultModalProps = {
++  drivers: Row[];
++  busy: boolean;
++  saveResult: ComponentProps<typeof ResourceEditor>["save"];
++  setResultModal: (open: boolean) => void;
++};
++
++export function SessionResultModal({
++  drivers,
++  busy,
++  saveResult,
++  setResultModal,
++}: SessionResultModalProps) {
++  return (
++    <Modal
++      title="Add or update session result"
++      close={() => setResultModal(false)}
++    >
++      <ResourceEditor
++        fields={[
++          {
++            name: "driver_id",
++            required: true,
++            options: drivers.map((d) => ({
++              value: String(d.id),
++              label: `${String(d.number || "#—")} · ${String(d.full_name || "Driver")}`,
++            })),
++          },
++          { name: "position", type: "number", required: true },
++          { name: "lap_time_ms", type: "number" },
++          { name: "pole", options: ["false", "true"] },
++          { name: "fastest_lap", options: ["false", "true"] },
++          { name: "classified", options: ["true", "false"] },
++        ]}
++        save={saveResult}
++        busy={busy}
++      />
++    </Modal>
++  );
++}
++
++type SessionEditorModalProps = {
++  editModal: boolean;
++  current: Row | undefined;
++  fields: ComponentProps<typeof ResourceEditor>["fields"];
++  save: ComponentProps<typeof ResourceEditor>["save"];
++  busy: boolean;
++  setModal: (open: boolean) => void;
++};
++
++export function SessionEditorModal({
++  editModal,
++  current,
++  fields,
++  save,
++  busy,
++  setModal,
++}: SessionEditorModalProps) {
++  return (
++    <Modal
++      title={editModal ? "Edit session" : "Schedule session"}
++      close={() => setModal(false)}
++    >
++      <div className="form-hint">
++        Event IDs are taken from the event records loaded above.
++      </div>
++      <ResourceEditor
++        fields={fields}
++        initial={editModal ? current : undefined}
++        save={save}
++        busy={busy}
++      />
++    </Modal>
++  );
++}
