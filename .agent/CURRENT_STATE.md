@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 905b786
+git_head: 14da91f
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -28,7 +28,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - .agent/orchestrate.py persists queue/clone/integrate/mark. Worker envelopes require actual stats/integer static counts0, no extra keys. All features/routes/copy/hooks/aria/stateclasses/dbms hashes retained; five states/44px/token spacing/reduced motion mandatory.
 
 ## Open risks
-- T370 broad browser batch:260 PASS/80FAIL.75 axe cases fail mixed legacy dark/light contrast plus status visible-label/name mismatch;5 E5 failures are ambiguous substring Refresh selector. W1 T44257 and W3 T44258 accepted repairs without changing API/copy/thresholds; rerun mandatory.
+- T370 broad browser batch:260 PASS/80FAIL.75 axe cases fail mixed legacy dark/light contrast plus status visible-label/name mismatch;5 E5 failures are ambiguous substring Refresh selector. W1 T44257/W3 T44258 repaired label/Refresh/mostcontrast. Rerun110 PASS20FAIL, narrowed to4 legacy text selectors; T44260 accepted fix, fullaxe/feed/edge/drawer rerun in progress. No API/copy/threshold changes.
 - T44248 first acceptance caught reserved module variable in new mapper test; W3 renamed binding2aa2b87, all3 assertions+global lint pass. Saved W1/root patches reapplied, acceptdfcf8ac/e765662 both0; no assertion weakened.
 - T331 giant main/transitional factories; strict mypy212 errors/24files (T44256.mypy.raw.log); zero required T339. No thresholds relaxed.
 - T44132 bundle checker omits layout/shared assets; fix before P3. Lighthouse absent, FPS gate17ms until T41316.7, hosted CI unverified. Final score>=95/all hard gates/no NOT_RUN required; never present obsolete score as current.
@@ -38,3 +38,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - T-44250: 8 additions/4 removals in shell.tsx as cross-worker glue connecting accepted W1 presenters and W2 hook/mapper; no bulk implementation. Metadata, architecture/config/ADRs, packets/state/envelopes/root acceptance helpers and approved installs only. Applying worker patches is integration, not authorship. No new dependencies this continuation.
 
 - T-44259 accepted905b786: Stage typed result-write router with explicit helper dependencies and AST-identical implementation; no main wiring yet. Verify0.
+
+- T-44260 accepted14da91f: Correct four remaining measured light-shell contrast selectors using approved ink/yellow surfaces and token spacing. Verify0.
