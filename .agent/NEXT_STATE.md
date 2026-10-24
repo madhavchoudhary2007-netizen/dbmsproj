@@ -3,9 +3,14 @@ updated_at: 2026-10-24
 phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 
 ## Queue
-### T-44250 O — Wire W1/W2 shell feed boundaries
-- target_files: frontend/components/shell.tsx
-- contract: Connect accepted hook/mapper/presenters, no new behavior or API.
+### T-44251 W3 — OPEN
+- target_files: frontend/e2e/race-control-feed.spec.ts
+- contract: T371 actual-browser polling, request-sharing, visibility, retry/offline and five-state ticker regressions.
+- verify: npm --prefix frontend run typecheck && cd frontend && ./node_modules/.bin/playwright test e2e/race-control-feed.spec.ts --list
+
+### T-44255 W1 — OPEN
+- target_files: frontend/components/shell-feed.tsx
+- contract: Prevent a populated dashboard with no ticker-relevant fields from rendering an empty red marquee.
 - verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Blocked
@@ -16,6 +21,7 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44250 acceptede765662; verify0.
 - T-44248 accepteddfcf8ac; verify0.
 - T-44253 accepted2aa2b87; verify0.
 - T-44252 accepted39f2e59; verify0.
