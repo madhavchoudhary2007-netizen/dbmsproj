@@ -34,7 +34,8 @@ from psycopg import IntegrityError, OperationalError, sql
 from psycopg.errors import ExclusionViolation, ForeignKeyViolation, UniqueViolation
 from psycopg.rows import dict_row
 from psycopg_pool import PoolClosed, PoolTimeout
-from pymongo import DESCENDING, MongoClient
+from pymongo import DESCENDING as DESCENDING
+from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.errors import PyMongoError
 from starlette.middleware.base import RequestResponseEndpoint
@@ -134,6 +135,7 @@ from .schemas_simulation import DemoRaceCreate, SimulationControl
 from .security_headers import SecurityHeadersMiddleware
 from .simulation_core import MAX_SESSION_LAPS, Simulation
 from .simulation_core import calculate_sector_performance as calculate_sector_performance
+from .simulation_restore import restore_incident_state, restore_telemetry_state
 from .telemetry_router import create_telemetry_router
 from .user_router import create_user_router
 
@@ -701,39 +703,11 @@ app.include_router(
 
 
 def restore_simulation_from_telemetry(sim: Simulation):
-    """Resume an active generated race without deleting its recorded laps."""
-    col = mongo_ready()
-    for driver in sim.drivers:
-        driver_id = str(driver["id"])
-        latest = col.find_one(
-            {"session_id": str(sim.session_id), "driver_id": driver_id}, sort=[("ts", DESCENDING)]
-        )
-        sim.lap_by_driver[driver_id] = int(latest.get("lap", 1)) if latest else 1
-        sim.sector_by_driver[driver_id] = int(latest.get("sector", 0)) if latest else 0
-        sim.elapsed_by_driver[driver_id] = int(latest.get("elapsed_ms", 0)) if latest else 0
-        sim.sector_splits_by_driver[driver_id] = (
-            list(latest.get("sector_ms") or []) if latest else []
-        )
-        sim.next_sector_due_by_driver[driver_id] = sim.elapsed_by_driver[driver_id]
-        if latest and latest.get("last_lap_ms"):
-            sim.last_lap_by_driver[driver_id] = int(latest["last_lap_ms"])
-        sim.tire_age_by_driver[driver_id] = int(latest.get("tire_age_laps", 0)) if latest else 0
-        sim.tire_wear_by_driver[driver_id] = (
-            float(latest.get("tire_wear_pct", 0)) if latest else 0.0
-        )
-        if latest and latest.get("tire_compound"):
-            sim.compound_by_driver[driver_id] = latest["tire_compound"]
-    sim.race_clock_ms = max(sim.elapsed_by_driver.values(), default=0)
+    return restore_telemetry_state(sim, lambda: mongo_ready())
 
 
 def restore_simulated_incidents(sim: Simulation):
-    """Keep a restarted simulator from duplicating reports already in the archive."""
-    sim.incident_laps_recorded = {
-        row["lap"]
-        for row in fetch_all(
-            "SELECT DISTINCT lap FROM incident_reports WHERE session_id=%s", (sim.session_id,)
-        )
-    }
+    return restore_incident_state(sim, lambda *a, **kw: fetch_all(*a, **kw))
 
 
 async def resume_or_create_auto_demo_race(create_if_missing: bool = True):
