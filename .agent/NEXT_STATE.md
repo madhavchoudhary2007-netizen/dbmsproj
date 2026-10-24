@@ -3,15 +3,15 @@ updated_at: 2026-10-24
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44307 W1 — OPEN
+- target_files: frontend/components/special-pages.tsx
+- contract: T379 activate accepted exact SessionPage module using compatibility reexport; remove old copy/imports only.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
 ### T-44308 W2 — OPEN
 - target_files: backend/app/simulation_pit.py, backend/app/main.py
 - contract: T331 move exact automatic simulator pit scheduling into existing simulation_pit module with compatibility wrapper.
 - verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "pit or sector_lap_elapsed" && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/simulation_pit.py
-
-### T-44306 W1 — OPEN
-- target_files: frontend/components/pages/sessions.tsx
-- contract: T379 stage exact now-small SessionPage in its own page module; no wiring/redesign yet.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
@@ -20,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44306 accepted478cffa; verify0.
 - T-44305 acceptedfe21209; verify0.
 - T-44304 accepted2be7bec; verify0.
 - T-380 accepted0a3e206; verify0.
