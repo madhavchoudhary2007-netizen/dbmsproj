@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: c93ec77
+git_head: cdd2dec
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -43,3 +43,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - T-44236 accepted63aa0ad: Added10-second shared dashboard cache with deduplicated reads, force refresh, per-consumer cancellation and stale-flight protection. Verify0.
 
 - T-44240 acceptedc93ec77: Record ADR-012 additive nullable next-event contract and relock focused architecture; implementation remains pending. Verify0.
+
+- T-44238 acceptedcdd2dec: Test actual shared cache TTL, deduplication, force refresh, independent aborts, replacement races and failures in four offline cases. Verify0.

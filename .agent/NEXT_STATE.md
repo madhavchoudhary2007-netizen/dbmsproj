@@ -3,10 +3,10 @@ updated_at: 2026-10-24
 phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 
 ## Queue
-### T-44238 W3 — OPEN
-- target_files: frontend/e2e/runtime/dashboard-feed.test.mjs
-- contract: Test the actual shared dashboard cache offline, including deduplication, TTL, cancellation and stale-flight races.
-- verify: node --experimental-vm-modules --test frontend/e2e/runtime/dashboard-feed.test.mjs
+### T-44241 W3 — OPEN
+- target_files: backend/tests/test_dashboard_next_event.py, backend/tests/test_dashboard_next_event_db.py, backend/tests/test_api.py
+- contract: Write failing-first ADR-012 dashboard next_event unit and disposable PostgreSQL selection tests, and update exact dashboard key characterization for the authorized additive field.
+- verify: python3 /Users/madhavchoudhary/Developer/dbmsproj/.agent/check-red-tests.py T-44241 backend/tests/test_dashboard_next_event.py && .venv/bin/ruff check backend/tests/test_dashboard_next_event.py backend/tests/test_dashboard_next_event_db.py backend/tests/test_api.py && .venv/bin/ruff format --check backend/tests/test_dashboard_next_event.py backend/tests/test_dashboard_next_event_db.py backend/tests/test_api.py
 
 ### T-44237 W2 — OPEN
 - target_files: frontend/lib/use-navigation-drawer.ts, frontend/components/shell.tsx
@@ -21,6 +21,7 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44238 acceptedcdd2dec; verify0.
 - T-44240 acceptedc93ec77; verify0.
 - T-44236 accepted63aa0ad; verify0.
 - T-44235 accepted683c6b5; verify0.

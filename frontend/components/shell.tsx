@@ -22,7 +22,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "./auth";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
+import { useNavigationDrawer } from "../lib/use-navigation-drawer";
 
 type NavItem = [href: string, name: string, icon: LucideIcon];
 interface NavGroup {
@@ -65,23 +66,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname(),
     router = useRouter(),
     { user, ready, logout } = useAuth(),
-    [open, setOpen] = useState(false);
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
+    { open, setOpen, menuButtonRef } = useNavigationDrawer(Boolean(user && ready));
   useEffect(() => {
     if (!ready) return;
     if (!user && path !== "/" && path !== "/login") router.replace("/login");
     if (user && path === "/login") router.replace("/dashboard");
   }, [path, ready, router, user]);
-  useEffect(() => {
-    if (!open) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      setOpen(false);
-      menuButtonRef.current?.focus();
-    };
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [open]);
   if (!ready || (user && path === "/login"))
     return (
       <main className="loading-screen" id="main-content" tabIndex={-1}>

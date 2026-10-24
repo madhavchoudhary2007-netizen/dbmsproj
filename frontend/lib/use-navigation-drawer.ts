@@ -1,0 +1,122 @@
+"use client";
+import { useCallback, useEffect, useRef, useState } from "react";
+const MOBILE_QUERY = "(max-width: 999px)";
+const FOCUSABLE = 'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+function focusSafely(element: HTMLElement | null) {
+  if (!element) return;
+  try {
+    element.focus({ preventScroll: true });
+  } catch {
+    element.focus();
+  }
+}
+function getControls(drawer: HTMLElement | null) {
+  return drawer
+    ? Array.from(drawer.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
+        (element) => {
+          if (element.getAttribute("aria-disabled") === "true" || element.tabIndex < 0) return false;
+          for (let node: HTMLElement | null = element; node; node = node.parentElement) {
+            const style = window.getComputedStyle(node);
+            if (node.hidden || node.inert || node.getAttribute("aria-hidden") === "true" || style.display === "none" || style.visibility === "hidden" || style.visibility === "collapse") return false;
+          }
+          return true;
+        },
+      )
+    : [];
+}
+type NavigationDrawer = { open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>>; close: () => void; isMobile: boolean; drawerRef: React.RefObject<HTMLElement | null>; backgroundRef: React.RefObject<HTMLDivElement | null>; menuButtonRef: React.RefObject<HTMLButtonElement | null> };
+export function useNavigationDrawer(enabled = true): NavigationDrawer {
+  const [open, setOpenState] = useState(false), [isMobile, setIsMobile] = useState(false);
+  const openRef = useRef(false);
+  const drawerRef = useRef<HTMLElement | null>(null), backgroundRef = useRef<HTMLDivElement | null>(null), menuButtonRef = useRef<HTMLButtonElement | null>(null);
+  useEffect(() => {
+    openRef.current = open;
+  }, [open]);
+  const focusTrigger = useCallback(() => {
+    focusSafely(menuButtonRef.current);
+  }, []);
+  const close = useCallback(() => setOpenState(false), []);
+  useEffect(() => {
+    if (!enabled) return;
+    if (typeof window.matchMedia !== "function") {
+      setIsMobile(window.innerWidth < 1000);
+      return;
+    }
+    const media = window.matchMedia(MOBILE_QUERY);
+    const sync = () => {
+      const next = media.matches;
+      setIsMobile(next);
+      if (!next && openRef.current) setOpenState(false);
+    };
+    sync();
+    media.addEventListener?.("change", sync);
+    if (!media.addEventListener) media.addListener(sync);
+    return () => {
+      media.removeEventListener?.("change", sync);
+      if (!media.removeEventListener) media.removeListener(sync);
+    };
+  }, [enabled, focusTrigger]);
+  useEffect(() => {
+    if (!enabled) return;
+    const drawer = drawerRef.current;
+    const background = backgroundRef.current;
+    const previous = {
+      drawerInert: drawer?.inert,
+      backgroundInert: background?.inert,
+      overflow: document.body.style.overflow,
+    };
+
+    if (drawer) drawer.inert = isMobile ? !open : false;
+    if (background) background.inert = isMobile && open;
+    if (isMobile && open) document.body.style.overflow = "hidden";
+
+    return () => {
+      if (drawer && previous.drawerInert !== undefined)
+        drawer.inert = previous.drawerInert;
+      if (background && previous.backgroundInert !== undefined)
+        background.inert = previous.backgroundInert;
+      document.body.style.overflow = previous.overflow;
+      if (open) focusTrigger();
+    };
+  }, [enabled, focusTrigger, isMobile, open]);
+  useEffect(() => {
+    if (!enabled || !open) return;
+    const drawer = drawerRef.current;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        close();
+        return;
+      }
+      if (event.key !== "Tab" || !isMobile || !drawer) return;
+      const controls = getControls(drawer);
+      if (!controls.length) {
+        event.preventDefault();
+        return;
+      }
+      const first = controls[0];
+      const last = controls[controls.length - 1];
+      const active = document.activeElement;
+      if (event.shiftKey && (active === first || !drawer.contains(active))) {
+        event.preventDefault();
+        focusSafely(last);
+      } else if (!event.shiftKey && (active === last || !drawer.contains(active))) {
+        event.preventDefault();
+        focusSafely(first);
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    const first = getControls(drawer)[0];
+    if (isMobile && first) focusSafely(first);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [close, enabled, isMobile, open]);
+  return {
+    open,
+    setOpen: setOpenState,
+    close,
+    isMobile,
+    drawerRef,
+    backgroundRef,
+    menuButtonRef,
+  };
+}
