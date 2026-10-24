@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 3bade73
+git_head: c16e5bb
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -35,3 +35,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 
 ## Orchestrator direct edits
 - T-44250: 8 additions/4 removals in shell.tsx as cross-worker glue connecting accepted W1 presenters and W2 hook/mapper; no bulk implementation. Metadata, architecture/config/ADRs, packets/state/envelopes/root acceptance helpers and approved installs only. Applying worker patches is integration, not authorship. No new dependencies this continuation.
+
+- T-44279 acceptedc16e5bb: Remove97 obsolete global desktop login rules, retain necessary geometry under scoped nb-login styles; no markup/auth changes. Verify0.
