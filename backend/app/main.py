@@ -118,7 +118,6 @@ from .schemas_operations import (
     Action,
     AutoReservationIn,
     Decision,
-    IncidentIn,
     ReservationIn,
     ReservationStatus,
 )
@@ -616,39 +615,13 @@ stewards_router, stewards_handlers = create_stewards_router(
     lambda value: jsonable(value),
     lambda limit, offset: limit_offset(limit, offset),
     authenticated_user_dependency,
+    lambda: connection(),
+    lambda *a, **kw: publish(*a, **kw),
+    admin_steward_dependency,
 )
 get_incidents = stewards_handlers["get_incidents"]
+create_incident = stewards_handlers["create_incident"]
 app.include_router(stewards_router)
-
-
-@app.post("/api/incidents", status_code=201)
-def create_incident(body: IncidentIn, user=admin_steward_dependency):
-    with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-        cur.execute("SELECT total_laps FROM race_sessions WHERE id=%s", (body.session_id,))
-        session = cur.fetchone()
-        if not session:
-            raise HTTPException(404, "Session not found")
-        if session["total_laps"] and body.lap > session["total_laps"]:
-            raise HTTPException(422, "Incident lap exceeds the session lap count")
-        cur.execute("SELECT 1 FROM demo_races WHERE session_id=%s", (body.session_id,))
-        if cur.fetchone():
-            cur.execute(
-                "SELECT 1 FROM demo_race_entries WHERE session_id=%s AND driver_id=%s",
-                (body.session_id, body.driver_id),
-            )
-            if not cur.fetchone():
-                raise HTTPException(422, "Driver is not entered in this generated race")
-        cur.execute(
-            (
-                "INSERT INTO incident_reports(session_id,driver_id,lap,description) VALUES (%s,%s"
-                ",%s,%s) RETURNING *"
-            ),
-            (body.session_id, body.driver_id, body.lap, body.description),
-        )
-        row = cur.fetchone()
-    result = jsonable(row)
-    publish(body.session_id, "incident.update", result)
-    return result
 
 
 @app.post("/api/incidents/{incident_id}/decision")

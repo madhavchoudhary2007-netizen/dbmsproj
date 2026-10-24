@@ -13,11 +13,6 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - contract: T365 typed static sticker, status badge and compound badge primitives.
 - verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
-### T-44203 W1 — OPEN (resume with owner-authorized5.6/high)
-- target_files: frontend/components/nb/button.tsx, frontend/components/nb/card.tsx
-- contract: T365 first typed primitives: NbButton and NbCard, no routes use them yet.
-- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
 ## Blocked
 - Previous6Luna usage-limit blocker superseded byowner5.6/high authorization; availability pendingfirstdispatch.
 
@@ -25,6 +20,7 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44203 accepted6eefdaa; verify0.
 - T-44207 accepted2bc94fb; verify0.
 - T-44206 accepted35ba591; verify0.
 - T-44200 accepted47c0408; verify0.

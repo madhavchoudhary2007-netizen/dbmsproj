@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 2bc94fb
+git_head: 6eefdaa
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (owner override); cap2
@@ -43,9 +43,7 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 
 - T-44200 accepted47c0408: Added bounded FLIP and coalesced cell flash hooks; repair1 adds guarded finish/cancel cleanup and reduced-motion handling. Runtime coverage remains T366. Verify0.
 
-## Model override / recovery
-- Owner explicitly switched all workers to gpt-5.6-luna/high. models.env andthreeCodexprofiles updated; cap2/orchestrator/effort unchanged. Tool definitions refreshed: w1-ui/w2-state/w3-eval nowexplicitly bind gpt-5.6-luna/high. Dispatch customroles withnooverrides, freshpacket-only context; max2 unchanged.
-- T44203 fresh5.6W1 reviewinginterrupted130linecandidate; T44205 fresh5.6W2 incidentcreate runningdisjoint clone. T44204 queuednotdispatched. T364runtime/T366/remainingphases unfinished.
-- Latest rootbuild/lint/types0; backend227PASS0skip/livePASS;85axe+4keyboardPASS; fourglobalCSSgates0. Remainingpalette/mypy/coverage/performancegaps remainopen.
-
-- T-44207 accepted2bc94fb: Switched all Codex worker profiles to owner-requested gpt-5.6-luna/high; preserved orchestrator, cap and boundaries. Verify0.
+## Current recovery / next work
+- Owner switched workers toGPT5.6Luna/high: models.env+3profiles2bc94fb accepted; customtoolmetadata5.6/high, actualfreshW1completed6eefdaa. W2alsoresponding; noquota blocker now. Cap2/orchestrator unchanged.
+- T44203 button/card accepted6eefdaa; no routeusesyet, runtimecomputedchecksT366 pending. T44204 badges W1 running. T44205createincident W2 repair1: directconnectioncallback froze monkeypatching, candidate savedrawpatch/own2filesreset; requirelateboundlambda. No APIchanges.
+- T364 hookscn/reduced+FLIP/flash accepted; runtimeT366 pending. Rootlatestbuild/lint/types0;full227PASS0skip/livePASS;85axe+4keyboardPASS;allfourglobalCSSgates0.
