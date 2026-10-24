@@ -51,6 +51,7 @@ from .api.health import register_legacy_health, register_readiness
 from .api.health import router as health_router
 from .api.laps import create_laps_router
 from .api.laps import race_lap_measurements as race_lap_measurements
+from .api.pit_write import create_pit_write_router
 from .api.race_archive import create_race_archive_router
 from .api.results_read import create_results_read_router
 from .api.results_write import create_results_write_router
@@ -124,13 +125,11 @@ from .schemas_health import HealthReport as HealthReport
 from .schemas_health import LivenessReport as LivenessReport
 from .schemas_health import ReadinessReport as ReadinessReport
 from .schemas_operations import Action as Action
-from .schemas_operations import (
-    AutoReservationIn,
-    ReservationIn,
-    ReservationStatus,
-)
+from .schemas_operations import AutoReservationIn as AutoReservationIn
 from .schemas_operations import Decision as Decision
 from .schemas_operations import IncidentIn as IncidentIn
+from .schemas_operations import ReservationIn as ReservationIn
+from .schemas_operations import ReservationStatus as ReservationStatus
 from .schemas_simulation import DemoRaceCreate, SimulationControl
 from .security_headers import SecurityHeadersMiddleware
 from .simulation_core import MAX_SESSION_LAPS, Simulation
@@ -524,95 +523,20 @@ def _require_principal_own_team(team_id: UUID, user: dict[str, Any]) -> None:
             raise HTTPException(403, "Principals may reserve pit boxes only for their own team")
 
 
-@app.post("/api/pit-reservations", status_code=201)
-def reserve_pit(body: ReservationIn, user=admin_steward_principal_dependency):
-    _require_principal_own_team(body.team_id, user)
-    try:
-        with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-            cur.execute(
-                "SELECT reserve_pit_box(%s,%s,%s,%s,%s) AS id",
-                (body.pit_box_id, body.session_id, body.team_id, body.starts_at, body.ends_at),
-            )
-            reservation_id = cur.fetchone()["id"]
-            cur.execute(PIT_RESERVATION_SELECT + " WHERE r.id=%s", (reservation_id,))
-            row = cur.fetchone()
-    except (UniqueViolation, ExclusionViolation) as exc:
-        raise HTTPException(409, "Pit box is already reserved for this time") from exc
-    except ForeignKeyViolation as exc:
-        raise HTTPException(404, "Pit box, session, or team not found") from exc
-    except Exception as exc:
-        if getattr(exc, "sqlstate", None) == "23514":
-            raise HTTPException(422, "Pit box and session must belong to the same event") from exc
-        if getattr(exc, "sqlstate", None) == "23P01":
-            raise HTTPException(409, "Pit box is already reserved for this time") from exc
-        raise
-    result = jsonable(row)
-    publish(body.session_id, "pit.update", result)
-    return result
-
-
-@app.post("/api/pit-reservations/auto", status_code=201)
-def reserve_pit_auto(body: AutoReservationIn, user=admin_steward_principal_dependency):
-    _require_principal_own_team(body.team_id, user)
-    session = fetch_one("SELECT state FROM race_sessions WHERE id=%s", (body.session_id,))
-    if not session:
-        raise HTTPException(404, "Session not found")
-    if session["state"] not in {"ACTIVE", "PAUSED"}:
-        raise HTTPException(409, "Pit reservations require an active or paused session")
-    sim = simulations.get(str(body.session_id))
-    rate_hz = sim.rate_hz if sim else 2.0
-    pit_duration = timedelta(seconds=max(0.6, 3.0 / max(rate_hz, 0.2)))
-    try:
-        reservation = create_automatic_reservation(
-            body.session_id, body.team_id, body.driver_id, pit_duration
-        )
-    except (UniqueViolation, ExclusionViolation) as exc:
-        raise HTTPException(409, "Driver or pit box already has a conflicting reservation") from exc
-    except ForeignKeyViolation as exc:
-        raise HTTPException(404, "Session, team, driver, or pit box not found") from exc
-    except Exception as exc:
-        sqlstate = getattr(exc, "sqlstate", None)
-        if sqlstate == "P0002":
-            raise HTTPException(409, "The event has no pit boxes") from exc
-        if sqlstate == "23514":
-            raise HTTPException(
-                422, "Driver must be an eligible member of the team for this session"
-            ) from exc
-        if sqlstate == "23505":
-            raise HTTPException(
-                409, "Driver already has an open pit reservation for this session"
-            ) from exc
-        raise
-    result = jsonable(reservation)
-    publish(body.session_id, "pit.update", result)
-    return result
-
-
-@app.patch("/api/pit-reservations/{reservation_id}")
-def update_pit_reservation(
-    reservation_id: UUID, body: ReservationStatus, user=admin_steward_principal_dependency
-):
-    with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-        cur.execute(
-            """SELECT r.*,t.principal_user_id FROM pit_reservations r
-            JOIN teams t ON t.id=r.team_id WHERE r.id=%s FOR UPDATE OF r""",
-            (reservation_id,),
-        )
-        reservation = cur.fetchone()
-        if not reservation:
-            raise HTTPException(404, "Pit reservation not found")
-        if user["role"] == "PRINCIPAL" and str(reservation["principal_user_id"]) != user["id"]:
-            raise HTTPException(403, "Principals may update reservations only for their own team")
-        if reservation["status"] != "RESERVED":
-            raise HTTPException(409, "Pit reservation is already closed")
-        cur.execute(
-            "UPDATE pit_reservations SET status=%s WHERE id=%s", (body.status, reservation_id)
-        )
-        cur.execute(PIT_RESERVATION_SELECT + " WHERE r.id=%s", (reservation_id,))
-        updated = cur.fetchone()
-    result = jsonable(updated)
-    publish(updated["session_id"], "pit.update", result)
-    return result
+_pit_write_router, _pit_write_handlers = create_pit_write_router(
+    lambda team_id, user: _require_principal_own_team(team_id, user),
+    lambda *args, **kwargs: connection(*args, **kwargs),
+    lambda value: jsonable(value),
+    lambda *args, **kwargs: publish(*args, **kwargs),
+    lambda *args, **kwargs: fetch_one(*args, **kwargs),
+    lambda: simulations,
+    lambda *args, **kwargs: create_automatic_reservation(*args, **kwargs),
+    admin_steward_principal_dependency,
+)
+app.include_router(_pit_write_router)
+reserve_pit = _pit_write_handlers["reserve_pit"]
+reserve_pit_auto = _pit_write_handlers["reserve_pit_auto"]
+update_pit_reservation = _pit_write_handlers["update_pit_reservation"]
 
 
 def mongo_ready():
