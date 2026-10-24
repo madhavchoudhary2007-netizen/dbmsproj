@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import sharp from "sharp";
 import { scorePixels } from "../../scripts/eval/palette-core";
 import { measurePalette } from "./palette-measure";
@@ -28,6 +28,20 @@ const routes = [
   ["E2E-R15", "/analytics"],
   ["E2E-R16", "/dbms"],
 ] as const;
+
+const settleVisuals = async (page: Page) => {
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    const finiteAnimations = document.getAnimations().filter((animation) => {
+      const timing = animation.effect?.getTiming();
+      return animation.playState === "running" && timing?.iterations !== Infinity;
+    });
+    await Promise.all(finiteAnimations.map((animation) => animation.finished.catch(() => undefined)));
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    });
+  });
+};
 
 for (const [id, route] of routes) {
   test(`${id} ${route} colour discipline at 1440px matches light archetype`, async ({ page }, testInfo) => {
@@ -71,13 +85,16 @@ for (const [id, route] of routes) {
 
     await page.goto(route, { waitUntil: "domcontentloaded" });
 
+    if (route === "/login") {
+      await expect(page.getByRole("heading", { name: "Sign in to ApexGrid" })).toBeVisible();
+      await expect(page.locator("form.login-form")).toBeVisible();
+      await expect(page.getByLabel("Email address")).toBeVisible();
+      await expect(page.getByLabel("Email address")).toBeEnabled();
+    }
+
+    await settleVisuals(page);
+
     if (page.viewportSize()?.width === 1440) {
-      await page.evaluate(async () => {
-        await document.fonts.ready;
-        await new Promise<void>((resolve) => {
-          requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-        });
-      });
       const screenshot = await page.screenshot({ fullPage: true });
       const { data, info } = await sharp(screenshot)
         .removeAlpha()

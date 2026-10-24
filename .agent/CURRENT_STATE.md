@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: b8d5460
+git_head: 48bdf7b
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -49,3 +49,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - T-44275 accepted12449c7: Scope login document to cream/ink/light scheme and expand desktop static red feed to full-width64px, mobile unchanged. Verify0.
 
 - T-44276 acceptedb8d5460: Activate staged exact Dashboard page via compatibility reexport; remove only duplicate component and unused hook import. Verify0.
+
+- T-44277 accepted48bdf7b: Extract exact simulator telemetry/incident restore bodies with typed callbacks and legacy late-bound main wrappers. Verify0.

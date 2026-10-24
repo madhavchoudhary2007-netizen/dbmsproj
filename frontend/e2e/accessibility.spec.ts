@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 const routes = [
   ["E2E-R01", "/"], ["E2E-R02", "/login"], ["E2E-R03", "/dashboard"],
@@ -9,6 +9,20 @@ const routes = [
   ["E2E-R13", "/drivers"], ["E2E-R14", "/users"], ["E2E-R15", "/analytics"],
   ["E2E-R16", "/dbms"],
 ] as const;
+
+const settleVisuals = async (page: Page) => {
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    const finiteAnimations = document.getAnimations().filter((animation) => {
+      const timing = animation.effect?.getTiming();
+      return animation.playState === "running" && timing?.iterations !== Infinity;
+    });
+    await Promise.all(finiteAnimations.map((animation) => animation.finished.catch(() => undefined)));
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    });
+  });
+};
 
 for (const [id, path] of routes) {
   test(`${id} ${path}: keyboard and accessibility audit`, async ({ page }) => {
@@ -32,6 +46,12 @@ for (const [id, path] of routes) {
     });
 
     await page.goto(path, { waitUntil: "domcontentloaded" });
+    if (path === "/login") {
+      await expect(page.getByRole("heading", { name: "Sign in to ApexGrid" })).toBeVisible();
+      await expect(page.locator("form.login-form")).toBeVisible();
+      await expect(page.getByLabel("Email address")).toBeVisible();
+      await expect(page.getByLabel("Email address")).toBeEnabled();
+    }
     await expect(page).toHaveURL((url) => new URL(url).pathname === path);
     await expect.poll(() => page.locator("body").innerText()).toMatch(/\S{8}/);
     expect(attemptedWrites).toEqual([]);
@@ -69,6 +89,7 @@ for (const [id, path] of routes) {
         .map((element) => element.textContent?.trim().slice(0, 120)));
     expect(unannouncedStates).toEqual([]);
 
+    await settleVisuals(page);
     const results = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
       .analyze();
