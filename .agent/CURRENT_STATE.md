@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 1f7a2d7
+git_head: 7659085
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -43,3 +43,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - T-44272 acceptedd7ece24: Extract Dashboard state/fetch lifecycle into typed useDashboard with identical request/cache/error ordering and untouched JSX. Verify0.
 
 - T-44273 accepted1f7a2d7: Stage byte-identical Dashboard function in its own client module, no route wiring or behavior change. Verify0.
+
+- T-44274 accepted7659085: Use existing recursive runtime route discovery for pit steward test, retaining original path, method and role assertions. Verify0.
