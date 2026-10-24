@@ -8,11 +8,6 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - contract: Accepted strict primitive browser suite across all five viewport projects; controls, five states, native modal, plinth and reduced motion.
 - verify: python3 .agent/check-frontend-browser.py T-366.accept e2e/nb-primitives.spec.ts --workers=2
 
-### T-365 — ROOT ACCEPTANCE
-- target_files: none
-- contract: Accepted shared primitive library and dev-only guide after production build/gating and axe at375/1440.
-- verify: python3 .agent/check-frontend-build.py && python3 .agent/check-guide-production.py && python3 .agent/check-frontend-browser.py T-365.accept e2e/nb-primitives.spec.ts --project=mobile-375 --project=desktop-1440 --grep "one accessible page" --workers=2
-
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
 
@@ -20,6 +15,7 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-365 acceptedb90911f; verify0.
 - T-364 acceptedd666cf6; verify0.
 - T-44232 acceptedc6787b1; verify0.
 - T-44226 accepted4b35c7a; verify0.
