@@ -3,10 +3,15 @@ updated_at: 2026-10-24
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44273 W1 — OPEN
-- target_files: frontend/components/pages/dashboard.tsx
-- contract: T379 stage an exact copy of the Dashboard component in its own page module; no redesign and no wiring yet.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+### T-44275 W1 — OPEN
+- target_files: frontend/app/styles/login.css
+- contract: T380 repair measured login palette deficits without widening bands; scope body light and provide appropriately sized red static feed.
+- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
+### T-44274 W3 — OPEN
+- target_files: backend/tests/test_api.py
+- contract: T331 repair obsolete top-level route discovery in existing manual pit steward-role test after approved router extraction.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k manual_pit_reservation_allows_steward_role && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/tests/test_api.py && .venv/bin/ruff format --check backend/tests/test_api.py
 
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
@@ -15,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44273 accepted1f7a2d7; verify0.
 - T-44272 acceptedd7ece24; verify0.
 - T-44271 accepteda98c95c; verify0.
 - T-44270 accepted298fef5; verify0.

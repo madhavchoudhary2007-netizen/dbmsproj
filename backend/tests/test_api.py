@@ -904,9 +904,11 @@ def test_unsupported_sanction_zero_and_points_only_decisions_remain_valid(decisi
 def test_manual_pit_reservation_allows_steward_role():
     from fastapi.routing import APIRoute
 
+    from backend.tests.test_route_registration import _flatten_routes
+
     route = next(
         route
-        for route in app.routes
+        for route in _flatten_routes(app.routes)
         if isinstance(route, APIRoute)
         and route.path == "/api/pit-reservations"
         and "POST" in route.methods
