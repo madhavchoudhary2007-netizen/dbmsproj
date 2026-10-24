@@ -20,12 +20,21 @@ def get_dashboard_data() -> dict[str, Any]:
         "WHERE s.state IN ('ACTIVE','PAUSED') "
         "ORDER BY s.started_at DESC NULLS LAST LIMIT 1"
     )
+    next_event = fetch_one(
+        "SELECT e.id,e.name,s.id AS session_id,s.scheduled_at,c.name AS circuit_name "
+        "FROM race_sessions s JOIN race_events e ON e.id=s.event_id "
+        "JOIN circuits c ON c.id=e.circuit_id "
+        "WHERE s.session_type='RACE' AND s.state='SCHEDULED' "
+        "AND s.scheduled_at>=CURRENT_TIMESTAMP "
+        "ORDER BY s.scheduled_at,s.id LIMIT 1"
+    )
     return {
         "active_sessions": active_sessions["count"],
         "scheduled_events": scheduled_events["count"],
         "open_incidents": open_incidents["count"],
         "drivers": drivers["count"],
         "active_session": active_session,
+        "next_event": next_event,
     }
 
 

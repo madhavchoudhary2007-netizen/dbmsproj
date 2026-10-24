@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 60e5e56
+git_head: 5627293
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -36,3 +36,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 
 
 - T-44241 accepted60e5e56: Record two intentional missing-field failures and add guarded disposable selection tests plus exact additive API characterization. Verify0.
+
+- T-44242 accepted5627293: Activate neo-brutal shell with preserved app-shell hook, drawer refs/semantics, labelled navigation, active-link state and plinth faces. Verify0.
