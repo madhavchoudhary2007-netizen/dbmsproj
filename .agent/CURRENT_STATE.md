@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 0a3e206
+git_head: 2be7bec
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (owner override2bc94fb), cap2
@@ -52,3 +52,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44303 accepted6e88345: Extract exact session lifecycle controls with unchanged action predicates, permission guards, icons and callback props. Verify0.
 
 - T-380 accepted0a3e206: Close login route with80 root browser checks, settled visual review, production build and static gates passing. Verify0.
+
+- T-44304 accepted2be7bec: Extract exact session overview/list presentation with original schedule, reload, loader and selection behavior. Verify0.

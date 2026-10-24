@@ -3,11 +3,6 @@ updated_at: 2026-10-24
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44304 W1 — OPEN
-- target_files: frontend/components/pages/session-overview.tsx, frontend/components/special-pages.tsx
-- contract: T379 extract unchanged SessionPage header/list/loader region into focused overview presentation.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
 ### T-44305 W2 — OPEN
 - target_files: backend/app/simulation_pit.py, backend/app/main.py
 - contract: T331 extract exact simulator pit state refresh into typed module and preserve main compatibility wrapper.
@@ -20,6 +15,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44304 accepted2be7bec; verify0.
 - T-380 accepted0a3e206; verify0.
 - T-44303 accepted6e88345; verify0.
 - T-44302 accepted8e88bb7; verify0.
