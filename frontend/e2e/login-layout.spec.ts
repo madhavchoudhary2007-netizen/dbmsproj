@@ -143,8 +143,10 @@ test("login keeps typed values while the invalid login is busy and errored", asy
   await expect(password).toBeEnabled();
   await expect(email).toHaveValue("driver@apexgrid.test");
   await expect(password).toHaveValue("WrongPassword!");
-  await expect(page.getByRole("alert")).toHaveText("Invalid email or password");
+  const formError = page.locator("#form-error");
+  await expect(formError).toHaveAttribute("role", "alert");
+  await expect(formError).toHaveText("401 Unauthorized: Invalid email or password");
   await expect(email).toHaveAttribute("aria-describedby", "form-error");
   await expect(password).toHaveAttribute("aria-describedby", "form-error");
-  await expect(page.locator("#form-error")).toHaveAttribute("id", "form-error");
+  await expect(formError).toHaveAttribute("id", "form-error");
 });
