@@ -1,0 +1,167 @@
+diff --git a/frontend/components/special-pages.tsx b/frontend/components/special-pages.tsx
+index cab7555..a64ce75 100644
+--- a/frontend/components/special-pages.tsx
++++ b/frontend/components/special-pages.tsx
+@@ -37,6 +37,7 @@ import { SessionResults } from "./pages/session-results";
+ import { SessionSimulator } from "./pages/session-simulator";
+ import { SessionEditorModal, SessionResultModal } from "./pages/session-modals";
+ import { SessionControls } from "./pages/session-controls";
++import { SessionOverview } from "./pages/session-overview";
+ export { Dashboard } from "@/components/pages/dashboard";
+ 
+ export function SessionPage() {
+@@ -80,49 +81,20 @@ export function SessionPage() {
+   } = useSessionPage();
+   return (
+     <>
+-      <PageHeader
+-        eyebrow="RACE CONTROL / SESSION CONTROL"
+-        title="Sessions"
+-        description="Schedule sessions, control the live state, and review classified results."
+-        action={
+-          canManage ? (
+-            <AddButton
+-              onClick={() => {
+-                setEditModal(false);
+-                setModal(true);
+-              }}
+-              children="Schedule session"
+-            />
+-          ) : null
+-        }
++      <SessionOverview
++        canManage={canManage}
++        setEditModal={setEditModal}
++        setModal={setModal}
++        rows={rows}
++        events={events}
++        err={err}
++        loading={loading}
++        load={load}
++        setSelected={setSelected}
++        setResults={setResults}
++        setResultsLoaded={setResultsLoaded}
++        setActionMsg={setActionMsg}
+       />
+-      <div className="toolbar">
+-        <span className="record-count">{rows.length} SESSIONS</span>
+-        <ReloadButton onClick={() => void load()} />
+-      </div>
+-      <StateMessage error={err} loading={loading} retry={() => void load()} />
+-      {!loading && !err && (
+-        <DataTable
+-          rows={rows.map((r) => ({
+-            ...r,
+-            event_name:
+-              r.event_name || events.find((e) => e.id === r.event_id)?.name,
+-          }))}
+-          columns={[
+-            "event_name",
+-            "session_type",
+-            "state",
+-            "scheduled_at",
+-            "total_laps",
+-          ]}
+-          onSelect={(r) => {
+-            setSelected(String(r.id || ""));
+-            setResults([]);
+-            setResultsLoaded(false);
+-            setActionMsg("");
+-          }}
+-        />
+-      )}
+       {actionMsg && <div className="notice">{actionMsg}</div>}
+       {current && (
+         <div className="panel session-control">
+diff --git a/frontend/components/pages/session-overview.tsx b/frontend/components/pages/session-overview.tsx
+new file mode 100644
+index 0000000..689f255
+--- /dev/null
++++ b/frontend/components/pages/session-overview.tsx
+@@ -0,0 +1,86 @@
++import { Row } from "@/lib/api";
++import {
++  AddButton,
++  DataTable,
++  PageHeader,
++  ReloadButton,
++  StateMessage,
++} from "../ui";
++
++type SessionOverviewProps = {
++  canManage: boolean;
++  setEditModal: (value: boolean) => void;
++  setModal: (value: boolean) => void;
++  rows: Row[];
++  events: Row[];
++  err: string;
++  loading: boolean;
++  load: () => Promise<void>;
++  setSelected: (value: string) => void;
++  setResults: (rows: Row[]) => void;
++  setResultsLoaded: (value: boolean) => void;
++  setActionMsg: (value: string) => void;
++};
++
++export function SessionOverview({
++  canManage,
++  setEditModal,
++  setModal,
++  rows,
++  events,
++  err,
++  loading,
++  load,
++  setSelected,
++  setResults,
++  setResultsLoaded,
++  setActionMsg,
++}: SessionOverviewProps) {
++  return (
++    <>
++      <PageHeader
++        eyebrow="RACE CONTROL / SESSION CONTROL"
++        title="Sessions"
++        description="Schedule sessions, control the live state, and review classified results."
++        action={
++          canManage ? (
++            <AddButton
++              onClick={() => {
++                setEditModal(false);
++                setModal(true);
++              }}
++              children="Schedule session"
++            />
++          ) : null
++        }
++      />
++      <div className="toolbar">
++        <span className="record-count">{rows.length} SESSIONS</span>
++        <ReloadButton onClick={() => void load()} />
++      </div>
++      <StateMessage error={err} loading={loading} retry={() => void load()} />
++      {!loading && !err && (
++        <DataTable
++          rows={rows.map((r) => ({
++            ...r,
++            event_name:
++              r.event_name || events.find((e) => e.id === r.event_id)?.name,
++          }))}
++          columns={[
++            "event_name",
++            "session_type",
++            "state",
++            "scheduled_at",
++            "total_laps",
++          ]}
++          onSelect={(r) => {
++            setSelected(String(r.id || ""));
++            setResults([]);
++            setResultsLoaded(false);
++            setActionMsg("");
++          }}
++        />
++      )}
++    </>
++  );
++}

@@ -37,6 +37,7 @@ import { SessionResults } from "./pages/session-results";
 import { SessionSimulator } from "./pages/session-simulator";
 import { SessionEditorModal, SessionResultModal } from "./pages/session-modals";
 import { SessionControls } from "./pages/session-controls";
+import { SessionOverview } from "./pages/session-overview";
 export { Dashboard } from "@/components/pages/dashboard";
 
 export function SessionPage() {
@@ -80,49 +81,20 @@ export function SessionPage() {
   } = useSessionPage();
   return (
     <>
-      <PageHeader
-        eyebrow="RACE CONTROL / SESSION CONTROL"
-        title="Sessions"
-        description="Schedule sessions, control the live state, and review classified results."
-        action={
-          canManage ? (
-            <AddButton
-              onClick={() => {
-                setEditModal(false);
-                setModal(true);
-              }}
-              children="Schedule session"
-            />
-          ) : null
-        }
+      <SessionOverview
+        canManage={canManage}
+        setEditModal={setEditModal}
+        setModal={setModal}
+        rows={rows}
+        events={events}
+        err={err}
+        loading={loading}
+        load={load}
+        setSelected={setSelected}
+        setResults={setResults}
+        setResultsLoaded={setResultsLoaded}
+        setActionMsg={setActionMsg}
       />
-      <div className="toolbar">
-        <span className="record-count">{rows.length} SESSIONS</span>
-        <ReloadButton onClick={() => void load()} />
-      </div>
-      <StateMessage error={err} loading={loading} retry={() => void load()} />
-      {!loading && !err && (
-        <DataTable
-          rows={rows.map((r) => ({
-            ...r,
-            event_name:
-              r.event_name || events.find((e) => e.id === r.event_id)?.name,
-          }))}
-          columns={[
-            "event_name",
-            "session_type",
-            "state",
-            "scheduled_at",
-            "total_laps",
-          ]}
-          onSelect={(r) => {
-            setSelected(String(r.id || ""));
-            setResults([]);
-            setResultsLoaded(false);
-            setActionMsg("");
-          }}
-        />
-      )}
       {actionMsg && <div className="notice">{actionMsg}</div>}
       {current && (
         <div className="panel session-control">
