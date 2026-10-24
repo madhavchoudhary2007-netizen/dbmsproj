@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 35b904f
+git_head: c1ecce3
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -45,3 +45,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - T-44244 acceptedef2f899: Add five-viewport browser drawer focus/inert/scroll/resize/navigation, dimensions, color and reduced-motion regression coverage; collection only. Verify0.
 
 - T-44246 accepted35b904f: Correct generated disposable fixture UUID prefixes to match unchanged event/session assertions. Verify0.
+
+- T-44245 acceptedc1ecce3: Add visible/online-only shared dashboard polling, five states, cancellation and recovery; Dashboard reuses cache and force reload without JSX changes. Verify0.
