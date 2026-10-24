@@ -46,6 +46,7 @@ import {
 } from "./ui";
 import { useAuth } from "./auth";
 import { DbmsWorkspace } from "./dbms-workspace";
+import { SessionResults } from "./pages/session-results";
 import { SessionSimulator } from "./pages/session-simulator";
 export { Dashboard } from "@/components/pages/dashboard";
 
@@ -238,34 +239,11 @@ export function SessionPage() {
             <StateMessage empty="No result rows are recorded for this session." />
           )}
           {results.length > 0 && (
-            <div className="results-table">
-              {results.some((result) => result.provisional === true) && (
-                <div className="notice">
-                  Historical time and grid penalties are recorded but not applied to official order or points. Review the penalties before treating results as final.
-                </div>
-              )}
-              <div className="panel-heading">
-                <div>
-                  <div className="eyebrow">
-                    {results.some((result) => result.provisional === true)
-                      ? "PROVISIONAL RESULTS"
-                      : "OFFICIAL RESULTS"}
-                  </div>
-                  <h2>{results.length} classified entries</h2>
-                </div>
-                {canControl && (
-                  <Button onClick={() => setResultModal(true)}>
-                    Update a result
-                  </Button>
-                )}
-              </div>
-              <DataTable
-                rows={results}
-                columns={Object.keys(results[0]).filter(
-                  (k) => typeof results[0][k] !== "object",
-                )}
-              />
-            </div>
+            <SessionResults
+              results={results}
+              canControl={canControl}
+              setResultModal={setResultModal}
+            />
           )}
           {canManage && (
             <div className="form-actions destructive-row">
