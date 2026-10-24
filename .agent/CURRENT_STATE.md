@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 39f2e59
+git_head: 2aa2b87
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -47,3 +47,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 
 - T-44246 accepted35b904f: Correct generated disposable fixture UUID prefixes to match unchanged event/session assertions. Verify0.
 
+
+- T-44253 accepted2aa2b87: Rename reserved local module variable while preserving real-source VM execution and every mapper assertion. Verify0.
