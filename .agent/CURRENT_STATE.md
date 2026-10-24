@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 145c55f
+git_head: 3483224
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -17,7 +17,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - Preserve legacy main aliases and late-bound callbacks: Decision removal caused7 failures fixed5ee4710. OpenAPI alone cannot prove Python alias/runtime uniqueness compatibility.
 
 ## Next work
-- Feed hookc1ecce3, mapper939fea6, presentersdfcf8ac and roote765662 glue integrated. Mapper3 offline tests39f2e59/2aa2b87 pass. T44251 actual polling/dedupe/offline/visibility browser tests preparing; Phase6 not complete.
+- Feed hookc1ecce3, mapper939fea6, presentersdfcf8ac and roote765662 glue integrated. Mapper3 offline tests39f2e59/2aa2b87 pass. T44251 root25 browser cases PASS across five projects (feed+drawer, T44251.browser.raw.log). Existing route/accessibility/targets/primary/edge gates running; Phase6 not complete.
 - Backend lock endpoints wireddb3cf1b: root227 PASS0skip/live PASS (T44233.full.raw.log). Shell CSS ac0a46e/683c6b5 activated5627293. Cache63aa0ad and four offline regression casescdd2dec accepted; drawer hookfeeaef3 wired; actual10 browser drawer cases PASS across five projects (T44244.browser.raw.log). Next drawer hook/markup and T371 cache/poll integration, then existing route/responsive/a11y/touch/hash/auth checks. Missing next_event covered by ADR012/c93ec77 and focused relock; T44241 red tests60e5e56 and implementation246f2f6 accepted. Initial full230 PASS/1FAIL fixed by fixture-generator correction35b904f without assertion changes; rerun231 PASS0skip/live PASS. No fabricated event. Remaining graph docs/overhaul-plan.md.
 - Four CSS lint gates0; production routes still legacy dark, light palette FAIL expected until Phase7, never skip/widen it. Last existing-route axe85 and non-palette925 before new shell. Phase5 guide60 now green; do not imply real-route redesign complete.
 
@@ -51,4 +51,3 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - T-44253 accepted2aa2b87: Rename reserved local module variable while preserving real-source VM execution and every mapper assertion. Verify0.
 
 
-- T-44254 accepted145c55f: Stage typed results-read/standings/recalculation router with identical handler bodies and explicit legacy map; main not wired yet. Verify0.
