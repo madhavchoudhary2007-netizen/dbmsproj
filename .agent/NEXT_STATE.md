@@ -8,11 +8,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T380 correct newly added login test ink fixture to the actual approved pure black palette.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
-### T-44293 W1 — OPEN
-- target_files: frontend/components/nb/button.tsx
-- contract: T380 fix native aria-busy forwarding in NbButton discovered by held-request login regression.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
 
@@ -20,6 +15,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44293 accepted0d7dd28; verify0.
 - T-44292 accepted1a2b573; verify0.
 - T-44291 accepted52e84a0; verify0.
 - T-44290 accepted6d32c9e; verify0.

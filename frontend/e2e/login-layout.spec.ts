@@ -89,8 +89,8 @@ test("login art stays contained across supported viewport widths", async ({ page
         }),
       );
       expect(inputStyles).toEqual([
-        ["4px", "rgb(255, 255, 255)", "rgb(17, 17, 17)"],
-        ["4px", "rgb(255, 255, 255)", "rgb(17, 17, 17)"],
+        ["4px", "rgb(255, 255, 255)", "rgb(0, 0, 0)"],
+        ["4px", "rgb(255, 255, 255)", "rgb(0, 0, 0)"],
       ]);
       const checker = await page.locator(".nb-login-checker").boundingBox();
       expect(checker).not.toBeNull();
