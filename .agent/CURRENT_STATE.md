@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: c8d5a5a
+git_head: c533c35
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (owner override2bc94fb), cap2
@@ -36,3 +36,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44295 accepted77d775d: Stage exact SessionPage orchestration hook from accepted data/actions/writes; current component unchanged. Verify0.
 
 - T-44296 acceptedc8d5a5a: Extract exact results presentation, preserving provisional notice, permission guard, headings and columns. Verify0.
+
+- T-44297 acceptedc533c35: Scope exact normalized login error assertion to app alert instead of ambiguous Next route announcer; all other checks retained. Verify0.
