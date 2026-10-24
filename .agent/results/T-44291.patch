@@ -1,0 +1,74 @@
+diff --git a/frontend/components/special-pages.tsx b/frontend/components/special-pages.tsx
+index dc6327f..35dcdf5 100644
+--- a/frontend/components/special-pages.tsx
++++ b/frontend/components/special-pages.tsx
+@@ -46,6 +46,7 @@ import {
+ } from "./ui";
+ import { useAuth } from "./auth";
+ import { DbmsWorkspace } from "./dbms-workspace";
++import { SessionSimulator } from "./pages/session-simulator";
+ export { Dashboard } from "@/components/pages/dashboard";
+ 
+ export function SessionPage() {
+@@ -222,52 +223,15 @@ export function SessionPage() {
+             </Button>
+           </div>
+           {canControl && (
+-            <div className="sim-controls">
+-              <div>
+-                <div className="eyebrow">TELEMETRY SIMULATOR</div>
+-                <p className="muted">
+-                  Start telemetry simulation for the selected session.
+-                </p>
+-              </div>
+-              <label>
+-                Cars
+-                <input
+-                  type="number"
+-                  min="1"
+-                  max={Math.max(
+-                    1,
+-                    drivers.filter((d) => d.eligibility === "ACTIVE").length,
+-                  )}
+-                  value={simCars}
+-                  onChange={(e) => setSimCars(+e.target.value)}
+-                />
+-                <small className="muted">
+-                  {drivers.filter((d) => d.eligibility === "ACTIVE").length}{" "}
+-                  eligible drivers available
+-                </small>
+-              </label>
+-              <label>
+-                Rate Hz
+-                <input
+-                  type="number"
+-                  min="1"
+-                  value={simRate}
+-                  onChange={(e) => setSimRate(+e.target.value)}
+-                />
+-              </label>
+-              <div className="action-row">
+-                {["start", "pause", "resume", "stop", "reset"].map((a) => (
+-                  <Button
+-                    key={a}
+-                    disabled={(a === "start" && current?.state !== "ACTIVE") || (a === "reset" && current?.state !== "PAUSED")}
+-                    kind={a === "stop" ? "danger" : "secondary"}
+-                    onClick={() => void simulate(a)}
+-                  >
+-                    {a}
+-                  </Button>
+-                ))}
+-              </div>
+-            </div>
++            <SessionSimulator
++              drivers={drivers}
++              current={current}
++              simCars={simCars}
++              setSimCars={setSimCars}
++              simRate={simRate}
++              setSimRate={setSimRate}
++              simulate={simulate}
++            />
+           )}
+           {simMessage && <div className="notice">{simMessage}</div>}
+           {resultsLoaded && results.length === 0 && (

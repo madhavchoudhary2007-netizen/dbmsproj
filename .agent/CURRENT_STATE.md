@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 3e715d5
+git_head: 6d32c9e
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -41,3 +41,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - T-44289 accepted523cd33: Fit mobile art into240px using compact text backing and internal horizontal44px static feed; desktop unchanged. Verify0.
 
 - T-44287 accepted3e715d5: Wire accepted session write helpers through existing callback names and state closures; all JSX unchanged. Verify0.
+
+- T-44290 accepted6d32c9e: Add actual login containment/desktop geometry and held-request busy/error regression checks, root browser execution pending. Verify0.
