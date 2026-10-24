@@ -1,0 +1,150 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import * as vm from "node:vm";
+
+const require = createRequire(import.meta.url);
+const typescript = require("../../node_modules/typescript");
+const sources = {
+  actions: readFileSync(new URL("../../lib/session-actions.ts", import.meta.url), "utf8"),
+  writes: readFileSync(new URL("../../lib/session-writes.ts", import.meta.url), "utf8"),
+};
+
+function controlledApi() {
+  const requests = [];
+  const api = (path, options = {}) => new Promise((resolve, reject) => requests.push({ path, options, resolve, reject }));
+  api.requests = requests;
+  return api;
+}
+
+async function load(kind, api) {
+  const context = vm.createContext({ Promise, Error });
+  const output = typescript.transpileModule(sources[kind], {
+    compilerOptions: { module: typescript.ModuleKind.ESNext, target: typescript.ScriptTarget.ES2022 },
+  }).outputText;
+  const mockedApi = new vm.SyntheticModule(["api", "asArray"], function () {
+    this.setExport("api", api);
+    this.setExport("asArray", value => Array.isArray(value) ? value : []);
+  }, { context, identifier: "./api" });
+  const sourceModule = new vm.SourceTextModule(output, { context, identifier: `./${kind}.ts` });
+  await sourceModule.link(async specifier => {
+    if (specifier === "./api" || specifier === "@/lib/api") return mockedApi;
+    throw new Error(`Unexpected import: ${specifier}`);
+  });
+  await sourceModule.evaluate();
+  return { api, functions: sourceModule.namespace };
+}
+
+const body = request => JSON.parse(request.options.body);
+
+test("empty selected action operations do not call the API", async () => {
+  const loaded = await load("actions", controlledApi());
+  await loaded.functions.performSessionAction("start", "", () => {}, async () => {});
+  await loaded.functions.simulateSession("run", "", () => {}, 2, 10, async () => {});
+  await loaded.functions.readSessionResults("", () => {}, () => {}, () => {});
+  assert.equal(loaded.api.requests.length, 0);
+});
+
+test("perform and simulate capture payloads and preserve success ordering", async () => {
+  const loaded = await load("actions", controlledApi());
+  const events = [];
+  let actionMessage = "";
+  const action = loaded.functions.performSessionAction("start", "s1", value => { actionMessage = value; events.push(value); }, async () => events.push("loaded"));
+  assert.equal(loaded.api.requests[0].path, "/sessions/s1/action");
+  assert.equal(loaded.api.requests[0].options.method, "POST");
+  assert.deepEqual(body(loaded.api.requests[0]), { action: "start" });
+  loaded.api.requests[0].resolve({});
+  await action;
+  assert.deepEqual(events, ["", "Session start request completed.", "loaded"]);
+  assert.equal(actionMessage, "Session start request completed.");
+  const simEvents = [];
+  const sim = loaded.functions.simulateSession("run", "s1", value => simEvents.push(value), 4, 20, async () => simEvents.push("loaded"));
+  assert.equal(loaded.api.requests[1].path, "/sessions/s1/simulate");
+  assert.equal(loaded.api.requests[1].options.method, "POST");
+  assert.deepEqual(body(loaded.api.requests[1]), { action: "run", cars: 4, rate_hz: 20 });
+  loaded.api.requests[1].resolve({ state: "running", cars: 4, rate_hz: 20 });
+  await sim;
+  assert.deepEqual(simEvents, ["", "Simulator running. 4 cars at 20 Hz.", "loaded"]);
+});
+
+test("action failures expose Error messages and skip reload", async () => {
+  const loaded = await load("actions", controlledApi());
+  let message = "", loads = 0;
+  const task = loaded.functions.performSessionAction("stop", "s1", value => { message = value; }, async () => { loads += 1; });
+  loaded.api.requests[0].reject(new Error("offline"));
+  await task;
+  assert.equal(message, "offline"); assert.equal(loads, 0);
+  const simulated = loaded.functions.simulateSession("run", "s1", value => { message = value; }, 1, 2, async () => { loads += 1; });
+  loaded.api.requests[1].reject(new Error("sim offline")); await simulated;
+  assert.equal(message, "sim offline"); assert.equal(loads, 0);
+});
+
+test("results read updates state in order and reports failures", async () => {
+  const loaded = await load("actions", controlledApi());
+  const events = []; let message = "";
+  const success = loaded.functions.readSessionResults("s1", value => events.push(["results", value]), value => events.push(["loaded", value]), value => { message = value; });
+  assert.equal(loaded.api.requests[0].path, "/sessions/s1/results");
+  loaded.api.requests[0].resolve([{ id: "r1" }]); await success;
+  assert.equal(events[0][1][0].id, "r1");
+  assert.deepEqual(events[1], ["loaded", true]);
+  const failed = loaded.functions.readSessionResults("s2", () => {}, () => {}, value => { message = value; });
+  loaded.api.requests[1].reject(new Error("results failed")); await failed;
+  assert.equal(message, "results failed");
+});
+
+test("result writes convert booleans, update state, and always clear busy", async () => {
+  const loaded = await load("writes", controlledApi());
+  const events = [];
+  const task = loaded.functions.saveSessionResult({ pole: "true", fastest_lap: false, classified: "true", extra: "kept" }, "s1", value => events.push(["busy", value]), value => events.push(["results", value]), value => events.push(["loaded", value]), value => events.push(["modal", value]));
+  assert.deepEqual(events, [["busy", true]]);
+  assert.deepEqual(body(loaded.api.requests[0]), [{ pole: true, fastest_lap: false, classified: true, extra: "kept" }]);
+  loaded.api.requests[0].resolve([{ id: "r1" }]);
+  await task;
+  assert.deepEqual(events, [["busy", true], ["results", [{ id: "r1" }]], ["loaded", true], ["modal", false], ["busy", false]]);
+  const rejected = loaded.functions.saveSessionResult({}, "s1", value => events.push(["busy", value]), () => {}, () => {}, () => {});
+  loaded.api.requests[1].reject(new Error("write failed"));
+  await assert.rejects(rejected, { message: "write failed" });
+  assert.deepEqual(events.at(-1), ["busy", false]);
+});
+
+test("session create and edit filter fields and use POST or PATCH", async () => {
+  const loaded = await load("writes", controlledApi());
+  const fields = [{ name: "name" }, { name: "date" }];
+  const loadCalls = [];
+  const create = loaded.functions.saveSession({ name: "A", date: undefined, unknown: "x" }, fields, false, "", () => {}, () => {}, () => {}, async () => loadCalls.push("create"));
+  assert.equal(loaded.api.requests[0].path, "/sessions");
+  assert.equal(loaded.api.requests[0].options.method, "POST");
+  assert.deepEqual(body(loaded.api.requests[0]), { name: "A" });
+  loaded.api.requests[0].resolve({});
+  await create;
+  const edit = loaded.functions.saveSession({ name: "B", date: "D", unknown: "x" }, fields, true, "s2", () => {}, () => {}, () => {}, async () => loadCalls.push("edit"));
+  assert.equal(loaded.api.requests[1].path, "/sessions/s2");
+  assert.equal(loaded.api.requests[1].options.method, "PATCH");
+  assert.deepEqual(body(loaded.api.requests[1]), { name: "B", date: "D" });
+  loaded.api.requests[1].resolve({});
+  await edit;
+  assert.deepEqual(loadCalls, ["create", "edit"]);
+});
+
+test("session writes propagate rejection while resetting busy", async () => {
+  const loaded = await load("writes", controlledApi());
+  const busy = [];
+  const task = loaded.functions.saveSession({ name: "A" }, [{ name: "name" }], false, "", value => busy.push(value), () => {}, () => {}, async () => {});
+  loaded.api.requests[0].reject(new Error("create failed"));
+  await assert.rejects(task, { message: "create failed" });
+  assert.deepEqual(busy, [true, false]);
+});
+
+test("delete clears selection and results, and reports failures after cleanup", async () => {
+  const loaded = await load("writes", controlledApi());
+  const events = [];
+  const task = loaded.functions.deleteSessionRecord("s1", value => events.push(["busy", value]), value => events.push(["selected", value]), value => events.push(["results", value]), async () => events.push(["load"]), value => events.push(["message", value]));
+  loaded.api.requests[0].resolve({});
+  await task;
+  assert.deepEqual(events.map(([kind, value]) => [kind, kind === "results" ? value.length : value]), [["busy", true], ["selected", ""], ["results", 0], ["load", undefined], ["busy", false]]);
+  const failed = loaded.functions.deleteSessionRecord("s2", value => events.push(["busy", value]), () => {}, () => {}, async () => {}, value => events.push(["message", value]));
+  loaded.api.requests[1].reject(new Error("delete failed"));
+  await failed;
+  assert.deepEqual(events.slice(-2), [["message", "delete failed"], ["busy", false]]);
+});

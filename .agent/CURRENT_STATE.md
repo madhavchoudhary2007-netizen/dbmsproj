@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: bcf158f
+git_head: c44f8ed
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (owner override2bc94fb), cap2
@@ -40,3 +40,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44297 acceptedc533c35: Scope exact normalized login error assertion to app alert instead of ambiguous Next route announcer; all other checks retained. Verify0.
 
 - T-44298 acceptedbcf158f: Activate accepted SessionPage orchestration hook and remove duplicate logic/imports, retaining exact JSX and callback bindings. Verify0.
+
+- T-44300 acceptedc44f8ed: Make scrollable login feed keyboard-focusable with descriptive name and visible ink focus outline; retain content/layout. Verify0.

@@ -3,10 +3,10 @@ updated_at: 2026-10-24
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44300 W1 — OPEN
-- target_files: frontend/components/login-art.tsx, frontend/app/styles/login.css
-- contract: T380 fix keyboard access for mobile login static feed scroll region found by axe.
-- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+### T-44301 W1 — OPEN
+- target_files: frontend/components/pages/session-modals.tsx, frontend/components/special-pages.tsx
+- contract: T379 extract both existing session dialogs into focused presentation module, no redesign.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ### T-44299 W3 — OPEN
 - target_files: frontend/e2e/runtime/session-operations.test.mjs
@@ -20,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44300 acceptedc44f8ed; verify0.
 - T-44298 acceptedbcf158f; verify0.
 - T-44297 acceptedc533c35; verify0.
 - T-44296 acceptedc8d5a5a; verify0.
