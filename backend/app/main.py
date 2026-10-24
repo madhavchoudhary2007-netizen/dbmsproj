@@ -120,6 +120,8 @@ from .schemas_operations import (
     ReservationIn,
     ReservationStatus,
 )
+from .schemas_operations import Decision as Decision
+from .schemas_operations import IncidentIn as IncidentIn
 from .schemas_simulation import DemoRaceCreate, SimulationControl
 from .security_headers import SecurityHeadersMiddleware
 from .simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance

@@ -3,14 +3,19 @@ updated_at: 2026-10-23
 phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phases0–2 complete; baseline51.2974)
 
 ## Queue
+### T-44214 W2 — OPEN
+- target_files: backend/app/main.py
+- contract: Repair T331 model re-export compatibility exposed by full backend suite: restore Decision and IncidentIn exports in main.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k 'incident_decisions_always_return_current_driver_state or unsupported_sanction_fields_are_rejected_with_guidance or unsupported_sanction_zero_and_points_only_decisions_remain_valid' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app/main.py && .venv/bin/ruff format --check backend/app/main.py
+
+### T-44211 W2 — OPEN
+- target_files: backend/app/core/simulation_tick.py
+- contract: T331 stage exact pure simulation tick in core module; wiring/removal is next atomic task.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,copy,importlib,subprocess; from datetime import UTC,datetime; from uuid import UUID; from backend.app.simulation_core import Simulation; old=ast.parse(subprocess.check_output(["git","show","89c82af:backend/app/main.py"],text=True)); a=next(n for n in old.body if isinstance(n,ast.FunctionDef) and n.name=="advance_simulation_tick"); new=ast.parse(open("backend/app/core/simulation_tick.py").read()); b=next(n for n in new.body if isinstance(n,ast.FunctionDef) and n.name==a.name); assert ast.dump(a)==ast.dump(b); m=importlib.import_module("backend.app.main"); c=importlib.import_module("backend.app.core.simulation_tick"); s=Simulation(UUID(int=1),[{"id":UUID(int=2),"number":7}],2,total_laps=2,seed=123); t=copy.deepcopy(s); stamp=datetime(2026,10,24,tzinfo=UTC); assert all(m.advance_simulation_tick(s,stamp)==c.advance_simulation_tick(t,stamp) for _ in range(8)); assert s==t; print("PASS exact tick AST and8deterministic differential ticks")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py && .venv/bin/ruff check backend/app/core/simulation_tick.py && .venv/bin/ruff format --check backend/app/core/simulation_tick.py
+
 ### T-44210 W1 — OPEN
 - target_files: frontend/components/nb/motifs.tsx, frontend/components/nb/marquee.tsx, frontend/components/nb/stat.tsx
 - contract: T365 decorative motorsport motifs, static accessible marquee and stat tile primitives.
-- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
-### T-44208 W1 — OPEN
-- target_files: frontend/components/nb/input.tsx, frontend/components/nb/field.tsx
-- contract: T365 accessible native form controls and labeled field primitive, no route changes.
 - verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Blocked
@@ -20,6 +25,7 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44208 accepted72a5b82; verify0.
 - T-44209 accepted89c82af; verify0.
 - T-44204 acceptede4a3f6c; verify0.
 - T-44205 accepted65bd176; verify0.

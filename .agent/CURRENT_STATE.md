@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 89c82af
+git_head: 72a5b82
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (owner override); cap2
@@ -36,3 +36,7 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - SharedhooksT364 accepted47c0408 inclcancelcleanup, runtimeT366 pending. T36313f614a complete: fourCSSlints0/rootproductionbuild0/85axe+4keyboardPASS after2colorcontrastfix. Currentdarkpalette remainsFAIL untilPh7; no fullcompletion claim.
 
 - T-44209 accepted89c82af: Moved exact incident decision and preserved alias/late callbacks; typed registration helper retains C901 gate,11 contract/runtime checks pass. Verify0.
+
+- T-44208 accepted72a5b82: Added typed ref-forwarded native controls and field label/error linkage; repaired error text to ink on red for AA contrast. Verify0.
+
+- RootfullT44209 nowRED7FAIL220PASS0skip: main.Decision missingexport (T44209removedimport). T44214 P0 restores explicitDecision/IncidentIn aliases; focused7regressioncases addedtoVerify. No testchanges; parentT331 stillunfinished. T44210 UIreviewrepair1 genericparagraphnaming andactualmarqueeentry, candidatepreserved.
