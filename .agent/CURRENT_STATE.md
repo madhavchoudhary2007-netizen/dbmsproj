@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: b0972ed
+git_head: 0f39a4b
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (owner override2bc94fb), cap2
@@ -36,3 +36,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44311 accepted3989f9d: Activate exact steward orchestration hook; all presentation, sanctions and action bindings unchanged. Verify0.
 
 - T-44312 acceptedb0972ed: Extract exact generated incident persistence with typed callbacks and unchanged lap guards, SQL, dedupe and publication. Verify0.
+
+- T-44313 accepted0f39a4b: Extract exact sanction fields/explanation, preserving disabled time/grid controls, input bounds and accessibility links. Verify0.

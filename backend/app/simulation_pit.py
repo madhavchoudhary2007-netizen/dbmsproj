@@ -4,11 +4,35 @@ import logging
 from collections.abc import Callable
 from datetime import datetime, timedelta
 from typing import Any
+from uuid import UUID
 
 from psycopg.rows import dict_row
 
 from .pit_repository import PIT_RESERVATION_SELECT
 from .simulation_core import MAX_SESSION_LAPS, Simulation
+
+
+def cancel_automatic_reservations(
+    session_id: UUID | str,
+    connection: Callable[..., Any],
+    publish: Callable[..., Any],
+) -> None:
+    with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            (
+                "UPDATE pit_reservations SET status='CANCELLED'\n            WHERE session_id=%s "
+                "AND allocation_source='AUTOMATIC' AND status='RESERVED' RETURNING id"
+            ),
+            (session_id,),
+        )
+        ids = [row["id"] for row in cur.fetchall()]
+        if ids:
+            cur.execute(PIT_RESERVATION_SELECT + " WHERE r.id=ANY(%s)", (ids,))
+            rows = cur.fetchall()
+        else:
+            rows = []
+    for row in rows:
+        publish(session_id, "pit.update", row)
 
 
 def schedule_pit_stops(

@@ -142,7 +142,11 @@ from .simulation_core import MAX_SESSION_LAPS
 from .simulation_core import Simulation as Simulation
 from .simulation_core import calculate_sector_performance as calculate_sector_performance
 from .simulation_incidents import record_generated_incidents
-from .simulation_pit import refresh_pit_state, schedule_pit_stops
+from .simulation_pit import (
+    cancel_automatic_reservations,
+    refresh_pit_state,
+    schedule_pit_stops,
+)
 from .simulation_restore import (
     restore_incident_state,
     restore_or_create_demo,
@@ -796,22 +800,7 @@ def record_simulated_incidents(sim: Simulation, packets: list[dict[str, Any]]):
 
 
 def cancel_automatic_pit_reservations(session_id: UUID | str):
-    with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-        cur.execute(
-            (
-                "UPDATE pit_reservations SET status='CANCELLED'\n            WHERE session_id=%s "
-                "AND allocation_source='AUTOMATIC' AND status='RESERVED' RETURNING id"
-            ),
-            (session_id,),
-        )
-        ids = [row["id"] for row in cur.fetchall()]
-        if ids:
-            cur.execute(PIT_RESERVATION_SELECT + " WHERE r.id=ANY(%s)", (ids,))
-            rows = cur.fetchall()
-        else:
-            rows = []
-    for row in rows:
-        publish(session_id, "pit.update", row)
+    return cancel_automatic_reservations(session_id, connection, publish)
 
 
 def _simulation_lease_is_valid(sim: Simulation) -> bool:
