@@ -8,11 +8,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T379 extract exact StewardDesk incident-report editor presentation, no redesign.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
-### T-44309 W2 — OPEN
-- target_files: frontend/lib/use-steward-desk.ts
-- contract: T379 stage exact StewardDesk state/orchestration in typed useStewardDesk hook, no main wiring yet.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
 
@@ -20,6 +15,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44309 accepted8ac6fa2; verify0.
 - T-44308 accepted304ebe7; verify0.
 - T-44307 accepted03ab0d5; verify0.
 - T-44306 accepted478cffa; verify0.
