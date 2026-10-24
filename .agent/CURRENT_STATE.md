@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 48bdf7b
+git_head: 3bade73
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -8,7 +8,7 @@ archetype: Neo-Brutal Motorsport (light), ADR007 approved
 last_eval_score: obsolete baseline51.2974358974359; no current score; final evaluation T430
 
 ## Verified milestones
-- Phases0–2,5–6 COMPLETE (5 of12). Phase3 T331 extraction remains; main1474 lines, target<=120. Phase4 and7–11 unfinished. Owner requests autonomous completion of all12, no routine questions.
+- Phases0–2,5–6 COMPLETE (5 of12). Phase3 T331 extraction remains; main1448 lines, target<=120. Phase4 and7–11 unfinished. Owner requests autonomous completion of all12, no routine questions.
 - Phase5 T3602ad337f/T3611e61efd/T362c0781f9/T36313f614a/T364d666cf6/T365b90911f/T366b18819f accepted through accept.sh. Tailwind4.3.3, SpaceGrotesk500/700 + SpaceMono400/700, scoped tokens/textures/plinth and complete shared primitives. Existing production routes adopt them in Phases6–7.
 - Root60 browser cases PASS across320/375/768/1440/5120 (T366.matrix.browser.raw.log). Parent accept reruns: motion30 PASS, primitive30 PASS, axe375/1440 2 PASS; keyboard/font4 per runner. Build/lint/types0 and four CSS lints0. /__nb dev200, production not-found visible + noindex + guide absent + zero writes. Next streamed notFound HTTP200 is documented behavior; do not substitute status-only checks (.agent/check-guide-production.py).
 - Phase5 fixes: escaped %5F_nb route6b9c6f7, explicit44px controlsfdb63e2, FLIP mount/scroll guarde6efcc1. Browser tests wait fonts/finite animations for axe without relaxing thresholds; reduced motion asserts immediately.
@@ -17,7 +17,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - Preserve legacy main aliases and late-bound callbacks: Decision removal caused7 failures fixed5ee4710. OpenAPI alone cannot prove Python alias/runtime uniqueness compatibility.
 
 ## Next work
-- T380 staged LoginArt/CSS622aafa; T44268 wiring6590437 accepted with mobile240px/contrast/copy fixes and unused legacy CSS removal. T44271 form primitives a98c95c accepted; browser65pass5palettefail (body dark and red3.886%); W1T44275 fixes layout/CSS. Dashboard hook d7ece24 exactlogic and staged page move pending wiring. Auth logic untouched. Pit reservation servicee5507c9 exact3bodies staged; T44269 thinrouter ed34d9d accepted; T44270 wiring298fef5 accepted. Full gate230pass1fail due old top-level route-discovery test, W3T44274 fixes discovery only; original STEWARD assertion retained.
+- T380 staged LoginArt/CSS622aafa; T44268 wiring6590437 accepted with mobile240px/contrast/copy fixes and unused legacy CSS removal. T44271 form primitives a98c95c accepted; browser65pass5palettefail initially; W1T44275 lightbody/redfeed12449c7 and W3T44278 realform/font/finite-animation synchronization3bade73 accepted, rerun running. Dashboard hook d7ece24 exactlogic and exactpage copy1f7a2d7 wired b8d5460; remaining T379 page splits pending. Auth logic untouched. Pit reservation servicee5507c9 exact3bodies staged; T44269 thinrouter ed34d9d accepted; T44270 wiring298fef5 accepted. Full pit gate repaired by W3T44274 recursive discovery only (original STEWARD assertion retained):231pass0skip/livePASS. Restore helpers48bdf7b exactAST moved, next full running.
 - Phase6 parent T370/T371 accepted da5a72d/current HEAD. Root481 browser checks PASS in combined evidence T370.evidence.raw.json:85axe,20edge,15feed,10drawer,80routes,75targets,80primary,20auth,96responsive. Build/types/lint/fourCSS gates0. Cache4 and mapper3 offline cases pass. Shell retains routes/auth/copy/hash hooks; real next_event additive ADR012 in place.
 - Start Phase7 login/dashboard before resources/live/session/stewards/pits/standings/analytics/DBMS. Use docs/overhaul-plan.md graph; DBMS showcase also requires Phase4. T331 backend continues in parallel; keep main aliases/latecallbacks and run full disposable suite after each wiring.
 - Palette across redesigned routes remains unverified; no band widening. Final score only atT430. Phase5 primitives60 browser cases passed; development guide hidden in production.
@@ -35,19 +35,3 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 
 ## Orchestrator direct edits
 - T-44250: 8 additions/4 removals in shell.tsx as cross-worker glue connecting accepted W1 presenters and W2 hook/mapper; no bulk implementation. Metadata, architecture/config/ADRs, packets/state/envelopes/root acceptance helpers and approved installs only. Applying worker patches is integration, not authorship. No new dependencies this continuation.
-
-- T-44270 accepted298fef5: Wire pit router with late-bound callbacks and preserved legacy handler/schema aliases; remove duplicated handlers. Verify0.
-
-- T-44271 accepteda98c95c: Adopt paper NbCard, labeled NbInput fields and primary NbButton, retain auth/copy, disable busy fields and link announced errors. Verify0.
-
-- T-44272 acceptedd7ece24: Extract Dashboard state/fetch lifecycle into typed useDashboard with identical request/cache/error ordering and untouched JSX. Verify0.
-
-- T-44273 accepted1f7a2d7: Stage byte-identical Dashboard function in its own client module, no route wiring or behavior change. Verify0.
-
-- T-44274 accepted7659085: Use existing recursive runtime route discovery for pit steward test, retaining original path, method and role assertions. Verify0.
-
-- T-44275 accepted12449c7: Scope login document to cream/ink/light scheme and expand desktop static red feed to full-width64px, mobile unchanged. Verify0.
-
-- T-44276 acceptedb8d5460: Activate staged exact Dashboard page via compatibility reexport; remove only duplicate component and unused hook import. Verify0.
-
-- T-44277 accepted48bdf7b: Extract exact simulator telemetry/incident restore bodies with typed callbacks and legacy late-bound main wrappers. Verify0.
