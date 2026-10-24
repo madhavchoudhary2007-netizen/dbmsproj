@@ -1,0 +1,166 @@
+diff --git a/frontend/app/styles/shell.css b/frontend/app/styles/shell.css
+index 20a17ae..d86755d 100644
+--- a/frontend/app/styles/shell.css
++++ b/frontend/app/styles/shell.css
+@@ -116,11 +116,15 @@
+   white-space: nowrap;
+ }
+ 
+-.nb-shell .feed-status { display: inline-flex; min-width: 0; align-items: center; gap: 8px; }
++.nb-shell .feed-status { display: inline-flex; min-width: 0; align-items: center; }
++.nb-shell .feed-status .feed-connection {
++  display: inline-block; min-width: 0; max-width: 88px; overflow: hidden;
++  text-overflow: ellipsis; white-space: nowrap;
++}
+ .nb-shell .feed-status button,
+ .nb-shell .feed-status [role="button"] {
+   display: inline-flex; min-width: 44px; min-height: 44px; align-items: center;
+-  justify-content: center; padding: 8px; color: var(--nb-ink);
++  justify-content: center; gap: 8px; overflow: hidden; padding: 8px; color: var(--nb-ink);
+   border: var(--nb-border); background: var(--nb-paper);
+ }
+ .nb-shell .feed-status .nb-face {
+@@ -132,7 +136,7 @@
+ 
+ .nb-shell .race-control-feed {
+   display: flex; width: 100%; height: 40px; min-width: 0; min-height: 40px;
+-  align-items: center; gap: 24px; margin: 0; padding: 0 16px; overflow: hidden;
++  align-items: center; flex-wrap: nowrap; gap: 24px; margin: 0; padding: 0 16px; overflow: hidden;
+   color: var(--nb-ink); border-bottom: 4px solid var(--nb-ink);
+   background: var(--nb-red); list-style: none; white-space: nowrap;
+ }
+@@ -140,6 +144,13 @@
+   display: block; min-width: 0; flex: 1 1 0%; overflow: hidden;
+   text-overflow: ellipsis; white-space: nowrap;
+ }
++.nb-shell .race-control-feed-state { min-width: 0; }
++.nb-shell .race-control-feed-message {
++  display: flex; min-width: 0; min-height: 44px; align-items: center; gap: 8px;
++  padding: 0 16px; color: var(--nb-ink); background: var(--nb-paper);
++}
++.nb-shell .race-control-feed-message > span { min-width: 0; overflow-wrap: anywhere; }
++.nb-shell .race-control-feed-message button { flex: 0 0 auto; }
+ 
+ .nb-shell .content { min-width: 0; flex: 1; padding: 32px; }
+ .nb-shell .footer {
+@@ -198,6 +209,10 @@
+ 
+ @media (max-width: 767px) {
+   .nb-shell .topbar { gap: 8px; padding: 0 16px; }
++  .nb-shell .feed-status, .nb-shell .feed-status button {
++    min-width: 44px; max-width: 96px;
++  }
++  .nb-shell .feed-status .feed-connection { max-width: 88px; }
+   .nb-shell .crumb { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+   .nb-shell .top-meta { flex-shrink: 0; gap: 8px; white-space: nowrap; }
+   .nb-shell .header-role { display: none; }
+diff --git a/frontend/components/shell-feed.tsx b/frontend/components/shell-feed.tsx
+new file mode 100644
+index 0000000..da7ad11
+--- /dev/null
++++ b/frontend/components/shell-feed.tsx
+@@ -0,0 +1,104 @@
++"use client";
++
++import { NbMarquee } from "@/components/nb/marquee";
++import { NbSkeleton } from "@/components/nb/skeleton";
++
++export type ShellFeedConnection = "LIVE" | "RECONNECTING" | "OFFLINE";
++export type ShellRaceControlState = "empty" | "loading" | "populated" | "error" | "partial";
++
++const sessionDescription = "API SESSION uses dashboard HTTP polling, not WebSocket.";
++
++export interface ShellFeedStatusProps {
++  connection: ShellFeedConnection;
++  error: string;
++  onRefresh: () => void;
++}
++
++export function ShellFeedStatus({ connection, error, onRefresh }: ShellFeedStatusProps) {
++  const statusDescription = error ? `${connection}: ${error}` : connection;
++  const statusTitle = `${statusDescription}. ${sessionDescription}`;
++
++  return (
++    <div className="feed-status" data-connection={connection}>
++      <span className="sr-only">API SESSION. {statusTitle}</span>
++      <button type="button" aria-label="Refresh race control feed" title={statusTitle} onClick={onRefresh}>
++        <span aria-hidden="true" className="status-dot" />
++        <span className="feed-connection">{connection}</span>
++      </button>
++    </div>
++  );
++}
++
++export interface ShellRaceControlProps {
++  items: readonly string[];
++  status: ShellRaceControlState;
++  error: string;
++  onRefresh: () => void;
++}
++
++function feedTitle(items: readonly string[]) {
++  return items.join(" • ");
++}
++
++function RaceControlMarquee({ items }: { items: readonly string[] }) {
++  return <NbMarquee items={items} tone="red" className="race-control-feed" title={feedTitle(items)} />;
++}
++
++function RefreshFeedButton({ onRefresh }: { onRefresh: () => void }) {
++  return (
++    <button type="button" aria-label="Refresh race control feed" title="Refresh race control feed" onClick={onRefresh}>
++      <span aria-hidden="true">Refresh</span>
++    </button>
++  );
++}
++
++export function ShellRaceControl({ items, status, error, onRefresh }: ShellRaceControlProps) {
++  if (status === "empty") {
++    return (
++      <div data-feed-state="empty" className="race-control-feed-state" role="status">
++        <span className="sr-only">Race control feed is empty.</span>
++      </div>
++    );
++  }
++
++  if (status === "loading") {
++    return (
++      <div data-feed-state="loading" className="race-control-feed-state race-control-feed-loading" role="status" aria-busy="true">
++        {items.length > 0 ? (
++          <RaceControlMarquee items={items} />
++        ) : (
++          <NbSkeleton label="Loading race control feed…" style={{ height: 40, minHeight: 40 }} />
++        )}
++      </div>
++    );
++  }
++
++  if (status === "error") {
++    return (
++      <div data-feed-state="error" className="race-control-feed-state race-control-feed-message" role="alert">
++        <span>{error || "Race control feed unavailable."}</span>
++        <RefreshFeedButton onRefresh={onRefresh} />
++      </div>
++    );
++  }
++
++  if (status === "partial") {
++    const partialMessage = error || "Showing stale race control data.";
++
++    return (
++      <div data-feed-state="partial" className="race-control-feed-state race-control-feed-partial" role="status">
++        <RaceControlMarquee items={items} />
++        <div className="race-control-feed-message">
++          <span>{partialMessage}</span>
++          <RefreshFeedButton onRefresh={onRefresh} />
++        </div>
++      </div>
++    );
++  }
++
++  return (
++    <div data-feed-state="populated" className="race-control-feed-state">
++      <RaceControlMarquee items={items} />
++    </div>
++  );
++}

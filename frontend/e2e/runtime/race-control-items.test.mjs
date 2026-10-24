@@ -12,9 +12,9 @@ function loadMapper() {
   const output = typescript.transpileModule(source, {
     compilerOptions: { module: typescript.ModuleKind.CommonJS, target: typescript.ScriptTarget.ES2022 },
   }).outputText;
-  const module = { exports: {} };
-  vm.runInNewContext(output, { module, exports: module.exports });
-  return module.exports.raceControlItems;
+  const compiledModule = { exports: {} };
+  vm.runInNewContext(output, { module: compiledModule, exports: compiledModule.exports });
+  return compiledModule.exports.raceControlItems;
 }
 
 test("maps actual race-control fields with exact labels and preserves input", () => {

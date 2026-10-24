@@ -3,10 +3,15 @@ updated_at: 2026-10-24
 phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 
 ## Queue
-### T-44252 W3 — OPEN
+### T-44253 W3 — OPEN
 - target_files: frontend/e2e/runtime/race-control-items.test.mjs
-- contract: Regression-test actual race-control ticker mapper offline using installed TypeScript transpilation.
-- verify: node --test frontend/e2e/runtime/race-control-items.test.mjs
+- contract: Fix Next ESLint reserved module variable in mapper runtime test without changing any assertion.
+- verify: node --test frontend/e2e/runtime/race-control-items.test.mjs && npm --prefix frontend run lint -- --max-warnings 0
+
+### T-44250 O — Wire W1/W2 shell feed boundaries
+- target_files: frontend/components/shell.tsx
+- contract: Connect accepted hook/mapper/presenters, no new behavior or API.
+- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ### T-44248 W1 — OPEN
 - target_files: frontend/components/shell-feed.tsx, frontend/app/styles/shell.css
@@ -21,6 +26,7 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44252 accepted39f2e59; verify0.
 - T-44249 accepted939fea6; verify0.
 - T-44247 acceptedc18eb51; verify0.
 - T-44245 acceptedc1ecce3; verify0.
