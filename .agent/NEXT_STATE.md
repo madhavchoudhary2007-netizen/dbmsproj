@@ -3,10 +3,20 @@ updated_at: 2026-10-23
 phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phases0–2 complete; baseline51.2974)
 
 ## Queue
-### T-44232 W2 — OPEN
-- target_files: backend/app/api/dbms_lock.py
-- contract: T331 stage exact DBMS lock demo and recalculation endpoints in focused API factory.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,subprocess; old=ast.parse(subprocess.check_output(["git","show","c2616e0:backend/app/main.py"],text=True)); new=ast.parse(open("backend/app/api/dbms_lock.py").read()); a={n.name:n for n in ast.walk(old) if isinstance(n,ast.FunctionDef)}; b={n.name:n for n in ast.walk(new) if isinstance(n,ast.FunctionDef)}; assert [ast.dump(n) for n in a["dbms_lock_demo"].body]==[ast.dump(n) for n in b["_run_lock_demo"].body]; a["dbms_recalculate"].decorator_list=[]; b["dbms_recalculate"].decorator_list=[]; assert ast.dump(a["dbms_recalculate"])==ast.dump(b["dbms_recalculate"]); assert not any(isinstance(n,ast.ClassDef) for n in ast.walk(new)); print("PASS exact lock body, recalculate endpoint and no namespace class")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app/api/dbms_lock.py && .venv/bin/ruff format --check backend/app/api/dbms_lock.py
+### T-366 — ROOT ACCEPTANCE
+- target_files: none
+- contract: Accepted strict primitive browser suite across all five viewport projects; controls, five states, native modal, plinth and reduced motion.
+- verify: python3 .agent/check-frontend-browser.py T-366.accept e2e/nb-primitives.spec.ts --workers=2
+
+### T-365 — ROOT ACCEPTANCE
+- target_files: none
+- contract: Accepted shared primitive library and dev-only guide after production build/gating and axe at375/1440.
+- verify: python3 .agent/check-frontend-build.py && python3 .agent/check-guide-production.py && python3 .agent/check-frontend-browser.py T-365.accept e2e/nb-primitives.spec.ts --project=mobile-375 --project=desktop-1440 --grep "one accessible page" --workers=2
+
+### T-364 — ROOT ACCEPTANCE
+- target_files: none
+- contract: Accepted typed reduced-motion, FLIP and flash hooks after mounted browser tests across all five projects.
+- verify: npm --prefix frontend run typecheck && python3 .agent/check-frontend-browser.py T-364.accept e2e/motion-hooks.spec.ts --workers=2
 
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
@@ -15,6 +25,7 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44232 acceptedc6787b1; verify0.
 - T-44226 accepted4b35c7a; verify0.
 - T-44225 accepted54449f5; verify0.
 - T-44231 acceptede6efcc1; verify0.

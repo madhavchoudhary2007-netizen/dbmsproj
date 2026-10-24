@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 4b35c7a
+git_head: c6787b1
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; customworkers gpt-5.6-luna/high (owner override); cap2
@@ -50,3 +50,5 @@ last_eval_score: baseline51.2974358974359, obsolete forcurrentcode, NOTpresentab
 - T-44225 accepted54449f5: Added primitive browser gates for five states, controls, accessibility, plinth, reduced motion, tabs and native modal; strict thresholds retained. Verify0.
 
 - T-44226 accepted4b35c7a: Added actual mounted-hook tests for FLIP, large-list bypass, flash coalescing, media changes and150ms skeleton delay. Verify0.
+
+- T-44232 acceptedc6787b1: Staged typed lock/recalculate router with exact lock runtime body and explicit dependency arguments; no complexity suppressions or namespace tricks. Verify0.
