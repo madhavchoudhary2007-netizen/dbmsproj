@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 8e498d7
+git_head: e5507c9
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -51,3 +51,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - T-370 acceptedda5a72d: Close shell milestone with481 root browser checks and build passing; UI controls, contrast, mobile and auth verified. Verify0.
 
 - T-371 accepted8e498d7: Close shared feed milestone: visible polling, cache dedupe, cancellation, five states and offline recovery verified. Verify0.
+
+- T-44267 acceptede5507c9: Stage exact manual/automatic/update reservation bodies with explicit dependencies, unchanged locking, SQL errors and publication. Verify0.

@@ -3,11 +3,6 @@ updated_at: 2026-10-24
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44267 W2 — OPEN
-- target_files: backend/app/pit_reservation_service.py
-- contract: T331 stage exact manual/automatic/update pit reservation implementations with explicit dependency parameters; main unchanged.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,pathlib,subprocess; a=ast.parse(subprocess.check_output(["git","show","HEAD:backend/app/main.py"],text=True)); b=ast.parse(pathlib.Path("backend/app/pit_reservation_service.py").read_text()); names={"reserve_pit","reserve_pit_auto","update_pit_reservation"}; x={n.name:ast.dump(ast.Module(body=n.body,type_ignores=[])) for n in a.body if isinstance(n,ast.FunctionDef) and n.name in names}; y={n.name.removeprefix("run_"):ast.dump(ast.Module(body=n.body,type_ignores=[])) for n in b.body if isinstance(n,ast.FunctionDef) and n.name.startswith("run_")}; assert x==y and set(x)==names; print("PASS exact three reservation bodies")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/pit_reservation_service.py
-
 ### T-44266 W1 — OPEN
 - target_files: frontend/components/login-art.tsx, frontend/app/styles/login.css, frontend/app/layout.tsx
 - contract: T380 stage new neo-brutal login art and scoped layout CSS before wiring route; no auth/form behavior changes.
@@ -21,6 +16,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44267 acceptede5507c9; verify0.
 - T-371 accepted8e498d7; verify0.
 - T-370 acceptedda5a72d; verify0.
 - T-44265 accepted94a7009; verify0.

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Space_Mono } from "next/font/google";
 import "./globals.css";
 import "./styles/shell.css";
+import "./styles/login.css";
 import { AuthProvider } from "@/components/auth";
 import { Shell } from "@/components/shell";
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], weight: ["500", "700"], display: "swap", variable: "--font-space-grotesk" });
