@@ -3,11 +3,6 @@ updated_at: 2026-10-24
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44285 W2 — OPEN
-- target_files: frontend/lib/session-actions.ts, frontend/components/special-pages.tsx
-- contract: T379 extract SessionPage lifecycle/simulator/results-read operations into typed module with same bodies and thin callbacks.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
 ### T-44284 W1 — OPEN
 - target_files: frontend/app/styles/login.css, frontend/components/login-art.tsx
 - contract: T380 TASTE-login fix measured form type clutter, broken legacy logo and checker strip sizing while retaining all copy and layout.
@@ -20,6 +15,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44285 accepted58aad6d; verify0.
 - T-44282 accepted7cb29bf; verify0.
 - T-44281 acceptedb6fa4ad; verify0.
 - T-44280 accepted097578f; verify0.

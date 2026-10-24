@@ -1,6 +1,6 @@
 import { Activity } from "lucide-react";
 
-import { CheckerStrip, StarBurst } from "@/components/nb/motifs";
+import { StarBurst } from "@/components/nb/motifs";
 import { NbMarquee } from "@/components/nb/marquee";
 import { NbSticker } from "@/components/nb/sticker";
 
@@ -48,7 +48,7 @@ export function LoginArt() {
         <span>RACE CONTROL PLATFORM</span>
         <span>01 — 06</span>
       </div>
-      <CheckerStrip aria-hidden="true" className="nb-login-checker" />
+      <div aria-hidden="true" className="tx-checker nb-login-checker" />
       <span aria-hidden="true" className="tx-grid nb-login-art-texture" />
     </section>
   );
