@@ -86,7 +86,7 @@ test("E-5 offline to online recovery passes with retry", async ({ page, context 
   await context.setOffline(true);
 
   // Trigger Refresh
-  const refreshButton = page.getByRole("button", { name: "Refresh" });
+  const refreshButton = page.getByRole("button", { name: "Refresh", exact: true });
   await refreshButton.click();
 
   // StateMessage renders role="alert" with "Try again" button

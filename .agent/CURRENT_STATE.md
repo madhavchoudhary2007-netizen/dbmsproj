@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 3483224
+git_head: 3e902c2
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -8,7 +8,7 @@ archetype: Neo-Brutal Motorsport (light), ADR007 approved
 last_eval_score: obsolete baseline51.2974358974359; no current score; final evaluation T430
 
 ## Verified milestones
-- Phases0–2 and5 COMPLETE (4 of12). Phase3 T331 extraction remains; main1671 lines, target<=120. Phase4 and6–11 unfinished. Owner requests autonomous completion of all12, no routine questions.
+- Phases0–2 and5 COMPLETE (4 of12). Phase3 T331 extraction remains; main1642 lines, target<=120. Phase4 and6–11 unfinished. Owner requests autonomous completion of all12, no routine questions.
 - Phase5 T3602ad337f/T3611e61efd/T362c0781f9/T36313f614a/T364d666cf6/T365b90911f/T366b18819f accepted through accept.sh. Tailwind4.3.3, SpaceGrotesk500/700 + SpaceMono400/700, scoped tokens/textures/plinth and complete shared primitives. Existing production routes adopt them in Phases6–7.
 - Root60 browser cases PASS across320/375/768/1440/5120 (T366.matrix.browser.raw.log). Parent accept reruns: motion30 PASS, primitive30 PASS, axe375/1440 2 PASS; keyboard/font4 per runner. Build/lint/types0 and four CSS lints0. /__nb dev200, production not-found visible + noindex + guide absent + zero writes. Next streamed notFound HTTP200 is documented behavior; do not substitute status-only checks (.agent/check-guide-production.py).
 - Phase5 fixes: escaped %5F_nb route6b9c6f7, explicit44px controlsfdb63e2, FLIP mount/scroll guarde6efcc1. Browser tests wait fonts/finite animations for axe without relaxing thresholds; reduced motion asserts immediately.
@@ -28,6 +28,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - .agent/orchestrate.py persists queue/clone/integrate/mark. Worker envelopes require actual stats/integer static counts0, no extra keys. All features/routes/copy/hooks/aria/stateclasses/dbms hashes retained; five states/44px/token spacing/reduced motion mandatory.
 
 ## Open risks
+- T370 broad browser batch:260 PASS/80FAIL.75 axe cases fail mixed legacy dark/light contrast plus status visible-label/name mismatch;5 E5 failures are ambiguous substring Refresh selector. W1 T44257 and W3 T44258 repair without changing API/copy/thresholds; rerun mandatory.
 - T44248 first acceptance caught reserved module variable in new mapper test; W3 renamed binding2aa2b87, all3 assertions+global lint pass. Saved W1/root patches reapplied, acceptdfcf8ac/e765662 both0; no assertion weakened.
 - T331 giant main/transitional factories; strict mypy last snapshot211 errors before latest moves, current count not rerun; zero required T339. No thresholds relaxed.
 - T44132 bundle checker omits layout/shared assets; fix before P3. Lighthouse absent, FPS gate17ms until T41316.7, hosted CI unverified. Final score>=95/all hard gates/no NOT_RUN required; never present obsolete score as current.
@@ -49,5 +50,6 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 
 
 - T-44253 accepted2aa2b87: Rename reserved local module variable while preserving real-source VM execution and every mapper assertion. Verify0.
+
 
 

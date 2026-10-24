@@ -1,0 +1,13 @@
+diff --git a/frontend/e2e/edge-resilience.spec.ts b/frontend/e2e/edge-resilience.spec.ts
+index 3fc3dd7..1cab064 100644
+--- a/frontend/e2e/edge-resilience.spec.ts
++++ b/frontend/e2e/edge-resilience.spec.ts
+@@ -86,7 +86,7 @@ test("E-5 offline to online recovery passes with retry", async ({ page, context
+   await context.setOffline(true);
+ 
+   // Trigger Refresh
+-  const refreshButton = page.getByRole("button", { name: "Refresh" });
++  const refreshButton = page.getByRole("button", { name: "Refresh", exact: true });
+   await refreshButton.click();
+ 
+   // StateMessage renders role="alert" with "Try again" button
