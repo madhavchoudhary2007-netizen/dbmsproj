@@ -3,15 +3,15 @@ updated_at: 2026-10-24
 phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 
 ## Queue
+### T-44245 W2 — OPEN
+- target_files: frontend/lib/use-race-control-feed.ts, frontend/components/special-pages.tsx
+- contract: T371 add visible-only shared dashboard feed hook and reuse cache in Dashboard fetch logic, preserving all existing JSX/health/reload behavior.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
 ### T-44244 W3 — OPEN
 - target_files: frontend/e2e/shell-navigation.spec.ts
 - contract: Add actual-browser shell drawer regression coverage across the five configured viewport projects.
 - verify: npm --prefix frontend run typecheck && cd frontend && ./node_modules/.bin/playwright test e2e/shell-navigation.spec.ts --list
-
-### T-44243 W2 — OPEN
-- target_files: backend/app/analytics_repository.py
-- contract: Implement only ADR-012 read-only nullable dashboard next_event after recorded red tests.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_dashboard_next_event.py backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/analytics_repository.py
 
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
@@ -21,6 +21,7 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44243 accepted246f2f6; verify0.
 - T-44242 accepted5627293; verify0.
 - T-44241 accepted60e5e56; verify0.
 - T-44237 acceptedfeeaef3; verify0.
