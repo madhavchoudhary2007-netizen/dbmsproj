@@ -3,10 +3,15 @@ updated_at: 2026-10-23
 phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phases0–2 complete; baseline51.2974)
 
 ## Queue
-### T-44212 W2 — OPEN
-- target_files: backend/app/main.py
-- contract: T331 wire staged pure simulation tick into main and remove duplicate implementation.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,importlib; source=ast.parse(open("backend/app/main.py").read()); assert not any(isinstance(n,ast.FunctionDef) and n.name=="advance_simulation_tick" for n in source.body); m=importlib.import_module("backend.app.main"); c=importlib.import_module("backend.app.core.simulation_tick"); assert m.advance_simulation_tick is c.advance_simulation_tick; assert hasattr(m,"Decision") and hasattr(m,"IncidentIn"); print("PASS direct tick alias, oldbody removed, model exports retained")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k 'incident_decisions_always_return_current_driver_state or unsupported_sanction_fields_are_rejected_with_guidance or unsupported_sanction_zero_and_points_only_decisions_remain_valid' && .venv/bin/ruff check backend/app/main.py backend/app/core/simulation_tick.py && .venv/bin/ruff format --check backend/app/main.py backend/app/core/simulation_tick.py
+### T-44217 W1 — OPEN
+- target_files: frontend/components/nb/table.tsx, frontend/components/nb/state.tsx
+- contract: T365 typed five-state table with preserved selection and internal scrolling, plus skeleton row-count passthrough.
+- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
+### T-44216 W1 — OPEN
+- target_files: frontend/components/nb/modal.tsx, frontend/components/nb/tabs.tsx
+- contract: T365 native modal and controlled accessible folder tabs, using existing lifecycle hook.
+- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Blocked
 - Previous6Luna usage-limit blocker superseded byowner5.6/high authorization; availability pendingfirstdispatch.
@@ -15,6 +20,7 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44212 accepted46129c0; verify0.
 - T-44215 accepted0bd674b; verify0.
 - T-44211 accepted8275aab; verify0.
 - T-44213 accepted471cb56; verify0.
