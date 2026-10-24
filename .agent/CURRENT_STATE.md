@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 35fe855
+git_head: 2e5c5a4
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; customworkers gpt-5.6-luna/high (owner override); cap2
@@ -36,3 +36,5 @@ last_eval_score: baseline51.2974358974359, obsolete forcurrentcode, NOTpresentab
 - T-44218 accepted2d00c1f: Added five-state chart frame, accessible loading, square active dot, tooltip and visual chart theme tokens without eager Recharts import. Verify0.
 
 - T-44219 accepted35fe855: Staged exact race archive endpoint in typed focused API factory; next atomic task wires alias and removes original route. Verify0.
+
+- T-44221 accepted2e5c5a4: Wired exact archive router with late-bound callbacks; preserved dbms_race and legacy exports, removed original duplicate handler. Verify0.

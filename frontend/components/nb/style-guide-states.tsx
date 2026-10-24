@@ -1,0 +1,104 @@
+"use client";
+
+import type { ViewState } from "@/lib/data-state";
+import { NbChartFrame, NbActiveDot } from "@/components/nb/chart-frame";
+import { chartTheme } from "@/components/nb/chart-theme";
+import { NbState } from "@/components/nb/state";
+import { NbTable } from "@/components/nb/table";
+
+type FixtureRow = Record<string, unknown> & {
+  id: string;
+  driver: string;
+  lap: number;
+};
+
+const fixtureRows: readonly FixtureRow[] = [
+  { id: "fixture-nova", driver: "Nova Vale", lap: 42 },
+  { id: "fixture-milo", driver: "Milo Quill", lap: 45 },
+  { id: "fixture-rhea", driver: "Rhea Sol", lap: 47 },
+];
+
+const headingLabels: Record<ViewState<readonly FixtureRow[]>["status"], string> = {
+  empty: "No fixture data",
+  loading: "Fixture data loading",
+  populated: "Fixture data ready",
+  error: "Fixture request error",
+  partial: "Fixture data filtered",
+};
+
+function DriverNames({ rows }: { rows: readonly FixtureRow[] }) {
+  return (
+    <ul className="min-w-0 space-y-2" aria-label="Fixture drivers">
+      {rows.map((row) => <li className="min-w-0 break-words" key={row.id}>{row.driver}</li>)}
+    </ul>
+  );
+}
+
+function FixtureChart({ rows }: { rows: readonly FixtureRow[] }) {
+  const points = rows.map((row, index) => `${16 + index * 64},${Math.max(16, 88 - row.lap)}`).join(" ");
+  const secondaryPoints = rows.map((row, index) => `${16 + index * 64},${Math.max(24, 96 - row.lap)}`).join(" ");
+  const lastIndex = rows.length - 1;
+  const lastCx = rows.length ? 16 + lastIndex * 64 : undefined;
+  const lastCy = rows.length ? Math.max(16, 88 - rows[lastIndex].lap) : undefined;
+
+  return (
+    <svg className="h-32 min-w-0 w-full" viewBox="0 0 160 112" aria-hidden="true" focusable="false">
+      <polyline fill="none" points={points} stroke={chartTheme.line.stroke} strokeWidth={chartTheme.line.strokeWidth} />
+      <polyline fill="none" points={secondaryPoints} stroke={chartTheme.secondary.stroke} strokeDasharray={chartTheme.secondary.strokeDasharray} strokeWidth="3" />
+      <NbActiveDot cx={lastCx} cy={lastCy} />
+    </svg>
+  );
+}
+
+export function NbStyleGuideStates({ onAction }: { onAction: () => void }) {
+  const states: readonly ViewState<readonly FixtureRow[]>[] = [
+    { status: "empty", reason: "no-data" },
+    { status: "loading" },
+    { status: "populated", data: fixtureRows },
+    { status: "error", error: { message: "Fixture request unavailable", retryable: true }, retry: onAction },
+    { status: "partial", data: fixtureRows.slice(0, 1), filter: { label: "Fixture filter", clear: onAction }, totalCount: 3 },
+  ];
+
+  return (
+    <section aria-label="Data state fixtures" className="min-w-0 bg-cream p-4 text-ink">
+      <div className="grid min-w-0 grid-cols-1 gap-8 min-[1200px]:grid-cols-2">
+        {states.map((state) => {
+          const status = state.status;
+          const sourceMessage = status === "partial" ? "Mongo fixture unavailable" : undefined;
+          return (
+            <section className="min-w-0" key={status}>
+              <h2 className="mb-4 font-bold" style={{ fontSize: "var(--fs-h2)" }}>{headingLabels[status]}</h2>
+              <div className="min-w-0" data-nb-state={status}>
+                <NbState state={state} empty="No fixture records." sourceMessage={sourceMessage}>
+                  {(rows) => <DriverNames rows={rows} />}
+                </NbState>
+              </div>
+              <div className="mt-4 min-w-0" data-nb-table={status}>
+                <NbTable<FixtureRow>
+                  state={state}
+                  caption={`Fixture timing ${status}`}
+                  columns={[{ key: "driver", title: "Driver" }, { key: "lap", title: "Lap", numeric: true }]}
+                  rowKey={(row) => row.id}
+                  pageSize={3}
+                  onSelect={() => onAction()}
+                  empty="No fixture records."
+                  sourceMessage={sourceMessage}
+                />
+              </div>
+              <div className="mt-4 min-w-0" data-nb-chart={status}>
+                <NbChartFrame<readonly FixtureRow[]>
+                  title={`Fixture pace ${status}`}
+                  state={state}
+                  empty="No fixture records."
+                  sourceMessage={sourceMessage}
+                >
+                  {(rows) => <FixtureChart rows={rows} />}
+                </NbChartFrame>
+              </div>
+            </section>
+          );
+        })}
+      </div>
+    </section>
+  );
+}

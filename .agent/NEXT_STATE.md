@@ -3,11 +3,6 @@ updated_at: 2026-10-23
 phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phases0–2 complete; baseline51.2974)
 
 ## Queue
-### T-44221 W2 — OPEN
-- target_files: backend/app/main.py
-- contract: T331 wire staged archive router and remove the old exact handler in main.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "decision or incident" && .venv/bin/ruff check backend/app/main.py backend/app/api/race_archive.py && .venv/bin/ruff format --check backend/app/main.py backend/app/api/race_archive.py
-
 ### T-44220 W1 — OPEN
 - target_files: frontend/components/nb/style-guide-states.tsx
 - contract: T365 style-guide five-state fixtures for state panels, tables and chart frames.
@@ -20,6 +15,7 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44221 accepted2e5c5a4; verify0.
 - T-44219 accepted35fe855; verify0.
 - T-44218 accepted2d00c1f; verify0.
 - T-44217 accepted0e166fc; verify0.
