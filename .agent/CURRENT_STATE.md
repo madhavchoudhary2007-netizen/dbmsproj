@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 6eefdaa
+git_head: 65bd176
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (owner override); cap2
@@ -47,3 +47,5 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - Owner switched workers toGPT5.6Luna/high: models.env+3profiles2bc94fb accepted; customtoolmetadata5.6/high, actualfreshW1completed6eefdaa. W2alsoresponding; noquota blocker now. Cap2/orchestrator unchanged.
 - T44203 button/card accepted6eefdaa; no routeusesyet, runtimecomputedchecksT366 pending. T44204 badges W1 running. T44205createincident W2 repair1: directconnectioncallback froze monkeypatching, candidate savedrawpatch/own2filesreset; requirelateboundlambda. No APIchanges.
 - T364 hookscn/reduced+FLIP/flash accepted; runtimeT366 pending. Rootlatestbuild/lint/types0;full227PASS0skip/livePASS;85axe+4keyboardPASS;allfourglobalCSSgates0.
+
+- T-44205 accepted65bd176: Moved exact incident-create endpoint into stewards API, preserving late-bound connection/publish and main alias;11 route contract checks pass. Verify0.
