@@ -92,14 +92,12 @@ a {
 .brand-mark span {
   color: #555f34;
 }
-.brand b,
-.login-brand b {
+.brand b {
   font-size: 14px;
   letter-spacing: 2px;
   display: block;
 }
-.brand small,
-.login-brand small {
+.brand small {
   font-size: 8px;
   color: var(--muted);
   letter-spacing: 1.7px;
@@ -616,7 +614,6 @@ tbody tr:hover {
 }
 .form-grid label,
 .decision-form label,
-.login-form label,
 .filter-panel label,
 .toolbar label {
   color: #8a949f;
@@ -634,8 +631,7 @@ tbody tr:hover {
 .filter-panel select,
 .toolbar select,
 .inline-form input,
-.inline-form select,
-.login-form input {
+.inline-form select {
   height: 44px;
   padding: 0 8px;
   background: #0a0e12;
@@ -646,8 +642,7 @@ tbody tr:hover {
 .form-grid input:focus,
 .form-grid select:focus,
 .decision-form input:focus,
-.decision-form textarea:focus,
-.login-form input:focus {
+.decision-form textarea:focus {
   border-color: #91a536;
 }
 .form-actions {
@@ -1117,30 +1112,6 @@ tbody tr:hover {
   }
   .form-actions {
     grid-column: 1;
-  }
-  .login-screen {
-    grid-template-columns: 1fr;
-    min-height: 100vh;
-  }
-  .login-visual {
-    min-height: 230px;
-    padding: 24px 24px;
-  }
-  .visual-copy {
-    margin: 24px 0 0;
-  }
-  .visual-copy p {
-    display: none;
-  }
-  .visual-footer {
-    display: none;
-  }
-  .login-main {
-    padding: 32px 24px;
-    min-height: 450px;
-  }
-  .login-copyright {
-    margin-top: 32px;
   }
   .action-row .button {
     flex: 1;
