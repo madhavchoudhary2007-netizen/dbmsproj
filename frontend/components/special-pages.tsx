@@ -29,6 +29,11 @@ import {
   simulateSession,
 } from "@/lib/session-actions";
 import {
+  deleteSessionRecord,
+  saveSession,
+  saveSessionResult,
+} from "@/lib/session-writes";
+import {
   AddButton,
   Button,
   DataTable,
@@ -68,28 +73,15 @@ export function SessionPage() {
   }, [drivers, simCarsInitialized]);
   const current = rows.find((r) => r.id === selected);
   const perform = async (action: string) => performSessionAction(action, selected, setActionMsg, load);
-  const saveResult = async (v: Row) => {
-    if (!selected) return;
-    setBusy(true);
-    try {
-      const saved = await api(`/sessions/${selected}/results`, {
-        method: "POST",
-        body: JSON.stringify([
-          {
-            ...v,
-            pole: v.pole === "true" || v.pole === true,
-            fastest_lap: v.fastest_lap === "true" || v.fastest_lap === true,
-            classified: v.classified === "true" || v.classified === true,
-          },
-        ]),
-      });
-      setResults(asArray(saved));
-      setResultsLoaded(true);
-      setResultModal(false);
-    } finally {
-      setBusy(false);
-    }
-  };
+  const saveResult = async (v: Row) =>
+    saveSessionResult(
+      v,
+      selected,
+      setBusy,
+      setResults,
+      setResultsLoaded,
+      setResultModal,
+    );
   const simulate = async (action: string) =>
     simulateSession(action, selected, setSimMessage, simCars, simRate, load);
   const getResults = async () =>
@@ -112,39 +104,26 @@ export function SessionPage() {
     { name: "total_laps", type: "number", min: 1, max: 72 },
     { name: "safety_car", options: ["false", "true"] },
   ];
-  const save = async (v: Row) => {
-    setBusy(true);
-    try {
-      const payload = Object.fromEntries(
-        fields
-          .map(({ name }) => [name, v[name]] as const)
-          .filter(([, value]) => value !== undefined),
-      );
-      await api(editModal && selected ? `/sessions/${selected}` : "/sessions", {
-        method: editModal ? "PATCH" : "POST",
-        body: JSON.stringify(payload),
-      });
-      setModal(false);
-      setEditModal(false);
-      await load();
-    } finally {
-      setBusy(false);
-    }
-  };
-  const deleteSession = async () => {
-    if (!selected) return;
-    setBusy(true);
-    try {
-      await api(`/sessions/${selected}`, { method: "DELETE" });
-      setSelected("");
-      setResults([]);
-      await load();
-    } catch (e) {
-      setActionMsg(e instanceof Error ? e.message : "Unable to delete session");
-    } finally {
-      setBusy(false);
-    }
-  };
+  const save = async (v: Row) =>
+    saveSession(
+      v,
+      fields,
+      editModal,
+      selected,
+      setBusy,
+      setModal,
+      setEditModal,
+      load,
+    );
+  const deleteSession = async () =>
+    deleteSessionRecord(
+      selected,
+      setBusy,
+      setSelected,
+      setResults,
+      load,
+      setActionMsg,
+    );
   return (
     <>
       <PageHeader
