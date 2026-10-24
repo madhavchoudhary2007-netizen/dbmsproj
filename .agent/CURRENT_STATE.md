@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: f51818a
+git_head: 3989f9d
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (owner override2bc94fb), cap2
@@ -32,3 +32,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 
 ## Orchestrator direct edits
 - T44250 shell glue8add/4remove (12productlines this turn), logged and accepted e765662; all other product implementation delegated. Metadata/config/ADRs/packets/state/root verification helpers only. No new dependencies this continuation.
+
+- T-44311 accepted3989f9d: Activate exact steward orchestration hook; all presentation, sanctions and action bindings unchanged. Verify0.
