@@ -3,9 +3,14 @@ updated_at: 2026-10-23
 phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phases0–2 complete; baseline51.2974)
 
 ## Queue
-### T-44220 W1 — OPEN
-- target_files: frontend/components/nb/style-guide-states.tsx
-- contract: T365 style-guide five-state fixtures for state panels, tables and chart frames.
+### T-44223 W2 — OPEN
+- target_files: backend/app/api/laps.py
+- contract: T331 stage exact lap aggregation and two lap endpoints in focused module; wire next atomic task.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,subprocess; old=ast.parse(subprocess.check_output(["git","show","2e5c5a4:backend/app/main.py"],text=True)); new=ast.parse(open("backend/app/api/laps.py").read()); names={"race_lap_measurements","dbms_race_laps","session_laps"}; a={n.name:n for n in ast.walk(old) if isinstance(n,ast.FunctionDef) and n.name in names}; b={n.name:n for n in ast.walk(new) if isinstance(n,ast.FunctionDef) and n.name in names}; assert a.keys()==b.keys()==names; [setattr(n,"decorator_list",[]) for n in [*a.values(),*b.values()]]; assert all(ast.dump(a[k])==ast.dump(b[k]) for k in names); print("PASS exact lap helper and route ASTs")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app/api/laps.py && .venv/bin/ruff format --check backend/app/api/laps.py
+
+### T-44222 W1 — OPEN
+- target_files: frontend/components/nb/style-guide.tsx, frontend/app/__nb/page.tsx
+- contract: T365 dev-only style-guide route exercising every shared primitive variant plus real motion hooks.
 - verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Blocked
@@ -15,6 +20,7 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44220 accepted324c60b; verify0.
 - T-44221 accepted2e5c5a4; verify0.
 - T-44219 accepted35fe855; verify0.
 - T-44218 accepted2d00c1f; verify0.
