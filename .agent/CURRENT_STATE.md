@@ -1,9 +1,9 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 47c0408
+git_head: 35ba591
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
-harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
+harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (owner override); cap2
 archetype: Neo-Brutal Motorsport (light); ADR007 approved
 last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF4; NOT_RUN P1/P2; notpresentable
 
@@ -43,8 +43,7 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 
 - T-44200 accepted47c0408: Added bounded FLIP and coalesced cell flash hooks; repair1 adds guarded finish/cancel cleanup and reduced-motion handling. Runtime coverage remains T366. Verify0.
 
-## Execution blocker
-- Requiredw1-ui terminated: You’ve hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/settings/usage to purchase more credits or try again at 7:00 AM.
-- T44203 repaircandidate130lines retained only .agent/workspaces/T44203 and interrupted.raw.patch; unaccepted, no productrootchanges. Resume freshw1-ui onupdatedpacket, reviewcandidate/rerunVerify, returnvalidJSON, thenrootaccept. Do notsubstitutemodels orclaimcompletion. PreparedT44204/T44205 queuedbutNOTdispatched. T364runtime/T366 andremainingPhases3–11 unfinished.
-
-- Finalrootcheck47c0408: productionbuild/lint/types0 (T44206.build.raw.log); fourglobalCSSgates0. T44203 isolatedcandidate Verify0 but nofinalworkerJSON, remainsunaccepted. Requiredworkeravailability is soleexecutionstop; noownerdecisionrequested.
+## Model override / recovery
+- Owner explicitly switched all workers to gpt-5.6-luna/high. models.env andthreeCodexprofiles updated; cap2/orchestrator/effort unchanged. Tool definitions refreshed: w1-ui/w2-state/w3-eval nowexplicitly bind gpt-5.6-luna/high. Dispatch customroles withnooverrides, freshpacket-only context; max2 unchanged.
+- T44203 fresh5.6W1 reviewinginterrupted130linecandidate; T44205 fresh5.6W2 incidentcreate runningdisjoint clone. T44204 queuednotdispatched. T364runtime/T366/remainingphases unfinished.
+- Latest rootbuild/lint/types0; backend227PASS0skip/livePASS;85axe+4keyboardPASS; fourglobalCSSgates0. Remainingpalette/mypy/coverage/performancegaps remainopen.
