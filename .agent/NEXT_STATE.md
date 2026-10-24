@@ -3,14 +3,19 @@ updated_at: 2026-10-24
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44290 W3 — OPEN
+- target_files: frontend/e2e/login-layout.spec.ts
+- contract: T380 add regression coverage for login art clipping and primitive busy/error behavior missed by generic route checks.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
+### T-44289 W1 — OPEN
+- target_files: frontend/app/styles/login.css
+- contract: T380 repair mobile art clipping measured in settled375 screenshot; retain entire240px panel content and internal feed scroll.
+- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
 ### T-44288 W1 — OPEN
 - target_files: frontend/components/pages/session-simulator.tsx
 - contract: T379 stage exact presentational SessionSimulator region into its own component, no wiring or redesign yet.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
-### T-44286 W2 — OPEN
-- target_files: frontend/lib/session-writes.ts
-- contract: T379 stage typed SessionPage write operations with exact existing bodies, no wiring yet.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Blocked
@@ -20,6 +25,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44286 accepted60cc688; verify0.
 - T-44284 accepted27ee284; verify0.
 - T-44285 accepted58aad6d; verify0.
 - T-44282 accepted7cb29bf; verify0.
