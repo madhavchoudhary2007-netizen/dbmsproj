@@ -3,11 +3,6 @@ updated_at: 2026-10-24
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44287 W2 — OPEN
-- target_files: frontend/components/special-pages.tsx
-- contract: T379 wire accepted session write operations and remove duplicated SessionPage bodies; JSX unchanged.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
 ### T-44290 W3 — OPEN
 - target_files: frontend/e2e/login-layout.spec.ts
 - contract: T380 add regression coverage for login art clipping and primitive busy/error behavior missed by generic route checks.
@@ -20,6 +15,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44287 accepted3e715d5; verify0.
 - T-44289 accepted523cd33; verify0.
 - Phase6 T370/T371 complete;481 browser checks and build/static0.
 - Login route redesigned,70genericbrowserchecks pass; mobilecontainment/TASTE fixes remain beforeT380 closure.
