@@ -1,58 +1,35 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: b90911f
+git_head: b18819f
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
-harness: codex; orchestrator gpt-6.1-sol/medium; customworkers gpt-5.6-luna/high (owner override); cap2
-archetype: Neo-Brutal Motorsport(light), ADR007approved
-last_eval_score: baseline51.2974358974359, obsolete forcurrentcode, NOTpresentable; fullscoreatT430
+harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
+archetype: Neo-Brutal Motorsport (light), ADR007 approved
+last_eval_score: obsolete baseline51.2974358974359; no current score; final evaluation T430
 
-## Verified phase facts
-- Phases0–2 complete. Phase3 T330accepted3afff87; T331inprogress, main1746lines (target<=120). Phase5 T3602ad337f/T3611e61efd/T362c0781f9/T36313f614a complete; T364runtime/T365/T366pending. Otherphasesunfinished; ownerrequestsall12, unattended.
-- Phase2 preservescookie/CSRF/securityheaders/CORS/logoutrevocation+HTTP/WSrejecttests, additive migration004 onlydisposable, ADR011live/ready. Sourcehistory/ADRs remainauthoritative; no authchangesinrecentmoves.
-- T330 permanentAPI snapshot9 + union7 + realGETgoldens14; runtime_route_registration2 addedafterduplicateroutefinding3343d87/fix7eeb81d. Requiredinput9REDregressionsfixed2c78430 (27focusedPASS); coversrequiredfields only, notallconstraints. NeverassumegreenOpenAPIprovesrouteuniqueness.
-- Currentbackend rootfull227PASS0skip/livePASSafterT44214exportrepair ANDafterT44212tickwiring (logsT44214.full/T44212.full.raw.log). RootRuffall0, mypy211errors19/46files; strictzeroT339pending, no gate loosened.
-- T331 exactmoves: SQLdbms+Mongo modules, stewardsread/create/decision89c82af; decisionimportremovalcaused7FAIL220PASS inrootfull. Repair5ee4710 restoredexplicitDecision/IncidentIn exports;18focusedPASS/full227PASS. PreservelegacyPythonaliases infuturemoves. T44212 46129c0 nowusesexactcoretick8275aab, old127linebodyremoved;22snapshot/runtime/replay/modelcasesPASS. Stagedcopy/wiretwoatomicsteps keeps150linebudget; no lastingduplicate.
-- Frontend Tailwind4.3.3+adapter/tokens/fonts SpaceGrotesk500/700+Mono400/700/44pxfirstskiplink. Rootbuild/lint/types0afterT44215;85axe+4keyboardPASSafterlegacycontrastfix159692d; previousT361925nonpalettechecksPASS. Newunusedprimitivebrowserintegrationstillpendingstyleguide; actualdarkUIlightpaletteFAILisexpecteduntilPh7, never skipped/widened.
-- SharedCSS/textures all4globalCSSgates0; staticplinthshadow, reducedguard, paletteactual1440rolesnearestscorer/gates unchanged. UIlibraryaccepted: button/card6eefdaa, badges e4a3f6c, inputs/field72a5b82, motifs/marquee/stat8ba857e, skeleton/fivestate0bd674b, modal/tabs38ae29f, table0e166fc. Typed cn/reduced/FLIP/flash47c0408 anddelayload/native-dialog/demo471cb56; runtimeT366pending.
+## Verified milestones
+- Phases0–2 and5 COMPLETE (4 of12). Phase3 T331 extraction remains; main1746 lines, target<=120. Phase4 and6–11 unfinished. Owner requests autonomous completion of all12, no routine questions.
+- Phase5 T3602ad337f/T3611e61efd/T362c0781f9/T36313f614a/T364d666cf6/T365b90911f/T366b18819f accepted through accept.sh. Tailwind4.3.3, SpaceGrotesk500/700 + SpaceMono400/700, scoped tokens/textures/plinth and complete shared primitives. Existing production routes adopt them in Phases6–7.
+- Root60 browser cases PASS across320/375/768/1440/5120 (T366.matrix.browser.raw.log). Parent accept reruns: motion30 PASS, primitive30 PASS, axe375/1440 2 PASS; keyboard/font4 per runner. Build/lint/types0 and four CSS lints0. /__nb dev200, production not-found visible + noindex + guide absent + zero writes. Next streamed notFound HTTP200 is documented behavior; do not substitute status-only checks (.agent/check-guide-production.py).
+- Corrected missing route: Next app/__nb is private; escaped app/%5F_nb restores /__nb (6b9c6f7). Browser found43.5px controls fixed with explicit44px dimensions fdb63e2. FLIP incorrectly animated mount/scroll; container-relative/key-order guard e6efcc1 passes actual mounted tests. Finite-animation/fonts readiness before axe preserves thresholds; reduced-motion still zero immediately.
+- Backend last root full227 PASS,0 failed/skipped, live acceptance PASS after lock-helper wiringc2616e0 (T44229.full.raw.log). Earlier archive/lap wiring also227 PASS. API snapshot9 + runtime uniqueness2 are permanent; required-input regressions27 and seeded GET goldens14 retained. No API/schema changes in current moves.
+- T331 extracted core tick46129c0, stewards89c82af, DBMS SQL/Mongo/archive2e5c5a4 and lapsef0dee3; lock helpers225b2b8 wiredc2616e0. New api/dbms_lock.py stagedc6787b1, next wire/remove originals. Exact lock body retained as module-level _run_lock_demo with explicit typed dependencies, thin public wrapper; no suppression/locals/classes. Factories/globals are transitional T332 debt.
+- Legacy Decision import removal caused7 failures;5ee4710 restored explicit main.Decision/IncidentIn exports, full227 green. Preserve all legacy main aliases and late-bound callbacks in further moves. OpenAPI alone does not prove route uniqueness or Python aliases.
 
-## Active work / next
-- T44225 primitive QA candidate reviewed; root dev404 failure fixed by escaped folder6b9c6f7, URL /__nb now200. Rootmobile3754PASS2FAIL: strict44px geometry43.5 defect (W1T44230); reduced reload readiness test repaired in clone. Axe/modal/tab/state/plinth passed. T44226 motion2PASS4FAIL: initial/scroll-induced FLIP, W2T44231 fixes relative measurement/key-order detection. Fixes fdb63e2 (44px dimensions) and e6efcc1 (relative/key-order FLIP) accepted; primitive mobile375 now6PASS, full5project matrix28PASS2FAIL from axe sampling200ms marquee entry; W3 adds explicit finite-animation/font readiness before unchanged AA audit. Reducedmotion still zeroimmediate. W2 T44232 stage review rejected new C901 suppression/unnecessaryhandlerfilter; correction inprogress, thresholdunchanged. QA specs notyetaccepted. No assertion/threshold loosened.
-- Lock helpers225b2b8 wiredc2616e0; rootfull227PASS0skip/livePASS (T44229.full.raw.log). Last lap wiringef0dee3 full227PASS0skip/livePASS. Guide24fae87 build/lint/types0; production404 proof mustrepeat afterescapedroute build. Actual all5projects needed before T364/T365/T366 closure; no accept during Next checks. Remainingplan docs/overhaul-plan.md.
+## Next work
+- No workers currently running. Queue T44233 W2 wire staged lock endpoints and T44234 W1 shell CSS foundation (T370), disjoint clones. Then shell markup/data hook T371, with root existing route/responsive/a11y/touch/hash/auth checks. Remaining task graph is docs/overhaul-plan.md.
+- Four CSS lint gates0; production routes still legacy dark, light palette FAIL expected until Phase7, never skip/widen it. Last existing-route axe85 and non-palette925 before new shell. Phase5 guide60 now green; do not imply real-route redesign complete.
 
-## Contracts and safety
-- Only overhaul/neo-brutal; commitsONLYaccept.sh, everyVerifyrootrerun, <=3files/150authoredchangedlines/task. Workersfreshpacket-only customrolesnooverrides afterprofile2bc94fb; explicittoolbindings5.6/high andsuccessfulresultsconfirmavailability. Noquotablocker now. Atmost2running, no workercommits.
-- Never.env/secrets, recursive removal, realDB/schema/volume writes. DBonlyapexgrid-test(PG15432/Mongo27018), projectlabelschecked; realbackendnosourcebind/reload. Ownerstatus.sh paths excluded/unmodified; preserveownerrun-loopedits. APIwirechangesneedownADR; currentpuremovespreservecontracts.
-- .agent/orchestrate.py clone/integrate/mark helpers persist; integrateonepatchthenacceptbeforeanother. NEVERacceptduringNextbuild/devcheck becausegeneratednext-envtemporarilychanges. .agent/check-frontend-build.py andcheck-frontend-browser.py restoreoriginalnext-envandkillonlyownrandomportserver.
+## Safety / workflow
+- Only overhaul/neo-brutal; commits only accept.sh; max2 custom-role workers, fresh packet-only clones, no per-call overrides. Profiles/models.env2bc94fb bind5.6/high after owner request; successful workers and tool role metadata confirm availability. No quota blocker.
+- <=3 target files and150 changed lines/task, exact worker Verify independently rerun. Workers offline/no fixed ports; root owns browser/network/disposable checks. Integrate one patch then accept before another. Never accept concurrently with another Next build/dev check; helpers restore next-env and kill only their own temporary loopback servers.
+- Never .env/secrets, recursive deletion, real database/schema/volumes. Only disposable apexgrid-test (PG15432/Mongo27018), project labels guarded, one db-baseline runner at a time on18000. Real backend has no source bind/reload. Owner status.sh and scripts/agent/status.sh excluded and untouched; preserve run-loop.sh owner edits.
+- .agent/orchestrate.py persists queue/clone/integrate/mark. Worker envelopes require actual stats/integer static counts0, no extra keys. All features/routes/copy/hooks/aria/stateclasses/dbms hashes retained; five states/44px/token spacing/reduced motion mandatory.
 
 ## Open risks
-- T331remaininggiantmodules; typedfactory/helpers temporaryT332 debt, strictmypy211 tozeroT339. Architecturelockunchangedverified. Sourceclasses/hooks/copy/aria/hashroutes/allfeaturesmustremain;fivestates/44targets/tokens/reducedmotion mandatory.
-- P3bundlecheckerT44132 misseslayout/sharedinitialassets; LighthouseCLIabsentP1/P2NOT_RUN, FPS17msuntilT41316.7. HostedCI NOT_RUN. No fullscore/deliveryclaimbefore>=95/allhardgates/noNOT_RUN.
-- W1 T44222 review caught nested main and dead modal Close button; corrected before acceptance. W2T44213 accidentallycreatedrootuse-nb-demo.ts; removedonlyownunacceptedcopybeforeaccept, nowonlyclone/rootacceptedfiles correct. Additionalnativeclose staleeventguard included. Neverstagerootaccidentalworkerfileswithothertask.
+- T331 giant main/transitional factories; strict mypy last snapshot211 errors before latest moves, current count not rerun; zero required T339. No thresholds relaxed.
+- T44132 bundle checker omits layout/shared assets; fix before P3. Lighthouse absent, FPS gate17ms until T41316.7, hosted CI unverified. Final score>=95/all hard gates/no NOT_RUN required; never present obsolete score as current.
+- Worker review caught nested main/dead modal control (corrected), accidental root demo hook (removed only worker-owned unaccepted copy), and T44232 complexity suppression/locals namespace tricks (rejected, standard explicit helper accepted). No other work reverted; no test weakened.
 
 ## Orchestrator direct edits
-- Zeroauthoredproductlines. Onlyarchitecture/config/ADRs/packets/state/envelopes/orchestration/rootplanneddependencyinstalls; integratingworkerpatchesisnotauthorship. Modeloverride changed3Codexprofiles/models.envonly, cap/effort/orchestratorunchanged. npm-generatedlockexceptionexplicitownerplannedinstall, no newdepsrecently.
-
-
-
-
-
-
-
-
-
-
-
-- T-44230 acceptedfdb63e2: Enforced explicit44px button/modal/guide target dimensions with56px large faces; preserved all hooks, variants and copy. Verify0.
-
-- T-44231 acceptede6efcc1: FLIP now measures container-relative positions and animates only changed key order, preventing false mount/scroll animations. Verify0.
-
-- T-44225 accepted54449f5: Added primitive browser gates for five states, controls, accessibility, plinth, reduced motion, tabs and native modal; strict thresholds retained. Verify0.
-
-- T-44226 accepted4b35c7a: Added actual mounted-hook tests for FLIP, large-list bypass, flash coalescing, media changes and150ms skeleton delay. Verify0.
-
-- T-44232 acceptedc6787b1: Staged typed lock/recalculate router with exact lock runtime body and explicit dependency arguments; no complexity suppressions or namespace tricks. Verify0.
-
-- T-364 acceptedd666cf6: Accepted typed reduced-motion, FLIP and flash hooks after mounted browser tests across all five projects. Verify0.
-
-- T-365 acceptedb90911f: Accepted shared primitive library and dev-only guide after production build/gating and axe at375/1440. Verify0.
+- Zero authored product lines. Metadata, architecture/config/ADRs, packets/state/envelopes/root acceptance helpers and approved installs only. Applying worker patches is integration, not authorship. No new dependencies this continuation.

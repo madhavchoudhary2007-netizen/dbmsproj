@@ -1,12 +1,17 @@
 # NEXT_STATE
-updated_at: 2026-10-23
-phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phases0–2 complete; baseline51.2974)
+updated_at: 2026-10-24
+phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 
 ## Queue
-### T-366 — ROOT ACCEPTANCE
-- target_files: none
-- contract: Accepted strict primitive browser suite across all five viewport projects; controls, five states, native modal, plinth and reduced motion.
-- verify: python3 .agent/check-frontend-browser.py T-366.accept e2e/nb-primitives.spec.ts --workers=2
+### T-44234 W1 — OPEN
+- target_files: frontend/app/styles/shell.css, frontend/app/layout.tsx
+- contract: T370 stage scoped shell stylesheet, preserving legacy route styles until activation.
+- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
+### T-44233 W2 — OPEN
+- target_files: backend/app/main.py
+- contract: T331 wire staged lock/recalculate router and remove old endpoint bodies.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "decision or incident" && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/api/dbms_lock.py
 
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
@@ -15,38 +20,7 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
-- T-365 acceptedb90911f; verify0.
-- T-364 acceptedd666cf6; verify0.
-- T-44232 acceptedc6787b1; verify0.
-- T-44226 accepted4b35c7a; verify0.
-- T-44225 accepted54449f5; verify0.
-- T-44231 acceptede6efcc1; verify0.
-- T-44230 acceptedfdb63e2; verify0.
-- T-44229 acceptedc2616e0; verify0.
-- T-44228 accepted6b9c6f7; verify0.
-- T-44227 accepted225b2b8; verify0.
-- T-44224 acceptedef0dee3; verify0.
-- T-44222 accepted24fae87; verify0.
-- T-44223 accepted818ff70; verify0.
-- T-44220 accepted324c60b; verify0.
-- T-44221 accepted2e5c5a4; verify0.
-- T-44219 accepted35fe855; verify0.
-- T-44218 accepted2d00c1f; verify0.
-- T-44217 accepted0e166fc; verify0.
-- T-44216 accepted38ae29f; verify0.
-- T-44212 accepted46129c0; verify0.
-- T-44215 accepted0bd674b; verify0.
-- T-44211 accepted8275aab; verify0.
-- T-44213 accepted471cb56; verify0.
-- T-44210 accepted8ba857e; verify0.
-- T-44214 accepted5ee4710; verify0.
-- T-44208 accepted72a5b82; verify0.
-- T-44209 accepted89c82af; verify0.
-- T-44204 acceptede4a3f6c; verify0.
-- T-44205 accepted65bd176; verify0.
-- T-44203 accepted6eefdaa; verify0.
-- T-44207 accepted2bc94fb; verify0.
-- T-44206 accepted35ba591; verify0.
-- T-44200 accepted47c0408; verify0.
-- T-363 accepted13f614a; verify0.
-- Recentaccepted tasks andevidence in CURRENT_STATE andgit history; earlierqueue fullyretained in docs/overhaul-plan.md.
+- Phase5 T360–T366 complete; parent d666cf6/b90911f/b18819f, root60 browser PASS, build/lint/types/CSS gates0, production guide hidden.
+- T44232 c6787b1 staged lock/recalculate router; T44229 c2616e0 helper wiring full227 PASS/live PASS.
+- T44230 fdb63e2 target44px; T44231 e6efcc1 FLIP; T44225 54449f5 and T44226 4b35c7a browser specs accepted.
+- Earlier child task history/evidence in git and CURRENT_STATE; remaining task inventory docs/overhaul-plan.md.
