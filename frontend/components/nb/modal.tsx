@@ -43,7 +43,7 @@ export const NbModal = forwardRef<HTMLDialogElement, NbModalProps>(
             <button
               type="button"
               aria-label="Close"
-              className="nb-focus min-h-11 min-w-11 border-4 border-paper bg-ink text-2xl leading-none text-paper focus-visible:text-ink"
+              className="nb-focus min-h-[44px] min-w-[44px] border-4 border-paper bg-ink text-2xl leading-none text-paper focus-visible:text-ink"
               onClick={() => dialogRef.current?.close()}
             >
               ×

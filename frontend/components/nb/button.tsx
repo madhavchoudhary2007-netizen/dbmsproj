@@ -18,8 +18,8 @@ const variants = {
 };
 
 const sizes = {
-  md: "min-h-11 px-4 py-2",
-  lg: "min-h-14 px-4 py-4",
+  md: "min-h-[44px] min-w-[44px] px-4 py-2",
+  lg: "min-h-[56px] min-w-[44px] px-4 py-4",
 };
 
 export const NbButton = forwardRef<HTMLButtonElement, NbButtonProps>(
@@ -43,11 +43,11 @@ export const NbButton = forwardRef<HTMLButtonElement, NbButtonProps>(
         type={type}
         disabled={disabled || busy}
         aria-busy={busy || undefined}
-        className={cn("nb-plinth inline-flex align-top [--nb-sh:4px]", className)}
+        className={cn("nb-plinth inline-flex min-h-[44px] min-w-[44px] align-top [--nb-sh:4px]", className)}
       >
         <span
           className={cn(
-            "nb-face flex w-full items-center justify-center gap-2 border-4 border-ink text-ink font-bold rounded-none",
+            "nb-face flex min-h-[44px] min-w-[44px] w-full items-center justify-center gap-2 border-4 border-ink text-ink font-bold rounded-none",
             variants[variant],
             sizes[size],
           )}

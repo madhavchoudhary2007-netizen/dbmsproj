@@ -61,7 +61,7 @@ export function NbStyleGuide() {
             </NbCard>
           ))}
           <NbCard tone="yellow" shadow={8} interactive>
-            <button type="button" className="min-h-11 min-w-11 border-4 border-ink bg-paper px-4 py-2 font-bold" onClick={demo.increment}>
+            <button type="button" className="min-h-[44px] min-w-[44px] border-4 border-ink bg-paper px-4 py-2 font-bold" onClick={demo.increment}>
               Native interactive button
             </button>
           </NbCard>
