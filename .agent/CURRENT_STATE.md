@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: fdb63e2
+git_head: e6efcc1
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; customworkers gpt-5.6-luna/high (owner override); cap2
@@ -17,8 +17,8 @@ last_eval_score: baseline51.2974358974359, obsolete forcurrentcode, NOTpresentab
 - SharedCSS/textures all4globalCSSgates0; staticplinthshadow, reducedguard, paletteactual1440rolesnearestscorer/gates unchanged. UIlibraryaccepted: button/card6eefdaa, badges e4a3f6c, inputs/field72a5b82, motifs/marquee/stat8ba857e, skeleton/fivestate0bd674b, modal/tabs38ae29f, table0e166fc. Typed cn/reduced/FLIP/flash47c0408 anddelayload/native-dialog/demo471cb56; runtimeT366pending.
 
 ## Active work / next
-- T44225 primitive QA candidate reviewed; root dev404 failure fixed by escaped folder6b9c6f7, URL /__nb now200. Rootmobile3754PASS2FAIL: strict44px geometry43.5 defect (W1T44230); reduced reload readiness test repaired in clone. Axe/modal/tab/state/plinth passed. T44226 motion2PASS4FAIL: initial/scroll-induced FLIP, W2T44231 fixes relative measurement/key-order detection. Two workers disjoint clones; QA specs not yetaccepted. No assertion/threshold loosened.
-- Lock helpers225b2b8 wiredc2616e0; rootfullrunning. Last lap wiringef0dee3 full227PASS0skip/livePASS. Guide24fae87 build/lint/types0; production404 proof mustrepeat afterescapedroute build. Actual all5projects needed before T364/T365/T366 closure; no accept during Next checks. Remainingplan docs/overhaul-plan.md.
+- T44225 primitive QA candidate reviewed; root dev404 failure fixed by escaped folder6b9c6f7, URL /__nb now200. Rootmobile3754PASS2FAIL: strict44px geometry43.5 defect (W1T44230); reduced reload readiness test repaired in clone. Axe/modal/tab/state/plinth passed. T44226 motion2PASS4FAIL: initial/scroll-induced FLIP, W2T44231 fixes relative measurement/key-order detection. Fixes fdb63e2 (44px dimensions) and e6efcc1 (relative/key-order FLIP) accepted; primitive mobile375 now6PASS, full5project matrix28PASS2FAIL from axe sampling200ms marquee entry; W3 adds explicit finite-animation/font readiness before unchanged AA audit. Reducedmotion still zeroimmediate. W2 T44232 stage review rejected new C901 suppression/unnecessaryhandlerfilter; correction inprogress, thresholdunchanged. QA specs notyetaccepted. No assertion/threshold loosened.
+- Lock helpers225b2b8 wiredc2616e0; rootfull227PASS0skip/livePASS (T44229.full.raw.log). Last lap wiringef0dee3 full227PASS0skip/livePASS. Guide24fae87 build/lint/types0; production404 proof mustrepeat afterescapedroute build. Actual all5projects needed before T364/T365/T366 closure; no accept during Next checks. Remainingplan docs/overhaul-plan.md.
 
 ## Contracts and safety
 - Only overhaul/neo-brutal; commitsONLYaccept.sh, everyVerifyrootrerun, <=3files/150authoredchangedlines/task. Workersfreshpacket-only customrolesnooverrides afterprofile2bc94fb; explicittoolbindings5.6/high andsuccessfulresultsconfirmavailability. Noquotablocker now. Atmost2running, no workercommits.
@@ -44,3 +44,5 @@ last_eval_score: baseline51.2974358974359, obsolete forcurrentcode, NOTpresentab
 
 
 - T-44230 acceptedfdb63e2: Enforced explicit44px button/modal/guide target dimensions with56px large faces; preserved all hooks, variants and copy. Verify0.
+
+- T-44231 acceptede6efcc1: FLIP now measures container-relative positions and animates only changed key order, preventing false mount/scroll animations. Verify0.
