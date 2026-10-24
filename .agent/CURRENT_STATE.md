@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: fa39f5d
+git_head: 13f614a
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; custom workers gpt-6-luna/high; cap2
@@ -35,3 +35,9 @@ last_eval_score: 51.2974358974359 baseline; F68/A53.333/P33.333/E46.154; failedF
 - T331 SQL rowbrowserdc48751/provider5898b4f exactmoves eachrootfull227PASS0skip/livePASS. Currentstewardslistfa39f5d exactAST/11snapshot+runtimePASS; rootfull227 running. Ruffall0; strictmypy212errors18/45files. Temporarytyped factories removedinT332.
 - T44189 3343d87 exposed duplicateMongo route; corrected7eeb81d, permanenttest_route_registration gate. T44191 required-inputRED9fail2controls fixed2c78430 (27focusedPASS, full2270skip/livePASS); helper coversrequiredfields, notallconstraint changes. Older214green lackedthesechecks.
 - T364 helper/reduced subscriptionf9dc8e6 acceptedoffline; T44200 FLIP/flash W2 andT44203 button/card W1 runningisolated, cap2. WorkerreportedplaceholderVerify/counts normalized androotrerun; no scopeviolations. Rootauthor0productlines.
+
+- T-363 accepted13f614a: Closed shared texture/component CSS foundation; four source-wide gates0, production build0,85axe and4keyboard checks pass after two-color contrast repair. Verify0.
+
+- T44200 reviewFAILED despitetypecheck0: external Animation.cancel lacked oncancel cleanup in bothhooks. Candidate preservedrawpatch, only2ownunaccepted newfiles reset; repair1 queued. No source accepted or testsweakened.
+
+- T44203 reviewrepair1 foromittedplan danger!icon/clientboundary; rootpacket hadomittedicon, recordedoversight. Bothownunacceptednewfiles reset, candidate retainedrawpatch. Envelope staticcounts arrays correctedtointegers onnextresult.
