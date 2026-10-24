@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: b18819f
+git_head: db3cf1b
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -33,3 +33,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 
 ## Orchestrator direct edits
 - Zero authored product lines. Metadata, architecture/config/ADRs, packets/state/envelopes/root acceptance helpers and approved installs only. Applying worker patches is integration, not authorship. No new dependencies this continuation.
+
+- T-44233 accepteddb3cf1b: Wired lock/recalculate router with preserved aliases, late-bound callbacks, existing guard/auth and explicit legacy runtime reexports. Verify0.
