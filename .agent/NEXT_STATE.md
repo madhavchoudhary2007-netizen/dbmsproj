@@ -3,15 +3,15 @@ updated_at: 2026-10-24
 phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 
 ## Queue
+### T-44243 W2 — OPEN
+- target_files: backend/app/analytics_repository.py
+- contract: Implement only ADR-012 read-only nullable dashboard next_event after recorded red tests.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_dashboard_next_event.py backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/analytics_repository.py
+
 ### T-44242 W1 — OPEN
 - target_files: frontend/components/shell.tsx
 - contract: T370 activate staged neo-brutal shell sidebar and wire existing drawer refs; preserve all auth/nav/runtime behavior. Topbar ticker and data status are later tasks.
 - verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
-### T-44241 W3 — OPEN
-- target_files: backend/tests/test_dashboard_next_event.py, backend/tests/test_dashboard_next_event_db.py, backend/tests/test_api.py
-- contract: Write failing-first ADR-012 dashboard next_event unit and disposable PostgreSQL selection tests, and update exact dashboard key characterization for the authorized additive field.
-- verify: python3 /Users/madhavchoudhary/Developer/dbmsproj/.agent/check-red-tests.py T-44241 backend/tests/test_dashboard_next_event.py && .venv/bin/ruff check backend/tests/test_dashboard_next_event.py backend/tests/test_dashboard_next_event_db.py backend/tests/test_api.py && .venv/bin/ruff format --check backend/tests/test_dashboard_next_event.py backend/tests/test_dashboard_next_event_db.py backend/tests/test_api.py
 
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
@@ -21,6 +21,7 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44241 accepted60e5e56; verify0.
 - T-44237 acceptedfeeaef3; verify0.
 - T-44238 acceptedcdd2dec; verify0.
 - T-44240 acceptedc93ec77; verify0.

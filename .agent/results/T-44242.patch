@@ -1,0 +1,104 @@
+diff --git a/frontend/components/shell.tsx b/frontend/components/shell.tsx
+index 665029c..54b8f71 100644
+--- a/frontend/components/shell.tsx
++++ b/frontend/components/shell.tsx
+@@ -66,7 +66,15 @@ export function Shell({ children }: { children: React.ReactNode }) {
+   const path = usePathname(),
+     router = useRouter(),
+     { user, ready, logout } = useAuth(),
+-    { open, setOpen, menuButtonRef } = useNavigationDrawer(Boolean(user && ready));
++    {
++      open,
++      setOpen,
++      close,
++      isMobile,
++      drawerRef,
++      backgroundRef,
++      menuButtonRef,
++    } = useNavigationDrawer(Boolean(user && ready));
+   useEffect(() => {
+     if (!ready) return;
+     if (!user && path !== "/" && path !== "/login") router.replace("/login");
+@@ -87,17 +95,22 @@ export function Shell({ children }: { children: React.ReactNode }) {
+     );
+   }
+   return (
+-    <div className="app-shell">
+-      <aside className={`sidebar ${open ? "show" : ""}`}>
++    <div className="app-shell nb-shell">
++      <aside
++        ref={drawerRef}
++        className={`sidebar ${open ? "show" : ""}`}
++        role={isMobile ? "dialog" : "complementary"}
++        aria-modal={isMobile && open ? true : undefined}
++        aria-hidden={isMobile && !open ? true : undefined}
++        aria-label="Main navigation"
++      >
+         <div className="brand">
+-          <div className="brand-mark">
+-            A<span>G</span>
+-          </div>
++          <span className="brand-mark">AG</span>
+           <div>
+             <b>APEXGRID</b>
+             <small>RACE OPERATIONS</small>
+           </div>
+-          <button className="close-nav" aria-label="Close navigation" aria-expanded={open} aria-controls="primary-navigation" onClick={() => setOpen(false)}>
++          <button className="close-nav" aria-label="Close navigation" aria-expanded={open} aria-controls="primary-navigation" onClick={close}>
+             <X size={18} />
+           </button>
+         </div>
+@@ -105,7 +118,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
+           <span className="status-dot" /> LIVE ENVIRONMENT{" "}
+           <ChevronDown size={13} />
+         </div>
+-        <nav id="primary-navigation">
++        <nav id="primary-navigation" aria-label="Primary navigation">
+           {groups
+             .filter((g) => g.name !== "PLATFORM" || user.role === "ADMIN")
+             .map((g) => (
+@@ -117,16 +130,19 @@ export function Shell({ children }: { children: React.ReactNode }) {
+                   )
+                   .map(([href, name, Icon]) => (
+                     <Link
+-                      onClick={() => setOpen(false)}
++                      onClick={close}
+                       href={href}
+-                      className={`nav-item ${path === href ? "active" : ""}`}
++                      className={`nav-item nb-plinth ${path === href ? "active" : ""}`}
++                      aria-current={path === href ? "page" : undefined}
+                       key={href}
+                     >
+-                      <Icon size={16} />
+-                      <span>{name}</span>
+-                      {path === href && (
+-                        <ChevronRight className="nav-current" size={14} />
+-                      )}
++                      <span className="nb-face">
++                        <Icon size={16} />
++                        <span>{name}</span>
++                        {path === href && (
++                          <ChevronRight className="nav-current" size={14} />
++                        )}
++                      </span>
+                     </Link>
+                   ))}
+               </div>
+@@ -145,7 +161,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
+           </div>
+         </div>
+       </aside>
+-      <div className="main-shell">
++      <div ref={backgroundRef} className="main-shell">
+         <header className="topbar">
+           <button ref={menuButtonRef} className="mobile-menu" aria-label="Open navigation" aria-expanded={open} aria-controls="primary-navigation" onClick={() => setOpen(true)}>
+             <Menu />
+@@ -172,7 +188,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
+       {open && (
+         <button
+           className="mobile-scrim"
+-          onClick={() => setOpen(false)}
++          onClick={close}
+           aria-label="Close navigation"
+         />
+       )}

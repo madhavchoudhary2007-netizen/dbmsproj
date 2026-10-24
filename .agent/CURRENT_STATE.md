@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: feeaef3
+git_head: 60e5e56
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -34,3 +34,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 ## Orchestrator direct edits
 - Zero authored product lines. Metadata, architecture/config/ADRs, packets/state/envelopes/root acceptance helpers and approved installs only. Applying worker patches is integration, not authorship. No new dependencies this continuation.
 
+
+- T-44241 accepted60e5e56: Record two intentional missing-field failures and add guarded disposable selection tests plus exact additive API characterization. Verify0.
