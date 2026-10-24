@@ -3,11 +3,6 @@ updated_at: 2026-10-24
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44307 W1 — OPEN
-- target_files: frontend/components/special-pages.tsx
-- contract: T379 activate accepted exact SessionPage module using compatibility reexport; remove old copy/imports only.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
 ### T-44308 W2 — OPEN
 - target_files: backend/app/simulation_pit.py, backend/app/main.py
 - contract: T331 move exact automatic simulator pit scheduling into existing simulation_pit module with compatibility wrapper.
@@ -20,6 +15,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44307 accepted03ab0d5; verify0.
 - T-44306 accepted478cffa; verify0.
 - T-44305 acceptedfe21209; verify0.
 - T-44304 accepted2be7bec; verify0.

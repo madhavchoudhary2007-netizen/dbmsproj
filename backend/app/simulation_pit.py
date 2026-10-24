@@ -1,13 +1,57 @@
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 from psycopg.rows import dict_row
 
 from .pit_repository import PIT_RESERVATION_SELECT
-from .simulation_core import Simulation
+from .simulation_core import MAX_SESSION_LAPS, Simulation
+
+
+def schedule_pit_stops(
+    sim: Simulation,
+    packets: list[dict[str, Any]],
+    tire_stint_target: Callable[[str, int], int],
+    create_automatic_reservation: Callable[..., Any],
+    publish: Callable[..., Any],
+    log: logging.Logger,
+) -> None:
+    completion_lap = min(sim.total_laps or MAX_SESSION_LAPS, MAX_SESSION_LAPS)
+    for packet in packets:
+        driver_id = str(packet["driver_id"])
+        driver = next((row for row in sim.drivers if str(row["id"]) == driver_id), None)
+        number = int((driver or {}).get("number") or 1)
+        compound = sim.compound_by_driver.setdefault(
+            driver_id, ("SOFT", "MEDIUM", "HARD")[number % 3]
+        )
+        target_age = sim.pit_due_tire_age_by_driver.setdefault(
+            driver_id, tire_stint_target(compound, number)
+        )
+        if (
+            packet["sector"] != 3
+            or packet["lap"] >= completion_lap
+            or packet["tire_age_laps"] < target_age
+            or driver_id in sim.pit_reservations_by_driver
+        ):
+            continue
+        if not driver or not driver.get("team_id"):
+            sim.pit_due_tire_age_by_driver[driver_id] = MAX_SESSION_LAPS + 1
+            continue
+        duration = timedelta(seconds=max(0.6, 3.0 / max(sim.rate_hz, 0.2)))
+        try:
+            reservation = create_automatic_reservation(
+                sim.session_id, driver["team_id"], driver["id"], duration
+            )
+        except Exception as exc:
+            log.warning("Automatic pit stop allocation failed for %s: %s", driver_id, exc)
+            sim.pit_due_tire_age_by_driver[driver_id] = MAX_SESSION_LAPS + 1
+            continue
+        sim.pit_reservations_by_driver[driver_id] = reservation
+        sim.pit_due_tire_age_by_driver[driver_id] = tire_stint_target(compound, number)
+        publish(sim.session_id, "pit.update", reservation)
 
 
 def refresh_pit_state(
