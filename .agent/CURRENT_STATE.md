@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: e6efcc1
+git_head: 54449f5
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; customworkers gpt-5.6-luna/high (owner override); cap2
@@ -46,3 +46,5 @@ last_eval_score: baseline51.2974358974359, obsolete forcurrentcode, NOTpresentab
 - T-44230 acceptedfdb63e2: Enforced explicit44px button/modal/guide target dimensions with56px large faces; preserved all hooks, variants and copy. Verify0.
 
 - T-44231 acceptede6efcc1: FLIP now measures container-relative positions and animates only changed key order, preventing false mount/scroll animations. Verify0.
+
+- T-44225 accepted54449f5: Added primitive browser gates for five states, controls, accessibility, plinth, reduced motion, tabs and native modal; strict thresholds retained. Verify0.

@@ -13,11 +13,6 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - contract: T364/T366 real mounted hook browser tests through local guide fixture.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/motion-hooks.spec.ts --list
 
-### T-44225 W3 — OPEN
-- target_files: frontend/e2e/nb-primitives.spec.ts
-- contract: T366 browser assertions for actual shared primitives through dev-only guide.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/nb-primitives.spec.ts --list
-
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
 
@@ -25,6 +20,7 @@ phase: 3 T331 extraction; Phase5 T360–T363verified, T364/T365inprogress (Phase
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44225 accepted54449f5; verify0.
 - T-44231 acceptede6efcc1; verify0.
 - T-44230 acceptedfdb63e2; verify0.
 - T-44229 acceptedc2616e0; verify0.

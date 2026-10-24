@@ -1,0 +1,155 @@
+diff --git a/frontend/e2e/motion-hooks.spec.ts b/frontend/e2e/motion-hooks.spec.ts
+new file mode 100644
+index 0000000..e69bc94
+--- /dev/null
++++ b/frontend/e2e/motion-hooks.spec.ts
+@@ -0,0 +1,149 @@
++import { expect, test, type Page } from "@playwright/test";
++declare global {
++  interface Window {
++    __motionRecords: Array<{
++      target: string;
++      frameKeys: string[][];
++      duration: unknown;
++      animation: Animation;
++    }>;
++  }
++}
++async function mountGuide(page: Page): Promise<string[]> {
++  const writes: string[] = [];
++  await page.route("**/api/**", async (route) => {
++    const request = route.request();
++    const pathname = new URL(request.url()).pathname;
++    if (request.method() !== "GET") {
++      writes.push(`${request.method()} ${pathname}`);
++      await route.abort();
++      return;
++    }
++    const body = pathname === "/api/auth/me"
++      ? { id: 1, email: "motion@example.test", full_name: "Motion Fixture", role: "admin" }
++      : [];
++    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(body) });
++  });
++  await page.goto("/__nb", { waitUntil: "domcontentloaded" });
++  await expect(page.locator('[data-testid="nb-guide"]')).toBeVisible();
++  return writes;
++}
++async function installMotionProbe(page: Page, pause = true): Promise<void> {
++  await page.addInitScript(({ shouldPause }) => {
++    const records: Window["__motionRecords"] = [];
++    const nativeAnimate = Element.prototype.animate;
++    Object.defineProperty(window, "__motionRecords", { value: records, writable: false });
++    Element.prototype.animate = function (keyframes, options) {
++      const animation = nativeAnimate.call(this, keyframes, options);
++      if (shouldPause) animation.pause();
++      if (this.matches("[data-flip-key], [data-testid='demo-value']")) {
++        const frames = Array.isArray(keyframes) ? keyframes : [keyframes];
++        const duration = typeof options === "number" ? options : options?.duration;
++        records.push({ target: this.getAttribute("data-flip-key") ?? "demo-value", frameKeys: frames.map((frame) => Object.keys(frame ?? {})), duration, animation });
++      }
++      return animation;
++    };
++  }, { shouldPause: pause });
++}
++const motionCount = (page: Page) => page.evaluate(() => window.__motionRecords.length);
++const finishMotion = (page: Page) => page.evaluate(() => window.__motionRecords.forEach(({ animation }) => animation.finish()));
++test("mounted FLIP reverses rows with bounded transform motion and cleans up", async ({ page }) => {
++  await installMotionProbe(page, false); const writes = await mountGuide(page);
++  const rows = page.locator('[data-testid="flip-rows"] li');
++  await expect.poll(() => rows.allTextContents()).toEqual(["First row", "Second row", "Third row"]);
++  expect(await motionCount(page)).toBe(0);
++  await page.getByRole("button", { name: "Reverse rows" }).click();
++  await expect.poll(() => rows.allTextContents()).toEqual(["Third row", "Second row", "First row"]);
++  await expect.poll(() => motionCount(page)).toBe(2);
++  expect(await page.evaluate(() => window.__motionRecords.map(({ frameKeys, duration }) => ({ frameKeys, duration })))).toEqual([
++    { frameKeys: [["transform"], ["transform"]], duration: 300 },
++    { frameKeys: [["transform"], ["transform"]], duration: 300 },
++  ]); await expect.poll(() => page.evaluate(() => window.__motionRecords.every(({ animation }) => animation.playState === "finished"))).toBe(true);
++  await finishMotion(page);
++  await expect.poll(() => rows.evaluateAll((elements) => elements.map((element) => element.style.willChange))).toEqual(["", "", ""]);
++  expect(writes).toEqual([]);
++});
++test("rapid reverses cancel prior FLIP animations and large lists stay instant", async ({ page }) => {
++  await installMotionProbe(page); const writes = await mountGuide(page);
++  const rows = page.locator('[data-testid="flip-rows"] li');
++  await page.getByRole("button", { name: "Toggle large list" }).click();
++  await expect(rows).toHaveCount(32);
++  await page.getByRole("button", { name: "Reverse rows" }).click();
++  await expect.poll(() => rows.first().textContent()).toBe("Row 32");
++  expect(await motionCount(page)).toBe(0);
++  await page.getByRole("button", { name: "Toggle large list" }).click();
++  await expect(rows).toHaveCount(3);
++  await expect.poll(() => motionCount(page)).toBeGreaterThan(0);
++  const settledCount = await motionCount(page);
++  await finishMotion(page);
++  await page.getByRole("button", { name: "Reverse rows" }).click();
++  await expect.poll(() => motionCount(page)).toBe(settledCount + 2); await expect.poll(() => rows.evaluateAll((elements) => elements.map((element) => element.style.willChange))).toEqual(["transform", "", "transform"]);
++  await page.getByRole("button", { name: "Reverse rows" }).click();
++  await expect.poll(() => motionCount(page)).toBe(settledCount + 4);
++  expect(await page.evaluate((start) => window.__motionRecords.slice(start, start + 2).every(({ animation }) => animation.playState === "idle"), settledCount)).toBe(true);
++  await finishMotion(page);
++  await expect.poll(() => rows.evaluateAll((elements) => elements.every((element) => element.style.willChange === ""))).toBe(true);
++  expect(writes).toEqual([]);
++});
++test("rapid value updates coalesce a background flash and reset after finish", async ({ page }) => {
++  await installMotionProbe(page); await page.clock.install();
++  const writes = await mountGuide(page);
++  const value = page.getByTestId("demo-value");
++  const update = page.getByRole("button", { name: "Update example" });
++  expect(await motionCount(page)).toBe(0);
++  const original = await value.evaluate((element) => getComputedStyle(element).backgroundColor);
++  await update.click();
++  await update.click();
++  await expect(value).toHaveText("Value 2");
++  await expect.poll(() => page.evaluate(() => window.__motionRecords.filter(({ target }) => target === "demo-value").length)).toBe(1);
++  expect(await page.evaluate(() => window.__motionRecords[0])).toMatchObject({ frameKeys: [["backgroundColor"], ["backgroundColor"], ["backgroundColor"]], duration: 200 });
++  await finishMotion(page);
++  await page.clock.runFor(200);
++  await expect.poll(() => value.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe(original);
++  await update.click();
++  await expect(value).toHaveText("Value 3");
++  await expect.poll(() => motionCount(page)).toBe(2);
++  expect(writes).toEqual([]);
++});
++test("reduced motion before mount keeps DOM updates while making zero WAAPI calls", async ({ page }) => {
++  await page.emulateMedia({ reducedMotion: "reduce" });
++  await installMotionProbe(page); const writes = await mountGuide(page);
++  const rows = page.locator('[data-testid="flip-rows"] li');
++  await page.getByRole("button", { name: "Reverse rows" }).click();
++  await page.getByRole("button", { name: "Update example" }).click();
++  await expect.poll(() => rows.first().textContent()).toBe("Third row");
++  await expect(page.getByTestId("demo-value")).toHaveText("Value 1");
++  expect(await motionCount(page)).toBe(0);
++  expect(writes).toEqual([]);
++});
++test("live reduced motion change cancels motion and resumes on the next updates", async ({ page }) => {
++  await installMotionProbe(page);
++  const writes = await mountGuide(page);
++  const rows = page.locator('[data-testid="flip-rows"] li');
++  await page.getByRole("button", { name: "Reverse rows" }).click();
++  await expect.poll(() => motionCount(page)).toBe(2);
++  await page.emulateMedia({ reducedMotion: "reduce" });
++  await expect.poll(() => rows.evaluateAll((elements) => elements.map((element) => element.style.willChange))).toEqual(["", "", ""]);
++  await expect.poll(() => page.evaluate(() => window.__motionRecords.every(({ animation }) => animation.playState === "idle"))).toBe(true);
++  await page.emulateMedia({ reducedMotion: "no-preference" });
++  await page.getByRole("button", { name: "Reverse rows" }).click();
++  await expect.poll(() => motionCount(page)).toBe(4);
++  await page.getByRole("button", { name: "Update example" }).click();
++  await expect.poll(() => page.evaluate(() => window.__motionRecords.filter(({ target }) => target === "demo-value").length)).toBe(1);
++  await finishMotion(page);
++  expect(writes).toEqual([]);
++});
++test("skeletons reserve height and reveal stripes after the delay", async ({ page }) => {
++  await page.clock.install({ time: new Date("2030-01-01T00:00:00.000Z") }); await page.clock.pauseAt(new Date("2030-01-01T00:00:01.000Z"));
++  const writes = await mountGuide(page);
++  const skeletons = page.locator('[data-testid="nb-guide"] [role="status"]');
++  const heights = await skeletons.evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().height));
++  expect(heights.every((height) => height > 0)).toBe(true);
++  await expect(page.locator('[data-testid="nb-guide"] .nb-skeleton')).toHaveCount(0);
++  await page.clock.runFor(149);
++  await expect(page.locator('[data-testid="nb-guide"] .nb-skeleton')).toHaveCount(0);
++  await page.clock.runFor(1);
++  await expect.poll(() => page.locator('[data-testid="nb-guide"] .nb-skeleton').count()).toBeGreaterThan(0);
++  expect(await skeletons.evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().height))).toEqual(heights);
++  expect(writes).toEqual([]);
++});
