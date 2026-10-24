@@ -4,17 +4,20 @@ import asyncio
 import hmac
 import logging
 import os
-import random
-import secrets
+import random as random
+import secrets as secrets
 import threading
 import time as time
 from collections.abc import Callable
 from concurrent.futures import Future as Future
 from concurrent.futures import ThreadPoolExecutor as ThreadPoolExecutor
 from contextlib import asynccontextmanager, suppress
-from datetime import UTC, datetime, timedelta
+from datetime import UTC as UTC
+from datetime import datetime as datetime
+from datetime import timedelta
 from typing import Any
-from uuid import UUID, uuid4
+from uuid import UUID as UUID
+from uuid import uuid4 as uuid4
 
 import jwt
 from fastapi import (
@@ -95,23 +98,24 @@ from .crud_repository import (
     update_crud_row,
 )
 from .database import close_pool, connection, fetch_all, fetch_one, get_pool, open_pool
-from .demo_names import generate_demo_names
+from .demo_names import generate_demo_names as generate_demo_names
+from .demo_race_repository import DemoRaceDeleteConflict as DemoRaceDeleteConflict
+from .demo_race_repository import DemoRaceSetupError as DemoRaceSetupError
+from .demo_race_repository import choose_demo_car_numbers as choose_demo_car_numbers
 from .demo_race_repository import (
-    DemoRaceDeleteConflict,
-    DemoRaceSetupError,
     create_demo_race_records,
     delete_demo_race_records,
     get_demo_race_row,
     list_demo_race_ids,
     validate_demo_race_delete,
 )
-from .demo_race_repository import choose_demo_car_numbers as choose_demo_car_numbers
 from .demo_race_router import (
     DEFAULT_DEMO_RACE_CREATE,
     create_demo_race_router,
     run_demo_race_create,
     run_demo_race_delete,
 )
+from .demo_runtime import build_demo_race
 from .membership_router import create_membership_router
 from .pit_repository import PIT_RESERVATION_SELECT, load_pit_strategy_rows, load_pit_telemetry
 from .pit_router import create_pit_router
@@ -134,7 +138,8 @@ from .schemas_operations import ReservationIn as ReservationIn
 from .schemas_operations import ReservationStatus as ReservationStatus
 from .schemas_simulation import DemoRaceCreate, SimulationControl
 from .security_headers import SecurityHeadersMiddleware
-from .simulation_core import MAX_SESSION_LAPS, Simulation
+from .simulation_core import MAX_SESSION_LAPS
+from .simulation_core import Simulation as Simulation
 from .simulation_core import calculate_sector_performance as calculate_sector_performance
 from .simulation_restore import (
     restore_incident_state,
@@ -610,29 +615,14 @@ def list_demo_races(
 
 
 def _make_demo_race(cars: int | None = None, auto_repeat: bool = False):
-    if mongo_ready() is None:
-        raise HTTPException(503, "MongoDB telemetry store is unavailable")
-    seed = secrets.randbits(63)
-    rng = random.Random(seed)  # noqa: S311 -- seeded race choices; seed is generated securely
-    car_count = cars if cars is not None else rng.randint(8, 16)
-    session_id, event_id = uuid4(), uuid4()
-    now = datetime.now(UTC)
-    names = generate_demo_names(rng, car_count)
-    try:
-        generated, total_laps = create_demo_race_records(
-            session_id, event_id, now, names, auto_repeat, seed=seed
-        )
-    except DemoRaceSetupError as exc:
-        raise HTTPException(409, str(exc)) from exc
-    sim = Simulation(session_id, generated, 2.0, total_laps=total_laps, seed=seed)
-    sim.auto_repeat = auto_repeat
-    sim.is_generated = True
-    sim.pace_offsets_ms = {str(d["id"]): d["pace_offset_ms"] for d in generated}
-    sim.lap_by_driver = {str(d["id"]): 1 for d in generated}
-    sim.elapsed_by_driver = {str(d["id"]): 0 for d in generated}
-    simulations[str(session_id)] = sim
-    sim.status = "running"
-    return demo_race_row(session_id)
+    return build_demo_race(
+        cars,
+        auto_repeat,
+        mongo_ready,
+        create_demo_race_records,
+        simulations,
+        demo_race_row,
+    )
 
 
 def launch_demo_simulation(session_id: UUID | str):
