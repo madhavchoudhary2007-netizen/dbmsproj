@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 0e166fc
+git_head: 2d00c1f
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; customworkers gpt-5.6-luna/high (owner override); cap2
@@ -32,3 +32,5 @@ last_eval_score: baseline51.2974358974359, obsolete forcurrentcode, NOTpresentab
 
 ## Orchestrator direct edits
 - Zeroauthoredproductlines. Onlyarchitecture/config/ADRs/packets/state/envelopes/orchestration/rootplanneddependencyinstalls; integratingworkerpatchesisnotauthorship. Modeloverride changed3Codexprofiles/models.envonly, cap/effort/orchestratorunchanged. npm-generatedlockexceptionexplicitownerplannedinstall, no newdepsrecently.
+
+- T-44218 accepted2d00c1f: Added five-state chart frame, accessible loading, square active dot, tooltip and visual chart theme tokens without eager Recharts import. Verify0.
