@@ -3,15 +3,15 @@ updated_at: 2026-10-24
 phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 
 ## Queue
+### T-44254 W2 — OPEN
+- target_files: backend/app/api/results_read.py
+- contract: T331 stage exact existing results-read, standings and recalculation handlers in a typed router factory without wiring or changing main yet.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/python -c 'import ast,pathlib,subprocess; old=ast.parse(subprocess.check_output(["git","show","HEAD:backend/app/main.py"],text=True)); new=ast.parse(pathlib.Path("backend/app/api/results_read.py").read_text()); names={"results","standings","recalculate"}; a={n.name:ast.dump(ast.Module(body=n.body,type_ignores=[])) for n in old.body if isinstance(n,ast.FunctionDef) and n.name in names}; b={n.name:ast.dump(ast.Module(body=n.body,type_ignores=[])) for n in ast.walk(new) if isinstance(n,ast.FunctionDef) and n.name in names}; assert a==b and set(a)==names; print("PASS exact read-results/standings/recalculation bodies")' && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/api/results_read.py
+
 ### T-44251 W3 — OPEN
 - target_files: frontend/e2e/race-control-feed.spec.ts
 - contract: T371 actual-browser polling, request-sharing, visibility, retry/offline and five-state ticker regressions.
 - verify: npm --prefix frontend run typecheck && cd frontend && ./node_modules/.bin/playwright test e2e/race-control-feed.spec.ts --list
-
-### T-44255 W1 — OPEN
-- target_files: frontend/components/shell-feed.tsx
-- contract: Prevent a populated dashboard with no ticker-relevant fields from rendering an empty red marquee.
-- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
@@ -21,6 +21,7 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44255 acceptedad1383a; verify0.
 - T-44250 acceptede765662; verify0.
 - T-44248 accepteddfcf8ac; verify0.
 - T-44253 accepted2aa2b87; verify0.

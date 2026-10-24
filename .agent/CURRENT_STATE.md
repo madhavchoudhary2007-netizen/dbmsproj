@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: e765662
+git_head: ad1383a
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -17,7 +17,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - Preserve legacy main aliases and late-bound callbacks: Decision removal caused7 failures fixed5ee4710. OpenAPI alone cannot prove Python alias/runtime uniqueness compatibility.
 
 ## Next work
-- Feed hookc1ecce3 and header CSSc18eb51 accepted; W1 header/ticker presenters and W2 real-data mapper in progress. Root will wire <=12 product glue lines, then actual polling/dedupe/offline/visibility tests; no claim of Phase6 completion yet.
+- Feed hookc1ecce3, mapper939fea6, presentersdfcf8ac and roote765662 glue integrated. Mapper3 offline tests39f2e59/2aa2b87 pass. T44251 actual polling/dedupe/offline/visibility browser tests preparing; Phase6 not complete.
 - Backend lock endpoints wireddb3cf1b: root227 PASS0skip/live PASS (T44233.full.raw.log). Shell CSS ac0a46e/683c6b5 activated5627293. Cache63aa0ad and four offline regression casescdd2dec accepted; drawer hookfeeaef3 wired; actual10 browser drawer cases PASS across five projects (T44244.browser.raw.log). Next drawer hook/markup and T371 cache/poll integration, then existing route/responsive/a11y/touch/hash/auth checks. Missing next_event covered by ADR012/c93ec77 and focused relock; T44241 red tests60e5e56 and implementation246f2f6 accepted. Initial full230 PASS/1FAIL fixed by fixture-generator correction35b904f without assertion changes; rerun231 PASS0skip/live PASS. No fabricated event. Remaining graph docs/overhaul-plan.md.
 - Four CSS lint gates0; production routes still legacy dark, light palette FAIL expected until Phase7, never skip/widen it. Last existing-route axe85 and non-palette925 before new shell. Phase5 guide60 now green; do not imply real-route redesign complete.
 
@@ -28,7 +28,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - .agent/orchestrate.py persists queue/clone/integrate/mark. Worker envelopes require actual stats/integer static counts0, no extra keys. All features/routes/copy/hooks/aria/stateclasses/dbms hashes retained; five states/44px/token spacing/reduced motion mandatory.
 
 ## Open risks
-- T44248 acceptance and pending T44250 glue blocked by new W3 mapper-test reserved variable module (Next ESLint). Own patches preserved T44248.patch/T44250.glue.raw.patch and removed from working product tree; T44253 repairs test only, then reapply/accept.
+- T44248 first acceptance caught reserved module variable in new mapper test; W3 renamed binding2aa2b87, all3 assertions+global lint pass. Saved W1/root patches reapplied, acceptdfcf8ac/e765662 both0; no assertion weakened.
 - T331 giant main/transitional factories; strict mypy last snapshot211 errors before latest moves, current count not rerun; zero required T339. No thresholds relaxed.
 - T44132 bundle checker omits layout/shared assets; fix before P3. Lighthouse absent, FPS gate17ms until T41316.7, hosted CI unverified. Final score>=95/all hard gates/no NOT_RUN required; never present obsolete score as current.
 - Worker review caught nested main/dead modal control (corrected), accidental root demo hook (removed only worker-owned unaccepted copy), and T44232 complexity suppression/locals namespace tricks (rejected, standard explicit helper accepted). No other work reverted; no test weakened.
@@ -50,6 +50,3 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 
 - T-44253 accepted2aa2b87: Rename reserved local module variable while preserving real-source VM execution and every mapper assertion. Verify0.
 
-- T-44248 accepteddfcf8ac: Add compact truthful polling status/retry and five-state real-data ticker with retained partial data, no empty red band and delayed loading skeleton. Verify0.
-
-- T-44250 acceptede765662: Wire accepted dashboard polling hook, actual-data mapper and five-state header/ticker presenters as small cross-worker glue. Verify0.
