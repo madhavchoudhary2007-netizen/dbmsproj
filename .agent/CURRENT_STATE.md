@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 52e84a0
+git_head: 1a2b573
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -36,12 +36,4 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 ## Orchestrator direct edits
 - T-44250: 8 additions/4 removals in shell.tsx as cross-worker glue connecting accepted W1 presenters and W2 hook/mapper; no bulk implementation. Metadata, architecture/config/ADRs, packets/state/envelopes/root acceptance helpers and approved installs only. Applying worker patches is integration, not authorship. No new dependencies this continuation. Root build/types/lint afterinitiallogin cleanup0 (T44283.build.raw.log); final login repair build pending.
 
-- TASTE login screenshot T44283: broken AG wrap/lime, tiny checker, card5sizes/textovergrid. T44284 scoped type/brand/checker/backing27ee284 accepted,70browserPASS; settled375 screenshotstillclipsmotifs, W1T44289 repair and W3T44290 containment/busytests in progress. T44285 SessionPage operations58aad6d moved, T44286 writes60cc688 staged; simulatorpresentationT44288 stage acceptance pending.
-
-- T-44289 accepted523cd33: Fit mobile art into240px using compact text backing and internal horizontal44px static feed; desktop unchanged. Verify0.
-
-- T-44287 accepted3e715d5: Wire accepted session write helpers through existing callback names and state closures; all JSX unchanged. Verify0.
-
-- T-44290 accepted6d32c9e: Add actual login containment/desktop geometry and held-request busy/error regression checks, root browser execution pending. Verify0.
-
-- T-44291 accepted52e84a0: Wire staged exact simulator presentation under unchanged permission guard, removing duplicate JSX. Verify0.
+- TASTE login screenshot T44283: broken AG wrap/lime, tiny checker, card5sizes/textovergrid. T44284 scoped type/brand/checker/backing27ee284 accepted,70browserPASS; settled375 screenshotstillclipsmotifs, W1T44289 cliprepair523cd33 and W3T44290 tests6d32c9e accepted. Rootnewtests expose nativearia-busy override (W1T44293fix) and wrong testinkfixture17instead0 (W3T44294fix); mobile geometrypass. T44285 SessionPage operations58aad6d moved, T44286 writes60cc688 staged; simulatorpresentation86d745b wired52e84a0; session writes3e715d5 wired.

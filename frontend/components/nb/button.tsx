@@ -42,7 +42,7 @@ export const NbButton = forwardRef<HTMLButtonElement, NbButtonProps>(
         ref={ref}
         type={type}
         disabled={disabled || busy}
-        aria-busy={busy || undefined}
+        aria-busy={busy || props["aria-busy"] || undefined}
         className={cn("nb-plinth inline-flex min-h-[44px] min-w-[44px] align-top [--nb-sh:4px]", className)}
       >
         <span
