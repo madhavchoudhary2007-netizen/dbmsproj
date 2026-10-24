@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 2d00c1f
+git_head: 35fe855
 branch: overhaul/neo-brutal
 architect_sha256: db26d7463fae63c6defc3bfc3b4f503865d32a31eb1e97066e274a6875771f4e
 harness: codex; orchestrator gpt-6.1-sol/medium; customworkers gpt-5.6-luna/high (owner override); cap2
@@ -17,7 +17,7 @@ last_eval_score: baseline51.2974358974359, obsolete forcurrentcode, NOTpresentab
 - SharedCSS/textures all4globalCSSgates0; staticplinthshadow, reducedguard, paletteactual1440rolesnearestscorer/gates unchanged. UIlibraryaccepted: button/card6eefdaa, badges e4a3f6c, inputs/field72a5b82, motifs/marquee/stat8ba857e, skeleton/fivestate0bd674b, modal/tabs38ae29f, table0e166fc. Typed cn/reduced/FLIP/flash47c0408 anddelayload/native-dialog/demo471cb56; runtimeT366pending.
 
 ## Active work / next
-- W1T44218 chartframe/theme andW2T44219 stagedarchive handler runningdisjointignoredclones, max2. Afterchartframe: styleguideT365 thenW3T366 (realbrowserall5projects+motionhooks), beforeparentT364/T365completion. Afterarchivecopy: nexttaskwire/oldremove, thenlaphelpers/routes. Allremainingplanrows docs/overhaul-plan.md.
+- Active W1 T44220 five-state style-guide fixtures and W2 T44221 archive wiring in disjoint clones, cap2. Chart primitives2d00c1f/archive stage35fe855 accepted; archive-stage rootfull227PASS0skip/livePASS (T44219.full.raw.log). Next style-guide route then W3 T366 browser tests, before closing T364/T365. Remaining plan rows in docs/overhaul-plan.md.
 - LatestT44212 rootfull227PASS0skip/livePASS, rootbuildafterT44215exit0, noAPI/schemafeaturechanges. W1scopechecks re-reviewedcomponentcontrast/naming/legacyCSSconflicts/roweventguards beforeaccept. Workerincorrectstaticcounts/extraenvelopekeys normalized, actualnumstatschecked, exactVerifyrootrerun.
 
 ## Contracts and safety
@@ -34,3 +34,5 @@ last_eval_score: baseline51.2974358974359, obsolete forcurrentcode, NOTpresentab
 - Zeroauthoredproductlines. Onlyarchitecture/config/ADRs/packets/state/envelopes/orchestration/rootplanneddependencyinstalls; integratingworkerpatchesisnotauthorship. Modeloverride changed3Codexprofiles/models.envonly, cap/effort/orchestratorunchanged. npm-generatedlockexceptionexplicitownerplannedinstall, no newdepsrecently.
 
 - T-44218 accepted2d00c1f: Added five-state chart frame, accessible loading, square active dot, tooltip and visual chart theme tokens without eager Recharts import. Verify0.
+
+- T-44219 accepted35fe855: Staged exact race archive endpoint in typed focused API factory; next atomic task wires alias and removes original route. Verify0.

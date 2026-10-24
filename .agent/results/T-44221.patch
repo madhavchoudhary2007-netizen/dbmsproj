@@ -1,0 +1,137 @@
+diff --git a/backend/app/main.py b/backend/app/main.py
+index 7112592..ef1286e 100644
+--- a/backend/app/main.py
++++ b/backend/app/main.py
+@@ -47,6 +47,7 @@ from .api.health import health_live as health_live
+ from .api.health import legacy_router as legacy_health_router
+ from .api.health import register_legacy_health, register_readiness
+ from .api.health import router as health_router
++from .api.race_archive import create_race_archive_router
+ from .api.stewards import create_stewards_router
+ from .auth_cookie import verify_csrf_token
+ from .auth_router import create_auth_router
+@@ -1613,114 +1614,16 @@ dbms_polyglot = dbms_mongo_handlers["dbms_polyglot"]
+ app.include_router(dbms_mongo_router)
+ 
+ 
+-@app.get("/api/dbms/races/{session_id}")
+-def dbms_race(session_id: UUID, include_laps: bool = True, user=admin_dependency):
+-    session = fetch_one(
+-        (
+-            "SELECT s.*,e.name AS event_name,c.name AS circuit_name FROM race_sessions s\n      J"
+-            "OIN race_events e ON e.id=s.event_id JOIN circuits c ON c.id=e.circuit_id WHERE s.id"
+-            "=%s AND s.session_type='RACE'"
+-        ),
+-        (session_id,),
+-    )
+-    if not session:
+-        raise HTTPException(404, "Race not found")
+-    results = fetch_all(
+-        (
+-            "SELECT r.*,u.full_name AS driver_name,d.number,d.licence_number FROM session_results"
+-            " r\n      JOIN drivers d ON d.id=r.driver_id LEFT JOIN users u ON u.id=d.user_id WHE"
+-            "RE r.session_id=%s ORDER BY r.position NULLS LAST"
+-        ),
+-        (session_id,),
+-    )
+-    incidents = fetch_all(
+-        """SELECT i.*,u.full_name AS driver_name FROM incident_reports i
+-      JOIN drivers d ON d.id=i.driver_id JOIN users u ON u.id=d.user_id
+-      WHERE i.session_id=%s ORDER BY i.lap,i.id""",
+-        (session_id,),
+-    )
+-    penalties = fetch_all(
+-        (
+-            "SELECT p.* FROM penalties p JOIN incident_reports i ON i.id=p.incident_id WHERE i.se"
+-            "ssion_id=%s"
+-        ),
+-        (session_id,),
+-    )
+-    provisional = session["state"] == "COMPLETED" and any(
+-        (penalty.get("time_seconds") or 0) > 0 or (penalty.get("grid_places") or 0) > 0
+-        for penalty in penalties
+-    )
+-    for result in results:
+-        result["provisional"] = provisional
+-    reservations = fetch_all(
+-        PIT_RESERVATION_SELECT + " WHERE r.session_id=%s ORDER BY r.starts_at", (session_id,)
+-    )
+-    col = mongo_ready()
+-    match = {"session_id": str(session_id)}
+-    # Full lap history is optional for the 1s live poll; it grows with every race lap.
+-    laps = race_lap_measurements(col, match) if include_laps else []
+-    driver_ids = col.distinct("driver_id", match)
+-    latest = [
+-        col.find_one({**match, "driver_id": driver_id}, sort=[("ts", DESCENDING)])
+-        for driver_id in driver_ids
+-    ]
+-    latest = sorted(
+-        (row for row in latest if row),
+-        key=lambda row: (row.get("position") is None, row.get("position") or 0),
+-    )
+-    ids = {row["driver_id"] for row in latest} | {str(row["driver_id"]) for row in results}
+-    drivers = (
+-        fetch_all(
+-            (
+-                "SELECT d.id,d.number,d.licence_number,u.full_name AS driver_name FROM drivers d "
+-                "LEFT JOIN users u ON u.id=d.user_id WHERE d.id=ANY(%s::uuid[])"
+-            ),
+-            (list(ids),),
+-        )
+-        if ids
+-        else []
+-    )
+-    if include_laps:
+-        lap_source = (
+-            "historical_demo"
+-            if laps and all(x.get("source") == "historical_demo" for x in laps)
+-            else "recorded_telemetry"
+-        )
+-    else:
+-        lap_source = (
+-            "historical_demo"
+-            if col.find_one(
+-                {**match, "sector": 3, "lap_time_ms": {"$gt": 0}, "source": "historical_demo"},
+-                {"_id": 1},
+-            )
+-            else "recorded_telemetry"
+-        )
+-    completed_count = list(
+-        col.aggregate(
+-            [
+-                {"$match": {**match, "sector": 3, "lap_time_ms": {"$gt": 0}}},
+-                {"$group": {"_id": {"driver_id": "$driver_id", "lap": "$lap"}}},
+-                {"$count": "count"},
+-            ]
+-        )
+-    )
+-    return jsonable(
+-        {
+-            "session": session,
+-            "results": results,
+-            "incidents": incidents,
+-            "penalties": penalties,
+-            "pit_reservations": reservations,
+-            "drivers": drivers,
+-            "laps": laps,
+-            "laps_included": include_laps,
+-            "completed_driver_laps": completed_count[0]["count"] if completed_count else 0,
+-            "latest": latest,
+-            "telemetry_count": col.count_documents(match),
+-            "updated_at": datetime.now(UTC),
+-            "lap_source": lap_source,
+-        }
+-    )
++race_archive_router, race_archive_handlers = create_race_archive_router(
++    lambda *a, **kw: fetch_one(*a, **kw),
++    lambda *a, **kw: fetch_all(*a, **kw),
++    lambda value: jsonable(value),
++    lambda: mongo_ready(),
++    lambda col, match: race_lap_measurements(col, match),
++    admin_dependency,
++)
++dbms_race = race_archive_handlers["dbms_race"]
++app.include_router(race_archive_router)
+ 
+ 
+ def race_lap_measurements(col, match: dict[str, Any]):
