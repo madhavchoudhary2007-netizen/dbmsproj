@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 2be7bec
+git_head: fe21209
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (owner override2bc94fb), cap2
@@ -17,8 +17,8 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 ## Active work / evidence
 - T380 ACCEPTED login route now uses LoginArt/NbCard/NbField/NbInput/NbButton,60/40 desktop/art240mobile; auth logic unchanged. Legacy desktop/mobile/shared login CSS removed c16e5bb/b6fa4ad. Root70 generic login checks pass after type/brand/checker/textbacking27ee284 (T44284.browser.raw.log). T44283 build/types/lint0; final production build/types/lint0 (T380.build.raw.log).
 - Settled screenshot caught mobile motif clipping missed by generic checks:523cd33 fixes internal44px horizontal feed. New actual geometry/busy test6d32c9e initially failed native aria-busy override and wrong test ink fixture17instead0; product0d7dd28 preserves calleraria-busy, testc659147 exactblack correction. Final80browserPASS (T380.final.browser.raw.log), settledvisuals reviewed; c44f8ed adds keyboardfocus to mobilefeed. Testnormalization fixturec533c35 retains exact existing401prefix. T380 accepted; no assertions/gates weakened.
-- T379 Dashboard exact module move b8d5460 and typed data hookd7ece24 done. Session loader7cb29bf, async operations58aad6d, writes60cc688 wired3e715d5, simulator86d745b wired52e84a0; original behavior/copy/JSX retained. Hook77d775d wiredbcf158f, resultsviewc8d5a5a, modals2f422c0, controls6e88345 accepted;8 actual-module offline operation tests bd3f9c2 pass. W1T44304 overview extraction in progress. Remaining page splits required before redesigns.
-- T44292 driver name generation1a2b573: root12 seed/carcount output+RNGstate parity checks pass; main1368. Full disposable suite T44292.full.raw.log231PASS0skip/livePASS. Demo creation8e88bb7 exactAST moved, full T44302 running; no backend integration until it ends. T44305 pitrefresh reviewed/pending acceptance.
+- T379 Dashboard exact module move b8d5460 and typed data hookd7ece24 done. Session loader7cb29bf, async operations58aad6d, writes60cc688 wired3e715d5, simulator86d745b wired52e84a0; original behavior/copy/JSX retained. Hook77d775d wiredbcf158f, resultsviewc8d5a5a, modals2f422c0, controls6e88345 accepted;8 actual-module offline operation tests bd3f9c2 pass. Overview2be7bec extracted; W1T44306 exact SessionPage module staging in progress, next wire then root mocked regression/build. Remaining page splits required before redesigns.
+- T44292 driver name generation1a2b573: root12 seed/carcount output+RNGstate parity checks pass; main1368. Full disposable suite T44292.full.raw.log231PASS0skip/livePASS. Demo creation8e88bb7 exactAST moved, full T44302 231PASS0skip/livePASS. T44305 pitrefresh acceptance in progress; rootfull afteraccept.
 
 ## Safety / workflow
 - Branch only overhaul/neo-brutal; commits only accept.sh, independently rerun exact Verify; max2 custom-role packet-only workers, no model/effort overrides. Isolated clones via .agent/orchestrate.py; <=3files/150 changedlines/task. Metadata state/envelopes normalized with realstats and integercounts.
@@ -32,25 +32,3 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 
 ## Orchestrator direct edits
 - T44250 shell glue8add/4remove (12productlines this turn), logged and accepted e765662; all other product implementation delegated. Metadata/config/ADRs/packets/state/root verification helpers only. No new dependencies this continuation.
-
-- T-44295 accepted77d775d: Stage exact SessionPage orchestration hook from accepted data/actions/writes; current component unchanged. Verify0.
-
-- T-44296 acceptedc8d5a5a: Extract exact results presentation, preserving provisional notice, permission guard, headings and columns. Verify0.
-
-- T-44297 acceptedc533c35: Scope exact normalized login error assertion to app alert instead of ambiguous Next route announcer; all other checks retained. Verify0.
-
-- T-44298 acceptedbcf158f: Activate accepted SessionPage orchestration hook and remove duplicate logic/imports, retaining exact JSX and callback bindings. Verify0.
-
-- T-44300 acceptedc44f8ed: Make scrollable login feed keyboard-focusable with descriptive name and visible ink focus outline; retain content/layout. Verify0.
-
-- T-44299 acceptedbd3f9c2: Add8 actual-module offline session operation regressions covering traffic, ordering, result conversion, failures and busy cleanup. Verify0.
-
-- T-44301 accepted2f422c0: Extract exact result/editor dialogs with original field/copy/permission contracts and precise ResourceEditor callback props, no casts. Verify0.
-
-- T-44302 accepted8e88bb7: Extract exact generated-race runtime creation body into typed service with compatibility imports/defaults and current callback bindings. Verify0.
-
-- T-44303 accepted6e88345: Extract exact session lifecycle controls with unchanged action predicates, permission guards, icons and callback props. Verify0.
-
-- T-380 accepted0a3e206: Close login route with80 root browser checks, settled visual review, production build and static gates passing. Verify0.
-
-- T-44304 accepted2be7bec: Extract exact session overview/list presentation with original schedule, reload, loader and selection behavior. Verify0.
