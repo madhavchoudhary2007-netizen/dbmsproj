@@ -3,9 +3,14 @@ updated_at: 2026-10-24
 phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 
 ## Queue
-### T-44247 W1 — OPEN
-- target_files: frontend/app/styles/shell.css
-- contract: T370 stage compact season/status header and forty-pixel ticker CSS for upcoming presentation wiring.
+### T-44249 W2 — OPEN
+- target_files: frontend/lib/race-control-items.ts
+- contract: T370 derive ticker strings from actual dashboard data only; no fabricated event or transport state.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
+### T-44248 W1 — OPEN
+- target_files: frontend/components/shell-feed.tsx, frontend/app/styles/shell.css
+- contract: T370 create presentational header feed status and real-data ticker components; root will wire existing W2 hook afterward as small cross-worker glue.
 - verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Blocked
@@ -16,6 +21,7 @@ phase: 3 T331 extraction + 6 shell; Phases0–2 and5 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44247 acceptedc18eb51; verify0.
 - T-44245 acceptedc1ecce3; verify0.
 - T-44246 accepted35b904f; verify0.
 - T-44244 acceptedef2f899; verify0.
