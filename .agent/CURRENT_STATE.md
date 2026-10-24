@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: c18eb51
+git_head: 939fea6
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -49,3 +49,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - T-44245 acceptedc1ecce3: Add visible/online-only shared dashboard polling, five states, cancellation and recovery; Dashboard reuses cache and force reload without JSX changes. Verify0.
 
 - T-44247 acceptedc18eb51: Add compact header season/status and forty-pixel real-data ticker styling with mobile overflow constraints. Verify0.
+
+- T-44249 accepted939fea6: Derive ticker labels only from valid active-session, incident-count and actual next-event fields; ignore malformed values. Verify0.
