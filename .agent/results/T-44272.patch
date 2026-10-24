@@ -1,0 +1,90 @@
+diff --git a/frontend/components/special-pages.tsx b/frontend/components/special-pages.tsx
+index e54d248..d28ff38 100644
+--- a/frontend/components/special-pages.tsx
++++ b/frontend/components/special-pages.tsx
+@@ -35,36 +35,10 @@ import {
+ } from "./ui";
+ import { useAuth } from "./auth";
+ import { DbmsWorkspace } from "./dbms-workspace";
+-import { DashboardData, readDashboardFeed } from "@/lib/dashboard-feed";
+-interface HealthData {
+-  services?: Record<string, unknown>;
+-  status?: unknown;
+-  [key: string]: unknown;
+-}
++import { useDashboard } from "@/lib/use-dashboard";
+ 
+ export function Dashboard() {
+-  const [data, setData] = useState<DashboardData | null>(null),
+-    [health, setHealth] = useState<HealthData | null>(null),
+-    [err, setErr] = useState(""),
+-    [load, setLoad] = useState(true);
+-  const initialLoad = useRef(true);
+-  const fetchData = useCallback(() => {
+-    const useCache = initialLoad.current;
+-    initialLoad.current = false;
+-    setLoad(true);
+-    setErr("");
+-    Promise.all([readDashboardFeed({ force: !useCache }), api<HealthData>("/health")])
+-      .then(([d, h]) => {
+-        setData(d);
+-        setHealth(h);
+-        setErr("");
+-      })
+-      .catch((e) => setErr(e.message))
+-      .finally(() => setLoad(false));
+-  }, []);
+-  useEffect(() => {
+-    fetchData();
+-  }, [fetchData]);
++  const { data, health, err, load, fetchData } = useDashboard();
+   return (
+     <>
+       <PageHeader
+diff --git a/frontend/lib/use-dashboard.ts b/frontend/lib/use-dashboard.ts
+new file mode 100644
+index 0000000..cc78156
+--- /dev/null
++++ b/frontend/lib/use-dashboard.ts
+@@ -0,0 +1,41 @@
++import { useCallback, useEffect, useRef, useState } from "react";
++import { api } from "./api";
++import { DashboardData, readDashboardFeed } from "./dashboard-feed";
++
++export interface HealthData {
++  services?: Record<string, unknown>;
++  status?: unknown;
++  [key: string]: unknown;
++}
++
++export function useDashboard(): {
++  data: DashboardData | null;
++  health: HealthData | null;
++  err: string;
++  load: boolean;
++  fetchData: () => void;
++} {
++  const [data, setData] = useState<DashboardData | null>(null),
++    [health, setHealth] = useState<HealthData | null>(null),
++    [err, setErr] = useState(""),
++    [load, setLoad] = useState(true);
++  const initialLoad = useRef(true);
++  const fetchData = useCallback(() => {
++    const useCache = initialLoad.current;
++    initialLoad.current = false;
++    setLoad(true);
++    setErr("");
++    Promise.all([readDashboardFeed({ force: !useCache }), api<HealthData>("/health")])
++      .then(([d, h]) => {
++        setData(d);
++        setHealth(h);
++        setErr("");
++      })
++      .catch((e) => setErr(e.message))
++      .finally(() => setLoad(false));
++  }, []);
++  useEffect(() => {
++    fetchData();
++  }, [fetchData]);
++  return { data, health, err, load, fetchData };
++}

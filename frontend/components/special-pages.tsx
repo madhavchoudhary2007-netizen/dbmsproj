@@ -35,36 +35,10 @@ import {
 } from "./ui";
 import { useAuth } from "./auth";
 import { DbmsWorkspace } from "./dbms-workspace";
-import { DashboardData, readDashboardFeed } from "@/lib/dashboard-feed";
-interface HealthData {
-  services?: Record<string, unknown>;
-  status?: unknown;
-  [key: string]: unknown;
-}
+import { useDashboard } from "@/lib/use-dashboard";
 
 export function Dashboard() {
-  const [data, setData] = useState<DashboardData | null>(null),
-    [health, setHealth] = useState<HealthData | null>(null),
-    [err, setErr] = useState(""),
-    [load, setLoad] = useState(true);
-  const initialLoad = useRef(true);
-  const fetchData = useCallback(() => {
-    const useCache = initialLoad.current;
-    initialLoad.current = false;
-    setLoad(true);
-    setErr("");
-    Promise.all([readDashboardFeed({ force: !useCache }), api<HealthData>("/health")])
-      .then(([d, h]) => {
-        setData(d);
-        setHealth(h);
-        setErr("");
-      })
-      .catch((e) => setErr(e.message))
-      .finally(() => setLoad(false));
-  }, []);
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  const { data, health, err, load, fetchData } = useDashboard();
   return (
     <>
       <PageHeader

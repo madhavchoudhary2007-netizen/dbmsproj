@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-24
-git_head: 298fef5
+git_head: a98c95c
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (latest owner override), cap2
@@ -37,3 +37,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final eval
 - T-44250: 8 additions/4 removals in shell.tsx as cross-worker glue connecting accepted W1 presenters and W2 hook/mapper; no bulk implementation. Metadata, architecture/config/ADRs, packets/state/envelopes/root acceptance helpers and approved installs only. Applying worker patches is integration, not authorship. No new dependencies this continuation.
 
 - T-44270 accepted298fef5: Wire pit router with late-bound callbacks and preserved legacy handler/schema aliases; remove duplicated handlers. Verify0.
+
+- T-44271 accepteda98c95c: Adopt paper NbCard, labeled NbInput fields and primary NbButton, retain auth/copy, disable busy fields and link announced errors. Verify0.
