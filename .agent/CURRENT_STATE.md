@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 171cb46
+git_head: a14c234
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -44,3 +44,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44345 accepted96b97d0: Stage exact generated-race delete modal with original copy, guards and callback bindings. Verify0.
 
 - T-44346 accepted171cb46: Activate exact generated race controls and delete modal; preserve copy, state guards and existing bindings. Verify0.
+
+- T-44347 accepteda14c234: Stage exact live lap/incident/pit record polling, retaining reset order, alive guard, retry and cleanup. Verify0.
+
+- Root44348 clone raced dependencyaccept: missinghelper caused TSexit2. Restored onlyisolatedtarget, provisioned exactaccepted a14c234 helper as read-onlytrackedcontext; re-dispatchonce. Futurequeue onlyafterdependencyaccept closes.
