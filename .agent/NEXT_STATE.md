@@ -3,11 +3,6 @@ updated_at: 2026-10-26
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44539 W2 — OPEN
-- target_files: frontend/lib/use-stewarding-records.ts, frontend/lib/use-steward-desk.ts
-- contract: T387 provide independent paged official penalties and seasonal licence read state without blocking the incident desk.
-- verify: npm --prefix frontend run test:runtime && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
-
 ### T-44540 W3 — OPEN
 - target_files: backend/tests/test_api.py
 - contract: T387 add a disposable-stack read-only integration assertion for the actual stewarding SQL queries.
@@ -23,6 +18,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44539 acceptede6dfc57; verify0.
 - T-44538 accepted8f08922; verify0.
 - T-44537 accepted779e680; verify0.
 - T-44536 accepted823c270; verify0.
