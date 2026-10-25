@@ -28,7 +28,6 @@ from fastapi import (
     Request,
     Response,
     WebSocket,
-    WebSocketDisconnect,
 )
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -56,6 +55,7 @@ from .api.health import register_legacy_health, register_readiness
 from .api.health import router as health_router
 from .api.laps import create_laps_router
 from .api.laps import race_lap_measurements as race_lap_measurements
+from .api.live import create_live_router
 from .api.pit_write import create_pit_write_router
 from .api.race_archive import create_race_archive_router
 from .api.results_read import create_results_read_router
@@ -882,42 +882,15 @@ def _websocket_authenticated_user(token: str) -> Any:
     )
 
 
-@app.websocket("/api/ws/sessions/{session_id}")
-async def session_ws(ws: WebSocket, session_id: UUID):
-    if not await _check_ws_runtime_lease(ws):
-        return
-    origin = ws.headers.get("origin")
-    if origin is not None and origin not in CORS_ORIGINS:
-        await ws.close(code=4403, reason="Origin not allowed")
-        return
-    protocols = ws.scope.get("subprotocols", [])
-    subprotocol_token = websocket_bearer(protocols)
-    cookie_token = ws.cookies.get("apexgrid_session")
-    token = subprotocol_token or cookie_token
-    if not token:
-        await ws.close(code=4401, reason="Expected apexgrid.jwt subprotocol and bearer token")
-        return
-    try:
-        user = _websocket_authenticated_user(token)
-    except Exception:
-        user = None
-    if not user:
-        await ws.close(code=4401, reason="Invalid or expired token")
-        return
-    await ws.accept(subprotocol="apexgrid.jwt" if subprotocol_token else None)
-    q = bus.subscribe(session_id)
-    try:
-        while True:
-            event = await _wait_for_ws_event(ws, q)
-            if event is None:
-                return
-            if not await _check_ws_runtime_lease(ws):
-                return
-            await ws.send_json(event)
-    except WebSocketDisconnect:
-        pass
-    finally:
-        bus.unsubscribe(session_id, q)
+live_router, session_ws = create_live_router(
+    lambda ws: _check_ws_runtime_lease(ws),
+    lambda token: _websocket_authenticated_user(token),
+    lambda ws, queue: _wait_for_ws_event(ws, queue),
+    lambda: bus,
+    lambda: CORS_ORIGINS,
+    websocket_bearer,
+)
+app.include_router(live_router)
 
 
 app.include_router(create_analytics_router(current_user, jsonable))

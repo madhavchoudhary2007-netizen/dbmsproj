@@ -3,10 +3,15 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44368 W1 — OPEN
-- target_files: frontend/components/pages/live/index.tsx
-- contract: T379 stage exact standalone LiveTiming page module; no compatibility wiring yet.
+### T-44370 W1 — OPEN
+- target_files: frontend/components/special-pages.tsx
+- contract: T379 remove unused legacy imports from compatibility page before final LiveTiming relocation.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
+### T-44369 W2 — OPEN
+- target_files: backend/app/main.py, backend/app/api/live.py
+- contract: T331 move WebSocket route into API module factory retaining session_ws alias and runtime behavior.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py backend/tests/test_token_revocation.py -k "websocket or token" && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/api/live.py
 
 ## Blocked
 - None currently. Owner switch gpt-6-luna/high implemented and freshworkers succeeded.
@@ -15,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44368 accepted1af6714; verify0.
 - T-44367 accepted5ac053e; verify0.
 - T-44366 accepted627d48a; verify0. (full accepted history: git log and .agent/results)
 - Worker switch: T44319 ba3fa7c, T44320 4645e52; custom roles gpt-6-luna/high.

@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 5ac053e
+git_head: 1af6714
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -50,3 +50,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44366 accepted627d48a: Move live state/ref/error hooks verbatim with stable dependencies and zero lint warnings. Verify0.
 
 - T-44367 accepted5ac053e: Move WebSocket lease/event/auth helper bodies verbatim with late-bound main wrappers. Verify0.
+
+- T-44368 accepted1af6714: Stage standalone LiveTiming page with exact existing function bytes and required imports. Verify0.
