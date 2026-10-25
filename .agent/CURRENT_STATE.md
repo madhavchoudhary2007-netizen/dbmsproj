@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 5cfe010
+git_head: 6391ea2
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -47,3 +47,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44456 acceptedfe37650: Add admin-only 44px resource row edit/delete icon actions using existing dialogs; render driver eligibility and user role badges while preserving original cell text. Verify0.
 
 - T-44455 accepted5cfe010: Promote proven delete confirmation regression to normal gate; assert one global primary action with exact accessible name through create/details/confirmation/cancel/Escape transitions. Verify0.
+
+- T-44457 accepted6391ea2: Remove unused main list-demo wrapper and unused Query import; keep actual registered handler and repository wiring. Verify0.

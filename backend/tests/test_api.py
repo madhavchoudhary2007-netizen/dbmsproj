@@ -37,7 +37,6 @@ from backend.app.main import (
     advance_simulation_tick,
     app,
     choose_demo_car_numbers,
-    pit_strategy,
     restore_simulated_incidents,
     save_results,
     simulations,
@@ -1088,8 +1087,11 @@ def test_constraint_demo_rolls_back_if_the_database_accepts_invalid_data(monkeyp
 
 
 def test_pit_strategy_reports_pending_live_decision_and_historical_stops(monkeypatch):
-    from backend.app import main as main_module
     from backend.app import pit_repository
+    from backend.app.core.serialization import jsonable
+    from backend.app.pit_strategy_router import create_pit_strategy_router
+    from backend.app.pit_strategy_service import project_pit_strategy, tire_stint_target
+    from backend.app.simulation_core import MAX_SESSION_LAPS
 
     session_id = uuid4()
     driver_id = uuid4()
@@ -1101,24 +1103,16 @@ def test_pit_strategy_reports_pending_live_decision_and_historical_stops(monkeyp
         "team_id": uuid4(),
         "team_name": "Team",
     }
-    monkeypatch.setattr(
-        main_module,
-        "fetch_one",
-        lambda *_: {
-            "id": session_id,
-            "state": "ACTIVE",
-            "total_laps": 30,
-            "generated": True,
-            "scheduled_at": datetime(2026, 10, 5, tzinfo=UTC),
-        },
-    )
-    monkeypatch.setattr(
-        pit_repository, "fetch_one", lambda *args: main_module.fetch_one(*args), raising=False
-    )
-    monkeypatch.setattr(
-        main_module,
-        "fetch_all",
-        lambda query, _params: (
+    session = {
+        "id": session_id,
+        "state": "ACTIVE",
+        "total_laps": 30,
+        "generated": True,
+        "scheduled_at": datetime(2026, 10, 5, tzinfo=UTC),
+    }
+
+    def fake_fetch_all(query, _params):
+        return (
             [driver]
             if "demo_race_entries" in query
             else [
@@ -1131,11 +1125,10 @@ def test_pit_strategy_reports_pending_live_decision_and_historical_stops(monkeyp
                     "ends_at": datetime(2026, 10, 5, 1, 1, tzinfo=UTC),
                 }
             ]
-        ),
-    )
-    monkeypatch.setattr(
-        pit_repository, "fetch_all", lambda query, params: main_module.fetch_all(query, params)
-    )
+        )
+
+    monkeypatch.setattr(pit_repository, "fetch_one", lambda *_: dict(session))
+    monkeypatch.setattr(pit_repository, "fetch_all", fake_fetch_all)
 
     class Collection:
         def find(self, *_args):
@@ -1163,13 +1156,24 @@ def test_pit_strategy_reports_pending_live_decision_and_historical_stops(monkeyp
         def aggregate(self, _pipeline):
             return iter([{"_id": str(box_id), "lap": 8, "compound": "SOFT"}])
 
-    monkeypatch.setattr(main_module, "mongo_ready", lambda: Collection())
+    collection = Collection()
     sim = Simulation(session_id, [{"id": driver_id, "number": 17}], 2, total_laps=30)
     sim.is_generated = True
     sim.pit_due_tire_age_by_driver[str(driver_id)] = 16
-    monkeypatch.setitem(main_module.simulations, str(session_id), sim)
+    simulations = {str(session_id): sim}
+    _, pit_strategy = create_pit_strategy_router(
+        lambda: None,
+        pit_repository.load_pit_strategy_rows,
+        pit_repository.load_pit_telemetry,
+        lambda: collection,
+        simulations.get,
+        project_pit_strategy,
+        MAX_SESSION_LAPS,
+        tire_stint_target,
+        jsonable,
+    )
 
-    result = pit_strategy(session_id, user={"id": uuid4(), "role": "ADMIN"})
+    result = pit_strategy(session_id)
     row = result["strategy"][0]
     assert result["source"] == "live_simulation"
     assert row["status"] == "PENDING"
@@ -1177,18 +1181,8 @@ def test_pit_strategy_reports_pending_live_decision_and_historical_stops(monkeyp
     assert row["recommended_stop_lap"] == 9
     assert row["stops"][0]["lap"] == 8
 
-    monkeypatch.setattr(
-        main_module,
-        "fetch_one",
-        lambda *_: {
-            "id": session_id,
-            "state": "COMPLETED",
-            "total_laps": 30,
-            "generated": True,
-            "scheduled_at": datetime(2026, 10, 5, tzinfo=UTC),
-        },
-    )
-    historical = pit_strategy(session_id, user={"id": uuid4(), "role": "ADMIN"})
+    session["state"] = "COMPLETED"
+    historical = pit_strategy(session_id)
     assert historical["source"] == "history"
     assert historical["strategy"][0]["status"] == "NO_FUTURE_STOP"
     assert historical["strategy"][0]["recommended_stop_lap"] is None
