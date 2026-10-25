@@ -133,6 +133,8 @@ test("T382-DELETE requires confirmation before writing", async ({ page }) => {
   await expect(confirmation).toBeHidden();
   expect(api.counts().deleteCount).toBe(0);
   await details.getByRole("button", { name: "Delete record" }).click();
-  await page.getByRole("dialog", { name: /delete/i }).getByRole("button", { name: "Delete record" }).click();
+  await page.getByRole("dialog", { name: /delete/i }).getByRole("button", { name: "Delete record" }).evaluate((button) => {
+    for (let i = 0; i < 20; i += 1) (button as HTMLButtonElement).click();
+  });
   await expect.poll(() => api.counts().deleteCount).toBe(1);
 });
