@@ -309,12 +309,15 @@ export function ResourceEditor({
 }) {
   const [vals, setVals] = useState<Row>(initial || {}),
     [err, setErr] = useState("");
+  const saveInFlight = useRef(false);
   const formId = useId();
   return (
     <form
       className="form-grid"
       onSubmit={async (e) => {
         e.preventDefault();
+        if (saveInFlight.current) return;
+        saveInFlight.current = true;
         setErr("");
         try {
           const payload = { ...vals };
@@ -328,6 +331,8 @@ export function ResourceEditor({
           await save(payload);
         } catch (ex) {
           setErr(ex instanceof Error ? ex.message : "Save failed");
+        } finally {
+          saveInFlight.current = false;
         }
       }}
     >

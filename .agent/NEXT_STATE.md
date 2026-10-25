@@ -3,6 +3,11 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44450 W3 — OPEN
+- target_files: frontend/e2e/resource-editor.spec.ts
+- contract: Strengthen strict delete confirmation regression to require one delete for same-frame confirm spam.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/resource-editor.spec.ts --list
+
 ### T-44449 W1 — OPEN
 - target_files: frontend/components/resource-page.tsx
 - contract: T382 add functional native delete confirmation using existing remove callback.
@@ -13,11 +18,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: Fix F-382-SAVE: ResourceEditor must synchronously exclude overlapping save submissions.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && npm --prefix frontend run test:runtime
 
-### T-44446 W3 — OPEN
-- target_files: .agent/audit/T44446-di-map.md
-- contract: Map remaining T331/T332 router dependencies and test bindings into concrete atomic next steps.
-- verify: test -s .agent/audit/T44446-di-map.md && test "$(wc -l < .agent/audit/T44446-di-map.md)" -le 100
-
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
 
@@ -27,6 +27,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44446 accepted8b7e8d8; verify0.
 - T-44447 acceptedcf0cfba; verify0.
 - T-44445 accepted60d910d; verify0.
 - T-44444 acceptedad4420d; verify0.

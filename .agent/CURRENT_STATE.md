@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: cf0cfba
+git_head: 8b7e8d8
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -26,7 +26,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - Preserveeveryroute/feature/chart/modal/copy/aria/data/stateclass/DBMShash; fiveStates/44targets/tokens/reducedmotion. Thresholds/testsunchanged. Latesttypecheck/strictlint/fourCSS0.
 
 ## Open risks / next
-- T331/T332globals/factorycallbacks, strictmypy190errors/34files measured T332-current-mypy.raw.log (improvedfrom212), target0T339; coverage/batching/DBMSshowcase/finaleval pending.
+- T331/T332globals/factorycallbacks, strictmypy177errors/30files measured T332-current-types.raw.log (improvedfrom212/190), target0T339; coverage/batching/DBMSshowcase/finaleval pending.
 - T44132 bundlechecker misseslayout/sharedassets; repairbeforeP3 with170KBunchanged. Lighthouseabsent,FPS17untilT41316.7,hostedCIunverified. Final>=95/allhardgates/noNOT_RUN.
 - TASTE-381-1 fourKPIaccents vsT400max3; consolidatebeforeA5. OtherPhase7layouts mustrepairT379A3. DBMSredesign dependsPhase4.
 
@@ -58,3 +58,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44447 acceptedcf0cfba: Style existing record guidance as readable paper panel with ink text and wrapping; adjust resource surface balance without new content or wider palette bands. Verify0.
 
 - T382paletteall6PASS aftercf0cfba. Resourceeditor55cases50reportedPASS(includes5strictdeleteexpectedfailures)/5FAIL: actual20POSTs vs1 inrapidsave atallwidths. F-382-SAVE P1 queuedT44448; missingdeleteconfirmation strictreproducerT44445, T44449fix. No realDBwrites, browserPOST/DELETE locallymocked.
+
+- T-44446 accepted8b7e8d8: Document remaining factory/global test bindings and six role-separated migration proposals; scoped source audit only, no proposed test commands claimed executed. Verify0.
+
+- RootRUN_XFAIL=1 T382-delete-before.browser.raw.log failed at missingconfirmation beforeUIrepair (realreproducer; allDELETE mocked). T44448 saveguard/T44449 confirmation ready; T44450 adds20confirm-click adversarialcheck.
