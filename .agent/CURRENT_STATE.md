@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 96cabf5
+git_head: 42321a7
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -58,3 +58,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44348 accepted96cabf5: Activate exact live record polling helper while retaining effect position, stable dependencies and all page JSX. Verify0.
 
 - T44349 eagerfactory proposal failed react-hooks/refs (originalevent-time T44342 correct). Restored onlyisolatedtarget; repair uses one lazycontextconstructor/event-timecalls, no suppression/behaviorchange. T44351 localRowtype boundary corrected to existingAPIimport beforeaccept.
+
+- T-44351 accepted42321a7: Stage exact live selectors with existing API Row, membership filter, option labels and manual-selection ref behavior. Verify0.

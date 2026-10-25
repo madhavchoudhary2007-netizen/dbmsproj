@@ -122,8 +122,24 @@ export function LiveTiming() {
   useEffect(() => {
     return startLiveRecordPolling(session, clearError, setCompletedLaps, setLiveIncidents, setLivePitStops, setRecordsError);
   }, [clearError, session]);
-  const createDemoRace = () => createLiveDemoActions({ session, deleteRace, refreshLists, clearError, reportError, setDemoBusy, setDemoMessage, setSession, setDriver, setPackets, setTiming, setSnapshot, setStatus, setDeleteRace }).createDemoRace();
-  const removeDemoRace = () => createLiveDemoActions({ session, deleteRace, refreshLists, clearError, reportError, setDemoBusy, setDemoMessage, setSession, setDriver, setPackets, setTiming, setSnapshot, setStatus, setDeleteRace }).removeDemoRace();
+  const demoActions = () => createLiveDemoActions({
+    session,
+    deleteRace,
+    refreshLists,
+    clearError,
+    reportError,
+    setDemoBusy,
+    setDemoMessage,
+    setSession,
+    setDriver,
+    setPackets,
+    setTiming,
+    setSnapshot,
+    setStatus,
+    setDeleteRace,
+  });
+  const createDemoRace = () => demoActions().createDemoRace();
+  const removeDemoRace = () => demoActions().removeDemoRace();
   useEffect(() => {
     if (!session) { setStatus("Choose an active session"); return; }
     setStatus("Connecting · live stream");
