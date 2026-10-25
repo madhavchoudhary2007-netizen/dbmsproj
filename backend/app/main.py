@@ -138,6 +138,7 @@ from .schemas_operations import ReservationIn as ReservationIn
 from .schemas_operations import ReservationStatus as ReservationStatus
 from .schemas_simulation import DemoRaceCreate, SimulationControl
 from .security_headers import SecurityHeadersMiddleware
+from .session_measurements import clear_measurements, ensure_reset_allowed
 from .simulation_core import MAX_SESSION_LAPS
 from .simulation_core import Simulation as Simulation
 from .simulation_core import calculate_sector_performance as calculate_sector_performance
@@ -731,58 +732,11 @@ def sync_simulation_lifecycle(session_id: UUID, action: str):
 
 
 def ensure_session_reset_allowed(session_id: UUID | str):
-    row = fetch_one(
-        """SELECT EXISTS(SELECT 1 FROM incident_reports i JOIN penalties p ON p.incident_id=i.id
-        WHERE i.session_id=s.id) AS has_penalties FROM race_sessions s WHERE s.id=%s""",
-        (session_id,),
-    )
-    if not row:
-        raise HTTPException(404, "Session not found")
-    if row["has_penalties"]:
-        raise HTTPException(409, "A session with official penalties cannot be reset")
+    return ensure_reset_allowed(session_id, fetch_one)
 
 
 def clear_session_measurements(session_id: UUID | str):
-    """Clear stored measurements after an explicit reset, preserving penalty history."""
-    col = mongo_ready()
-    cancelled = []
-    with connection() as conn, conn.cursor() as cur:
-        cur.execute(
-            """SELECT e.championship_id,
-            EXISTS(SELECT 1 FROM incident_reports i JOIN penalties p ON """
-            """p.incident_id=i.id WHERE i.session_id=s.id) AS has_penalties
-            FROM race_sessions s JOIN race_events e ON e.id=s.event_id WHERE s.id=%s""",
-            (session_id,),
-        )
-        row = cur.fetchone()
-        if not row:
-            raise HTTPException(404, "Session not found")
-        championship_id = row["championship_id"]
-        if row["has_penalties"]:
-            raise HTTPException(409, "A session with official penalties cannot be reset")
-        try:
-            col.delete_many({"session_id": str(session_id)})
-        except PyMongoError as exc:
-            raise HTTPException(503, "Telemetry store reset failed") from exc
-        cur.execute("DELETE FROM session_results WHERE session_id=%s", (session_id,))
-        cur.execute("SELECT recalculate_standings(%s)", (championship_id,))
-        cur.execute(
-            (
-                "UPDATE pit_reservations SET status='CANCELLED'\n            WHERE session_id=%s "
-                "AND allocation_source='AUTOMATIC' AND status='RESERVED' RETURNING id"
-            ),
-            (session_id,),
-        )
-        cancelled_ids = [item["id"] for item in cur.fetchall()]
-        if cancelled_ids:
-            cur.execute(PIT_RESERVATION_SELECT + " WHERE r.id=ANY(%s)", (cancelled_ids,))
-            cancelled = cur.fetchall()
-        cur.execute(
-            "DELETE FROM pit_reservations WHERE session_id=%s AND allocation_source='AUTOMATIC'",
-            (session_id,),
-        )
-    for reservation in cancelled:
-        publish(session_id, "pit.update", reservation)
+    return clear_measurements(session_id, mongo_ready, connection, publish)
 
 
 def refresh_simulation_pit_state(sim: Simulation, timestamp: datetime):

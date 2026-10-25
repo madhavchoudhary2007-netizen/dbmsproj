@@ -3,15 +3,20 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44318 W2 — OPEN
+- target_files: frontend/lib/use-pit-wall.ts
+- contract: T379 stage exact PitWall state/effects/actions into use-pit-wall hook; do not wire presentation yet.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
+
+### T-44316 W1 — OPEN
+- target_files: frontend/components/special-pages.tsx
+- contract: T379 wire byte-identical standalone StewardDesk via compatibility reexport; remove old function and imports used only by it.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
+
 ### T-44317 W2 — OPEN
 - target_files: backend/app/main.py, backend/app/session_measurements.py
 - contract: T331 move exact ensure_session_reset_allowed and clear_session_measurements bodies into typed session_measurements module; retain legacy main wrappers.
 - verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "reset or simulation_stop" && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/session_measurements.py
-
-### T-44315 W1 — OPEN
-- target_files: frontend/components/pages/stewards.tsx
-- contract: T379 stage exact StewardDesk page in pages/stewards.tsx; leave compatibility source unchanged until separate wiring.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
 ## Blocked
 - None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
@@ -20,6 +25,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44315 accepted7bc73c9; verify0.
 - T-44314 accepted45cbcad; verify0.
 - T-44313 accepted0f39a4b; verify0.
 - T-44312 acceptedb0972ed; verify0.
