@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 5c977c3
+git_head: 33b3818
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high (latest owner override2026-10-25), cap2
@@ -59,3 +59,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44324 accepteda54f000: Wire exact PitWall hook; preserve all return JSX and remaining page functions byte-for-byte. Verify0.
 
 - T-44325 accepted5c977c3: Wire exact TelemetryCharts, preserving every series, conditional and property; remove unused chart imports. Verify0.
+
+- T-44326 accepted33b3818: Stage exact Analytics state, search, effects and derived rows in useAnalytics hook. Verify0.

@@ -13,11 +13,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T379 stage exact PitWall presentation page under pages/pit-wall.tsx; keep legacy source until separate wire.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
-### T-44326 W2 — OPEN
-- target_files: frontend/lib/use-analytics.ts
-- contract: T379 stage exact Analytics state/effects/search and derived rows into use-analytics hook; leave original presentation unchanged.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
-
 ## Blocked
 - None currently. Owner switched workers to gpt-6-luna/high; T44318 interrupted before edits, fresh worker required.
 
@@ -25,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44326 accepted33b3818; verify0.
 - T-44325 accepted5c977c3; verify0.
 - T-44324 accepteda54f000; verify0.
 - T-44323 accepted480ae39; verify0.
