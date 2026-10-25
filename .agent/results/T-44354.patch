@@ -1,0 +1,62 @@
+diff --git a/frontend/components/special-pages.tsx b/frontend/components/special-pages.tsx
+index 8e90eb0..d05c3dd 100644
+--- a/frontend/components/special-pages.tsx
++++ b/frontend/components/special-pages.tsx
+@@ -24,6 +24,7 @@ import { LatestTelemetry } from "./pages/live/latest-telemetry";
+ import { SnapshotStrip } from "./pages/live/snapshot-strip";
+ import { DemoControls } from "./pages/live/demo-controls";
+ import { DeleteDemoModal } from "./pages/live/delete-demo-modal";
++import { LiveSelectors } from "./pages/live/live-selectors";
+ export { Dashboard } from "@/components/pages/dashboard";
+ export { SessionPage } from "@/components/pages/sessions";
+ export { StewardDesk } from "@/components/pages/stewards";
+@@ -325,38 +326,17 @@ export function LiveTiming() {
+         setShowCompletedDemos={setShowCompletedDemos}
+         showCompletedDemos={showCompletedDemos}
+       />
+-      <div className="toolbar select-toolbar">
+-        <label>
+-          Session
+-          <select value={session} onChange={(e) => { autoFollow.current = false; setSession(e.target.value); setDriver(""); }}>
+-            <option value="">Select session</option>
+-            {sessions.map((s) => (
+-              <option key={String(s.id)} value={String(s.id)}>
+-                {String(s.event_name || s.session_type || s.id)} · {String(s.state)} · {String(s.scheduled_at || "").slice(0, 10)} · {String(s.id).slice(0, 8)}
+-              </option>
+-            ))}
+-          </select>
+-        </label>
+-        <label>
+-          Driver
+-          <select value={driver} onChange={(e) => setDriver(e.target.value)}>
+-            <option value="">All drivers</option>
+-            {[...namedDrivers.values()].filter((d) => driverIds.has(String(d.id))).map((d) => (
+-              <option key={String(d.id)} value={String(d.id)}>
+-                {String(d.full_name || d.number || d.id)}
+-              </option>
+-            ))}
+-          </select>
+-        </label>
+-        <span className="stream-state">
+-          <i
+-            className={
+-              status.startsWith("Connected") ? "green-dot" : "amber-dot"
+-            }
+-          />
+-          {status}
+-        </span>
+-      </div>
++      <LiveSelectors
++        session={session}
++        setSession={setSession}
++        driver={driver}
++        setDriver={setDriver}
++        autoFollow={autoFollow}
++        sessions={sessions}
++        namedDrivers={namedDrivers}
++        driverIds={driverIds}
++        status={status}
++      />
+       {error && <div className="notice error-notice">{error}</div>}
+       {session && (
+         <>
