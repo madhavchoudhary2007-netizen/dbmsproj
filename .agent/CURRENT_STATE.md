@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 1479019
+git_head: 8be4a2d
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -38,3 +38,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44432 accepted1479019: Exercise actual migrated routes in-process and require exact numeric Decimal JSON, nullable averages, UUID/date encoding and integer dashboard counts. Verify0.
 
 - Production frontend build/lint/types0 T382-current-build.raw.log afterresourceheader/toolbar/hook. ReviewcaughtW2partialretry callback and W3malformedadminmock beforebrowser; repairedwithinpackets.
+
+- T-44434 accepted8be4a2d: Classify resource loading, empty, error, populated and partial states without I/O; retained errors retry the source and active filters preserve clear action. Verify0.
