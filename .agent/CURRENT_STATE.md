@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 414de5c
+git_head: 246153e
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -68,3 +68,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44449 accepted7838c2d: Require native delete confirmation with selected-record context, cancel/Escape safety and original deletion callback; long names wrap at mobile width. Verify0.
 
 - T-44450 accepted414de5c: Exercise twenty same-frame confirmation clicks and require exactly one locally mocked DELETE, retaining all cancellation and confirmation assertions. Verify0.
+
+- T-44451 accepted246153e: Characterize actual demo delete helper with local simulations and explicit fake dependencies; preserve ordering and conflict assertions, removing main monkeypatch coupling. Verify0.

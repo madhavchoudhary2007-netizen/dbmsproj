@@ -3,15 +3,15 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44453 W2 — OPEN
+- target_files: backend/app/main.py
+- contract: T331 remove unregistered, now unused demo-create/delete compatibility wrappers from main.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k demo_delete_waits_for_simulator_and_validates_before_stopping && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_request_dependencies.py backend/tests/test_runtime_dependencies.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py
+
 ### T-44452 W2 — OPEN
 - target_files: frontend/components/resource-page.tsx
 - contract: Fix F-382-DELETE: synchronously exclude overlapping resource deletion requests.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && npm --prefix frontend run test:runtime
-
-### T-44451 W3 — OPEN
-- target_files: backend/tests/test_api.py
-- contract: T331 characterize demo deletion helper directly and remove legacy main monkeypatch coupling.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k demo_delete_waits_for_simulator_and_validates_before_stopping && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/tests/test_api.py
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -22,6 +22,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44451 accepted246153e; verify0.
 - T-44450 accepted414de5c; verify0.
 - T-44449 accepted7838c2d; verify0.
 - T-44448 accepted06330e6; verify0.

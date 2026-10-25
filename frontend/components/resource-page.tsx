@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { api, asArray, listAll, pretty, Row } from "@/lib/api";
 import { useResourceRows } from "@/lib/use-resource-rows";
 import { Plus, RefreshCw, Search } from "lucide-react";
@@ -59,6 +59,7 @@ export function ResourcePage({
     [entityRows, setEntityRows] = useState<Record<string, Row[]>>({}),
     [userLoadError, setUserLoadError] = useState(""),
     [actionError, setActionError] = useState("");
+  const removeInFlight = useRef(false);
   const supportsHistory = endpoint === "/drivers" || endpoint === "/teams";
   const { user } = useAuth();
   const canManage = user?.role === "ADMIN";
@@ -178,6 +179,8 @@ export function ResourcePage({
   };
   const remove = async () => {
     if (!edit?.id) return;
+    if (removeInFlight.current) return;
+    removeInFlight.current = true;
     setBusy(true);
     try {
       await api(`${endpoint}/${edit.id}`, { method: "DELETE" });
@@ -189,6 +192,7 @@ export function ResourcePage({
         e instanceof Error ? e.message : "Unable to delete record",
       );
     } finally {
+      removeInFlight.current = false;
       setBusy(false);
     }
   };
