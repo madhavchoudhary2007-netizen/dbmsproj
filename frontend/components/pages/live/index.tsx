@@ -26,7 +26,8 @@ export function LiveTiming() {
     completedLaps, setCompletedLaps, liveIncidents, setLiveIncidents,
     livePitStops, setLivePitStops, recordsError, setRecordsError,
     listLoading, listError, setListLoading, setListError,
-    snapshot, setSnapshot, timing, setTiming, status, setStatus, error, setError,
+    snapshot, setSnapshot, snapshotView, setSnapshotView, snapshotRetry,
+    timing, setTiming, status, setStatus, error, setError,
     demoBusy, setDemoBusy, showCompletedDemos, setShowCompletedDemos,
     showAllLaps, setShowAllLaps, deleteRace, setDeleteRace, demoMessage,
     setDemoMessage, canManageDemos, autoFollow, demoInFlight, listRequest, reportError, clearError,
@@ -69,8 +70,9 @@ export function LiveTiming() {
       session, clearError, reportError, setStatus, setSessionDrivers,
       setPackets, setCompletedLaps, setLiveIncidents, setLivePitStops,
       setTiming, setSnapshot,
+      setSnapshotView, snapshotRetry,
     });
-  }, [clearError, reportError, session, setStatus, setSessionDrivers, setPackets, setCompletedLaps, setLiveIncidents, setLivePitStops, setTiming, setSnapshot]);
+  }, [clearError, reportError, session, setStatus, setSessionDrivers, setPackets, setCompletedLaps, setLiveIncidents, setLivePitStops, setTiming, setSnapshot, setSnapshotView, snapshotRetry]);
   const {
     shown,
     namedDrivers,
@@ -139,7 +141,7 @@ export function LiveTiming() {
         status={status}
         primary={!canManageDemos}
       />
-      {error && <div className="notice error-notice">{error}</div>}
+      {error && <div className="notice error-notice live-error-notice">{error}</div>}
       {session && (
         <>
           {Boolean(timing.safety_car ?? snapshot?.safety_car) && (
@@ -147,7 +149,7 @@ export function LiveTiming() {
               <TriangleAlert size={16} /> SAFETY CAR DEPLOYED
             </div>
           )}
-          <TimingTower orderRows={orderRows} status={status} selectedDriver={driver} onSelectDriver={setDriver} />
+          <TimingTower orderRows={orderRows} status={status} selectedDriver={driver} onSelectDriver={setDriver} loading={snapshotView.loading} error={snapshotView.error} retry={() => snapshotRetry.current?.()} />
           <RaceRecords selectedLaps={selectedLaps} recordsError={recordsError} showAllLaps={showAllLaps} setShowAllLaps={setShowAllLaps} visibleLaps={visibleLaps} namedDrivers={namedDrivers} liveIncidents={liveIncidents} livePitStops={livePitStops} />
           <SnapshotStrip snapshot={snapshot} />
           <TelemetryCharts

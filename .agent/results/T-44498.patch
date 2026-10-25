@@ -1,0 +1,118 @@
+diff --git a/frontend/app/styles/live.css b/frontend/app/styles/live.css
+index 6fc01f6..704c255 100644
+--- a/frontend/app/styles/live.css
++++ b/frontend/app/styles/live.css
+@@ -130,6 +130,18 @@
+   min-width: 0;
+   white-space: normal;
+   overflow-wrap: anywhere;
++  color: var(--nb-ink);
++  font-size: var(--fs-label);
++}
++.nb-shell .live-error-notice {
++  margin: 12px 0;
++  padding: 12px;
++  border: 4px solid var(--nb-ink);
++  background: var(--nb-red);
++  color: var(--nb-ink);
++  font-family: var(--font-sans);
++  font-size: var(--fs-body);
++  line-height: 1.5;
+ }
+ .nb-shell .live-demo-notice {
+   padding: 12px;
+diff --git a/frontend/components/pages/live/index.tsx b/frontend/components/pages/live/index.tsx
+index 02e7df6..4f71ab5 100644
+--- a/frontend/components/pages/live/index.tsx
++++ b/frontend/components/pages/live/index.tsx
+@@ -26,7 +26,8 @@ export function LiveTiming() {
+     completedLaps, setCompletedLaps, liveIncidents, setLiveIncidents,
+     livePitStops, setLivePitStops, recordsError, setRecordsError,
+     listLoading, listError, setListLoading, setListError,
+-    snapshot, setSnapshot, timing, setTiming, status, setStatus, error, setError,
++    snapshot, setSnapshot, snapshotView, setSnapshotView, snapshotRetry,
++    timing, setTiming, status, setStatus, error, setError,
+     demoBusy, setDemoBusy, showCompletedDemos, setShowCompletedDemos,
+     showAllLaps, setShowAllLaps, deleteRace, setDeleteRace, demoMessage,
+     setDemoMessage, canManageDemos, autoFollow, demoInFlight, listRequest, reportError, clearError,
+@@ -69,8 +70,9 @@ export function LiveTiming() {
+       session, clearError, reportError, setStatus, setSessionDrivers,
+       setPackets, setCompletedLaps, setLiveIncidents, setLivePitStops,
+       setTiming, setSnapshot,
++      setSnapshotView, snapshotRetry,
+     });
+-  }, [clearError, reportError, session, setStatus, setSessionDrivers, setPackets, setCompletedLaps, setLiveIncidents, setLivePitStops, setTiming, setSnapshot]);
++  }, [clearError, reportError, session, setStatus, setSessionDrivers, setPackets, setCompletedLaps, setLiveIncidents, setLivePitStops, setTiming, setSnapshot, setSnapshotView, snapshotRetry]);
+   const {
+     shown,
+     namedDrivers,
+@@ -139,7 +141,7 @@ export function LiveTiming() {
+         status={status}
+         primary={!canManageDemos}
+       />
+-      {error && <div className="notice error-notice">{error}</div>}
++      {error && <div className="notice error-notice live-error-notice">{error}</div>}
+       {session && (
+         <>
+           {Boolean(timing.safety_car ?? snapshot?.safety_car) && (
+@@ -147,7 +149,7 @@ export function LiveTiming() {
+               <TriangleAlert size={16} /> SAFETY CAR DEPLOYED
+             </div>
+           )}
+-          <TimingTower orderRows={orderRows} status={status} selectedDriver={driver} onSelectDriver={setDriver} />
++          <TimingTower orderRows={orderRows} status={status} selectedDriver={driver} onSelectDriver={setDriver} loading={snapshotView.loading} error={snapshotView.error} retry={() => snapshotRetry.current?.()} />
+           <RaceRecords selectedLaps={selectedLaps} recordsError={recordsError} showAllLaps={showAllLaps} setShowAllLaps={setShowAllLaps} visibleLaps={visibleLaps} namedDrivers={namedDrivers} liveIncidents={liveIncidents} livePitStops={livePitStops} />
+           <SnapshotStrip snapshot={snapshot} />
+           <TelemetryCharts
+diff --git a/frontend/components/pages/live/timing-tower.tsx b/frontend/components/pages/live/timing-tower.tsx
+index 610c959..d43f863 100644
+--- a/frontend/components/pages/live/timing-tower.tsx
++++ b/frontend/components/pages/live/timing-tower.tsx
+@@ -84,11 +84,17 @@ export function TimingTower({
+   status,
+   selectedDriver,
+   onSelectDriver,
++  loading,
++  error,
++  retry,
+ }: {
+   orderRows: Row[];
+   status: string;
+   selectedDriver: string;
+   onSelectDriver: (id: string) => void;
++  loading: boolean;
++  error: string;
++  retry: () => void;
+ }) {
+   const bodyRef = useRef<HTMLTableSectionElement>(null);
+   useFlip(bodyRef, orderRows.map((row) => String(row.driver_id)));
+@@ -103,9 +109,15 @@ export function TimingTower({
+     tire_wear_pct: car.tire_wear_pct ?? "—",
+     pit_state: car.pit_state ?? "—",
+   }));
+-  const state: ViewState<readonly Row[]> = rows.length
+-    ? { status: "populated", data: rows }
+-    : { status: "empty", reason: "no-data" };
++  const state: ViewState<readonly Row[]> = loading && rows.length === 0
++    ? { status: "loading" }
++    : error && rows.length === 0
++      ? { status: "error", error: { message: error, retryable: true }, retry }
++      : error
++        ? { status: "partial", data: rows, filter: { label: "snapshot", clear: retry }, totalCount: rows.length }
++        : rows.length
++          ? { status: "populated", data: rows }
++          : { status: "empty", reason: "no-data" };
+ 
+   return (
+     <NbCard tone="paper" className="panel running-order-panel !bg-paper !p-4">
+@@ -125,6 +137,10 @@ export function TimingTower({
+         bodyRef={bodyRef}
+         caption="LIVE TIMING / RUNNING ORDER"
+         empty="Waiting for timing and telemetry packets from this session."
++        sourceMessage={error || undefined}
++        partialSummary={error ? `Showing ${rows.length} retained drivers.` : undefined}
++        partialActionLabel="Retry snapshot"
++        partialActionAriaLabel="Retry snapshot"
+         onSelect={(row) => onSelectDriver(String(row.driver_id))}
+         isSelected={(row) => String(row.driver_id) === selectedDriver}
+       />

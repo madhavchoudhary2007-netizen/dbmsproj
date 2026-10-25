@@ -130,6 +130,18 @@
   min-width: 0;
   white-space: normal;
   overflow-wrap: anywhere;
+  color: var(--nb-ink);
+  font-size: var(--fs-label);
+}
+.nb-shell .live-error-notice {
+  margin: 12px 0;
+  padding: 12px;
+  border: 4px solid var(--nb-ink);
+  background: var(--nb-red);
+  color: var(--nb-ink);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: 1.5;
 }
 .nb-shell .live-demo-notice {
   padding: 12px;

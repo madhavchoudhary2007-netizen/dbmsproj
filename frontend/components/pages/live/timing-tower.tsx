@@ -84,11 +84,17 @@ export function TimingTower({
   status,
   selectedDriver,
   onSelectDriver,
+  loading,
+  error,
+  retry,
 }: {
   orderRows: Row[];
   status: string;
   selectedDriver: string;
   onSelectDriver: (id: string) => void;
+  loading: boolean;
+  error: string;
+  retry: () => void;
 }) {
   const bodyRef = useRef<HTMLTableSectionElement>(null);
   useFlip(bodyRef, orderRows.map((row) => String(row.driver_id)));
@@ -103,9 +109,15 @@ export function TimingTower({
     tire_wear_pct: car.tire_wear_pct ?? "—",
     pit_state: car.pit_state ?? "—",
   }));
-  const state: ViewState<readonly Row[]> = rows.length
-    ? { status: "populated", data: rows }
-    : { status: "empty", reason: "no-data" };
+  const state: ViewState<readonly Row[]> = loading && rows.length === 0
+    ? { status: "loading" }
+    : error && rows.length === 0
+      ? { status: "error", error: { message: error, retryable: true }, retry }
+      : error
+        ? { status: "partial", data: rows, filter: { label: "snapshot", clear: retry }, totalCount: rows.length }
+        : rows.length
+          ? { status: "populated", data: rows }
+          : { status: "empty", reason: "no-data" };
 
   return (
     <NbCard tone="paper" className="panel running-order-panel !bg-paper !p-4">
@@ -125,6 +137,10 @@ export function TimingTower({
         bodyRef={bodyRef}
         caption="LIVE TIMING / RUNNING ORDER"
         empty="Waiting for timing and telemetry packets from this session."
+        sourceMessage={error || undefined}
+        partialSummary={error ? `Showing ${rows.length} retained drivers.` : undefined}
+        partialActionLabel="Retry snapshot"
+        partialActionAriaLabel="Retry snapshot"
         onSelect={(row) => onSelectDriver(String(row.driver_id))}
         isSelected={(row) => String(row.driver_id) === selectedDriver}
       />
