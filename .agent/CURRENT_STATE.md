@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 4514b8e
+git_head: d5d6796
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -41,3 +41,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T44451 actual demo-delete helper characterization246153e preservesallassertions; T44453 unused main demo wrappersremoved4514b8e. main834lines, parent<=120 unfinished. Backend latestfull245PASS0skip/livePASS T44440.full.raw.log(beforeT44451/53); rerunrequired.
 - Strictmypy177errors/30files; backendDIaudit8b7e8d8 .agent/audit/T44446-di-map.md. Typedpitreads e55086a/c53cd59. Runtime32PASS. Latestfrontendbuild T382-current-build.raw.log predateslatesttable/dialog/guards; rerunrequired.
 - Isolatedclones maynotcontainignoredrawlogs: inlineactualdiagnostics inpackets. Rootnormalizesactualdiffcounts. No implementationblocker or newdependency.
+
+- T-44454 acceptedd5d6796: Mark the active resource dialog action as primary; keep hidden confirmation and background header/editor unmarked. Optional ResourceEditor prop preserves other callers. Verify0.

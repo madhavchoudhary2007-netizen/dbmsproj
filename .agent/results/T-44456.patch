@@ -1,0 +1,70 @@
+diff --git a/frontend/components/resource-page.tsx b/frontend/components/resource-page.tsx
+index 12436dd..5172135 100644
+--- a/frontend/components/resource-page.tsx
++++ b/frontend/components/resource-page.tsx
+@@ -2,9 +2,10 @@
+ import { useEffect, useMemo, useRef, useState } from "react";
+ import { api, asArray, listAll, pretty, Row } from "@/lib/api";
+ import { useResourceRows } from "@/lib/use-resource-rows";
+-import { Plus, RefreshCw, Search } from "lucide-react";
++import { Pencil, Plus, RefreshCw, Search, Trash2 } from "lucide-react";
+ import { useAuth } from "./auth";
+ import { NbButton } from "./nb/button";
++import { NbBadge } from "./nb/badge";
+ import { NbCard } from "./nb/card";
+ import { NbModal } from "./nb/modal";
+ import {
+@@ -341,11 +342,48 @@ export function ResourcePage({
+       </div>
+       <NbTable
+         state={tableState}
+-        columns={columns.map((key) => ({
+-          key,
+-          title: key.replaceAll("_", " "),
+-          render: (row) => pretty(row[key]),
+-        }))}
++        columns={[
++          ...columns.map((key) => ({
++            key,
++            title: key.replaceAll("_", " "),
++            render: (row: Row) =>
++              (endpoint === "/drivers" && key === "eligibility") ||
++              (endpoint === "/users" && key === "role") ? (
++                <NbBadge status={String(row[key] ?? "")}>{pretty(row[key])}</NbBadge>
++              ) : (
++                pretty(row[key])
++              ),
++          })),
++          ...(canManage
++            ? [{
++                key: "actions",
++                title: "Actions",
++                render: (row: Row) => (
++                  <div className="flex items-center gap-2">
++                    <NbButton
++                      variant="ghost"
++                      className="!p-0 [&>span]:!px-0 [&>span]:!py-0"
++                      aria-label="Edit record"
++                      onClick={() => void showRow(row)}
++                    >
++                      <Pencil size={16} aria-hidden="true" />
++                    </NbButton>
++                    <NbButton
++                      variant="ghost"
++                      className="!p-0 [&>span]:!px-0 [&>span]:!py-0"
++                      aria-label="Delete record"
++                      onClick={() => {
++                        void showRow(row);
++                        setDeleteConfirm(true);
++                      }}
++                    >
++                      <Trash2 size={16} aria-hidden="true" />
++                    </NbButton>
++                  </div>
++                ),
++              }]
++            : []),
++        ]}
+         rowKey={(row, index) => String(row.id ?? index)}
+         caption={title}
+         pageSize={pageSize}
