@@ -501,7 +501,6 @@ app.include_router(
         _make_demo_race,
         launch_demo_simulation,
         lambda: simulations,
-        connection,
         dict_row,
         mongo_ready,
         DemoRaceDeleteConflict,

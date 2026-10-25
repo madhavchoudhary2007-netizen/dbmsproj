@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: ad39af5
+git_head: be6cc11
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -48,3 +48,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44509 accepted1b65d17: Render readable latest telemetry states and align record and snapshot retry accessible names with visible labels. Verify0.
 
 - T-44511 acceptedad39af5: Display selected-race actual lap progress and recorded completed pit counts, leaving unavailable data unknown. Verify0.
+
+- T-44512 acceptedbe6cc11: Add actual live-record and telemetry browser coverage, populated WCAG checks, and completed pit-history runtime cases. Verify0.

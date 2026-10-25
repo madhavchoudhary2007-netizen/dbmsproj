@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Callable
-from typing import Any
+from typing import Annotated, Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
+from .core.request_database import DatabaseSession, get_database
 from .schemas_simulation import DemoRaceCreate
 
 DEFAULT_DEMO_RACE_CREATE = DemoRaceCreate()
@@ -69,7 +70,6 @@ def create_demo_race_router(
     make_demo_race: Callable[[int | None], Any],
     launch_demo_simulation: Callable[[Any], Any],
     get_simulations: Callable[[], dict[str, Any]],
-    connection: Callable[[], Any],
     row_factory: Any,
     mongo_ready: Callable[[], Any],
     delete_conflict: type[Exception],
@@ -101,12 +101,13 @@ def create_demo_race_router(
     @router.delete("/api/demo-races/{session_id}", status_code=204)
     async def delete_demo_race(
         session_id: UUID,
+        database: Annotated[DatabaseSession, Depends(get_database)],
         user: Any = admin_steward_dependency,
     ) -> None:
         await run_demo_race_delete(
             session_id,
             get_simulations(),
-            connection,
+            database.connection,
             row_factory,
             mongo_ready,
             delete_conflict,
