@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: eeeb579
+git_head: 7603ad3
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high (latest owner override2026-10-25), cap2
@@ -46,3 +46,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 
 - T44334 firstverifyFAILED exit5: root -k reset selected0tests. Corrected to existing lifecycle reset+stop tests; no assertion change. Discarded only isolated taskfiles, re-dispatchonce perprotocol.
 
+
+- T-44337 accepted7603ad3: Stage exact live timing derived rows and charts; retain running order, gap formatting, sector/lap filters and limits. Verify0.

@@ -11,7 +11,6 @@ import {
 import { api, asArray, listAll, Row, pretty, API_BASE } from "@/lib/api";
 import {
   Button,
-  DataTable,
   Modal,
   PageHeader,
   ReloadButton,
@@ -22,6 +21,7 @@ import { useAuth } from "./auth";
 import { TelemetryCharts } from "./pages/live/telemetry-charts";
 import { RaceRecords } from "./pages/live/race-records";
 import { TimingTower } from "./pages/live/timing-tower";
+import { LatestTelemetry } from "./pages/live/latest-telemetry";
 export { Dashboard } from "@/components/pages/dashboard";
 export { SessionPage } from "@/components/pages/sessions";
 export { StewardDesk } from "@/components/pages/stewards";
@@ -524,34 +524,7 @@ export function LiveTiming() {
             chartPackets={chartPackets}
             hasTireTemperatures={hasTireTemperatures}
           />
-          <div className="panel">
-            <div className="panel-heading">
-              <div>
-                <div className="eyebrow">LATEST TELEMETRY</div>
-                <h2>{shown.length} samples in view</h2>
-              </div>
-              <span className="live-badge">
-                <i /> {status}
-              </span>
-            </div>
-            <DataTable
-              rows={shown.slice(-30).reverse()}
-              columns={[
-                "ts",
-                "driver_id",
-                "lap",
-                "sector",
-                "position",
-                "speed_kph",
-                "throttle_pct",
-                "brake_pct",
-                "tire_compound",
-                "pit_state",
-                "pit_box_number",
-                "pit_reservation_id",
-              ]}
-            />
-          </div>
+          <LatestTelemetry shown={shown} status={status} />
         </>
       )}
       {deleteRace && (
