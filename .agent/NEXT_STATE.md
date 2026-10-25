@@ -3,10 +3,20 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44371 W2 — OPEN
-- target_files: frontend/components/special-pages.tsx
-- contract: T379 activate exact standalone LiveTiming page via compatibility re-export and remove obsolete imports.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+### T-44374 W1 — OPEN
+- target_files: frontend/app/globals.css
+- contract: T379 full-suite gap: remove legacy dark document background and authentication-loading flash under approved light tokens.
+- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
+### T-44373 W3 — OPEN
+- target_files: frontend/playwright.config.ts, frontend/package.json
+- contract: T379 full-suite gap: separate Node runtime test execution from Playwright discovery without dropping any test.
+- verify: npm --prefix frontend run test:runtime && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test --list
+
+### T-44372 W2 — OPEN
+- target_files: backend/app/main.py, backend/app/api/simulation.py
+- contract: T331 move simulator control route into API factory with unchanged response, guard behavior and exported alias.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "simulation or contract_routes" && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/api/simulation.py
 
 ## Blocked
 - None currently. Owner switch gpt-6-luna/high implemented and freshworkers succeeded.
@@ -15,6 +25,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44371 acceptedb0d6bcc; verify0.
 - T-44370 acceptedb6494d1; verify0.
 - T-44369 accepted1d7f717; verify0.
 - T-44368 accepted1af6714; verify0.

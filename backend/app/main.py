@@ -61,6 +61,7 @@ from .api.race_archive import create_race_archive_router
 from .api.results_read import create_results_read_router
 from .api.results_write import create_results_write_router
 from .api.session_action import create_session_action_router
+from .api.simulation import create_simulation_router
 from .api.stewards import create_stewards_router
 from .auth_cookie import verify_csrf_token
 from .auth_router import create_auth_router
@@ -832,40 +833,15 @@ async def _reset_session_simulation(
     )
 
 
-@app.post("/api/sessions/{session_id}/simulate")
-async def control_simulation(
-    session_id: UUID, body: SimulationControl, user=admin_steward_dependency
-):
-    if mongo_ready() is None:
-        raise HTTPException(503, "MongoDB telemetry store is unavailable")
-    sim = simulations.get(str(session_id))
-    if body.action == "start":
-        sim = await _start_session_simulation(session_id, body, sim)
-    elif body.action in {"pause", "resume"}:
-        expected, next_status, detail = {
-            "pause": ("running", "paused", "Simulation is not running"),
-            "resume": ("paused", "running", "Simulation is not paused"),
-        }[body.action]
-        if not sim or sim.status != expected:
-            raise HTTPException(409, detail)
-        sim.status = next_status
-    elif body.action == "stop":
-        if not sim:
-            raise HTTPException(409, "Simulation has not started")
-        sim.status = "stopped"
-        if sim.task and not sim.task.done():
-            sim.task.cancel()
-            await asyncio.gather(sim.task, return_exceptions=True)
-        cancel_automatic_pit_reservations(session_id)
-        sim.pit_reservations_by_driver.clear()
-    elif body.action == "reset":
-        sim = await _reset_session_simulation(session_id, body, sim)
-    return {
-        "session_id": str(session_id),
-        "state": sim.status,
-        "cars": len(sim.drivers),
-        "rate_hz": sim.rate_hz,
-    }
+simulation_router, control_simulation = create_simulation_router(
+    lambda: mongo_ready(),
+    lambda: simulations,
+    lambda *args, **kwargs: _start_session_simulation(*args, **kwargs),
+    lambda *args, **kwargs: _reset_session_simulation(*args, **kwargs),
+    lambda *args, **kwargs: cancel_automatic_pit_reservations(*args, **kwargs),
+    admin_steward_dependency,
+)
+app.include_router(simulation_router)
 
 
 async def _check_ws_runtime_lease(ws: WebSocket) -> bool:

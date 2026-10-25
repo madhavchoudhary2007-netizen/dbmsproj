@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: b6494d1
+git_head: b0d6bcc
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -37,3 +37,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - Exact bytes/AST verified for all moves; evidence/results/Githistory retain details. Rootruntime command firstomittedrequired VMflag; correct --experimental-vm-modules gives24PASS0skip. No productdefect.
 
 - T-44370 acceptedb6494d1: Remove only unused legacy imports, keeping LiveTiming function bytes and compatibility exports unchanged. Verify0.
+
+- T-44371 acceptedb0d6bcc: Activate standalone LiveTiming through compatibility export; remove obsolete local body and imports. Verify0.
