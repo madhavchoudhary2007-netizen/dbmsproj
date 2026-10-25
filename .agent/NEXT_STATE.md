@@ -3,11 +3,6 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44389 W1 — OPEN
-- target_files: frontend/app/styles/shell.css, frontend/app/styles/dashboard.css, frontend/app/globals.css
-- contract: T381/Taste stylesheet boundary: move dashboard-only CSS out of shared shell without changing styles.
-- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
 ### T-44388 W2 — OPEN
 - target_files: frontend/lib/use-dashboard.ts, frontend/lib/dashboard-load.ts
 - contract: T381 five-state dashboard data boundary with independent source results, stale-response and unmount protection.
@@ -21,6 +16,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44389 accepteda74019e; verify0.
 - T-44387 accepted61cfaa0; verify0.
 - T-44386 acceptede0f42fd; verify0.
 - T-44384 acceptedd36776d; verify0.

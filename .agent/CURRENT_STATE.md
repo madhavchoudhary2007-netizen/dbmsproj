@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 61cfaa0
+git_head: a74019e
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -38,3 +38,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - Exact bytes/AST verified for all moves; evidence/results/Githistory retain details. Rootruntime command firstomittedrequired VMflag; correct --experimental-vm-modules gives24PASS0skip. No productdefect.
 
 - Current: T44386 e0f42fd full231PASS0skip/livePASS; T44387 61cfaa0 browser59PASS/1A3FAIL. T44388 helper/state pendingrepair2 (avoid refs-through-pure-helper lint, no workaroundeffects). T44389 CSSmove whitespace repaired, acceptancepending.
+
+- T-44389 accepteda74019e: Move exact dashboard styles to dedicated stylesheet, keeping shared shell below300lines and unchanged appearance. Verify0.
