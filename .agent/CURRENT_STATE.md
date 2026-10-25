@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 266e518
+git_head: 20b8d27
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -52,3 +52,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44350 accepted266e518: Add four actual-module demo race creation/deletion regressions for payloads, selection, cleanup, error preservation and busy state. Verify0.
 
 - RootT44348accept failed due unrelated acceptedT44350 testharness constmodule violating Nextlint. Restored only rootT44348target, kept its patch referenced; W1T44351 samebaselinefailure. W3T44353 exactvariablerename repair queued, allassertions unchanged; rerun independentaccepts afterward.
+
+- T-44353 accepted20b8d27: Rename test harness local module binding only; retain all four tests and assertions, full frontend lint passes. Verify0.
