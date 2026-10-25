@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 0752dcf
+git_head: 7a6fde5
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -45,3 +45,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T379 final build/types/lint0; full mocked browser1100collected:1020PASS/80FAIL, no complete-parentaccept. Failures75body-luminance darkdocument and5reduced-motion animations. T44374 lightdocument repair active; production rerun to distinguish devtools animations. No thresholds/tests relaxed.
 
 - T-44373 accepted0752dcf: Separate Playwright spec discovery and expose all 24 Node runtime tests through an explicit runnable script. Verify0.
+
+- T-44374 accepted7a6fde5: Use approved cream document background and ink authentication-loading text with light colour scheme. Verify0.

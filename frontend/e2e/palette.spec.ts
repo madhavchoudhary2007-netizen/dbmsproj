@@ -84,6 +84,7 @@ for (const [id, route] of routes) {
     });
 
     await page.goto(route, { waitUntil: "domcontentloaded" });
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
     if (route === "/login") {
       await expect(page.getByRole("heading", { name: "Sign in to ApexGrid" })).toBeVisible();
