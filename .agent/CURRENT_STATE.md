@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 92a9018
+git_head: 1373d88
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -38,3 +38,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T381 health ink/plinthface Taste defects fixed5a0ad53 andbrowserprovedd018de6. Remaining fourKPIaccents vsT400max3 TASTE-381-1 mustresolvebeforeA5. Servicehealth source rows notyetcomplete. History/results retain repair details.
 
 - Latest accepted: T44415–21 platformmocks, connectivityhelpers/UI/browser, membershipDI and cookie-warningcleanup; evidence Git/results. Backend243PASS0skip/livePASS T44420.full.raw.log.
+
+- T-44423 accepted1373d88: Show actual event, circuit, session and state in Race weekend; preserve every raw session field in a keyboard-accessible details disclosure. Verify0.
