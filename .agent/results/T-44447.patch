@@ -1,0 +1,19 @@
+diff --git a/frontend/app/styles/resources.css b/frontend/app/styles/resources.css
+index 8306478..2b0ae74 100644
+--- a/frontend/app/styles/resources.css
++++ b/frontend/app/styles/resources.css
+@@ -72,6 +72,14 @@
+ .nb-shell .resource-range {
+   white-space: nowrap;
+ }
++.nb-shell .resource-toolbar ~ .table-note {
++  margin: 16px 0 0;
++  border: 1px solid var(--nb-ink);
++  background: var(--nb-paper);
++  padding: 12px 16px;
++  color: var(--nb-ink);
++}
++.nb-shell .resource-toolbar ~ .table-note code { overflow-wrap: anywhere; }
+ @media (max-width: 619px) {
+   .nb-shell .toolbar.resource-toolbar {
+     grid-template-areas: "filter" "reload" "count" "range";
