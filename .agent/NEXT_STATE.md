@@ -3,15 +3,20 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44442 W1 — OPEN
+- target_files: frontend/components/resource-page.tsx
+- contract: T382 replace both resource dialogs with existing native NbModal preserving every form and membership interaction.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh
+
+### T-44441 W3 — OPEN
+- target_files: frontend/e2e/resource-flows.spec.ts
+- contract: Verify all five resource view states in-browser including retained-source failure and filter reset.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/resource-flows.spec.ts --list
+
 ### T-44440 W2 — OPEN
 - target_files: backend/app/analytics_repository.py, backend/app/analytics_router.py, backend/app/membership_router.py
 - contract: T332 resolve strict typing gaps introduced in the migrated membership/analytics modules without runtime changes.
 - verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_analytics_router_serialization.py backend/tests/test_dashboard_next_event.py backend/tests/test_request_dependencies.py && .venv/bin/mypy --strict --follow-imports=silent backend/app/analytics_repository.py backend/app/analytics_router.py backend/app/membership_router.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/analytics_repository.py backend/app/analytics_router.py backend/app/membership_router.py
-
-### T-44439 W2 — OPEN
-- target_files: backend/app/pit_router.py, backend/app/pit_repository.py, backend/app/main.py
-- contract: T332 migrate pit read router and its two repository queries to request-scoped dependencies.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_request_dependencies.py backend/tests/test_runtime_dependencies.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/pit_router.py backend/app/pit_repository.py backend/app/main.py
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -22,6 +27,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44439 acceptede55086a; verify0.
 - T-44438 accepted403815e; verify0.
 - T-44437 accepted458e68e; verify0.
 - T-44436 accepted4d76acf; verify0.

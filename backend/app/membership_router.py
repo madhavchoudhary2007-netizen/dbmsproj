@@ -16,40 +16,40 @@ from .schemas_competition import MembershipIn, MembershipPatch
 router = APIRouter()
 
 
-@router.get("/api/drivers/{driver_id}/memberships")
+@router.get("/api/drivers/{driver_id}/memberships", response_model=None)
 def driver_memberships(
     driver_id: UUID,
     user: Annotated[dict[str, Any], Depends(current_user)],
     database: Annotated[DatabaseSession, Depends(get_database)],
-):
+) -> Any:
     return jsonable(list_driver_memberships(driver_id, database=database))
 
 
-@router.get("/api/teams/{team_id}/memberships")
+@router.get("/api/teams/{team_id}/memberships", response_model=None)
 def team_memberships(
     team_id: UUID,
     user: Annotated[dict[str, Any], Depends(current_user)],
     database: Annotated[DatabaseSession, Depends(get_database)],
-):
+) -> Any:
     return jsonable(list_team_memberships(team_id, database=database))
 
 
-@router.post("/api/team-memberships", status_code=201)
+@router.post("/api/team-memberships", status_code=201, response_model=None)
 def create_membership(
     body: MembershipIn,
     user: Annotated[dict[str, Any], Depends(require_roles("ADMIN"))],
     database: Annotated[DatabaseSession, Depends(get_database)],
-):
+) -> Any:
     return jsonable(create_membership_row(body, database=database))
 
 
-@router.patch("/api/team-memberships/{membership_id}")
+@router.patch("/api/team-memberships/{membership_id}", response_model=None)
 def update_membership(
     membership_id: UUID,
     body: MembershipPatch,
     user: Annotated[dict[str, Any], Depends(require_roles("ADMIN"))],
     database: Annotated[DatabaseSession, Depends(get_database)],
-):
+) -> Any:
     if not body.model_dump(exclude_unset=True):
         raise HTTPException(422, "At least one field is required")
     row = update_membership_row(membership_id, body, database=database)

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Annotated, Any
+from typing import Annotated, Any, cast
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
@@ -35,15 +35,18 @@ def driver_analytics(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
 ) -> list[dict[str, Any]]:
-    return jsonable(
-        get_driver_analytics(
-            championship_id,
-            season,
-            circuit_id,
-            driver_id,
-            team_id,
-            limit,
-            offset,
-            database,
-        )
+    return cast(
+        list[dict[str, Any]],
+        jsonable(
+            get_driver_analytics(
+                championship_id,
+                season,
+                circuit_id,
+                driver_id,
+                team_id,
+                limit,
+                offset,
+                database,
+            )
+        ),
     )

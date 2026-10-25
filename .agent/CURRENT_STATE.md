@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 403815e
+git_head: e55086a
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -48,3 +48,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44437 accepted458e68e: Execute actual resource classifier in VM; verify five states, retained-source retry identity, whitespace filters, pagination and immutable useful falsy values. Verify0.
 
 - T-44438 accepted403815e: Scope resource journey assertions to main and exact pagination controls; supply the actual zero-metric dashboard contract, preserving every test assertion. Verify0.
+
+- T-44439 acceptede55086a: Migrate pit read handlers and two repository queries to request-scoped auth/database dependencies; preserve exact SQL and original numeric response encoding. Verify0.
+
+- T382table344browserPASS/6FAIL T382-table.browser.raw.log: onlydesktopA3resourcepalette (red3.97–4.13%,championshipcream74.9%). Existing20resourceflowsPASS. No thresholdschanged. T44443 layoutrepairnext. Backend245PASS0skip/livePASS T44439.full.raw.log.

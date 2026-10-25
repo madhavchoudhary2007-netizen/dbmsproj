@@ -1,22 +1,27 @@
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 from .core.request_database import DatabaseSession
 
 
 def get_dashboard_data(database: DatabaseSession) -> dict[str, Any]:
-    active_sessions = database.fetch_one(
-        "SELECT count(*) AS count FROM race_sessions WHERE state='ACTIVE'"
+    active_sessions = cast(
+        dict[str, Any],
+        database.fetch_one("SELECT count(*) AS count FROM race_sessions WHERE state='ACTIVE'"),
     )
-    scheduled_events = database.fetch_one(
-        "SELECT count(DISTINCT e.id) AS count FROM race_events e "
-        "JOIN race_sessions s ON s.event_id=e.id "
-        "WHERE s.session_type='RACE' AND s.state='SCHEDULED'"
+    scheduled_events = cast(
+        dict[str, Any],
+        database.fetch_one(
+            "SELECT count(DISTINCT e.id) AS count FROM race_events e "
+            "JOIN race_sessions s ON s.event_id=e.id "
+            "WHERE s.session_type='RACE' AND s.state='SCHEDULED'"
+        ),
     )
-    open_incidents = database.fetch_one(
-        "SELECT count(*) AS count FROM incident_reports WHERE state='OPEN'"
+    open_incidents = cast(
+        dict[str, Any],
+        database.fetch_one("SELECT count(*) AS count FROM incident_reports WHERE state='OPEN'"),
     )
-    drivers = database.fetch_one("SELECT count(*) AS count FROM drivers")
+    drivers = cast(dict[str, Any], database.fetch_one("SELECT count(*) AS count FROM drivers"))
     active_session = database.fetch_one(
         "SELECT s.*,e.name AS event_name,c.name AS circuit_name "
         "FROM race_sessions s JOIN race_events e ON e.id=s.event_id "
