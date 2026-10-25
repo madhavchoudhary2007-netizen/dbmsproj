@@ -1,0 +1,115 @@
+diff --git a/backend/app/main.py b/backend/app/main.py
+index 04f3376..0d97727 100644
+--- a/backend/app/main.py
++++ b/backend/app/main.py
+@@ -33,7 +33,7 @@ from fastapi import (
+ from fastapi.middleware.cors import CORSMiddleware
+ from fastapi.responses import JSONResponse
+ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+-from psycopg import IntegrityError, OperationalError, sql
++from psycopg import IntegrityError, OperationalError
+ from psycopg.errors import ExclusionViolation, ForeignKeyViolation, UniqueViolation
+ from psycopg.rows import dict_row
+ from psycopg_pool import PoolClosed, PoolTimeout
+@@ -45,6 +45,7 @@ from starlette.middleware.base import RequestResponseEndpoint
+ 
+ from . import token_revocation
+ from .analytics_router import create_analytics_router
++from .api.crud import create_crud_router
+ from .api.dbms_lock import FutureTimeout as FutureTimeout
+ from .api.dbms_lock import create_dbms_lock_router
+ from .api.dbms_mongo import create_dbms_mongo_router
+@@ -90,7 +91,6 @@ from .core.validation import (
+     validate_session_laps,
+ )
+ from .crud_repository import (
+-    CrudDeleteError,
+     create_crud_row,
+     delete_crud_row,
+     get_crud_row,
+@@ -359,63 +359,29 @@ def create_automatic_reservation(
+ def crud_routes(
+     resource: str, table: str, cols: tuple[str, ...], joins: str = "", select: str | None = None
+ ):
+-    # Names here are hard-coded contract identifiers, never user supplied SQL.
+-    projection = select or f"{table}.*"
+-    base = (
+-        sql.SQL("SELECT {} FROM {} {}")
+-        .format(sql.SQL(projection), sql.Identifier(table), sql.SQL(joins))
+-        .as_string()
++    app.include_router(
++        create_crud_router(
++            resource,
++            table,
++            cols,
++            joins,
++            select,
++            authenticated_user_dependency=authenticated_user_dependency,
++            admin_role_dependency=admin_role_dependency,
++            limit_offset=lambda *args, **kwargs: limit_offset(*args, **kwargs),
++            jsonable=lambda *args, **kwargs: jsonable(*args, **kwargs),
++            list_crud_rows=lambda *args, **kwargs: list_crud_rows(*args, **kwargs),
++            get_crud_row=lambda *args, **kwargs: get_crud_row(*args, **kwargs),
++            _require_crud_record=lambda *args, **kwargs: _require_crud_record(*args, **kwargs),
++            _crud_write_payload=lambda *args, **kwargs: _crud_write_payload(*args, **kwargs),
++            validate_session_laps=lambda *args, **kwargs: validate_session_laps(*args, **kwargs),
++            create_crud_row=lambda *args, **kwargs: create_crud_row(*args, **kwargs),
++            fetch_one=lambda *args, **kwargs: fetch_one(*args, **kwargs),
++            update_crud_row=lambda *args, **kwargs: update_crud_row(*args, **kwargs),
++            delete_crud_row=lambda *args, **kwargs: delete_crud_row(*args, **kwargs),
++            get_telemetry_collection=lambda: telemetry_collection,
++        )
+     )
+-    prefix = f"/api/{resource}"
+-
+-    @app.get(prefix)
+-    def listing(
+-        limit: int = Query(50, ge=1, le=200),
+-        offset: int = Query(0, ge=0),
+-        user=authenticated_user_dependency,
+-    ):
+-        page_limit, page_offset = limit_offset(limit, offset)
+-        return jsonable(list_crud_rows(base, page_limit, page_offset))
+-
+-    @app.get(prefix + "/{item_id}")
+-    def get_item(item_id: UUID, user=authenticated_user_dependency):
+-        result = get_crud_row(base, table, item_id)
+-        return jsonable(_require_crud_record(result, f"{resource[:-1].capitalize()} not found"))
+-
+-    @app.post(prefix, status_code=201)
+-    def create_item(payload: dict[str, Any], user=admin_role_dependency):
+-        clean = _crud_write_payload(payload, cols)
+-        validate_session_laps(table, clean)
+-        row = create_crud_row(table, clean)
+-        return jsonable(row)
+-
+-    @app.patch(prefix + "/{item_id}")
+-    def update_item(item_id: UUID, payload: dict[str, Any], user=admin_role_dependency):
+-        clean = _crud_write_payload(payload, cols)
+-        validate_session_laps(table, clean)
+-        if table == "race_sessions":
+-            existing = fetch_one("SELECT state FROM race_sessions WHERE id=%s", (item_id,))
+-            if not existing:
+-                raise HTTPException(404, "Session not found")
+-            if existing["state"] != "SCHEDULED" and set(clean) & {
+-                "event_id",
+-                "session_type",
+-                "scheduled_at",
+-                "total_laps",
+-            }:
+-                raise HTTPException(
+-                    409, "Session context and lap count cannot change after a session starts"
+-                )
+-        row = update_crud_row(table, item_id, clean)
+-        return jsonable(_require_crud_record(row, f"{resource[:-1].capitalize()} not found"))
+-
+-    @app.delete(prefix + "/{item_id}", status_code=204)
+-    def delete_item(item_id: UUID, user=admin_role_dependency):
+-        try:
+-            delete_crud_row(table, resource, item_id, telemetry_collection)
+-        except CrudDeleteError as exc:
+-            raise HTTPException(exc.status_code, exc.detail) from exc
+-        return None
+ 
+ 
+ register_resources(crud_routes)

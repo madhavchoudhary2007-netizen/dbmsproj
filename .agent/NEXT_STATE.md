@@ -3,11 +3,6 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44365 W2 — OPEN
-- target_files: frontend/components/special-pages.tsx, frontend/lib/live-list-refresh.ts
-- contract: T379 extract exact async live session/race list refresh body and wire original useCallback.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
-
 ### T-44364 W2 — OPEN
 - target_files: backend/app/main.py
 - contract: T331 wire staged CRUD router factory through existing crud_routes registration wrapper without changing public handlers.
@@ -20,6 +15,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44365 accepted68e26c9; verify0.
 - T-44363 accepted70bf3a3; verify0.
 - T-44362 acceptedcc361aa; verify0.
 - T-44361 accepted5bba15e; verify0.
