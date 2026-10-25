@@ -1,6 +1,6 @@
 # CURRENT_STATE
-updated_at: 2026-10-25
-git_head: 7c1a7c7
+updated_at: 2026-10-26
+git_head: 01e561c
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -46,14 +46,11 @@ last_eval_score: obsolete51.2974; no current score; final T430
 
 - T387 case cards b301b9c and native dialogs/header82138ba implemented; sanction field styling44532 and session spam/result resilience tests44531 active. Penalty history/licence meter need an actual readable API source (drivers response has no season_points); never fabricate totals.
 
-- T-44532 acceptedf92abda: Use associated sanction fields with mobile stacking and unchanged disabled timing/grid guards and explanation. Verify0.
 
-- T-44531 accepted2e88c3d: Add gated same-frame official/simulator/delete spam, actual result loading/error/retry/retention and obsolete-session response checks. Verify0.
 
 - ADR-013 records missing T387 read models; focused Phase C and lock renewed. lock.sh embeds git commit, so identical hash/banner generation used to obey accept.sh-only commits. No API implementation yet.
 
-- T-44535 accepted09c2730: ADR-013 documents required read-only stewarding contracts, focused Phase C and renewed architecture lock; implementation pending. Verify0.
 
 - Runtime69PASS; T386 dialog five-width browser5PASS. Session spam regression recorded three failures, each20 requests; W2 guard ready for acceptance. ADR-013 focused Phase C/lock verified; official stewarding read implementation pending.
 
-- T-44533 accepted7c1a7c7: Restore token-sized labels and four-pixel ink control borders where legacy form rules overrode primitives. Verify0.
+

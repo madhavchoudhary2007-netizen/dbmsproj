@@ -1,12 +1,32 @@
 # NEXT_STATE
-updated_at: 2026-10-25
+updated_at: 2026-10-26
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44534 W2 — OPEN
-- target_files: frontend/lib/use-session-page.ts
-- contract: T386 suppress same-frame duplicate lifecycle, simulator and delete mutations with synchronous guards that survive rerenders.
+### T-44539 W2 — OPEN
+- target_files: frontend/lib/use-stewarding-records.ts, frontend/lib/use-steward-desk.ts
+- contract: T387 provide independent paged official penalties and seasonal licence read state without blocking the incident desk.
 - verify: npm --prefix frontend run test:runtime && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+
+### T-44540 W3 — OPEN
+- target_files: backend/tests/test_api.py
+- contract: T387 add a disposable-stack read-only integration assertion for the actual stewarding SQL queries.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q --collect-only backend/tests/test_api.py && .venv/bin/ruff check backend/tests/test_api.py && .venv/bin/ruff format --check backend/tests/test_api.py
+
+### T-44538 W1 — OPEN
+- target_files: frontend/components/pages/stewards.tsx
+- contract: T387 adjust the steward header surface and actual case count to satisfy unchanged palette bands.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+
+### T-44537 W3 — OPEN
+- target_files: backend/tests/test_stewarding_reads.py
+- contract: T387 add isolated HTTP regression coverage for ADR-013 read-only stewarding contracts and provider overrides.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q --collect-only backend/tests/test_stewarding_reads.py && .venv/bin/ruff check backend/tests/test_stewarding_reads.py && .venv/bin/ruff format --check backend/tests/test_stewarding_reads.py
+
+### T-44536 W2 — OPEN
+- target_files: backend/app/api/stewarding_reads.py, backend/app/main.py
+- contract: T387 implement ADR-013 authenticated read-only official penalty and seasonal licence endpoints through request-scoped providers.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_request_dependencies.py backend/tests/test_runtime_dependencies.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/api/stewarding_reads.py backend/app/main.py
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -18,6 +38,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44534 accepted01e561c; verify0.
 - T-44533 accepted7c1a7c7; verify0.
 - T-44535 accepted09c2730; verify0.
 - T-44531 accepted2e88c3d; verify0.

@@ -52,6 +52,7 @@ from .api.results_read import create_results_read_router
 from .api.results_write import create_results_write_router
 from .api.session_action import create_session_action_router
 from .api.simulation import create_simulation_router
+from .api.stewarding_reads import router as stewarding_reads_router
 from .api.stewards import create_stewards_router
 from .auth_cookie import verify_csrf_token
 from .auth_router import create_auth_router
@@ -320,6 +321,7 @@ register_resources(crud_routes)
 
 
 app.include_router(membership_router)
+app.include_router(stewarding_reads_router)
 
 
 app.include_router(
