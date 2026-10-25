@@ -141,3 +141,25 @@ test("marks every tied positive fastest lap and leaves drivers without one unmar
   assert.equal(orderRows[2].best_lap_ms, undefined);
   assert.equal(orderRows[3].best_lap_ms, undefined);
 });
+
+test("counts unique completed pit stops per driver without changing pit history", async () => {
+  const { deriveLiveTimingData } = await load();
+  const packets = [{ driver_id: "a" }, { driver_id: "b" }];
+  const history = [
+    { id: "p1", driver_id: "a", status: "COMPLETED" },
+    { id: "p1", driver_id: "a", status: "COMPLETED" },
+    { id: "p2", driver_id: "a", status: "COMPLETED" },
+    { id: "p3", driver_id: "a", status: "RESERVED" },
+    { id: "p4", driver_id: "b", status: "CANCELLED" },
+    { id: "p5", driver_id: "b", status: "COMPLETED" },
+  ];
+  const before = plain(history);
+  const missing = deriveLiveTimingData(packets, "", [], {}, [], [], false, false, undefined);
+  const empty = deriveLiveTimingData(packets, "", [], {}, [], [], false, false, []);
+  const data = deriveLiveTimingData(packets, "", [], {}, [], [], false, false, history);
+  assert.equal(missing.orderRows[0].pit_count, undefined);
+  assert.equal(missing.orderRows[1].pit_count, undefined);
+  assert.deepEqual(plain(empty.orderRows.map(row => row.pit_count)), [0, 0]);
+  assert.deepEqual(plain(data.orderRows.map(row => row.pit_count)), [2, 1]);
+  assert.deepEqual(plain(history), before);
+});
