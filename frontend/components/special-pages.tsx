@@ -1,24 +1,13 @@
 "use client";
 import { useCallback, useEffect } from "react";
-import {
-  Activity,
-  RefreshCw,
-  Radio,
-  TriangleAlert,
-} from "lucide-react";
-import { api, asArray, listAll, Row, API_BASE } from "@/lib/api";
+import { TriangleAlert } from "lucide-react";
 import { refreshLiveLists } from "@/lib/live-list-refresh";
 import { createLiveDemoActions } from "@/lib/live-demo-actions";
-import { belongsToLiveRun, deriveLiveTimingData } from "@/lib/live-timing-data";
+import { deriveLiveTimingData } from "@/lib/live-timing-data";
 import { startLiveRecordPolling } from "@/lib/live-record-polling";
 import { startInitialLiveSelection, startLiveListPolling } from "@/lib/live-list-polling";
 import { startLiveStream } from "@/lib/live-stream";
-import {
-  PageHeader,
-  ReloadButton,
-  SearchBox,
-  StateMessage,
-} from "./ui";
+import { PageHeader } from "./ui";
 import { useLiveTimingState } from "@/lib/use-live-timing-state";
 import { TelemetryCharts } from "./pages/live/telemetry-charts";
 import { RaceRecords } from "./pages/live/race-records";
