@@ -3,10 +3,15 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44517 W3 — OPEN
-- target_files: backend/tests/test_demo_route_dependencies.py
-- contract: T332 verify generated-race DELETE uses a request DatabaseSession override and preserves delete error ordering.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_demo_route_dependencies.py backend/tests/test_contract_snapshot.py backend/tests/test_request_dependencies.py backend/tests/test_runtime_dependencies.py && .venv/bin/ruff check backend/tests/test_demo_route_dependencies.py && .venv/bin/ruff format --check backend/tests/test_demo_route_dependencies.py
+### T-44521 W3 — OPEN
+- target_files: frontend/e2e/live-records.spec.ts
+- contract: T385 correct the temperature-tile locator to exclude the chart tooltip without weakening value checks.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && npx playwright test e2e/live-records.spec.ts --list
+
+### T-44519 W1 — OPEN
+- target_files: frontend/components/pages/session-controls.tsx, frontend/components/pages/session-simulator.tsx
+- contract: T386 restyle existing session lifecycle and simulator controls without changing their behavior.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -18,6 +23,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44517 accepteddede5cd; verify0.
 - T-44516 accepted7023bc4; verify0.
 - T-44518 acceptedeffb424; verify0.
 - T-44515 accepted51b8121; verify0.

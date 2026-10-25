@@ -1,5 +1,8 @@
 import type { Row } from "@/lib/api";
-import { Button } from "@/components/ui";
+import { NbButton } from "@/components/nb/button";
+import { NbCard } from "@/components/nb/card";
+import { NbField } from "@/components/nb/field";
+import { NbInput } from "@/components/nb/input";
 
 type SessionSimulatorProps = {
   drivers: Row[];
@@ -21,54 +24,51 @@ export function SessionSimulator({
   simulate,
 }: SessionSimulatorProps) {
   return (
-    <div className="sim-controls">
+    <NbCard tone="cream" className="sim-controls space-y-4">
       <div>
-        <div className="eyebrow">TELEMETRY SIMULATOR</div>
-        <p className="muted">
+        <div className="eyebrow font-bold text-ink">TELEMETRY SIMULATOR</div>
+        <p className="font-sans text-[length:var(--fs-body)] text-ink">
           Start telemetry simulation for the selected session.
         </p>
       </div>
-      <label>
-        Cars
-        <input
-          type="number"
-          min="1"
-          max={Math.max(
-            1,
-            drivers.filter((d) => d.eligibility === "ACTIVE").length,
-          )}
-          value={simCars}
-          onChange={(e) => setSimCars(+e.target.value)}
-        />
-        <small className="muted">
-          {drivers.filter((d) => d.eligibility === "ACTIVE").length}{" "}
-          eligible drivers available
-        </small>
-      </label>
-      <label>
-        Rate Hz
-        <input
-          type="number"
-          min="1"
-          value={simRate}
-          onChange={(e) => setSimRate(+e.target.value)}
-        />
-      </label>
-      <div className="action-row">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <NbField
+          id="sim-cars"
+          label="Cars"
+          description={`${drivers.filter((d) => d.eligibility === "ACTIVE").length} eligible drivers available`}
+        >
+          <NbInput
+            type="number"
+            min="1"
+            max={Math.max(1, drivers.filter((d) => d.eligibility === "ACTIVE").length)}
+            value={simCars}
+            onChange={(e) => setSimCars(+e.target.value)}
+          />
+        </NbField>
+        <NbField id="sim-rate" label="Rate Hz">
+          <NbInput
+            type="number"
+            min="1"
+            value={simRate}
+            onChange={(e) => setSimRate(+e.target.value)}
+          />
+        </NbField>
+      </div>
+      <div className="action-row flex flex-wrap gap-2">
         {["start", "pause", "resume", "stop", "reset"].map((a) => (
-          <Button
+          <NbButton
             key={a}
             disabled={
               (a === "start" && current?.state !== "ACTIVE") ||
               (a === "reset" && current?.state !== "PAUSED")
             }
-            kind={a === "stop" ? "danger" : "secondary"}
+            variant={a === "stop" ? "danger" : "secondary"}
             onClick={() => void simulate(a)}
           >
             {a}
-          </Button>
+          </NbButton>
         ))}
       </div>
-    </div>
+    </NbCard>
   );
 }

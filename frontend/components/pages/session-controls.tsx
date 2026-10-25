@@ -1,6 +1,6 @@
 import { Pause, Play, Square } from "lucide-react";
 import { Row } from "@/lib/api";
-import { Button } from "../ui";
+import { NbButton } from "@/components/nb/button";
 
 type SessionControlsProps = {
   current: Row;
@@ -24,43 +24,52 @@ export function SessionControls({
   getResults,
 }: SessionControlsProps) {
   return (
-    <div className="action-row">
-      {canManage && (
-        <Button
-          kind="secondary"
-          onClick={() => {
-            setEditModal(true);
-            setModal(true);
-          }}
-        >
-          Edit session
-        </Button>
-      )}
+    <div className="space-y-3">
       {canControl && (
-        <>
-          <Button disabled={current?.state !== "SCHEDULED"} onClick={() => void perform("start")}>
+        <div role="group" aria-label="Session lifecycle" className="flex flex-wrap items-stretch gap-2">
+          <span className="inline-flex min-h-12 items-center border-4 border-ink bg-yellow px-3 font-bold uppercase text-ink">
+            {String(current?.state ?? "")}
+          </span>
+          <NbButton className="[&_.nb-face]:!min-h-12" disabled={current?.state !== "SCHEDULED"} onClick={() => void perform("start")}>
             <Play size={14} /> Start
-          </Button>
-          <Button kind="secondary" disabled={current?.state !== "ACTIVE"} onClick={() => void perform("pause")}>
+          </NbButton>
+          <NbButton className="[&_.nb-face]:!min-h-12" variant="secondary" disabled={current?.state !== "ACTIVE"} onClick={() => void perform("pause")}>
             <Pause size={14} /> Pause
-          </Button>
-          <Button kind="secondary" disabled={current?.state !== "PAUSED"} onClick={() => void perform("resume")}>
+          </NbButton>
+          <NbButton className="[&_.nb-face]:!min-h-12" variant="secondary" disabled={current?.state !== "PAUSED"} onClick={() => void perform("resume")}>
             <Play size={14} /> Resume
-          </Button>
-          <Button kind="danger" disabled={current?.state !== "ACTIVE" && current?.state !== "PAUSED"} onClick={() => void perform("finish")}>
+          </NbButton>
+          <NbButton className="[&_.nb-face]:!min-h-12" variant="danger" disabled={current?.state !== "ACTIVE" && current?.state !== "PAUSED"} onClick={() => void perform("finish")}>
             <Square size={14} /> Finish
-          </Button>
-          <Button kind="secondary" disabled={!current || current.state === "SCHEDULED"} onClick={() => void perform("reset")}>
-            Reset
-          </Button>
-          <Button kind="secondary" disabled={!current || !["ACTIVE", "PAUSED", "COMPLETED"].includes(String(current.state))} onClick={() => setResultModal(true)}>
-            Record result
-          </Button>
-        </>
+          </NbButton>
+        </div>
       )}
-      <Button kind="secondary" onClick={() => void getResults()}>
-        Load results
-      </Button>
+      <div className="action-row flex flex-wrap gap-2">
+        {canManage && (
+          <NbButton
+            variant="secondary"
+            onClick={() => {
+              setEditModal(true);
+              setModal(true);
+            }}
+          >
+            Edit session
+          </NbButton>
+        )}
+        {canControl && (
+          <>
+            <NbButton variant="secondary" disabled={!current || current.state === "SCHEDULED"} onClick={() => void perform("reset")}>
+              Reset
+            </NbButton>
+            <NbButton variant="secondary" disabled={!current || !["ACTIVE", "PAUSED", "COMPLETED"].includes(String(current.state))} onClick={() => setResultModal(true)}>
+              Record result
+            </NbButton>
+          </>
+        )}
+        <NbButton variant="secondary" onClick={() => void getResults()}>
+          Load results
+        </NbButton>
+      </div>
     </div>
   );
 }

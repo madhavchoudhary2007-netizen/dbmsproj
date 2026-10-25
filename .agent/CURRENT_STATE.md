@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 7023bc4
+git_head: dede5cd
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -40,10 +40,10 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T383 hero/list/nativeDelete/persistentmutationguard7ae0ac6 implemented. GeneratedlistfiveStates e52386c, observer6tests7e554e7; runtime64PASS. Readable scopedselectors/notices262f582. Root T383-list-final40PASS10FAIL: all20mutationcasespass; outagefixtures corrected0ba1b81; focused10/10recoveryPASS T383-list-recovery.browser.raw.log (combinedearlier40PASS). Initialroute50browserPASS T383-header-cards.
 - T384 interval/sector/fastest metadata1f267c0 with3VMcases37a230e; NbTabledriverselectionafe1acd/domaincells9f604dd/motionmobile401fdf1/fiveStatesf8b1888. Actualsnapshot5VMcases3518121; runtime64PASS. All25focusedbrowsercases havepassing evidence: T384-tower15PASS +T384-tower-repair8PASS +T384-mobile-selection2PASS. Driverclick/Enter/Space/selectedaria/mobileDetails/axe/overflow5widths, actualWSreorder/reducedmotion. NoAPIshapechanges. No newdependencies or realDBwrites. Rootproductedits0.
 
-- T385 theme5f8c134/frames+4actualcornertilesa8a1741/partialretryandlayout040cb67; recorded-lapNbTable/incident+pit5State timelines38165fc/sourceflags63a8d91 +7VMcasesc96573a. LatestTelemetry44509underreview; livehistorybrowser44512pending. M13firstdrawpending.
-
-- Pit count metadata1d3180f deduplicates actual completed IDs; not yet wired into tower. T383 factual selected-race lap counter still pending; no inferred/fake progress.
+- T385 chart theme/frames/corner tiles, record and latest-telemetry tables, timelines and poll/retry state implemented. Pit counts wired ad39af5 with real selected-race lap counters. Runtime64PASS. Production build/lint/types0 T383-385-build.raw.log (before Sessions).
 - T44503 one transient worker usage error; account tool reported ordinaryUsageAllowed=true; same-role retry succeeded. Its unaccepted236-line rewrite was restored only in clone, replacedwith57-line targeted change. No model substitution.
 
-- Current production source build/lint/types0 T383-385-build.raw.log (beforeSessions). T385 all empty/loading/error/retry/retention browser cases15PASS across focused runs; final5populated cases exposed snapshot childcontrast+nonfocusabletable, repairedT44518 pendingbrowser. M13firstdraw remainsopen.
-- T332 demo DELETE now uses request DatabaseSession c48443f; exactdeletehelperAST unchanged, 245fullPASS +livePASS; missing-marker404 precedes lazyMongo503. Dedicated4overridecases T44517 readyforacceptance. No schema/API changes.
+- Current production source build/lint/types0 T383-385-build.raw.log (beforeSessions). T385 all empty/loading/error/retry/retention browser cases15PASS across focused runs; T44518 repaired snapshot contrast and table keyboard scrolling. Focused populated run4PASS/1 fixture locator collision, T44521 repairs tooltip/tile scoping. M13firstdraw remainsopen.
+- T332 demo DELETE uses request DatabaseSession c48443f; exact helper AST unchanged; missing-marker404 precedes lazyMongo503. Four request-override tests dede5cd accepted; root full249-test run in progress. No schema/API changes.
+
+- T-44517 accepteddede5cd: Test generated-race DELETE with request database overrides and exact 204/404/503/409 ordering and simulation state. Verify0.
