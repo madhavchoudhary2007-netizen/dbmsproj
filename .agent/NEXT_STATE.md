@@ -13,11 +13,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T379 move exact DbmsCenter page into pages/dbms-center.tsx and retain compatibility reexport.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
-### T-44318 W2 — OPEN
-- target_files: frontend/lib/use-pit-wall.ts
-- contract: T379 stage exact PitWall state/effects/actions into use-pit-wall hook; do not wire presentation yet.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
-
 ## Blocked
 - None currently. Owner switched workers to gpt-6-luna/high; T44318 interrupted before edits, fresh worker required.
 
@@ -25,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44318 accepted3b7ca06; verify0.
 - T-44320 accepted4645e52; verify0.
 - T-44319 acceptedba3fa7c; verify0.
 - T-44316 acceptedf2ef65e; verify0.
