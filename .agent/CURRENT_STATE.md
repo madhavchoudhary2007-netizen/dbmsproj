@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: f4e0e36
+git_head: 95cc69c
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -61,3 +61,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 
 
 - T387 independent paged source e6dfc57 accepted; typed UUIDs and one queued refresh after pending read. Twelve HTTP read tests passed; dedicated read-only SQL comparison added, full disposable gate pending. Root current continuation0 product edits.
+
+- T-44541 accepted95cc69c: Render official penalty NbTable and factual seasonal 12-cell licence meters with independent five states and bounded paging. Verify0.
