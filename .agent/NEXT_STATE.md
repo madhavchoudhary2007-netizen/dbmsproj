@@ -3,10 +3,15 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44388 W2 — OPEN
-- target_files: frontend/lib/use-dashboard.ts, frontend/lib/dashboard-load.ts
-- contract: T381 five-state dashboard data boundary with independent source results, stale-response and unmount protection.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && npm --prefix frontend run test:runtime
+### T-44391 W1 — OPEN
+- target_files: frontend/components/pages/dashboard.tsx, frontend/components/nb/state.tsx
+- contract: T381 wire real dashboard KPI data through NbState and add planned Next up paper card from existing next_event data.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh
+
+### T-44390 W3 — OPEN
+- target_files: frontend/e2e/runtime/dashboard-load.test.mjs
+- contract: T381 regressions for actual dashboard-load module: independent source settlement and all five state classifications.
+- verify: npm --prefix frontend run test:runtime && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -16,6 +21,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44388 accepted0f0ec37; verify0.
 - T-44389 accepteda74019e; verify0.
 - T-44387 accepted61cfaa0; verify0.
 - T-44386 acceptede0f42fd; verify0.
@@ -43,5 +49,5 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T44360 065361e stream wire; T44361 5bba15e CRUD router stage; T44362 cc361aa live polling.
 - T44363 70bf3a3 nested-router test traversal; T44365 68e26c9 list refresh; T44364 a52fd5b CRUD wire.
 - Phases0–2,5–6 complete. Login T380 complete0a3e206; remaining Phase7 pages dependT379.
-- T379 Dashboard/Sessions/Stewards/Pit/Analytics/DBMS moves complete; only final Live local state/page move remains.
-- Backend T331 remains main<=120; latest main1047lines. CRUD wire isolated full suite running T44364.full.raw.log.
+- T379 all seven route moves complete; final full palette gate remains.
+- Backend T331 remains main<=120; latest main894lines. Latest full T44386:231PASS0skip/livePASS.

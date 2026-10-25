@@ -1,0 +1,116 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import * as vm from "node:vm";
+
+const require = createRequire(import.meta.url);
+const typescript = require("../../node_modules/typescript");
+const source = readFileSync(new URL("../../lib/dashboard-load.ts", import.meta.url), "utf8");
+
+async function load(readDashboardFeed, api) {
+  const realm = vm.createContext({ Promise });
+  const output = typescript.transpileModule(source, {
+    compilerOptions: { module: typescript.ModuleKind.ESNext, target: typescript.ScriptTarget.ES2022 },
+  }).outputText;
+  const feed = new vm.SyntheticModule(["readDashboardFeed"], function () {
+    this.setExport("readDashboardFeed", readDashboardFeed);
+  }, { context: realm, identifier: "./dashboard-feed" });
+  const mockedApi = new vm.SyntheticModule(["api"], function () {
+    this.setExport("api", api);
+  }, { context: realm, identifier: "./api" });
+  const sourceModule = new vm.SourceTextModule(output, { context: realm, identifier: "./dashboard-load.ts" });
+  await sourceModule.link(specifier => {
+    if (specifier === "./dashboard-feed") return feed;
+    if (specifier === "./api") return mockedApi;
+    throw new Error(`Unexpected import: ${specifier}`);
+  });
+  await sourceModule.evaluate();
+  return sourceModule.namespace;
+}
+
+function deferred() {
+  let resolve;
+  let reject;
+  const promise = new Promise((yes, no) => { resolve = yes; reject = no; });
+  return { promise, resolve, reject };
+}
+
+test("loadDashboardSources starts both sources and forwards force and the shared abort signal", async () => {
+  const dashboard = deferred();
+  const health = deferred();
+  const controller = new AbortController();
+  const signal = controller.signal;
+  const calls = [];
+  const { loadDashboardSources } = await load(
+    options => { calls.push(["dashboard", options]); return dashboard.promise; },
+    (path, options) => { calls.push(["health", path, options]); return health.promise; },
+  );
+  const result = loadDashboardSources(true, signal);
+  assert.equal(calls.length, 2);
+  assert.equal(calls[0][0], "dashboard");
+  assert.equal(calls[0][1].force, true);
+  assert.equal(calls[0][1].signal, signal);
+  assert.equal(calls[1][0], "health");
+  assert.equal(calls[1][1], "/health");
+  assert.equal(calls[1][2].signal, signal);
+  controller.abort();
+  assert.equal(calls[0][1].signal.aborted, true);
+  assert.equal(calls[1][2].signal.aborted, true);
+  const dashboardData = { active_sessions: 1 };
+  const healthData = { status: "ok" };
+  dashboard.resolve(dashboardData);
+  health.resolve(healthData);
+  const settled = await result;
+  assert.equal(settled.dashboard.status, "fulfilled");
+  assert.equal(settled.health.status, "fulfilled");
+  if (settled.dashboard.status === "fulfilled") assert.equal(settled.dashboard.value, dashboardData);
+  if (settled.health.status === "fulfilled") assert.equal(settled.health.value, healthData);
+});
+
+test("loadDashboardSources retains either or both source rejections without throwing", async () => {
+  for (const rejected of ["dashboard", "health", "both"]) {
+    const dashboardError = new Error("dashboard failed");
+    const healthError = new Error("health failed");
+    const { loadDashboardSources } = await load(
+      () => rejected !== "dashboard" && rejected !== "both"
+        ? Promise.resolve({ drivers: 2 }) : Promise.reject(dashboardError),
+      () => rejected !== "health" && rejected !== "both"
+        ? Promise.resolve({ status: "ok" }) : Promise.reject(healthError),
+    );
+    const result = await loadDashboardSources(false);
+    assert.equal(result.dashboard.status, rejected === "dashboard" || rejected === "both" ? "rejected" : "fulfilled");
+    assert.equal(result.health.status, rejected === "health" || rejected === "both" ? "rejected" : "fulfilled");
+    if (result.dashboard.status === "rejected") assert.equal(result.dashboard.reason, dashboardError);
+    if (result.health.status === "rejected") assert.equal(result.health.reason, healthError);
+  }
+});
+
+test("deriveDashboardState classifies loading, empty, error, populated, and partial data", async () => {
+  const { deriveDashboardState: state } = await load(() => Promise.resolve({}), () => Promise.resolve({}));
+  assert.equal(state(null, true, "offline", "down").status, "loading");
+  const nullEmpty = state(null, false, "", "down");
+  assert.equal(nullEmpty.status, "empty");
+  if (nullEmpty.status === "empty") assert.equal(nullEmpty.reason, "no-data");
+  const nullError = state(null, false, "offline", "down");
+  assert.equal(nullError.status, "error");
+  if (nullError.status === "error") {
+    assert.equal(nullError.error.message, "offline");
+    assert.equal(nullError.error.retryable, true);
+  }
+  const emptyObject = state({}, false, "", "");
+  assert.equal(emptyObject.status, "empty");
+  if (emptyObject.status === "empty") assert.equal(emptyObject.reason, "no-data");
+  const zeros = { active_sessions: 0, scheduled_events: 0, open_incidents: 0, drivers: 0 };
+  const populated = state(zeros, false, "", "");
+  assert.equal(populated.status, "populated");
+  if (populated.status === "populated") assert.equal(populated.data, zeros);
+  const retained = { active_sessions: 3, drivers: 1 };
+  const partial = state(retained, false, "timeout", "degraded");
+  assert.equal(partial.status, "partial");
+  if (partial.status === "partial") {
+    assert.equal(partial.data, retained);
+    assert.equal(partial.filter.label, "Dashboard data unavailable: timeout; Service health unavailable: degraded");
+    assert.equal(partial.totalCount, 4);
+  }
+});
