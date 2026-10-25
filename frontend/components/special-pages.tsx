@@ -7,6 +7,7 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import { api, asArray, listAll, Row, API_BASE } from "@/lib/api";
+import { refreshLiveLists } from "@/lib/live-list-refresh";
 import { createLiveDemoActions } from "@/lib/live-demo-actions";
 import { belongsToLiveRun, deriveLiveTimingData } from "@/lib/live-timing-data";
 import { startLiveRecordPolling } from "@/lib/live-record-polling";
@@ -69,19 +70,7 @@ export function LiveTiming() {
     }
   }, []);
   const refreshLists = useCallback(async () => {
-    const request = ++listRequest.current;
-    const [s, r] = await Promise.all([
-      listAll("/sessions"),
-      listAll("/demo-races"),
-    ]);
-    const sessionRows = asArray(s);
-    const raceRows = asArray(r);
-    if (request === listRequest.current) {
-      setSessions(sessionRows);
-      setDemoRaces(raceRows);
-      clearError("lists");
-    }
-    return { sessionRows, raceRows, current: request === listRequest.current };
+    return refreshLiveLists(listRequest, setSessions, setDemoRaces, clearError);
   }, [clearError]);
   useEffect(() => {
     return startInitialLiveSelection(refreshLists, autoFollow, setSession, reportError);

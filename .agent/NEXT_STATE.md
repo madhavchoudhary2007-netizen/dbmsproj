@@ -3,10 +3,15 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44363 W3 — OPEN
-- target_files: backend/tests/test_api.py
-- contract: T331 retain lifecycle timestamp rejection test through included API routers using existing route traversal helper.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k session_crud_does_not_accept_lifecycle_timestamps && .venv/bin/ruff check backend/tests/test_api.py
+### T-44365 W2 — OPEN
+- target_files: frontend/components/special-pages.tsx, frontend/lib/live-list-refresh.ts
+- contract: T379 extract exact async live session/race list refresh body and wire original useCallback.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
+
+### T-44364 W2 — OPEN
+- target_files: backend/app/main.py
+- contract: T331 wire staged CRUD router factory through existing crud_routes registration wrapper without changing public handlers.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_api.py -k "contract or route or session_crud_does_not_accept_lifecycle_timestamps or protected_driver_session_fields" && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py
 
 ## Blocked
 - None currently. Owner switch gpt-6-luna/high implemented and freshworkers succeeded.
@@ -15,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44363 accepted70bf3a3; verify0.
 - T-44362 acceptedcc361aa; verify0.
 - T-44361 accepted5bba15e; verify0.
 - T-44360 accepted065361e; verify0.

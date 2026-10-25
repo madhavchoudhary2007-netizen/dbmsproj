@@ -1,0 +1,63 @@
+diff --git a/frontend/components/special-pages.tsx b/frontend/components/special-pages.tsx
+index 71a3afa..f7ae0d0 100644
+--- a/frontend/components/special-pages.tsx
++++ b/frontend/components/special-pages.tsx
+@@ -7,6 +7,7 @@ import {
+   TriangleAlert,
+ } from "lucide-react";
+ import { api, asArray, listAll, Row, API_BASE } from "@/lib/api";
++import { refreshLiveLists } from "@/lib/live-list-refresh";
+ import { createLiveDemoActions } from "@/lib/live-demo-actions";
+ import { belongsToLiveRun, deriveLiveTimingData } from "@/lib/live-timing-data";
+ import { startLiveRecordPolling } from "@/lib/live-record-polling";
+@@ -69,19 +70,7 @@ export function LiveTiming() {
+     }
+   }, []);
+   const refreshLists = useCallback(async () => {
+-    const request = ++listRequest.current;
+-    const [s, r] = await Promise.all([
+-      listAll("/sessions"),
+-      listAll("/demo-races"),
+-    ]);
+-    const sessionRows = asArray(s);
+-    const raceRows = asArray(r);
+-    if (request === listRequest.current) {
+-      setSessions(sessionRows);
+-      setDemoRaces(raceRows);
+-      clearError("lists");
+-    }
+-    return { sessionRows, raceRows, current: request === listRequest.current };
++    return refreshLiveLists(listRequest, setSessions, setDemoRaces, clearError);
+   }, [clearError]);
+   useEffect(() => {
+     return startInitialLiveSelection(refreshLists, autoFollow, setSession, reportError);
+diff --git a/frontend/lib/live-list-refresh.ts b/frontend/lib/live-list-refresh.ts
+new file mode 100644
+index 0000000..14eb1dd
+--- /dev/null
++++ b/frontend/lib/live-list-refresh.ts
+@@ -0,0 +1,24 @@
++import type { Dispatch, MutableRefObject, SetStateAction } from "react";
++import { asArray, listAll, type Row } from "@/lib/api";
++import type { LiveErrorSource } from "@/lib/live-stream-types";
++
++export async function refreshLiveLists(
++  listRequest: MutableRefObject<number>,
++  setSessions: Dispatch<SetStateAction<Row[]>>,
++  setDemoRaces: Dispatch<SetStateAction<Row[]>>,
++  clearError: (source?: LiveErrorSource) => void,
++): Promise<{ sessionRows: Row[]; raceRows: Row[]; current: boolean }> {
++  const request = ++listRequest.current;
++  const [s, r] = await Promise.all([
++    listAll("/sessions"),
++    listAll("/demo-races"),
++  ]);
++  const sessionRows = asArray(s);
++  const raceRows = asArray(r);
++  if (request === listRequest.current) {
++    setSessions(sessionRows);
++    setDemoRaces(raceRows);
++    clearError("lists");
++  }
++  return { sessionRows, raceRows, current: request === listRequest.current };
++}
