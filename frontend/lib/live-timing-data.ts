@@ -1,5 +1,21 @@
 import type { Row } from "./api";
 
+export function belongsToLiveRun(
+  packet: Row,
+  session: string,
+  startedAt: string | undefined,
+): boolean {
+  if (String(packet.session_id || session) !== session) return false;
+  if (!startedAt || !packet.ts) return true;
+  const packetTime = new Date(String(packet.ts)).getTime();
+  const runStart = new Date(String(startedAt)).getTime();
+  return (
+    !Number.isFinite(packetTime) ||
+    !Number.isFinite(runStart) ||
+    packetTime >= runStart
+  );
+}
+
 export function deriveLiveTimingData(
   packets: Row[],
   driver: string,

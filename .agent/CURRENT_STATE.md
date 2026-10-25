@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 42321a7
+git_head: 57f81b3
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -15,9 +15,9 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 
 ## Active work / evidence
 - T379 exact moves: Dashboard hook/module; Sessions hooks/actions/components/module03ab0d5 plus8real-module operationtestsbd3f9c2, root120browserPASS. Steward f2ef65e root55browserPASS; Pit28eb2e1+DBMS8d44b1f root100browserPASS; Analyticsbd20525. Root105live/analyticsbrowserPASS T379-live-analytics.browser.raw.log. Only Live split remains beforeT379/T381.
-- Live exact extracted charts5c977c3, records1c47bc2, timing409d428, latestcf15b05, snapshot477af90; data7603ad3 and demoactionsad281aa staged. W2T44342 actionwire and W1T44343 demohero/list staging active, disjointtargets. Derivedhelper must additionally return driverIds when wired (existing selector references it; rootpacket omission, not productbug yet).
+- Live exact extracted charts5c977c3, records1c47bc2, timing409d428, latestcf15b05, snapshot477af90; data7603ad3 and demoactionsad281aa staged. Demoactions7718c89 and data8a33d97 (driverIds included) wired; controls/modal171cb46, records96cabf5 wired. Lazyactioncontext57f81b3 avoids render-time refs, fourruntimecases266e518/harnessrepair20b8d27. Selectors42321a7 staged; W1T44354wire and W2T44352purepredicate active, disjointtargets.
 - Backend T331 results/sessionaction/pit/DBMS/SQL/Mongo/locks/archive/laps/stewards/runtimehelpers extracted. Preserve legacy main aliases and currentcallbacklookup untilT332; removingDecision once caused7failures, fixed5ee4710. BodyAST parity independently checked for moves. No locals/proxy/class tricks.
-- Latest full backend after startwire642a40f:231PASS,0fail/skip/xfailed + liveacceptancePASS, T44339.full.raw.log. Earlier restore/demo/incident/pit/reset/finalization/lifecycle fulls also231/livegreen. T44341 tickpersistence accepted; needs nextfull. Main1121lines. Snapshot9/runtimeuniqueness2/input27/seededGET14 retained. T44274 nestedrouter testlookup repair preserved STEWARDassertion.
+- Latest full backend after tickpersistbbbd12e:231PASS,0fail/skip/xfailed + liveacceptancePASS, T44341.full.raw.log. Earlier restore/demo/incident/pit/reset/finalization/lifecycle fulls also231/livegreen. T44341 bbbd12e tickpersistence full231PASS0skip/livePASS T44341.full.raw.log. Main1121lines. Snapshot9/runtimeuniqueness2/input27/seededGET14 retained. T44274 nestedrouter testlookup repair preserved STEWARDassertion.
 - Owner worker switch implementedba3fa7c/4645e52; boot0 and freshcustom-role toolmetadata6luna/high. Prior5.6 quota retry44316 finishedbefore switch; old44318 interruptedbeforeedits. No dependencies added this continuation.
 
 ## Safety / workflow
@@ -35,28 +35,9 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - Root44319 verifyquotingfailed, fixedshlex.quote/reaccept0; prematuremark removedbeforecommit. Worker44321/28/33 countmismatches normalizedrealstats. Root44334 -k reset selected0/exit5; isolatedtaskfiles restored/re-dispatchedonce with existinglifecycle/stop tests,17PASS; noassertionchanged.
 - Root44331 dispatch briefly overlapped same relativetarget as44330 in separateclones; interruptedbeforeedits, resumedonlyafter44330accepted. Neverexceeded2workers. Allpackets/results/patches/acceptlogs inGit/.agent/results.
 
-- T-44342 accepted7718c89: Activate exact generated-race actions through typed callback helper; retain all page JSX and render closures. Verify0.
+- Root44348 clone raced dependencyaccept: missinghelper TSexit2; isolatedtarget restored, acceptedreadonlydependency provisioned, repairpassed. Queue after dependencies accept.
 
-- T-44343 accepted6fb844f: Stage exact generated race hero, message and list, retaining copy, accessibility hooks and selection ordering. Verify0.
+- T44350 constmodule testharness lint defect blocked44348/51. W3T44353 bindingrename20b8d27 preserved allassertions; rootaccepts44348/51 subsequentlypassed.
 
-- T-44344 accepted8a33d97: Wire exact derived live timing helper and expose existing driverIds; preserve all effects, actions and JSX. Verify0.
+- T44349 eagerfactory rootproposal failed react-hooks/refs; lazyevent-time repairpassed57f81b3. W1T44351 localRowtype boundary corrected to existingAPIimport beforeaccept.
 
-- T-44345 accepted96b97d0: Stage exact generated-race delete modal with original copy, guards and callback bindings. Verify0.
-
-- T-44346 accepted171cb46: Activate exact generated race controls and delete modal; preserve copy, state guards and existing bindings. Verify0.
-
-- T-44347 accepteda14c234: Stage exact live lap/incident/pit record polling, retaining reset order, alive guard, retry and cleanup. Verify0.
-
-- Root44348 clone raced dependencyaccept: missinghelper caused TSexit2. Restored onlyisolatedtarget, provisioned exactaccepted a14c234 helper as read-onlytrackedcontext; re-dispatchonce. Futurequeue onlyafterdependencyaccept closes.
-
-- T-44350 accepted266e518: Add four actual-module demo race creation/deletion regressions for payloads, selection, cleanup, error preservation and busy state. Verify0.
-
-- RootT44348accept failed due unrelated acceptedT44350 testharness constmodule violating Nextlint. Restored only rootT44348target, kept its patch referenced; W1T44351 samebaselinefailure. W3T44353 exactvariablerename repair queued, allassertions unchanged; rerun independentaccepts afterward.
-
-- T-44353 accepted20b8d27: Rename test harness local module binding only; retain all four tests and assertions, full frontend lint passes. Verify0.
-
-- T-44348 accepted96cabf5: Activate exact live record polling helper while retaining effect position, stable dependencies and all page JSX. Verify0.
-
-- T44349 eagerfactory proposal failed react-hooks/refs (originalevent-time T44342 correct). Restored onlyisolatedtarget; repair uses one lazycontextconstructor/event-timecalls, no suppression/behaviorchange. T44351 localRowtype boundary corrected to existingAPIimport beforeaccept.
-
-- T-44351 accepted42321a7: Stage exact live selectors with existing API Row, membership filter, option labels and manual-selection ref behavior. Verify0.

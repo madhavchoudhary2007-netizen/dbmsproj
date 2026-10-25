@@ -3,10 +3,15 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44349 W2 — OPEN
+### T-44352 W2 — OPEN
+- target_files: frontend/lib/live-timing-data.ts
+- contract: T379 stage exact current-run packet predicate as pure helper in live-timing-data; leave existing stream unchanged.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
+
+### T-44354 W1 — OPEN
 - target_files: frontend/components/special-pages.tsx
-- contract: T379 share lazy demo action factory context, avoiding render-time ref access rejected by lint.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint && node --experimental-vm-modules --test frontend/e2e/runtime/live-demo-actions.test.mjs
+- contract: T379 activate exact staged LiveSelectors toolbar and remove duplicate toolbar JSX.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
 ## Blocked
 - None currently. Owner switch gpt-6-luna/high implemented and freshworkers succeeded.
@@ -15,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44349 accepted57f81b3; verify0.
 - T-44351 accepted42321a7; verify0.
 - T-44348 accepted96cabf5; verify0.
 - T-44353 accepted20b8d27; verify0.
