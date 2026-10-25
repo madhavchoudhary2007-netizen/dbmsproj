@@ -1,0 +1,82 @@
+diff --git a/frontend/e2e/runtime/session-operations.test.mjs b/frontend/e2e/runtime/session-operations.test.mjs
+index a3a8cfa..df4f5cb 100644
+--- a/frontend/e2e/runtime/session-operations.test.mjs
++++ b/frontend/e2e/runtime/session-operations.test.mjs
+@@ -148,3 +148,77 @@ test("delete clears selection and results, and reports failures after cleanup",
+   await failed;
+   assert.deepEqual(events.slice(-2), [["message", "delete failed"], ["busy", false]]);
+ });
++
++test("results read forwards its signal and clears prior error while loading", async () => {
++  const loaded = await load("actions", controlledApi());
++  const events = [];
++  const signal = { aborted: false };
++  const task = loaded.functions.readSessionResults("s1", value => events.push(["results", value]), value => events.push(["loaded", value]), value => events.push(["message", value]), {
++    signal,
++    setResultsError: value => events.push(["error", value]),
++    setResultsLoading: value => events.push(["loading", value]),
++  });
++  assert.equal(loaded.api.requests[0].options.signal, signal);
++  assert.deepEqual(events, [["error", ""], ["loading", true]]);
++  const rows = [{ id: "r1" }];
++  loaded.api.requests[0].resolve(rows);
++  await task;
++  assert.deepEqual(events.slice(2), [["results", rows], ["loaded", true], ["loading", false]]);
++});
++
++test("results rejection preserves rows, reports the error, and clears loading", async () => {
++  const loaded = await load("actions", controlledApi());
++  const previous = [{ id: "existing" }];
++  let results = previous, isLoaded = true;
++  const events = [];
++  const task = loaded.functions.readSessionResults("s1", value => { results = value; events.push(["results", value]); }, value => { isLoaded = value; events.push(["loaded", value]); }, value => events.push(["message", value]), {
++    setResultsError: value => events.push(["error", value]),
++    setResultsLoading: value => events.push(["loading", value]),
++  });
++  loaded.api.requests[0].reject(new Error("results offline"));
++  await task;
++  assert.equal(results, previous);
++  assert.equal(isLoaded, true);
++  assert.deepEqual(events, [["error", ""], ["loading", true], ["error", "results offline"], ["message", "results offline"], ["loading", false]]);
++});
++
++test("results AbortError is quiet and still clears current loading", async () => {
++  const loaded = await load("actions", controlledApi());
++  const events = [];
++  const task = loaded.functions.readSessionResults("s1", value => events.push(["results", value]), value => events.push(["loaded", value]), value => events.push(["message", value]), {
++    setResultsError: value => events.push(["error", value]),
++    setResultsLoading: value => events.push(["loading", value]),
++  });
++  const error = new Error("aborted");
++  error.name = "AbortError";
++  loaded.api.requests[0].reject(error);
++  await task;
++  assert.deepEqual(events, [["error", ""], ["loading", true], ["loading", false]]);
++});
++
++test("stale results success and rejection commit no state after becoming stale", async () => {
++  const loaded = await load("actions", controlledApi());
++  for (const outcome of ["success", "rejection"]) {
++    let current = true;
++    const events = [];
++    const task = loaded.functions.readSessionResults("s1", value => events.push(["results", value]), value => events.push(["loaded", value]), value => events.push(["message", value]), {
++      isCurrent: () => current,
++      setResultsError: value => events.push(["error", value]),
++      setResultsLoading: value => events.push(["loading", value]),
++    });
++    const beforeStale = events.length;
++    current = false;
++    if (outcome === "success") loaded.api.requests.at(-1).resolve([{ id: "stale" }]);
++    else loaded.api.requests.at(-1).reject(new Error("stale failure"));
++    await task;
++    assert.deepEqual(events.slice(beforeStale), [], `${outcome} changed state after becoming stale`);
++  }
++});
++
++test("empty selected results do not start loading or call the API", async () => {
++  const loaded = await load("actions", controlledApi());
++  const loading = [];
++  await loaded.functions.readSessionResults("", () => {}, () => {}, () => {}, { setResultsLoading: value => loading.push(value) });
++  assert.deepEqual(loading, []);
++  assert.equal(loaded.api.requests.length, 0);
++});

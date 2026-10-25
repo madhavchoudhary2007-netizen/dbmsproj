@@ -3,6 +3,11 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44527 W1 — OPEN
+- target_files: frontend/components/pages/session-results.tsx, frontend/components/pages/sessions.tsx
+- contract: T386 render all five session-result states using the verified result source flags, keeping actual rows on refresh failures.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+
 ### T-44530 W3 — OPEN
 - target_files: frontend/e2e/runtime/session-operations.test.mjs
 - contract: T386 prove actual session result reader loading, failure, abort and stale-response behavior with the existing VM harness.
@@ -12,11 +17,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - target_files: frontend/components/pages/stewards.tsx, frontend/components/pages/steward-report.tsx, frontend/components/pages/steward-cases.tsx
 - contract: T387 restyle the steward header and native decision/report modal while preserving exact decision semantics.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
-
-### T-44528 W3 — OPEN
-- target_files: frontend/e2e/session-flow.spec.ts
-- contract: T386 correct result dialog fixture labels and expected formatted/typed result values.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && npx playwright test e2e/session-flow.spec.ts --list
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -28,6 +28,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44528 accepted885b8ac; verify0.
 - T-44526 accepted7897a78; verify0.
 - T-44525 acceptedb301b9c; verify0.
 - T-44524 accepted4666958; verify0.
