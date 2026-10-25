@@ -1,0 +1,39 @@
+diff --git a/frontend/components/pages/dashboard.tsx b/frontend/components/pages/dashboard.tsx
+index d1bd4b3..959117a 100644
+--- a/frontend/components/pages/dashboard.tsx
++++ b/frontend/components/pages/dashboard.tsx
+@@ -70,13 +70,13 @@ export function Dashboard() {
+             {Object.entries(health?.services || {}).map(([k, v]) => (
+               <div className="detail-row" key={k}>
+                 <span>{k}</span>
+-                <b className={String(v).toLowerCase() === "up" ? "green" : "red"}>{pretty(v)}</b>
++                <b className={["up", "healthy"].includes(String(v).toLowerCase()) ? "green" : "red"}>{pretty(v)}</b>
+               </div>
+             ))}
+             {health && (
+               <div className="detail-row">
+                 <span>overall</span>
+-                <b className={String(health.status).toLowerCase() === "healthy" ? "green" : "red"}>
++                <b className={["ok", "healthy", "up"].includes(String(health.status).toLowerCase()) ? "green" : "red"}>
+                   {pretty(health.status)}
+                 </b>
+               </div>
+@@ -86,15 +86,14 @@ export function Dashboard() {
+       </div>
+       <NbState
+         state={state}
++        className={state.status === "partial" && (err || healthError) ? "dashboard-summary error" : "dashboard-summary"}
+         empty="No dashboard data is currently available."
+         nextAction={<NbButton variant="secondary" onClick={fetchData}>Reload dashboard data</NbButton>}
+         shownCount={4}
+         partialSummary="Showing 4 dashboard metrics"
+-        sourceMessage={state.status === "partial"
+-          ? [state.filter.label, err, healthError].filter(Boolean).join(": ")
+-          : healthError || err || undefined}
++        sourceMessage={state.status === "partial" ? state.filter.label : healthError || err || undefined}
+         partialActionLabel="Try again"
+-        partialActionAriaLabel="Retry dashboard data"
++        partialActionAriaLabel="Try again"
+       >
+         {(dashboard) => (
+           <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
