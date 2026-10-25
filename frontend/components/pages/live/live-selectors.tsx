@@ -27,7 +27,7 @@ export function LiveSelectors({
   primary = false,
 }: LiveSelectorsProps) {
   return (
-    <div className="toolbar select-toolbar">
+    <div className="toolbar select-toolbar live-selectors">
       <label>
         Session
         <select data-primary={primary ? "true" : undefined} value={session} onChange={(e) => { autoFollowRef.current = false; setSession(e.target.value); setDriver(""); }}>

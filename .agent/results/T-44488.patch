@@ -1,0 +1,86 @@
+diff --git a/frontend/app/styles/live.css b/frontend/app/styles/live.css
+index 2da54e9..c9b657b 100644
+--- a/frontend/app/styles/live.css
++++ b/frontend/app/styles/live.css
+@@ -99,6 +99,55 @@
+ .nb-shell .demo-race-hero h2 {
+   font-weight: 700;
+ }
++.nb-shell .live-selectors {
++  display: flex;
++  align-items: flex-end;
++  flex-wrap: wrap;
++  gap: 12px;
++  color: var(--nb-ink);
++}
++.nb-shell .live-selectors label {
++  display: grid;
++  flex: 1 1 160px;
++  min-width: 0;
++  gap: 4px;
++  color: var(--nb-ink);
++  font-size: var(--fs-label);
++  line-height: 1.2;
++}
++.nb-shell .live-selectors select {
++  width: 100%;
++  min-width: 0;
++  min-height: 44px;
++  padding: 8px;
++  border: 4px solid var(--nb-ink);
++  background: var(--nb-paper);
++  color: var(--nb-ink);
++  font-size: var(--fs-body);
++}
++.nb-shell .live-selectors .stream-state {
++  flex: 1 1 100%;
++  min-width: 0;
++  white-space: normal;
++  overflow-wrap: anywhere;
++}
++.nb-shell .live-demo-notice {
++  padding: 12px;
++  background: var(--nb-mint);
++  color: var(--nb-ink);
++  font-family: var(--font-sans);
++  font-size: var(--fs-body);
++  line-height: 1.5;
++  box-shadow: none;
++}
++.nb-shell .demo-race-hero .eyebrow,
++.nb-shell .demo-races-container .eyebrow {
++  font-size: var(--fs-label);
++  font-weight: 700;
++  line-height: 1.2;
++  letter-spacing: 0.08em;
++  text-transform: uppercase;
++}
+ @media (max-width: 620px) {
+   .nb-shell .demo-race-row {
+     gap: 12px;
+diff --git a/frontend/components/pages/live/demo-controls.tsx b/frontend/components/pages/live/demo-controls.tsx
+index df23dd0..8252ad7 100644
+--- a/frontend/components/pages/live/demo-controls.tsx
++++ b/frontend/components/pages/live/demo-controls.tsx
+@@ -95,7 +95,7 @@ export function DemoControls({
+           </NbButton>
+         </NbCard>
+       )}
+-      {demoMessage && <div className="notice" role="status">{demoMessage}</div>}
++      {demoMessage && <div className="notice live-demo-notice" role="status">{demoMessage}</div>}
+       <section className="demo-races-panel" aria-labelledby="demo-races-title">
+           <NbCard shadow={4} className="demo-races-container">
+           <div className="panel-heading">
+diff --git a/frontend/components/pages/live/live-selectors.tsx b/frontend/components/pages/live/live-selectors.tsx
+index 0b99ec9..8e41e4d 100644
+--- a/frontend/components/pages/live/live-selectors.tsx
++++ b/frontend/components/pages/live/live-selectors.tsx
+@@ -27,7 +27,7 @@ export function LiveSelectors({
+   primary = false,
+ }: LiveSelectorsProps) {
+   return (
+-    <div className="toolbar select-toolbar">
++    <div className="toolbar select-toolbar live-selectors">
+       <label>
+         Session
+         <select data-primary={primary ? "true" : undefined} value={session} onChange={(e) => { autoFollowRef.current = false; setSession(e.target.value); setDriver(""); }}>

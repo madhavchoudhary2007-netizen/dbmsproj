@@ -95,7 +95,7 @@ export function DemoControls({
           </NbButton>
         </NbCard>
       )}
-      {demoMessage && <div className="notice" role="status">{demoMessage}</div>}
+      {demoMessage && <div className="notice live-demo-notice" role="status">{demoMessage}</div>}
       <section className="demo-races-panel" aria-labelledby="demo-races-title">
           <NbCard shadow={4} className="demo-races-container">
           <div className="panel-heading">
