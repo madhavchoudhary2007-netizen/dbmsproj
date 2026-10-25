@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 702e3cc
+git_head: a13ec92
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -27,7 +27,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 
 ## Open risks / next
 - Backend globals/factorycallbacks/strictmypy/batching/migrationledger, Phase4DBMSshowcase andfinalfullE2E/eval remain. Do not claimcompletion or current95score.
-- T44132 bundlechecker omitslayout/sharedassets; fixbeforeP3 while170KBunchanged. Lighthouseabsent, FPS17untilT41316.7, hostedCIunverified. TASTE-382-BLOAT resourcepage586lines>300; genuineboundarysplitsneeded.
+- T44132 bundlechecker omitslayout/sharedassets; fixbeforeP3 while170KBunchanged. Lighthouseabsent, FPS17untilT41316.7, hostedCIunverified. TASTE-382-BLOAT resourcepage594lines>300; genuineboundarysplitsneeded.
 - HostPython3.14/Node26 vsDocker3.12/22; productionfrontendimage lackssource/lintconfig(hostchecks). Acceptancefixture dependsoldchampionshipround3(T021backlog, ownfixtureplanrequired).
 
 ## Orchestrator direct edits / process findings
@@ -40,16 +40,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 
 - Repeatedkeyboardreopen realnative/Reactrace fixed da4d3ee/bc67c9a; root15/15reopencycles T382-keyboard-after.raw.log, all45editor+30primitivebrowsercasesPASS. Currentmembership10fails:5actuallegacycontrast1.09:1,5testEndmembershiplocatorambiguity; queuedT44478/79. T383liveheader2c7283c, yellowhero/nativeDelete next.
 
-- T-44476 accepted0fb8de5: Render live-demo hero as yellow card with primary CTA and native delete confirmation; keep one active primary and every existing action/copy. Verify0.
-
-- T-44477 accepted5569250: Type simulation tick RNG/return and known driver-number boundary, validation returns, and remove redundant CRUD row casts without runtime changes. Verify0.
-
-- T-44478 accepted0443c82: Replace legacy dark/tiny membership roster styling with scoped ink-on-paper, readable token typography and wrapping, preserving other state colors. Verify0.
-
-- T-44479 accepteda9e7dde: Scope membership mutation to exact Open Driver row and assert partial source cause by exact text, retaining all strict retry/write/count assertions. Verify0.
-
-- T-44480 acceptedeb229b7: Match exact partial-error HTTP formatting and retry accessible name while preserving retained-data, write-count and recovery assertions. Verify0.
-
-- T-44481 accepted1d68f7b: Render generated race list as paper cards with actual status badges and tactile controls; scope live metadata and delete styles to avoid unrelated route changes. Verify0.
-
-- T-44483 accepted702e3cc: Expose actual initial list loading and current-generation list errors through an optional refresh observer, preserving polling, return values and original failure propagation. Verify0.
+- T382 finalmembership25browserPASS T382-memberships-gate.browser.raw.log incl5states/currentdates/nestedfocus/responsive/axe; all45editor+30primitivecasesPASS. Prior360resourcepagecasesPASS. Latestprodsourcebuild0 T382-memberships-build.raw.log predatesnativeclose/finalCSS, finalbuildstillrequired.
+- T383 header/yellowhero/paperracecards/nativeDelete implemented1d68f7b. Root50route/axe/primary/target/responsivePASS T383-header-cards.browser.raw.log. Newstrictmutationtests T383-demo-before expose20POST/20DELETE instead1; W2persistentguard pendingaccept. Five-state list/sourceflags next.

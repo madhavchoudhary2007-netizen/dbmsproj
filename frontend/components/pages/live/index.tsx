@@ -29,7 +29,7 @@ export function LiveTiming() {
     snapshot, setSnapshot, timing, setTiming, status, setStatus, error, setError,
     demoBusy, setDemoBusy, showCompletedDemos, setShowCompletedDemos,
     showAllLaps, setShowAllLaps, deleteRace, setDeleteRace, demoMessage,
-    setDemoMessage, canManageDemos, autoFollow, listRequest, reportError, clearError,
+    setDemoMessage, canManageDemos, autoFollow, demoInFlight, listRequest, reportError, clearError,
   } = useLiveTimingState();
   const refreshLists = useCallback(async () => {
     return refreshLiveLists(listRequest, setSessions, setDemoRaces, clearError, (error) => {
@@ -61,7 +61,7 @@ export function LiveTiming() {
     setSnapshot,
     setStatus,
     setDeleteRace,
-  });
+  }, demoInFlight);
   const createDemoRace = () => demoActions().createDemoRace();
   const removeDemoRace = () => demoActions().removeDemoRace();
   useEffect(() => {

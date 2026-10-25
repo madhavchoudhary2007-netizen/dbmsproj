@@ -17,7 +17,7 @@ export interface LiveDemoActionContext {
   setDeleteRace(race: Row | null): void;
 }
 
-export function createLiveDemoActions(context: LiveDemoActionContext) {
+export function createLiveDemoActions(context: LiveDemoActionContext, guard: { current: boolean } = { current: false }) {
   const {
     session,
     deleteRace,
@@ -36,6 +36,8 @@ export function createLiveDemoActions(context: LiveDemoActionContext) {
   } = context;
 
   const createDemoRace = async () => {
+    if (guard.current) return;
+    guard.current = true;
     setDemoBusy(true);
     clearError();
     setDemoMessage("");
@@ -53,11 +55,14 @@ export function createLiveDemoActions(context: LiveDemoActionContext) {
       reportError("demo", e instanceof Error ? e.message : "Unable to create live race");
     } finally {
       setDemoBusy(false);
+      guard.current = false;
     }
   };
 
   const removeDemoRace = async () => {
     if (!deleteRace) return;
+    if (guard.current) return;
+    guard.current = true;
     const race = deleteRace;
     setDemoBusy(true);
     clearError();
@@ -83,6 +88,7 @@ export function createLiveDemoActions(context: LiveDemoActionContext) {
       reportError("demo", e instanceof Error ? e.message : "Unable to delete generated race");
     } finally {
       setDemoBusy(false);
+      guard.current = false;
     }
   };
 

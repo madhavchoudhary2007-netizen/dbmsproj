@@ -27,6 +27,7 @@ export function useLiveTimingState() {
   const { user } = useAuth();
   const canManageDemos = user?.role === "ADMIN" || user?.role === "STEWARD";
   const autoFollow = useRef(true);
+  const demoInFlight = useRef(false);
   const listRequest = useRef(0);
   const errorSource = useRef<"lists" | "snapshot" | "demo" | "">("");
   const reportError = useCallback((source: "lists" | "snapshot" | "demo", message: string) => {
@@ -48,6 +49,6 @@ export function useLiveTimingState() {
     snapshot, setSnapshot, timing, setTiming, status, setStatus, error, setError,
     demoBusy, setDemoBusy, showCompletedDemos, setShowCompletedDemos,
     showAllLaps, setShowAllLaps, deleteRace, setDeleteRace, demoMessage,
-    setDemoMessage, canManageDemos, autoFollow, listRequest, reportError, clearError,
+    setDemoMessage, canManageDemos, autoFollow, demoInFlight, listRequest, reportError, clearError,
   };
 }
