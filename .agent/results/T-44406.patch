@@ -1,0 +1,32 @@
+diff --git a/frontend/e2e/dashboard-states.spec.ts b/frontend/e2e/dashboard-states.spec.ts
+index 62dea45..66277f7 100644
+--- a/frontend/e2e/dashboard-states.spec.ts
++++ b/frontend/e2e/dashboard-states.spec.ts
+@@ -67,6 +67,27 @@ test("renders zero metrics and the actual next event with its sessions link", as
+   expect(api.writes).toEqual([]);
+ });
+ 
++test("keeps healthy status labels readable and the sessions link visible", async ({ page }) => {
++  const api = await mockApi(page);
++  await page.goto("/dashboard");
++  await expect(page.locator('.dashboard-summary[data-testid="state-populated"]')).toBeVisible();
++  const healthLabels = page.locator(".dashboard-health-card .green");
++  await expect(healthLabels).toHaveCount(3);
++  expect(await healthLabels.evaluateAll((labels) => labels.map((label) => getComputedStyle(label).color))).toEqual(["rgb(0, 0, 0)", "rgb(0, 0, 0)", "rgb(0, 0, 0)"]);
++  expect(await healthLabels.evaluateAll((labels) => labels.map((label) => getComputedStyle(label).backgroundColor))).toEqual(["rgb(124, 245, 176)", "rgb(124, 245, 176)", "rgb(124, 245, 176)"]);
++
++  const sessionsLink = page.getByRole("link", { name: "View sessions" });
++  const face = sessionsLink.locator(".nb-face");
++  await expect(face).toBeVisible();
++  expect(await face.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe("rgb(255, 255, 255)");
++  expect(await face.evaluate((element) => getComputedStyle(element).color)).toBe("rgb(0, 0, 0)");
++  const box = await sessionsLink.boundingBox();
++  expect(box?.width).toBeGreaterThanOrEqual(44);
++  expect(box?.height).toBeGreaterThanOrEqual(44);
++  await expect(sessionsLink).not.toHaveAttribute("data-primary");
++  expect(api.writes).toEqual([]);
++});
++
+ test("shows dashboard failure cause and recovers on retry", async ({ page }) => {
+   const api = await mockApi(page, { dashboard: async (n) => n === 1
+     ? { status: 503, json: { detail: "Dashboard source unavailable" } }

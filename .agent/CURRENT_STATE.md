@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 5a0ad53
+git_head: d756a9f
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -53,3 +53,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44403 accepted4521ac9: Offline provider regressions prove independent runtime instances, resource failures and actual FastAPI HTTP/WebSocket dependency injection. Verify0.
 
 - T-44404 accepted5a0ad53: Restore the visible secondary link face and ink health labels; size service-health card to real content. Verify0.
+
+- T-44405 acceptedd756a9f: Publish existing lifespan resources through typed app.state.runtime and clear resource references on shutdown; legacy aliases retained. Verify0.
