@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: a4ef7b6
+git_head: dbb62d5
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -47,10 +47,9 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T387 case files/native dialogs/official records UI implemented through95cc69c; ADR013 permits two read-only paged endpoints; lock verified. Root262PASS0skip/livePASS T-44540.full.raw.log. Paged source handles abort/stale/queued refresh; penalties and seasonal 12-cell meters retain real totals. T44542 browser tests accepted1800077, actual browser milestone pending.
 - T386-387 prior route batch99PASS1desktopSteward paletteFAIL; all30 Session resilience cases passed after01e561c spam guard. Shared form readability7c1a7c7 and Steward count sticker8f08922 need current combined browser/build proof.
 
-- T-44543 accepted19c41c6: Narrow guaranteed SQL rows with DatabaseRow and preserve ranking using nonoptional dictionary comparators. Verify0.
 
-- T-44544 acceptedc09bfdd: Disambiguate route Refresh while preserving every source outage and retention assertion. Verify0.
 
-- T-44545 accepted290d2e7: Restore dominant cream header surface without changing content or colour bands. Verify0.
 
-- T-44546 accepteda4ef7b6: Style Pit Wall selectors/header and native reservation modal while retaining management rules. Verify0.
+
+
+- T387 source browser24PASS plus focused15PASS T387-records-repair.browser.raw.log completes all35 cases across five widths, including outage/retention and palette. Production build pending. T388 header/native reservation modal a4ef7b6 accepted; remaining strategy/grid/queue/history. Backend helper19c41c6 root262PASS0skip/livePASS T-44543.full.raw.log.

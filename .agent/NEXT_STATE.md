@@ -3,10 +3,20 @@ updated_at: 2026-10-26
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44547 W2 — OPEN
-- target_files: backend/app/telemetry_router.py, backend/app/pit_strategy_router.py
-- contract: T339 annotate telemetry and pit strategy handlers without changing wire encoding or contracts.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_request_dependencies.py backend/tests/test_runtime_dependencies.py && .venv/bin/mypy --strict backend/app/telemetry_router.py backend/app/pit_strategy_router.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/telemetry_router.py backend/app/pit_strategy_router.py
+### T-44550 W3 — OPEN
+- target_files: scripts/eval/bundle_assets.py, scripts/eval/test_bundle_assets.py
+- contract: T44132 regression-tested full initial script asset graph helper, before wiring bundle gate.
+- verify: python3 -m unittest discover -s scripts/eval -p test_bundle_assets.py -v
+
+### T-44549 W2 — OPEN
+- target_files: backend/app/api/results_read.py, backend/app/api/results_write.py, backend/app/api/session_action.py
+- contract: T339 annotate result read/write and lifecycle route handlers without wire changes.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_request_dependencies.py backend/tests/test_runtime_dependencies.py && .venv/bin/mypy --strict backend/app/api/results_read.py backend/app/api/results_write.py backend/app/api/session_action.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/api/results_read.py backend/app/api/results_write.py backend/app/api/session_action.py
+
+### T-44548 W1 — OPEN
+- target_files: frontend/components/pages/pit-wall.tsx, frontend/components/pages/pit-strategy.tsx
+- contract: T388 render automatic strategy as accessible tyre decision cards with truthful five states.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -18,6 +28,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44547 accepteddbb62d5; verify0.
 - T-44546 accepteda4ef7b6; verify0.
 - T-44545 accepted290d2e7; verify0.
 - T-44544 acceptedc09bfdd; verify0.
