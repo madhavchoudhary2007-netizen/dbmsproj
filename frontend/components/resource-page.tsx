@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { api, asArray, listAll, Row } from "@/lib/api";
+import { api, asArray, listAll, pretty, Row } from "@/lib/api";
 import { useResourceRows } from "@/lib/use-resource-rows";
 import { Plus, RefreshCw, Search } from "lucide-react";
 import { useAuth } from "./auth";
@@ -8,12 +8,13 @@ import { NbButton } from "./nb/button";
 import { NbCard } from "./nb/card";
 import {
   Button,
-  DataTable,
   Modal,
   ResourceEditor,
   StateMessage,
 } from "./ui";
 import { NbInput } from "./nb/input";
+import { NbTable } from "./nb/table";
+import { resourceViewState } from "@/lib/resource-view";
 
 type FieldOption = string | { value: string; label: string };
 type Field = {
@@ -135,6 +136,18 @@ export function ResourcePage({
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
   const visiblePage = Math.min(page, pageCount - 1);
   const visibleRows = filtered.slice(visiblePage * pageSize, (visiblePage + 1) * pageSize);
+  const tableState = resourceViewState({
+    rows,
+    visibleRows,
+    loading,
+    error,
+    term,
+    retry: () => void load(),
+    clear: () => {
+      setTerm("");
+      setPage(0);
+    },
+  });
   const save = async (v: Row) => {
     setBusy(true);
     try {
@@ -321,28 +334,38 @@ export function ResourcePage({
           <RefreshCw size={16} aria-hidden="true" />
         </NbButton>
       </div>
-      {error || loading ? (
-        <StateMessage
-          error={error}
-          loading={loading}
-          retry={() => void load()}
-        />
-      ) : filtered.length ? (
-        <DataTable
-          rows={visibleRows}
-          columns={columns}
-          onSelect={(row) => {
-            if (canManage || supportsHistory) void showRow(row);
+      <NbTable
+        state={tableState}
+        columns={columns.map((key) => ({
+          key,
+          title: key.replaceAll("_", " "),
+          render: (row) => pretty(row[key]),
+        }))}
+        rowKey={(row, index) => String(row.id ?? index)}
+        caption={title}
+        pageSize={pageSize}
+        empty={
+          term
+            ? "No records match this filter."
+            : "No records returned by the API."
+        }
+        sourceMessage={error || undefined}
+        partialActionLabel={error ? "Try again" : "Clear filter"}
+        partialActionAriaLabel={error ? "Try again" : "Clear filter"}
+        onSelect={(row) => {
+          if (canManage || supportsHistory) void showRow(row);
+        }}
+      />
+      {term && filtered.length === 0 && (
+        <NbButton
+          variant="secondary"
+          onClick={() => {
+            setTerm("");
+            setPage(0);
           }}
-        />
-      ) : (
-        <StateMessage
-          empty={
-            term
-              ? "No records match this filter."
-              : "No records returned by the API."
-          }
-        />
+        >
+          Clear filter
+        </NbButton>
       )}
       {!loading && !error && filtered.length > pageSize && (
         <div className="dbms-pagination resource-pagination">

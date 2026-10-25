@@ -3,10 +3,20 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44435 W3 — OPEN
+### T-44438 W3 — OPEN
 - target_files: frontend/e2e/resource-flows.spec.ts
-- contract: T382 characterize resource loading/empty/error/retry, filtering/paging, and create dialog without writes.
+- contract: Repair resource flow test scopes to avoid shell status/alerts and Next devtools collisions.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/resource-flows.spec.ts --list
+
+### T-44437 W3 — OPEN
+- target_files: frontend/e2e/runtime/resource-view.test.mjs
+- contract: Test actual pure resource view classifier for five states and retry/filter callback identity.
+- verify: npm --prefix frontend run test:runtime && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
+### T-44436 W1 — OPEN
+- target_files: frontend/components/resource-page.tsx
+- contract: T382 integrate NbTable and five resource view states while preserving existing row inspection and record operations.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -17,6 +27,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44435 accepted164c755; verify0.
 - T-44434 accepted8be4a2d; verify0.
 - T-44432 accepted1479019; verify0.
 - T-44433 accepteddb1e96d; verify0.
