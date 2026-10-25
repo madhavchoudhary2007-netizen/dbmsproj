@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 09d5636
+git_head: fb08ca2
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -42,3 +42,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44388 accepted0f0ec37: Independent dashboard and health source results with five-state classification, guarded reloads and abort/generation cleanup. Verify0.
 
 - T-44390 accepted09d5636: Actual-module VM regressions for independent dashboard source results, abort forwarding and five-state classification. Verify0.
+
+- T-44391 acceptedfb08ca2: Dashboard KPIs and Next up event card use the real five-state boundary; partial source retry labels preserve shared defaults. Verify0.
