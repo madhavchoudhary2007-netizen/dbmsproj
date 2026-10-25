@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./mock-platform";
 
 const routes = [
   ["E2E-R01", "/"],

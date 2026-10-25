@@ -1,0 +1,30 @@
+diff --git a/frontend/e2e/responsive.spec.ts b/frontend/e2e/responsive.spec.ts
+index 5b477bc..eec02c8 100644
+--- a/frontend/e2e/responsive.spec.ts
++++ b/frontend/e2e/responsive.spec.ts
+@@ -1,4 +1,4 @@
+-import { expect, test } from "@playwright/test";
++import { expect, test } from "./mock-platform";
+ 
+ const routes = [
+   ["E2E-R01", "/"],
+diff --git a/frontend/e2e/routes.spec.ts b/frontend/e2e/routes.spec.ts
+index cfa2891..474d0f3 100644
+--- a/frontend/e2e/routes.spec.ts
++++ b/frontend/e2e/routes.spec.ts
+@@ -1,4 +1,4 @@
+-import { expect, test } from "@playwright/test";
++import { expect, test } from "./mock-platform";
+ 
+ const adminUser = {
+   id: 999,
+diff --git a/frontend/e2e/states-matrix.spec.ts b/frontend/e2e/states-matrix.spec.ts
+index a18c45e..680ec3a 100644
+--- a/frontend/e2e/states-matrix.spec.ts
++++ b/frontend/e2e/states-matrix.spec.ts
+@@ -1,4 +1,4 @@
+-import { expect, test } from "@playwright/test";
++import { expect, test } from "./mock-platform";
+ 
+ const adminUser = {
+   id: 999,
