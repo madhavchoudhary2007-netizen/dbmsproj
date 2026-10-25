@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 09cae83
+git_head: ec4c854
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -42,3 +42,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44371 acceptedb0d6bcc: Activate standalone LiveTiming through compatibility export; remove obsolete local body and imports. Verify0.
 
 - T-44372 accepteda5bb1f7: Move simulator control route into API module preserving response, role dependency and late-bound callbacks. Verify0.
+
+- T-44381 acceptedec4c854: Use approved dashboard KPI tiles with scoped48px values, typed tones and unchanged shared defaults; remove orphan CSS. Verify0.

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import hmac
 import logging
 import os
 import random as random
@@ -19,7 +18,6 @@ from typing import Any
 from uuid import UUID as UUID
 from uuid import uuid4 as uuid4
 
-import jwt
 from fastapi import (
     Depends,
     FastAPI,
@@ -80,6 +78,7 @@ from .core.errors import (
     reference_conflict_handler,
 )
 from .core.events import EventBus
+from .core.http_auth import authenticate_http_user
 from .core.lock_demo import create_lock_demo_helpers
 from .core.security import websocket_bearer
 from .core.serialization import jsonable, telemetry_ws_payload
@@ -294,42 +293,17 @@ def current_user(
     request: Request,
     credentials: HTTPAuthorizationCredentials | None = bearer_dependency,
 ):
-    bearer_token = credentials.credentials if credentials else None
-    cookie_token = request.cookies.get("apexgrid_session")
-    token = bearer_token or cookie_token
-    if not token:
-        raise HTTPException(401, "Authentication required", headers={"WWW-Authenticate": "Bearer"})
-    try:
-        claims = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        if _token_is_revoked(claims, fail_closed=True):
-            raise ValueError()
-        user_id = claims.get("sub")
-        if not user_id:
-            raise ValueError()
-        if (
-            not bearer_token
-            and cookie_token
-            and request.method in {"POST", "PUT", "PATCH", "DELETE"}
-        ):
-            require_allowed_origin(request)
-            csrf_cookie = request.cookies.get("apexgrid_csrf", "")
-            csrf_header = request.headers.get("x-csrf-token", "")
-            session_id = claims.get("jti", "")
-            if (
-                not csrf_cookie
-                or not csrf_header
-                or not session_id
-                or not hmac.compare_digest(csrf_cookie.encode(), csrf_header.encode())
-                or not verify_csrf_token(csrf_cookie, session_id, JWT_SECRET)
-            ):
-                raise HTTPException(403, "CSRF validation failed")
-        user = fetch_one("SELECT id,email,full_name,role FROM users WHERE id=%s", (user_id,))
-    except (jwt.exceptions.InvalidTokenError, ValueError):
-        user = None
-    if not user:
-        raise HTTPException(401, "Invalid or expired token", headers={"WWW-Authenticate": "Bearer"})
-    request.state.auth_claims = claims
-    return jsonable(user)
+    return authenticate_http_user(
+        request,
+        credentials,
+        JWT_SECRET=JWT_SECRET,
+        JWT_ALGORITHM=JWT_ALGORITHM,
+        _token_is_revoked=_token_is_revoked,
+        require_allowed_origin=require_allowed_origin,
+        verify_csrf_token=verify_csrf_token,
+        fetch_one=fetch_one,
+        jsonable=jsonable,
+    )
 
 
 authenticated_user_dependency = Depends(current_user)
