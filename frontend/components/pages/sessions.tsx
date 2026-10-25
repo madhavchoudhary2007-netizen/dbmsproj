@@ -1,4 +1,6 @@
 import { Button, StateMessage } from "@/components/ui";
+import { NbBadge } from "@/components/nb/badge";
+import { NbCard } from "@/components/nb/card";
 import { useSessionPage } from "@/lib/use-session-page";
 import { SessionControls } from "./session-controls";
 import { SessionEditorModal, SessionResultModal } from "./session-modals";
@@ -47,8 +49,10 @@ export function SessionPage() {
   } = useSessionPage();
   return (
     <>
+      <div className="grid min-w-0 gap-4 lg:grid-cols-[2fr_3fr]">
       <SessionOverview
         canManage={canManage}
+        primary={!modal && !resultModal}
         setEditModal={setEditModal}
         setModal={setModal}
         rows={rows}
@@ -61,19 +65,19 @@ export function SessionPage() {
         setResultsLoaded={setResultsLoaded}
         setActionMsg={setActionMsg}
       />
-      {actionMsg && <div className="notice">{actionMsg}</div>}
       {current && (
-        <div className="panel session-control">
+        <NbCard className="session-control min-w-0">
+          {actionMsg && <div className="notice">{actionMsg}</div>}
           <div className="panel-heading">
             <div>
               <div className="eyebrow">SELECTED SESSION</div>
-              <h2>
+              <h2 className="text-[length:var(--fs-h3)] font-bold">
                 {String(
                   current.event_name || current.session_type || "Session",
                 )}
               </h2>
             </div>
-            <span className="state-pill">{String(current.state)}</span>
+            <NbBadge status={String(current.state)}>{String(current.state)}</NbBadge>
           </div>
           <SessionControls
             current={current}
@@ -126,8 +130,17 @@ export function SessionPage() {
               setResultModal={setResultModal}
             />
           )}
-        </div>
+        </NbCard>
       )}
+      {!current && (
+        <NbCard className="session-control min-w-0">
+          {actionMsg && <div className="notice">{actionMsg}</div>}
+          <p className="eyebrow text-[length:var(--fs-label)]">SELECTED SESSION</p>
+          <h2 className="text-[length:var(--fs-h3)] font-bold">No session selected</h2>
+          <p>Select a session from the list to review its controls and classified results.</p>
+        </NbCard>
+      )}
+      </div>
       {modal && canManage && (
         <SessionEditorModal
           editModal={editModal}
