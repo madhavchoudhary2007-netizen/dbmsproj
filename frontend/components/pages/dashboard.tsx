@@ -116,7 +116,7 @@ export function Dashboard() {
                 stickerTilt={tilt}
               />
             ))}
-            <NbCard tone="paper" shadow={8} className="col-span-full min-w-0">
+            <NbCard tone="paper" shadow={8} className="col-span-full min-w-0 dashboard-next-card">
               <div className="eyebrow">NEXT UP</div>
               {dashboard.next_event ? (
                 <div className="min-w-0 [overflow-wrap:anywhere]">
@@ -132,7 +132,7 @@ export function Dashboard() {
           </div>
         )}
       </NbState>
-      <NbCard tone="paper" shadow={8} className="mt-4 min-w-0">
+      <NbCard tone="paper" shadow={8} className="mt-4 min-w-0 dashboard-incidents-card">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2>Latest incidents</h2>
           <NbButton variant="secondary" onClick={reloadIncidents}>Reload incidents</NbButton>
