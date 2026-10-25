@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 1c47bc2
+git_head: ad281aa
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high (latest owner override2026-10-25), cap2
@@ -16,10 +16,10 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 
 ## Active work / evidence
 - T380 login COMPLETE0a3e206: root80browserPASS T380.final.browser.raw.log; settled5widthvisuals reviewed; build/types/lint0 T380.build.raw.log. Layout60/40 desktop,240mobileart, motifs/3type sizes; exactauthcopy retained. New login-layout tests cover geometry/busy/error. NbButton aria-busy fixed0d7dd28, mobilefeed focus c44f8ed; no gate weakened.
-- T379 Dashboard exactmodule/hook complete; Sessions exactmodule/hooks/components complete03ab0d5 and8actual-module operation tests bd3f9c2. Root120dashboard/sessionbrowserPASS T379-sessions.browser.raw.log. Steward hook3989f9d,reportf51818a,sanctions0f39a4b,module7bc73c9 wiredf2ef65e; byte-identical page/body verified. Root55stewardbrowserPASS T379-stewards.browser.raw.log. RemainingLive/Pit/Analytics/DBMS split beforeT381.
-- T331 latest incidentsb0972ed and pit cancellation45cbcad full231PASS0skip/livePASS T44312/T44314.full.raw.log. Reset helper e0e553d and finalizationdc23dbc ASTexact; both full231PASS/0skip/livePASS T44317/T44322.full.raw.log. Main1220lines. Naming parity12seed/countchecks, restore/demo/pit scheduling previousfulls green. Transitional main wrappers/callback injection preserve tests pendingT332.
+- T379 Dashboard exactmodule/hook complete; Sessions exactmodule/hooks/components complete03ab0d5 and8actual-module operation tests bd3f9c2. Root120dashboard/sessionbrowserPASS T379-sessions.browser.raw.log. Steward hook3989f9d,reportf51818a,sanctions0f39a4b,module7bc73c9 wiredf2ef65e; byte-identical page/body verified. Root55stewardbrowserPASS T379-stewards.browser.raw.log. Only Live split remains beforeT379/T381; Analytics move underreview.
+- T331 latest incidentsb0972ed and pit cancellation45cbcad full231PASS0skip/livePASS T44312/T44314.full.raw.log. Reset helper e0e553d and finalizationdc23dbc ASTexact; both full231PASS/0skip/livePASS T44317/T44322.full.raw.log. Main1164lines. Naming parity12seed/countchecks, restore/demo/pit scheduling previousfulls green. Transitional main wrappers/callback injection preserve tests pendingT332.
 - Owner latest switch gpt-6-luna/high: profiles ba3fa7c/4645e52; boot0; fresh custom W1/W2 toolmetadata confirm6luna/high. Prior5.6 usage-limit worker44316 retry returnedvalidbefore switch; 44318 oldworker interrupted before edits. Root44319 firstverify had shellquotingerror; corrected using shlex.quote, rerunaccept0; erroneous premature mark removed beforecommit.
-- DBMS exactmove8d44b1f and pit hook3b7ca06 wired a54f000 root100pit/DBMSbrowserPASS. Chart staged480ae39 wired5c977c3; Analytics hook33b3818 and PitPagec0c4f52 staged. Pit export28eb2e1 and Analytics hookwiree99a00d accepted; lifecyclefa95df4 full231PASS0skip/livePASS. T44331 records worker interruptedbeforeedits for serialization; readytoresume. At most2active workers. Allresults/patches/acceptlogs inGit/.agent/results.
+- DBMS exactmove8d44b1f and pit hook3b7ca06 wired a54f000 root100pit/DBMSbrowserPASS. Chart staged480ae39 wired5c977c3; Analytics hook33b3818 and PitPagec0c4f52 staged. Pit export28eb2e1 and Analytics hookwiree99a00d accepted; lifecyclefa95df4 full231PASS0skip/livePASS. Records1c47bc2 and demoactionsad281aa accepted, exactbody parity. Active W1T44333Analyticsmove/W2T44334resethelper, disjoint. At most2active workers. Allresults/patches/acceptlogs inGit/.agent/results.
 
 ## Safety / workflow
 - Branch only overhaul/neo-brutal; commits only accept.sh, independently rerun exact Verify; max2 custom-role packet-only workers, no model/effort overrides. Isolated clones via .agent/orchestrate.py; <=3files/150 changedlines/task. Metadata state/envelopes normalized with realstats and integercounts.
@@ -32,37 +32,18 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - Finish remaining T379 splits, then dashboard/resources/live/session/stewards/pit/standings/analytics/DBMS according to plan. DBMS redesign also needs Phase4. Keep backend T331 progressing in parallel and full suite after each wiring.
 
 ## Orchestrator direct edits
-- T44250 shell glue8add/4remove (12productlines this turn), logged and accepted e765662; all other product implementation delegated. Metadata/config/ADRs/packets/state/root verification helpers only. No new dependencies this continuation.
-
-
-
-
-
-
-
-
+- T44250 shell glue8add/4remove (12productlines before2importglue lines), logged and accepted e765662; all other product implementation delegated. Metadata/config/ADRs/packets/state/root verification helpers only. No new dependencies this continuation.
 
 - T44319 first acceptance failed shell quoting in root-authored verify; corrected with shlex.quote, no false acceptance retained.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 - Root dispatch mistakeT44331 andT44330 both named special-pages despite isolatedclones; interrupted44331 immediately before edits, deferred until44330 completes/accepts. Never over2workers.
 
-
 - T44330 root patch context collided with alreadyaccepted PitWall import removal; mechanical reviewed Analytics-only patch applied with one import integration line, all other rootpagebytes retained. Root rerunsaccept; no authored logic.
-
 
 - T44331 isolatedpatch importcontext included alreadyremovedPitimport; root applied reviewed exactregion/newfile plus one importglue line preserving currentroot. Total authoredglue now15productlines, no authoredlogic.
 
 - T-44331 accepted1c47bc2: Extract exact recorded lap and race-control panels, preserving mappings, controls, state messages and table columns. Verify0.
+
+- T-44332 acceptedad281aa: Stage exact generated race create/delete actions with typed callback context, retaining requests and setter ordering. Verify0.
+
+- Latest spacing/banned/motion0. Root mistakenly invoked absent lint-colors exit127; actual fourth gate is lint-neobrutal, separately run; inspect latest log.

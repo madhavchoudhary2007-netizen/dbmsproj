@@ -3,23 +3,24 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44334 W2 — OPEN
+- target_files: backend/app/main.py, backend/app/simulation_reset.py
+- contract: T331 move exact simulation reset orchestration into simulation_reset module with legacy async wrapper.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "reset" && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/simulation_reset.py
+
 ### T-44333 W1 — OPEN
 - target_files: frontend/components/special-pages.tsx, frontend/components/pages/analytics.tsx
 - contract: T379 move exact Analytics page to pages/analytics.tsx and retain compatibility reexport.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
-### T-44332 W2 — OPEN
-- target_files: frontend/lib/live-demo-actions.ts
-- contract: T379 stage exact LiveTiming create/delete demo race actions in typed live-demo-actions module; keep source unchanged until separate wire.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
-
 ## Blocked
-- None currently. Owner switched workers to gpt-6-luna/high; T44318 interrupted before edits, fresh worker required.
+- None currently. Owner switch gpt-6-luna/high implemented and freshworkers succeeded.
 
 ## Deferred
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44332 acceptedad281aa; verify0.
 - T-44331 accepted1c47bc2; verify0.
 - T-44330 acceptede99a00d; verify0.
 - T-44329 accepted28eb2e1; verify0.
