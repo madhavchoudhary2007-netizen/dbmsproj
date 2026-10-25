@@ -1,0 +1,51 @@
+diff --git a/backend/app/main.py b/backend/app/main.py
+index 2159bc6..b5043a2 100644
+--- a/backend/app/main.py
++++ b/backend/app/main.py
+@@ -110,10 +110,7 @@ from .demo_race_repository import (
+     validate_demo_race_delete,
+ )
+ from .demo_race_router import (
+-    DEFAULT_DEMO_RACE_CREATE,
+     create_demo_race_router,
+-    run_demo_race_create,
+-    run_demo_race_delete,
+ )
+ from .demo_runtime import build_demo_race
+ from .membership_router import router as membership_router
+@@ -136,7 +133,7 @@ from .schemas_operations import Decision as Decision
+ from .schemas_operations import IncidentIn as IncidentIn
+ from .schemas_operations import ReservationIn as ReservationIn
+ from .schemas_operations import ReservationStatus as ReservationStatus
+-from .schemas_simulation import DemoRaceCreate, SimulationControl
++from .schemas_simulation import SimulationControl
+ from .session_measurements import clear_measurements, ensure_reset_allowed
+ from .simulation_core import MAX_SESSION_LAPS
+ from .simulation_core import Simulation as Simulation
+@@ -545,26 +542,6 @@ async def resume_or_create_auto_demo_race(create_if_missing: bool = True):
+     )
+ 
+ 
+-async def create_demo_race(
+-    body: DemoRaceCreate = DEFAULT_DEMO_RACE_CREATE,
+-    user: Any = admin_steward_dependency,
+-) -> Any:
+-    return await run_demo_race_create(body, _make_demo_race, launch_demo_simulation, demo_race_row)
+-
+-
+-async def delete_demo_race(session_id: UUID, user=admin_steward_dependency):
+-    return await run_demo_race_delete(
+-        session_id,
+-        simulations,
+-        connection,
+-        dict_row,
+-        mongo_ready,
+-        DemoRaceDeleteConflict,
+-        validate_demo_race_delete,
+-        delete_demo_race_records,
+-    )
+-
+-
+ bus = EventBus()
+ 
+ 
