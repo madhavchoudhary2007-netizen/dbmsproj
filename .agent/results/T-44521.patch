@@ -1,0 +1,16 @@
+diff --git a/frontend/e2e/live-records.spec.ts b/frontend/e2e/live-records.spec.ts
+index 963f6fb..5029c0b 100644
+--- a/frontend/e2e/live-records.spec.ts
++++ b/frontend/e2e/live-records.spec.ts
+@@ -56,7 +56,10 @@ test("shows actual laps, filtered history, all telemetry, and responsive tables"
+   await expect(rows.filter({ hasText: "Driver B" })).toHaveCount(0);
+   for (const title of ["Speed · km/h", "Throttle · %", "Brake · %", "Lap time · ms", "Tire wear · %", "Tire temperatures · °C"]) await expect(card(page, title).getByRole("heading", { name: title, exact: true })).toBeVisible();
+   const temps = card(page, "Tire temperatures · °C");
+-  for (const [label, value] of [["Front left", "90"], ["Front right", "91"], ["Rear left", "92"], ["Rear right", "93"]]) await expect(temps.getByText(label, { exact: true }).locator("..")).toContainText(value);
++  for (const [label, value] of [["Front left", "90"], ["Front right", "91"], ["Rear left", "92"], ["Rear right", "93"]]) {
++    const tile = temps.locator("dl dt").filter({ hasText: new RegExp(`^${label}$`) }).locator("..");
++    await expect(tile.locator("dd")).toHaveText(value);
++  }
+   const accessibility = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+   expect(accessibility.violations).toEqual([]);
+   for (const width of [320, 375, 768, 1440, 2560]) { await page.setViewportSize({ width, height: 900 }); expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0); }

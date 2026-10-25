@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: dede5cd
+git_head: d868cac
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -18,7 +18,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T382 resources header/toolbar/exactrowhook/classifier/NbTable/nativeModal/NbField/form/rowEditDelete/roleeligibilitybadges implemented; alloriginalcelltext/copy/pageSize50 preserved. Root360browserPASS T382-actions-primary.browser.raw.log, allsixpalettes/fivewidthaxe/targets/overflow/primary/dataflow. Build/lint/types0 T382-actions-build.raw.log. Inlinevalidation/twocolumnmemberships implemented; finalmodalaxe/partialfixtures andfocusedfileboundaries remain.
 - Real20POST/save and20DELETE/confirm duplicates repaired06330e6/6e28dd6, confirmation7838c2d. Strict25PASS T382-delete-guard.browser.raw.log; markerretired5cfe010, activeprimarytransitions5widthPASS. Browserwrites locallymocked only.
 - Backend main823lines, <=120T331 NOT met; T332unfinished. Genuine modules/core/extracts retained. TypedRuntimeState/providers/lifespan shareandclear identities; requestauth/DatabaseSession. Membership/analytics/pitreads useDI. Actualreturnannotation Decimalstringregression fixedresponse_modelNone19b7991; exactnumericserializationtests1479019 preservewireencoding.
-- Backendfull245PASS0skip/liveacceptancePASS T-44514.full.raw.log. Strictmypy134errors/25files T339-current-after-dbms.raw.log,target0T339. Runtime64PASS. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
+- Backend full249PASS0skip/live acceptance PASS T-44517.full.raw.log. Strictmypy134errors/25files T339-current-after-dbms.raw.log,target0T339. Runtime64PASS. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
 
 ## Safety / workflow
 - Onlyoverhaul/neo-brutal; commits onlyaccept.sh; independentlyrerunVerify;2packet-onlycustomworkersmax, no model/effortoverrides. Isolatedclones .agent/orchestrate.py;<=3files/150added+deleted; normalizeactualstats. Every5tasks budget.
@@ -44,6 +44,8 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T44503 one transient worker usage error; account tool reported ordinaryUsageAllowed=true; same-role retry succeeded. Its unaccepted236-line rewrite was restored only in clone, replacedwith57-line targeted change. No model substitution.
 
 - Current production source build/lint/types0 T383-385-build.raw.log (beforeSessions). T385 all empty/loading/error/retry/retention browser cases15PASS across focused runs; T44518 repaired snapshot contrast and table keyboard scrolling. Focused populated run4PASS/1 fixture locator collision, T44521 repairs tooltip/tile scoping. M13firstdraw remainsopen.
-- T332 demo DELETE uses request DatabaseSession c48443f; exact helper AST unchanged; missing-marker404 precedes lazyMongo503. Four request-override tests dede5cd accepted; root full249-test run in progress. No schema/API changes.
+- T332 demo DELETE uses request DatabaseSession c48443f; exact helper AST unchanged; missing-marker404 precedes lazyMongo503. Four request-override tests dede5cd accepted; root full249PASS0skip/live acceptance PASS. No schema/API changes.
 
 - T-44517 accepteddede5cd: Test generated-race DELETE with request database overrides and exact 204/404/503/409 ordering and simulation state. Verify0.
+
+- T-44519 acceptedd868cac: Use labelled 48px lifecycle controls and associated simulator inputs inside a cream card, preserving callbacks and disabled conditions. Verify0.
