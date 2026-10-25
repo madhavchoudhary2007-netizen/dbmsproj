@@ -3,11 +3,6 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44464 W2 — OPEN
-- target_files: backend/app/core/events.py, backend/app/core/serialization.py
-- contract: T339 eliminate strict typing errors in event bus and telemetry serialization without runtime changes.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "websocket_bus_keeps_newest or telemetry_payload" && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_runtime_dependencies.py && .venv/bin/mypy --strict --follow-imports=silent backend/app/core/events.py backend/app/core/serialization.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/core/events.py backend/app/core/serialization.py
-
 ### T-44463 W3 — OPEN
 - target_files: frontend/e2e/resource-editor.spec.ts
 - contract: T382 synchronize keyboard regression on actual dialog teardown and verify native inline errors.
@@ -23,6 +18,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44464 accepteded47d9f; verify0.
 - T-44462 accepted4019403; verify0.
 - T-44461 accepteda939d11; verify0.
 - T-44460 acceptede5c4a2a; verify0.
