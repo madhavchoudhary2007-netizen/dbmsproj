@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: ed47d9f
+git_head: e6311f5
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -44,3 +44,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44462 accepted4019403: Exercise actual field-validation hook using queued functional state updates, call-time native snapshots, error clearing/preservation and no-op identity. Verify0.
 
 - T-44464 accepteded47d9f: Type EventBus payload queues, identifiers and method signatures without changing queue/thread behavior; explicitly narrow JSON-safe telemetry return type. Verify0.
+
+- T-44463 acceptede6311f5: Assert actual dialog teardown and restored edit focus before keyboard reopen; cover native linked inline errors, clearing, blocked invalid submit and numeric-zero save. Verify0.

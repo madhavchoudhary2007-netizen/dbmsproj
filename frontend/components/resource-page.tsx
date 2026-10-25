@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { api, asArray, listAll, pretty, Row } from "@/lib/api";
+import { useResourceMemberships } from "@/lib/use-resource-memberships";
 import { useResourceRows } from "@/lib/use-resource-rows";
 import { Pencil, Plus, RefreshCw, Search, Trash2 } from "lucide-react";
 import { useAuth } from "./auth";
@@ -46,14 +47,19 @@ export function ResourcePage({
   userRole?: string;
 }) {
   const { rows, loading, error, load } = useResourceRows(endpoint);
+  const {
+    members,
+    error: memberError,
+    setError: setMemberError,
+    clear: clearMembers,
+    load: loadMembers,
+  } = useResourceMemberships(endpoint);
   const [term, setTerm] = useState(""),
     [page, setPage] = useState(0),
     [modal, setModal] = useState(false),
     [deleteConfirm, setDeleteConfirm] = useState(false),
     [edit, setEdit] = useState<Row | undefined>(),
     [busy, setBusy] = useState(false),
-    [members, setMembers] = useState<Row[]>([]),
-    [memberError, setMemberError] = useState(""),
     [memberModal, setMemberModal] = useState(false),
     [users, setUsers] = useState<Row[]>([]),
     [relatedRows, setRelatedRows] = useState<Record<string, Row[]>>({}),
@@ -106,7 +112,7 @@ export function ResourcePage({
           e instanceof Error ? e.message : "Unable to load membership choices",
         ),
       );
-  }, [canManage, supportsHistory]);
+  }, [canManage, setMemberError, supportsHistory]);
   const userOptions = users
     .filter((row) => !userRole || row.role === userRole)
     .filter((row) => endpoint !== "/drivers" || edit?.user_id === row.id || !rows.some((driver) => driver.user_id === row.id))
@@ -201,13 +207,10 @@ export function ResourcePage({
     setEdit(row);
     setActionError("");
     setModal(true);
-    setMembers([]);
-    setMemberError("");
+    clearMembers();
     if (supportsHistory && row.id) {
       try {
-        setMembers(
-          asArray(await api(`/${endpoint.slice(1)}/${row.id}/memberships`)),
-        );
+        await loadMembers(String(row.id));
       } catch (e) {
         setMemberError(
           e instanceof Error ? e.message : "Unable to load membership history",
@@ -224,9 +227,7 @@ export function ResourcePage({
       });
       setMemberModal(false);
       if (edit?.id && supportsHistory)
-        setMembers(
-          asArray(await api(`/${endpoint.slice(1)}/${edit.id}/memberships`)),
-        );
+        await loadMembers(String(edit.id));
       await load();
     } finally {
       setBusy(false);
@@ -242,9 +243,7 @@ export function ResourcePage({
           end_date: new Date().toISOString().slice(0, 10),
         }),
       });
-      setMembers(
-        asArray(await api(`/${endpoint.slice(1)}/${edit.id}/memberships`)),
-      );
+      await loadMembers(String(edit.id));
     } catch (e) {
       setMemberError(
         e instanceof Error ? e.message : "Unable to update membership",

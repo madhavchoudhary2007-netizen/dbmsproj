@@ -3,10 +3,15 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44463 W3 — OPEN
-- target_files: frontend/e2e/resource-editor.spec.ts
-- contract: T382 synchronize keyboard regression on actual dialog teardown and verify native inline errors.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/resource-editor.spec.ts --list
+### T-44466 W1 — OPEN
+- target_files: frontend/components/membership-history.tsx
+- contract: T382 create reusable five-state membership roster presentation for both existing dialogs.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+
+### T-44465 W2 — OPEN
+- target_files: frontend/lib/use-resource-memberships.ts, frontend/components/resource-page.tsx
+- contract: T382 isolate membership history loading with cancellation and actual pending state.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && npm --prefix frontend run test:runtime
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -18,6 +23,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44463 acceptede6311f5; verify0.
 - T-44464 accepteded47d9f; verify0.
 - T-44462 accepted4019403; verify0.
 - T-44461 accepteda939d11; verify0.
