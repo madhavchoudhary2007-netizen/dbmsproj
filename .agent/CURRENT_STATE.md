@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 9f604dd
+git_head: 9641a88
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -18,7 +18,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T382 resources header/toolbar/exactrowhook/classifier/NbTable/nativeModal/NbField/form/rowEditDelete/roleeligibilitybadges implemented; alloriginalcelltext/copy/pageSize50 preserved. Root360browserPASS T382-actions-primary.browser.raw.log, allsixpalettes/fivewidthaxe/targets/overflow/primary/dataflow. Build/lint/types0 T382-actions-build.raw.log. Inlinevalidation/twocolumnmemberships implemented; finalmodalaxe/partialfixtures andfocusedfileboundaries remain.
 - Real20POST/save and20DELETE/confirm duplicates repaired06330e6/6e28dd6, confirmation7838c2d. Strict25PASS T382-delete-guard.browser.raw.log; markerretired5cfe010, activeprimarytransitions5widthPASS. Browserwrites locallymocked only.
 - Backend main824lines, <=120T331 NOT met; T332unfinished. Genuine modules/core/extracts retained. TypedRuntimeState/providers/lifespan shareandclear identities; requestauth/DatabaseSession. Membership/analytics/pitreads useDI. Actualreturnannotation Decimalstringregression fixedresponse_modelNone19b7991; exactnumericserializationtests1479019 preservewireencoding.
-- Backendfull245PASS0skip/liveacceptancePASS T-44477.full.raw.log. Strictmypy134errors/25files T339-current-after-dbms.raw.log,target0T339. Runtime48PASS. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
+- Backendfull245PASS0skip/liveacceptancePASS T-44477.full.raw.log. Strictmypy134errors/25files T339-current-after-dbms.raw.log,target0T339. Runtime51PASS. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
 
 ## Safety / workflow
 - Onlyoverhaul/neo-brutal; commits onlyaccept.sh; independentlyrerunVerify;2packet-onlycustomworkersmax, no model/effortoverrides. Isolatedclones .agent/orchestrate.py;<=3files/150added+deleted; normalizeactualstats. Every5tasks budget.
@@ -37,7 +37,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 
 ## Latest route verification
 - T382 finalmembership25browserPASS T382-memberships-gate.browser.raw.log, all45editor+30primitivePASS; native Escape/Reactclose race da4d3ee/bc67c9a, 15/15keyboardreopens. Readability/currentroster/fiveStates complete; finalproductionbuild stillrequired aftersharedmodalchanges. Earlier360resourcebrowserPASS. Bloat594linesdeferredT400.
-- T383 hero/list/nativeDelete/persistentmutationguard7ae0ac6 implemented. GeneratedlistfiveStates e52386c, observer6tests7e554e7; runtime48PASS. Readable scopedselectors/notices262f582. Root T383-list-final40PASS10FAIL: all20mutationcasespass; outagefixtures count initialStrictMode requests incorrectly, T44492repair. Initialroute50browserPASS T383-header-cards.
+- T383 hero/list/nativeDelete/persistentmutationguard7ae0ac6 implemented. GeneratedlistfiveStates e52386c, observer6tests7e554e7; runtime51PASS. Readable scopedselectors/notices262f582. Root T383-list-final40PASS10FAIL: all20mutationcasespass; outagefixtures corrected0ba1b81; focused10/10recoveryPASS T383-list-recovery.browser.raw.log (combinedearlier40PASS). Initialroute50browserPASS T383-header-cards.
 - T384 derivedsector/interval/fastestmetadata underreviewT44490; interactiveNbTableT44491 underreview. NoAPIshapechanges. No newdependencies or realDBwrites. Rootproductedits0.
 
 - T-44490 accepted1f267c0: Derive factual three-sector comparisons, predecessor intervals and tied fastest-lap markers without changing existing gap logic. Verify0.
@@ -49,3 +49,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44494 accepted37a230e: Test factual predecessor intervals, three-sector comparisons, input immutability and tied fastest laps against actual source. Verify0.
 
 - T-44493 accepted9f604dd: Show actual tyres, positions, team stripes, fastest lap, interval and sector comparison cues; preserve all original fields. Verify0.
+
+- T-44495 accepted9641a88: Expose actual snapshot loading/error settlement and existing refresh retry with stale-request and cleanup guards. Verify0.

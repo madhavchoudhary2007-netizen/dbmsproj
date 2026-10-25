@@ -1,0 +1,206 @@
+diff --git a/frontend/app/styles/live.css b/frontend/app/styles/live.css
+index c9b657b..6fc01f6 100644
+--- a/frontend/app/styles/live.css
++++ b/frontend/app/styles/live.css
+@@ -148,6 +148,48 @@
+   letter-spacing: 0.08em;
+   text-transform: uppercase;
+ }
++.nb-shell .running-order-panel .timing-mobile-details {
++  display: none;
++}
++.nb-shell .running-order-panel .timing-mobile-details > dl {
++  display: grid;
++  gap: 8px;
++  margin: 8px 0 0;
++  min-width: 0;
++}
++.nb-shell .running-order-panel .timing-mobile-details > dl > div {
++  display: grid;
++  grid-template-columns: minmax(0, 1fr);
++  gap: 4px;
++  min-width: 0;
++}
++.nb-shell .running-order-panel .timing-mobile-details dt {
++  font-size: var(--fs-label);
++  font-weight: 700;
++}
++.nb-shell .running-order-panel .timing-mobile-details dd {
++  margin: 0;
++  min-width: 0;
++  overflow-wrap: anywhere;
++}
++@media (max-width: 767px) {
++  .nb-shell .running-order-panel .timing-secondary {
++    display: none;
++  }
++  .nb-shell .running-order-panel .timing-mobile-details {
++    display: block;
++  }
++  .nb-shell .running-order-panel .timing-mobile-details > summary {
++    display: flex;
++    align-items: center;
++    min-height: 44px;
++    overflow-wrap: anywhere;
++  }
++  .nb-shell .running-order-panel .timing-mobile-details > dl {
++    border-top: 4px solid var(--nb-ink);
++    padding-top: 8px;
++  }
++}
+ @media (max-width: 620px) {
+   .nb-shell .demo-race-row {
+     gap: 12px;
+diff --git a/frontend/components/nb/table.tsx b/frontend/components/nb/table.tsx
+index da3e24c..31ba85e 100644
+--- a/frontend/components/nb/table.tsx
++++ b/frontend/components/nb/table.tsx
+@@ -9,6 +9,7 @@ import { NbState } from "@/components/nb/state";
+ export type NbTableColumn<T extends Record<string, unknown>> = {
+   key: string;
+   title: ReactNode;
++  className?: string;
+   numeric?: boolean;
+   render?: (row: T) => ReactNode;
+ };
+@@ -28,6 +29,7 @@ export type NbTableProps<T extends Record<string, unknown>> = {
+   partialActionLabel?: string;
+   partialActionAriaLabel?: string;
+   ref?: Ref<HTMLTableElement>;
++  bodyRef?: Ref<HTMLTableSectionElement>;
+ };
+ 
+ export function NbTable<T extends Record<string, unknown>>({
+@@ -45,8 +47,9 @@ export function NbTable<T extends Record<string, unknown>>({
+   partialActionLabel,
+   partialActionAriaLabel,
+   ref,
++  bodyRef,
+ }: NbTableProps<T>) {
+-  const isNestedControl = (target: EventTarget | null) => target instanceof HTMLElement && Boolean(target.closest("a,button,input,select,textarea,[role=button],[role=link],[contenteditable=true]"));
++  const isNestedControl = (target: EventTarget | null) => target instanceof HTMLElement && Boolean(target.closest("a,button,input,select,textarea,summary,[role=button],[role=link],[contenteditable=true]"));
+   const renderTable = (rows: readonly T[]) => (
+     <div className="min-w-0 max-w-full overflow-x-auto shadow-nb-4">
+       <table ref={ref} className={cn("min-w-full border-collapse text-left", className)}>
+@@ -54,17 +57,18 @@ export function NbTable<T extends Record<string, unknown>>({
+         <thead className="sticky top-0 z-10">
+           <tr>
+             {columns.map((column) => (
+-              <th key={column.key} scope="col" className={cn("!border-b-2 !border-[var(--nb-ink)] !bg-[var(--nb-ink)] !px-3 !py-3 !text-[length:var(--fs-data)] !font-bold !text-[var(--nb-paper)]", column.numeric && "text-right")}>{column.title}</th>
++              <th key={column.key} scope="col" className={cn("!border-b-2 !border-[var(--nb-ink)] !bg-[var(--nb-ink)] !px-3 !py-3 !text-[length:var(--fs-data)] !font-bold !text-[var(--nb-paper)]", column.numeric && "text-right", column.className)}>{column.title}</th>
+             ))}
+           </tr>
+         </thead>
+-        <tbody>
++        <tbody ref={bodyRef}>
+           {rows.map((row, index) => {
+             const selectable = Boolean(onSelect);
+             const select = () => onSelect?.(row);
+             return (
+               <tr
+                 key={rowKey(row, index)}
++                data-flip-key={bodyRef ? rowKey(row, index) : undefined}
+                 className={cn("h-12 odd:!bg-[var(--nb-paper)] even:!bg-[var(--nb-cream)] hover:!bg-[var(--nb-yellow)] focus-visible:outline-4 focus-visible:outline-[var(--nb-yellow)] focus-visible:outline-offset-[-4px]", selectable && "clickable")}
+                 aria-selected={isSelected ? isSelected(row) : undefined}
+                 onClick={onSelect ? (event) => { if (!isNestedControl(event.target)) select(); } : undefined}
+@@ -77,7 +81,7 @@ export function NbTable<T extends Record<string, unknown>>({
+                 tabIndex={selectable ? 0 : undefined}
+               >
+                 {columns.map((column) => (
+-                  <td key={column.key} className={cn("h-12 !border-b-2 !border-[var(--nb-ink)] !px-3 !py-2 !text-[length:var(--fs-data)] !text-[var(--nb-ink)]", column.numeric && "font-mono tabular-nums text-right")}>{column.render ? column.render(row) : String(row[column.key] ?? "—")}</td>
++                  <td key={column.key} className={cn("h-12 !border-b-2 !border-[var(--nb-ink)] !px-3 !py-2 !text-[length:var(--fs-data)] !text-[var(--nb-ink)]", column.numeric && "font-mono tabular-nums text-right", column.className)}>{column.render ? column.render(row) : String(row[column.key] ?? "—")}</td>
+                 ))}
+               </tr>
+             );
+diff --git a/frontend/components/pages/live/timing-tower.tsx b/frontend/components/pages/live/timing-tower.tsx
+index 5d2ea3e..610c959 100644
+--- a/frontend/components/pages/live/timing-tower.tsx
++++ b/frontend/components/pages/live/timing-tower.tsx
+@@ -3,10 +3,19 @@ import { NbTable, type NbTableColumn } from "@/components/nb/table";
+ import { TyreBadge } from "@/components/nb/tyre-badge";
+ import type { ViewState } from "@/lib/data-state";
+ import { pretty, type Row } from "@/lib/api";
++import { useFlip } from "@/lib/use-flip";
++import { useFlashOnChange } from "@/lib/use-flash-on-change";
++import { useRef, type ReactNode } from "react";
+ 
+ const tyreCompounds = ["SOFT", "MEDIUM", "HARD", "INTERMEDIATE", "WET"] as const;
+ type TyreCompound = (typeof tyreCompounds)[number];
+ 
++function FlashValue({ value, children }: { value: unknown; children: ReactNode }) {
++  const ref = useRef<HTMLSpanElement>(null);
++  useFlashOnChange(ref, value);
++  return <span ref={ref}>{children}</span>;
++}
++
+ function isTyreCompound(value: unknown): value is TyreCompound {
+   return typeof value === "string" && tyreCompounds.includes(value as TyreCompound);
+ }
+@@ -40,10 +49,10 @@ function sectorCell(row: Row, index: number) {
+ 
+ const columns: readonly NbTableColumn<Row>[] = [
+   { key: "position", title: "position", numeric: true, render: (row) => <span style={{ alignItems: "center", backgroundColor: "var(--color-ink)", color: "var(--color-paper)", display: "inline-flex", fontFamily: "var(--font-mono)", height: 44, justifyContent: "center", minWidth: 44 }}>{pretty(row.position)}</span> },
+-  { key: "number", title: "number", numeric: true, render: (row) => pretty(row.number) },
+-  { key: "driver_name", title: "driver name", render: (row) => <span style={{ alignItems: "center", display: "inline-flex", gap: 8 }}><span>{pretty(row.driver_name)}</span>{(row as Row & { fastest_lap?: unknown }).fastest_lap === true && <span style={{ backgroundColor: "var(--color-violet)", color: "var(--color-ink)", padding: 4 }}>FL</span>}</span> },
+-  { key: "licence_number", title: "licence number", numeric: true, render: (row) => pretty(row.licence_number) },
+-  { key: "team_name", title: "team name", render: (row) => {
++  { key: "number", title: "number", numeric: true, className: "timing-secondary", render: (row) => pretty(row.number) },
++  { key: "driver_name", title: "driver name", render: (row) => <><span style={{ alignItems: "center", display: "inline-flex", gap: 8 }}><span>{pretty(row.driver_name)}</span>{(row as Row & { fastest_lap?: unknown }).fastest_lap === true && <span style={{ backgroundColor: "var(--color-violet)", color: "var(--color-ink)", padding: 4 }}>FL</span>}</span><details className="timing-mobile-details"><summary aria-label={`Timing details for ${pretty(row.driver_name)}`}>Details</summary><dl>{columns.filter((column) => column.className === "timing-secondary").map((column) => <div key={column.key}><dt>{column.title}</dt><dd>{column.render ? column.render(row) : String(row[column.key] ?? "—")}</dd></div>)}</dl></details></> },
++  { key: "licence_number", title: "licence number", numeric: true, className: "timing-secondary", render: (row) => pretty(row.licence_number) },
++  { key: "team_name", title: "team name", className: "timing-secondary", render: (row) => {
+     const team = row as Row & { team_color?: unknown; team_colour?: unknown };
+     const suppliedColor = typeof team.team_color === "string" && team.team_color.trim()
+       ? team.team_color
+@@ -53,21 +62,21 @@ const columns: readonly NbTableColumn<Row>[] = [
+     const color = suppliedColor ?? "var(--color-ink)";
+     return <span style={{ borderLeft: `4px solid ${color}`, display: "inline-block", minHeight: 44, padding: 8 }}>{pretty(row.team_name)}</span>;
+   } },
+-  { key: "gap", title: "gap", numeric: true, render: (row) => pretty(row.gap) },
+-  { key: "lap", title: "lap", numeric: true, render: (row) => pretty(row.lap) },
+-  { key: "sector", title: "sector", numeric: true, render: (row) => pretty(row.sector) },
+-  { key: "sector_times_ms", title: "sector times ms", numeric: true, render: (row) => pretty(row.sector_times_ms) },
+-  { key: "last_lap_ms", title: "last lap ms", numeric: true, render: (row) => pretty(row.last_lap_ms) },
+-  { key: "best_lap_ms", title: "best lap ms", numeric: true, render: (row) => pretty(row.best_lap_ms) },
++  { key: "gap", title: "gap", numeric: true, render: (row) => <FlashValue value={row.gap}>{pretty(row.gap)}</FlashValue> },
++  { key: "lap", title: "lap", numeric: true, className: "timing-secondary", render: (row) => pretty(row.lap) },
++  { key: "sector", title: "sector", numeric: true, className: "timing-secondary", render: (row) => pretty(row.sector) },
++  { key: "sector_times_ms", title: "sector times ms", numeric: true, className: "timing-secondary", render: (row) => pretty(row.sector_times_ms) },
++  { key: "last_lap_ms", title: "last lap ms", numeric: true, className: "timing-secondary", render: (row) => <FlashValue value={row.last_lap_ms}>{pretty(row.last_lap_ms)}</FlashValue> },
++  { key: "best_lap_ms", title: "best lap ms", numeric: true, className: "timing-secondary", render: (row) => <FlashValue value={row.best_lap_ms}>{pretty(row.best_lap_ms)}</FlashValue> },
+   { key: "tire_compound", title: "tire compound", render: (row) => <span style={{ alignItems: "center", display: "inline-flex", gap: 8 }}>{isTyreCompound(row.tire_compound) && <TyreBadge compound={row.tire_compound} />}<span>{pretty(row.tire_compound)}</span><span>{pretty(row.tire_age_laps)} laps</span></span> },
+-  { key: "tire_age_laps", title: "tire age laps", numeric: true, render: (row) => pretty(row.tire_age_laps) },
+-  { key: "tire_wear_pct", title: "tire wear pct", numeric: true, render: (row) => pretty(row.tire_wear_pct) },
+-  { key: "pit_state", title: "pit state", render: (row) => pretty(row.pit_state) },
+-  { key: "pit_box_number", title: "pit box number", numeric: true, render: (row) => pretty(row.pit_box_number) },
+-  { key: "interval", title: "interval", render: (row) => pretty((row as Row & { interval?: unknown }).interval) },
+-  { key: "sector_s1", title: "S1", render: (row) => sectorCell(row, 0) },
+-  { key: "sector_s2", title: "S2", render: (row) => sectorCell(row, 1) },
+-  { key: "sector_s3", title: "S3", render: (row) => sectorCell(row, 2) },
++  { key: "tire_age_laps", title: "tire age laps", numeric: true, className: "timing-secondary", render: (row) => pretty(row.tire_age_laps) },
++  { key: "tire_wear_pct", title: "tire wear pct", numeric: true, className: "timing-secondary", render: (row) => pretty(row.tire_wear_pct) },
++  { key: "pit_state", title: "pit state", className: "timing-secondary", render: (row) => pretty(row.pit_state) },
++  { key: "pit_box_number", title: "pit box number", numeric: true, className: "timing-secondary", render: (row) => pretty(row.pit_box_number) },
++  { key: "interval", title: "interval", className: "timing-secondary", render: (row) => <FlashValue value={(row as Row & { interval?: unknown }).interval}>{pretty((row as Row & { interval?: unknown }).interval)}</FlashValue> },
++  { key: "sector_s1", title: "S1", className: "timing-secondary", render: (row) => sectorCell(row, 0) },
++  { key: "sector_s2", title: "S2", className: "timing-secondary", render: (row) => sectorCell(row, 1) },
++  { key: "sector_s3", title: "S3", className: "timing-secondary", render: (row) => sectorCell(row, 2) },
+ ];
+ 
+ export function TimingTower({
+@@ -81,6 +90,8 @@ export function TimingTower({
+   selectedDriver: string;
+   onSelectDriver: (id: string) => void;
+ }) {
++  const bodyRef = useRef<HTMLTableSectionElement>(null);
++  useFlip(bodyRef, orderRows.map((row) => String(row.driver_id)));
+   const rows = orderRows.map((car) => ({
+     ...car,
+     position: car.position ?? "—",
+@@ -111,6 +122,7 @@ export function TimingTower({
+         state={state}
+         columns={columns}
+         rowKey={(row) => String(row.driver_id)}
++        bodyRef={bodyRef}
+         caption="LIVE TIMING / RUNNING ORDER"
+         empty="Waiting for timing and telemetry packets from this session."
+         onSelect={(row) => onSelectDriver(String(row.driver_id))}

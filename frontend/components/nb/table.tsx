@@ -9,6 +9,7 @@ import { NbState } from "@/components/nb/state";
 export type NbTableColumn<T extends Record<string, unknown>> = {
   key: string;
   title: ReactNode;
+  className?: string;
   numeric?: boolean;
   render?: (row: T) => ReactNode;
 };
@@ -28,6 +29,7 @@ export type NbTableProps<T extends Record<string, unknown>> = {
   partialActionLabel?: string;
   partialActionAriaLabel?: string;
   ref?: Ref<HTMLTableElement>;
+  bodyRef?: Ref<HTMLTableSectionElement>;
 };
 
 export function NbTable<T extends Record<string, unknown>>({
@@ -45,8 +47,9 @@ export function NbTable<T extends Record<string, unknown>>({
   partialActionLabel,
   partialActionAriaLabel,
   ref,
+  bodyRef,
 }: NbTableProps<T>) {
-  const isNestedControl = (target: EventTarget | null) => target instanceof HTMLElement && Boolean(target.closest("a,button,input,select,textarea,[role=button],[role=link],[contenteditable=true]"));
+  const isNestedControl = (target: EventTarget | null) => target instanceof HTMLElement && Boolean(target.closest("a,button,input,select,textarea,summary,[role=button],[role=link],[contenteditable=true]"));
   const renderTable = (rows: readonly T[]) => (
     <div className="min-w-0 max-w-full overflow-x-auto shadow-nb-4">
       <table ref={ref} className={cn("min-w-full border-collapse text-left", className)}>
@@ -54,17 +57,18 @@ export function NbTable<T extends Record<string, unknown>>({
         <thead className="sticky top-0 z-10">
           <tr>
             {columns.map((column) => (
-              <th key={column.key} scope="col" className={cn("!border-b-2 !border-[var(--nb-ink)] !bg-[var(--nb-ink)] !px-3 !py-3 !text-[length:var(--fs-data)] !font-bold !text-[var(--nb-paper)]", column.numeric && "text-right")}>{column.title}</th>
+              <th key={column.key} scope="col" className={cn("!border-b-2 !border-[var(--nb-ink)] !bg-[var(--nb-ink)] !px-3 !py-3 !text-[length:var(--fs-data)] !font-bold !text-[var(--nb-paper)]", column.numeric && "text-right", column.className)}>{column.title}</th>
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody ref={bodyRef}>
           {rows.map((row, index) => {
             const selectable = Boolean(onSelect);
             const select = () => onSelect?.(row);
             return (
               <tr
                 key={rowKey(row, index)}
+                data-flip-key={bodyRef ? rowKey(row, index) : undefined}
                 className={cn("h-12 odd:!bg-[var(--nb-paper)] even:!bg-[var(--nb-cream)] hover:!bg-[var(--nb-yellow)] focus-visible:outline-4 focus-visible:outline-[var(--nb-yellow)] focus-visible:outline-offset-[-4px]", selectable && "clickable")}
                 aria-selected={isSelected ? isSelected(row) : undefined}
                 onClick={onSelect ? (event) => { if (!isNestedControl(event.target)) select(); } : undefined}
@@ -77,7 +81,7 @@ export function NbTable<T extends Record<string, unknown>>({
                 tabIndex={selectable ? 0 : undefined}
               >
                 {columns.map((column) => (
-                  <td key={column.key} className={cn("h-12 !border-b-2 !border-[var(--nb-ink)] !px-3 !py-2 !text-[length:var(--fs-data)] !text-[var(--nb-ink)]", column.numeric && "font-mono tabular-nums text-right")}>{column.render ? column.render(row) : String(row[column.key] ?? "—")}</td>
+                  <td key={column.key} className={cn("h-12 !border-b-2 !border-[var(--nb-ink)] !px-3 !py-2 !text-[length:var(--fs-data)] !text-[var(--nb-ink)]", column.numeric && "font-mono tabular-nums text-right", column.className)}>{column.render ? column.render(row) : String(row[column.key] ?? "—")}</td>
                 ))}
               </tr>
             );

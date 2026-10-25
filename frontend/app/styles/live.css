@@ -148,6 +148,48 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+.nb-shell .running-order-panel .timing-mobile-details {
+  display: none;
+}
+.nb-shell .running-order-panel .timing-mobile-details > dl {
+  display: grid;
+  gap: 8px;
+  margin: 8px 0 0;
+  min-width: 0;
+}
+.nb-shell .running-order-panel .timing-mobile-details > dl > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+  min-width: 0;
+}
+.nb-shell .running-order-panel .timing-mobile-details dt {
+  font-size: var(--fs-label);
+  font-weight: 700;
+}
+.nb-shell .running-order-panel .timing-mobile-details dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 767px) {
+  .nb-shell .running-order-panel .timing-secondary {
+    display: none;
+  }
+  .nb-shell .running-order-panel .timing-mobile-details {
+    display: block;
+  }
+  .nb-shell .running-order-panel .timing-mobile-details > summary {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    overflow-wrap: anywhere;
+  }
+  .nb-shell .running-order-panel .timing-mobile-details > dl {
+    border-top: 4px solid var(--nb-ink);
+    padding-top: 8px;
+  }
+}
 @media (max-width: 620px) {
   .nb-shell .demo-race-row {
     gap: 12px;
