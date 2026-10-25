@@ -13,7 +13,7 @@ from .core.serialization import jsonable
 router = APIRouter()
 
 
-@router.get("/api/dashboard")
+@router.get("/api/dashboard", response_model=None)
 def dashboard(
     user: Annotated[dict[str, Any], Depends(current_user)],
     database: Annotated[DatabaseSession, Depends(get_database)],
@@ -23,7 +23,7 @@ def dashboard(
     return data
 
 
-@router.get("/api/analytics/drivers")
+@router.get("/api/analytics/drivers", response_model=None)
 def driver_analytics(
     user: Annotated[dict[str, Any], Depends(current_user)],
     database: Annotated[DatabaseSession, Depends(get_database)],

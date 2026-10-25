@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 6139e34
+git_head: b2aae4b
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -19,7 +19,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T381 dashboard hero/KPIs/context/Next up/incidents + independent5-state sources implemented. Root135browserPASS T381-visual-verified.browser.raw.log incl route/axe/targets/6widthresponsive/palette/legacyoffline/spam/unmount/malformed/healthcontrast+visiblelink. Settled5widthscreenshotsreviewed,0overflow/oneprimary/noerrors. Productionbuild/types/lint0 T381-current-build.raw.log; rootruntime31PASS. Preserve .stat-card/.state.error/Try again.
 - T381 actual lease/WS hook6b9fd8c wired93b90e0. Readiness503down, abort/listenercleanup, idle/pending/retained status truthful. Platform mock imports complete with original test bodies retained; real-stack suites untouched. Root165browserPASS T381-connectivity-final.browser.raw.log incl eightconnectivityscenarios atfivewidthprojects; repairedfixtures without weakening assertions. Originalinterrupted/failedruns retained.
 - Backend T331 main857lines (<=120 NOT achieved), T332unfinished. Existing genuine API/core extracts retained. Appfactory22c7e77 exactleasebodyAST; RuntimeState60c4999/providers4521ac9/lifespan d756a9f/b87fee6 share and clear realresourceidentities. Root239PASS0skip/livePASS T44407.full.raw.log.
-- Requestauth/injectedDBadapters1ffce81 +4offlineauthregressions6b6cf24 stagednotyetrouteradopted, ownmodule strictmypy0. Full243PASS0skip/livePASS T44420.full.raw.log; cookie-deprecation warnings eliminated. Membership router now uses request-scoped dependencies cc18c4b. T331/T332ordercoupling: legacytests patchmain, so providerfoundations required before removingcompat wrappers; neitherparentcomplete.
+- Requestauth/injectedDBadapters1ffce81 +4offlineauthregressions6b6cf24 adopted in membership/analytics; ownmodule strictmypy0. Full243PASS0skip/livePASS T44420.full.raw.log; cookie-deprecation warnings eliminated. Membership router now uses request-scoped dependencies cc18c4b. T331/T332ordercoupling: legacytests patchmain, so providerfoundations required before removingcompat wrappers; neitherparentcomplete.
 - Original40pxfeed09cae83 restored androot95PASS; bodybootlight/actualheadingready/residualmotion fixes unchanged. T44389 exactCSSmovea74019e.
 
 ## Safety / workflow
@@ -35,22 +35,18 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 ## Orchestrator direct edits / process findings
 - Productglue14lines only in long continuation, workers implement other productchanges. Actualnumstats checked independently; source moves byte/AST checked. Priornewfileenvelope0/0 normalizedactual121, no trust inreportedcounts.
 - E5partial legacyselector/aria regression fixed3226b70; invalidincidents{} crash fixed1924d64/testda48958. Rootinterruptedknown-failingbroadrun130exit, cleanedownNext/restorednext-env; later135PASS. Newfixture StrictMode/duplicate-text selectors fixedwithout weakening assertions. W3T44406 153linefile repaired150; T44414 extra type-onlyimport restored toboundary.
-- T381 health ink/plinthface Taste defects fixed5a0ad53 andbrowserprovedd018de6. Remaining fourKPIaccents vsT400max3 TASTE-381-1 mustresolvebeforeA5. Servicehealth source rows notyetcomplete. History/results retain repair details.
+- T381 health ink/plinthface Taste defects fixed5a0ad53 andbrowserprovedd018de6. Remaining fourKPIaccents vsT400max3 TASTE-381-1 mustresolvebeforeA5. Observed servicehealth rows nowcomplete; browser165PASS. History/results retain repair details.
 
-- Latest accepted: T44415–21 platformmocks, connectivityhelpers/UI/browser, membershipDI and cookie-warningcleanup; evidence Git/results. Backend243PASS0skip/livePASS T44420.full.raw.log.
-
-- T-44423 accepted1373d88: Show actual event, circuit, session and state in Race weekend; preserve every raw session field in a keyboard-accessible details disclosure. Verify0.
-
-- T-44424 acceptedf311789: Remove unused membership global database fallback; all four functions require the request-injected DatabaseSession and preserve SQL behavior. Verify0.
-
-- T-44425 acceptedc18bce7: Adopt typed request auth/database dependencies for dashboard and analytics, retaining characterization-only repository compatibility and unchanged wire contracts. Verify0.
 
 - Process violation T44427 W3 edited root instead of its packetclone, triggering T44425 boundary rejection. Moved only owned patch into clone, restored rootownedfile via git, reran T44425 accept0. W3 retry must verify explicit clone. No feature/assertion/gate changed.
 
-- T-44426 accepted0ec278d: Introduce shared resource-page cream hero, observed count sticker and preserved New record/membership callbacks with neo-brutal controls. Verify0.
 
 - T-44427 accepted7122a27: Observe mocked socket URL/messages/closure through WebSocketRoute and exercise existing exact 503 readiness failure; preserve all eight regression assertions. Verify0.
 
 - T-44429 accepted6139e34: Use tokenized search and reload controls in resource toolbar, preserving callbacks and accessible names while showing the actual result range. Verify0.
 
 - T44425 fullgate242PASS1FAIL: addedreturnannotations invoked Pydantic Decimal-to-string serializer, breaking existing analytics numeric assertion. T44430 restores original response_model=None; test unchanged. Parentgate remainsFAILED pending repair.
+
+- T-44428 acceptedb2aae4b: Inject explicit database adapters into dashboard characterization fixtures; preserve exact assertions, disposable safety guard, query logic and rollback. Verify0.
+
+- T382 resource header0ec278d/toolbar6139e34 accepted, full sixroutebrowsermatrix currentlyrunning. Parentunfinished; table/modal/5states/layout/palette remain.
