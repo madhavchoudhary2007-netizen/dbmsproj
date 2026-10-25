@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 95bf890
+git_head: 2676edf
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -36,3 +36,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - Productglue14lines only in long continuation, workers implement other productchanges. Actualnumstats checked independently; source moves byte/AST checked. Priornewfileenvelope0/0 normalizedactual121, no trust inreportedcounts.
 - E5partial legacyselector/aria regression fixed3226b70; invalidincidents{} crash fixed1924d64/testda48958. Rootinterruptedknown-failingbroadrun130exit, cleanedownNext/restorednext-env; later135PASS. Newfixture StrictMode/duplicate-text selectors fixedwithout weakening assertions. W3T44406 153linefile repaired150; T44414 extra type-onlyimport restored toboundary.
 - T381 health ink/plinthface Taste defects fixed5a0ad53 andbrowserprovedd018de6. Remaining fourKPIaccents vsT400max3 TASTE-381-1 mustresolvebeforeA5. Servicehealth source rows notyetcomplete. History/results retain repair details.
+
+- T-44415 accepted2676edf: Import-only platform fixture adoption; byte-exact original feed test bodies and all 40px/polling assertions preserved. Verify0.
