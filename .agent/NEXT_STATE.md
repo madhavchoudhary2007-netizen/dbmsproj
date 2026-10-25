@@ -3,6 +3,11 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44328 W2 — OPEN
+- target_files: backend/app/main.py, backend/app/simulation_lifecycle.py
+- contract: T331 move exact sync_simulation_lifecycle into typed simulation_lifecycle module, retain legacy wrapper.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "simulation_stop or simulation_pause or reset" && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/simulation_lifecycle.py
+
 ### T-44327 W1 — OPEN
 - target_files: frontend/components/pages/pit-wall.tsx
 - contract: T379 stage exact PitWall presentation page under pages/pit-wall.tsx; keep legacy source until separate wire.
@@ -13,11 +18,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T379 stage exact Analytics state/effects/search and derived rows into use-analytics hook; leave original presentation unchanged.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
-### T-44325 W1 — OPEN
-- target_files: frontend/components/special-pages.tsx
-- contract: T379 wire staged TelemetryCharts into LiveTiming and remove only exact legacy chart region plus unused recharts imports.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
-
 ## Blocked
 - None currently. Owner switched workers to gpt-6-luna/high; T44318 interrupted before edits, fresh worker required.
 
@@ -25,6 +25,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44325 accepted5c977c3; verify0.
 - T-44324 accepteda54f000; verify0.
 - T-44323 accepted480ae39; verify0.
 - T-44322 accepteddc23dbc; verify0.
