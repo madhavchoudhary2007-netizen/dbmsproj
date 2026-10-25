@@ -1,0 +1,144 @@
+diff --git a/frontend/e2e/runtime/resource-memberships.test.mjs b/frontend/e2e/runtime/resource-memberships.test.mjs
+new file mode 100644
+index 0000000..9304ea6
+--- /dev/null
++++ b/frontend/e2e/runtime/resource-memberships.test.mjs
+@@ -0,0 +1,138 @@
++import test from "node:test";
++import assert from "node:assert/strict";
++import { readFileSync } from "node:fs";
++import { createRequire } from "node:module";
++import * as vm from "node:vm";
++
++const require = createRequire(import.meta.url);
++const typescript = require("../../node_modules/typescript");
++const source = readFileSync(new URL("../../lib/use-resource-memberships.ts", import.meta.url), "utf8");
++const deferred = () => {
++  let resolve, reject;
++  const promise = new Promise((yes, no) => { resolve = yes; reject = no; });
++  return { promise, resolve, reject };
++};
++
++async function load() {
++  const NativeDate = Date;
++  class FixedDate extends NativeDate {
++    constructor(...args) { super(...(args.length ? args : ["2026-10-25T12:00:00.000Z"])); }
++  }
++  const realm = vm.createContext({ AbortController, Date: FixedDate, Error });
++  const slots = [];
++  let cursor = 0;
++  const react = new vm.SyntheticModule(["useState", "useRef", "useCallback", "useEffect"], function () {
++    this.setExport("useState", initial => {
++      const index = cursor++;
++      const slot = slots[index] ??= { value: initial };
++      return [slot.value, value => { slot.value = typeof value === "function" ? value(slot.value) : value; }];
++    });
++    this.setExport("useRef", initial => slots[cursor++] ??= { current: initial });
++    this.setExport("useCallback", (callback, deps) => {
++      const index = cursor++;
++      const slot = slots[index];
++      if (slot && deps.every((dep, i) => dep === slot.deps[i])) return slot.callback;
++      slots[index] = { callback, deps };
++      return callback;
++    });
++    this.setExport("useEffect", (effect, deps) => {
++      const index = cursor++;
++      if (!slots[index]) slots[index] = { cleanup: effect() };
++    });
++  }, { context: realm, identifier: "react" });
++  const requests = [];
++  const apiModule = new vm.SyntheticModule(["api", "asArray"], function () {
++    this.setExport("api", (url, options) => {
++      const request = deferred();
++      requests.push({ url, signal: options.signal, ...request });
++      return request.promise;
++    });
++    this.setExport("asArray", value => Array.isArray(value) ? value : []);
++  }, { context: realm, identifier: "./api" });
++  const output = typescript.transpileModule(source, {
++    compilerOptions: { module: typescript.ModuleKind.ESNext, target: typescript.ScriptTarget.ES2022 },
++  }).outputText;
++  const hookModule = new vm.SourceTextModule(output, { context: realm, identifier: "./use-resource-memberships.ts" });
++  await hookModule.link(specifier => specifier === "react" ? react : apiModule);
++  await hookModule.evaluate();
++  return {
++    requests,
++    render: endpoint => { cursor = 0; return hookModule.namespace.useResourceMemberships(endpoint); },
++    unmount: () => slots.forEach(slot => slot?.cleanup?.()),
++  };
++}
++
++test("load exposes pending and successful rows, then retains rows and throws on the current error", async () => {
++  const hook = await load();
++  const actions = hook.render("/teams");
++  const first = actions.load("1");
++  assert.equal(hook.render("/teams").loading, true);
++  hook.requests[0].resolve([{ id: 1 }]);
++  await first;
++  assert.deepEqual(hook.render("/teams").members, [{ id: 1 }]);
++
++  const failed = hook.render("/teams").load("2");
++  hook.requests[1].reject(new Error("offline"));
++  await assert.rejects(failed, /offline/);
++  const result = hook.render("/teams");
++  assert.equal(result.loading, false);
++  assert.equal(result.error, "offline");
++  assert.deepEqual(result.members, [{ id: 1 }]);
++
++  const retry = result.load("2");
++  assert.equal(hook.render("/teams").error, "");
++  hook.requests[2].resolve([{ id: 2 }]);
++  await retry;
++  assert.deepEqual(hook.render("/teams").members, [{ id: 2 }]);
++});
++
++test("overlapping requests and clear or unmount ignore stale results and abort their signals", async () => {
++  const hook = await load();
++  const actions = hook.render("/departments");
++  const old = actions.load("old");
++  const newer = hook.render("/departments").load("new");
++  assert.equal(hook.requests[0].signal.aborted, true);
++  hook.requests[1].resolve([{ id: "new" }]);
++  await newer;
++  hook.requests[0].resolve([{ id: "old" }]);
++  await old;
++  assert.deepEqual(Array.from(hook.render("/departments").members), [{ id: "new" }]);
++
++  const staleError = hook.render("/departments").load("stale-error");
++  const latest = hook.render("/departments").load("latest");
++  hook.requests[2].reject(new Error("stale failure"));
++  await staleError;
++  hook.requests[3].resolve([{ id: "latest" }]);
++  await latest;
++  assert.equal(hook.render("/departments").error, "");
++
++  const cleared = hook.render("/departments").load("clear");
++  hook.render("/departments").clear();
++  assert.equal(hook.requests[4].signal.aborted, true);
++  hook.requests[4].resolve([{ id: "cleared" }]);
++  await cleared;
++  assert.deepEqual(Array.from(hook.render("/departments").members), []);
++
++  const unmounted = hook.render("/departments").load("unmount");
++  hook.unmount();
++  assert.equal(hook.requests[5].signal.aborted, true);
++  hook.requests[5].reject(new Error("late failure"));
++  await unmounted;
++  assert.equal(hook.render("/departments").error, "");
++});
++
++test("current roster uses inclusive UTC today bounds and requires a start date", async () => {
++  const hook = await load();
++  const loadRows = hook.render("/teams").load("1");
++  hook.requests[0].resolve([
++    { id: "open", start_date: "2026-10-24", end_date: null },
++    { id: "ends-today", start_date: "2026-10-25", end_date: "2026-10-25" },
++    { id: "starts-today", start_date: "2026-10-25", end_date: "" },
++    { id: "past-start", start_date: "2026-10-24", end_date: "2026-10-24" },
++    { id: "future-end", start_date: "2026-10-24", end_date: "2026-10-26" },
++    { id: "future-start", start_date: "2026-10-26", end_date: null },
++    { id: "missing-start", end_date: null },
++  ]);
++  await loadRows;
++  assert.deepEqual(hook.render("/teams").currentMembers.map(row => row.id), ["open", "ends-today", "starts-today", "future-end"]);
++});
