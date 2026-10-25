@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 6fb844f
+git_head: 8a33d97
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -38,3 +38,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44342 accepted7718c89: Activate exact generated-race actions through typed callback helper; retain all page JSX and render closures. Verify0.
 
 - T-44343 accepted6fb844f: Stage exact generated race hero, message and list, retaining copy, accessibility hooks and selection ordering. Verify0.
+
+- T-44344 accepted8a33d97: Wire exact derived live timing helper and expose existing driverIds; preserve all effects, actions and JSX. Verify0.

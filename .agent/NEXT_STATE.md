@@ -8,11 +8,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T379 stage exact generated race delete modal into live/delete-demo-modal.tsx; keep source unchanged.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
-### T-44344 W2 — OPEN
-- target_files: frontend/components/special-pages.tsx, frontend/lib/live-timing-data.ts
-- contract: T379 wire exact derived live timing data helper, exposing existing driverIds for the unchanged driver selector.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
-
 ## Blocked
 - None currently. Owner switch gpt-6-luna/high implemented and freshworkers succeeded.
 
@@ -20,6 +15,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44344 accepted8a33d97; verify0.
 - T-44343 accepted6fb844f; verify0.
 - T-44342 accepted7718c89; verify0.
 - T-44341 acceptedbbbd12e; verify0.
