@@ -29,13 +29,18 @@ export function useNativeDialog(
       didNotifyCloseRef.current = true;
       onCloseRef.current();
     };
+    const handleCancel = (event: Event) => {
+      event.preventDefault();
+      onCloseRef.current();
+    };
     const handleClick = (event: MouseEvent) => {
       if (event.target !== dialog || !dialog.open) return;
       const rect = dialog.getBoundingClientRect();
       const outside = event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom;
-      if (outside) dialog.close();
+      if (outside) onCloseRef.current();
     };
     dialog.addEventListener("close", handleClose);
+    dialog.addEventListener("cancel", handleCancel);
     dialog.addEventListener("click", handleClick);
     return () => {
       if (dialog.open) {
@@ -43,6 +48,7 @@ export function useNativeDialog(
         dialog.close();
       }
       dialog.removeEventListener("close", handleClose);
+      dialog.removeEventListener("cancel", handleCancel);
       dialog.removeEventListener("click", handleClick);
       restoreFocus();
     };
