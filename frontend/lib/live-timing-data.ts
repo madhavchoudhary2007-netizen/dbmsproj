@@ -95,6 +95,7 @@ export function deriveLiveTimingData(
   return {
     shown,
     namedDrivers,
+    driverIds,
     orderRows,
     chartPackets,
     hasTireTemperatures,

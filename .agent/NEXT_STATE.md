@@ -3,9 +3,14 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44343 W1 — OPEN
-- target_files: frontend/components/pages/live/demo-controls.tsx
-- contract: T379 stage exact generated demo hero, message and race list in live/demo-controls.tsx; leave source untouched until separate wire.
+### T-44345 W1 — OPEN
+- target_files: frontend/components/pages/live/delete-demo-modal.tsx
+- contract: T379 stage exact generated race delete modal into live/delete-demo-modal.tsx; keep source unchanged.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
+
+### T-44344 W2 — OPEN
+- target_files: frontend/components/special-pages.tsx, frontend/lib/live-timing-data.ts
+- contract: T379 wire exact derived live timing data helper, exposing existing driverIds for the unchanged driver selector.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
 ## Blocked
@@ -15,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44343 accepted6fb844f; verify0.
 - T-44342 accepted7718c89; verify0.
 - T-44341 acceptedbbbd12e; verify0.
 - T-44340 accepted477af90; verify0.
