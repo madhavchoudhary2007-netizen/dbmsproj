@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: e0f42fd
+git_head: 61cfaa0
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -37,22 +37,4 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T44366 introduced5newdepswarnings, repairedstabledeps/max-warnings0 beforeaccept627d48a; root60livebrowserPASS. T44367 rootpacket mistakenlyselected DBlease tests; active-owner failures, correctedoffline24PASS and rootfull231PASS0skip/livePASS. No assertionschanged.
 - Exact bytes/AST verified for all moves; evidence/results/Githistory retain details. Rootruntime command firstomittedrequired VMflag; correct --experimental-vm-modules gives24PASS0skip. No productdefect.
 
-- T-44370 acceptedb6494d1: Remove only unused legacy imports, keeping LiveTiming function bytes and compatibility exports unchanged. Verify0.
-
-- T-44371 acceptedb0d6bcc: Activate standalone LiveTiming through compatibility export; remove obsolete local body and imports. Verify0.
-
-- T-44372 accepteda5bb1f7: Move simulator control route into API module preserving response, role dependency and late-bound callbacks. Verify0.
-
-- T-44381 acceptedec4c854: Use approved dashboard KPI tiles with scoped48px values, typed tones and unchanged shared defaults; remove orphan CSS. Verify0.
-
-- T-44382 acceptedbc1c162: Extract HTTP authentication body verbatim while preserving dependency signature and late-bound security callbacks. Verify0.
-
-- Newrootgates caught regressions: T44381 removed .stat-card testedhook (5dashboardretryfailures); fixed d36776d; root95dashboard/primitive/feed/retrybrowserPASS T381-hero-recovery.browser.raw.log. T44382 removed main.jwt export (14fullfailures217PASS); fixed07b8e27; rootfull231PASS0skip/livePASS T44385.full.raw.log. Assertions unchanged. Focusedverifies hadpassed; do not claim latestfullgreen.
-
-- T-44383 accepted02486b3: Add scoped dashboard hero and single Open live timing primary while preserving reload and existing data logic. Verify0.
-
-- T-44385 accepted07b8e27: Restore legacy jwt module export required by existing auth and WebSocket compatibility tests. Verify0.
-
-- T-44384 acceptedd36776d: Restore stat-card compatibility hook on dashboard KPI tiles without restoring obsolete CSS. Verify0.
-
-- T-44386 acceptede0f42fd: Extract origin, revocation and role-check dependencies with exact guards and original main wrappers. Verify0.
+- Current: T44386 e0f42fd full231PASS0skip/livePASS; T44387 61cfaa0 browser59PASS/1A3FAIL. T44388 helper/state pendingrepair2 (avoid refs-through-pure-helper lint, no workaroundeffects). T44389 CSSmove whitespace repaired, acceptancepending.
