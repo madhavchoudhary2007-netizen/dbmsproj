@@ -8,6 +8,7 @@ import { NbModal } from "../nb/modal";
 import { StewardReport } from "./steward-report";
 import { StewardSanctions } from "./steward-sanctions";
 import { StewardCases } from "./steward-cases";
+import { StewardRecords } from "./steward-records";
 import { useStewardDesk } from "@/lib/use-steward-desk";
 
 export function StewardDesk() {
@@ -30,6 +31,7 @@ export function StewardDesk() {
     setGrid,
     message,
     canSteward,
+    records,
     load,
     report,
     decide,
@@ -74,6 +76,7 @@ export function StewardDesk() {
             setGrid(0);
         }}
       />
+      <StewardRecords records={records} />
       {message && <NbCard tone="cream" className="mb-4" role="status">{message}</NbCard>}
       {active && canSteward && (
         <NbModal

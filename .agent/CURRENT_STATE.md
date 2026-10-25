@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: e6dfc57
+git_head: f4e0e36
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -17,8 +17,8 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T381 dashboard hero/context/KPIs/services/Nextup/incidents implemented. Actuallease503/notready/recovery +cookieWSopen/error/close/cleanup, no syntheticstatus. Root165browserPASS T381-connectivity-final.browser.raw.log; fivewidthvisuals0overflow/oneprimary/noerrors. Preserve .stat-card/.state.error/Try again. TASTE-381-1 fouraccenttiles vsT400max3 unresolved.
 - T382 resource CRUD/native modals/memberships/eligibility implemented, copy/hooks/pageSize50 preserved. Browser360PASS T382-actions-primary; final modal/accessibility coverage retained below. Resource page bloat remains T400.
 - Resource20-click save/delete duplicates repaired; strict25PASS T382-delete-guard.browser.raw.log; primary transitions5widthPASS, locally mocked writes only.
-- Backend main823lines, <=120T331 NOT met; T332unfinished. Genuine modules/core/extracts retained. TypedRuntimeState/providers/lifespan shareandclear identities; requestauth/DatabaseSession. Membership/analytics/pitreads useDI. Actualreturnannotation Decimalstringregression fixedresponse_modelNone19b7991; exactnumericserializationtests1479019 preservewireencoding.
-- Backend full249PASS0skip/live acceptance PASS T-44517.full.raw.log. Strictmypy134errors/25files T339-current-after-dbms.raw.log,target0T339. Runtime69PASS T44530 accept log. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
+- Backend main825lines, <=120T331 NOT met; T332unfinished. Genuine modules/core/extracts retained. TypedRuntimeState/providers/lifespan shareandclear identities; requestauth/DatabaseSession. Membership/analytics/pitreads useDI. Actualreturnannotation Decimalstringregression fixedresponse_modelNone19b7991; exactnumericserializationtests1479019 preservewireencoding.
+- Backend full262PASS0skip/live acceptance PASS T-44540.full.raw.log. Strictmypy127errors/22files T339-current.raw.log,target0T339. Runtime69PASS T44530 accept log. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
 
 ## Safety / workflow
 - Onlyoverhaul/neo-brutal; commits onlyaccept.sh; independentlyrerunVerify;2packet-onlycustomworkersmax, no model/effortoverrides. Isolatedclones .agent/orchestrate.py;<=3files/150added+deleted; normalizeactualstats. Every5tasks budget.
@@ -42,7 +42,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T385 charts/corner tiles, laps/latest telemetry tables, control timelines and retry/source states implemented. Fifteen loading/empty/error/retention browser cases PASS; populated4widths PASS. Mobile tooltip tile scope repaired9a68302; focused mobile1PASS T385-populated-mobile-final, completing five populated widths. M13 first draw remains open.
 - T386 layout/controls/results/native modals implemented7023bc4/d868cac/2e68037. Route gate69PASS1desktop paletteFAIL (red4.10%, minimum5). T44524 fixed desktop palette (all5palette cases PASS); focused lifecycle/simulator/result-read10PASS, dialog fixture corrected885b8ac, focused5/5 browser PASS T386-dialog-final. Desktop/mobile screenshots inspected; legacy field label/border styling remains a Taste defect. Result source7897a78 + five-state view378faa0 + five VM tests8e83f3c; no stale result writes.
 - T332 request database demo DELETE + four dependency override cases accepted c48443f/dede5cd. Root249PASS0skip and live acceptance PASS T-44517.full.raw.log; exact helper ordering preserved.
-- T44503 transient worker usage error recovered with same role/model; oversized unaccepted clone diff replaced with targeted change. T44519 count envelope corrected before acceptance; no boundary spill. No dependencies added.
+- Review corrected worker envelope counts, fixture schema/labels, UUID types and missing source partial state before acceptance. No dependencies added.
 
 - T387 case cards b301b9c and native dialogs/header82138ba implemented; sanction field styling44532 and session spam/result resilience tests44531 active. Penalty history/licence meter need an actual readable API source (drivers response has no season_points); never fabricate totals.
 
@@ -55,8 +55,9 @@ last_eval_score: obsolete51.2974; no current score; final T430
 
 
 
-- T386-387 route batch99PASS1desktopSteward paletteFAIL; all30 Session resilience tests passed (spam fixed01e561c). Five native session dialogs passed after shared form readability7c1a7c7. T387 official read models823c270 + twelve HTTP cases779e680 passed offline; full disposable gate follows real SQL integration test.
+- T386-387 route batch99PASS1desktopSteward paletteFAIL; all30 Session resilience tests passed (spam fixed01e561c). Five native session dialogs passed after shared form readability7c1a7c7. T387 official reads823c270, twelve HTTP cases779e680, real SQL comparisonf4e0e36: root262PASS0skip/livePASS.
 
-- T-44538 accepted8f08922: Use paper steward header and a truthful red case-count sticker to correct desktop palette balance. Verify0.
 
-- T-44539 acceptede6dfc57: Add independent paged penalties/licence sources with UUID contracts, request cancellation, retained errors and queued refresh after decisions. Verify0.
+
+
+- T387 independent paged source e6dfc57 accepted; typed UUIDs and one queued refresh after pending read. Twelve HTTP read tests passed; dedicated read-only SQL comparison added, full disposable gate pending. Root current continuation0 product edits.
