@@ -24,7 +24,7 @@ export function LiveTiming() {
     sessions, setSessions, demoRaces, setDemoRaces, session, setSession,
     sessionDrivers, setSessionDrivers, driver, setDriver, packets, setPackets,
     completedLaps, setCompletedLaps, liveIncidents, setLiveIncidents,
-    livePitStops, setLivePitStops, recordsError, setRecordsError,
+    livePitStops, setLivePitStops, recordsLoading, setRecordsLoading, recordsRetry, recordsError, setRecordsError,
     listLoading, listError, setListLoading, setListError,
     snapshot, setSnapshot, snapshotView, setSnapshotView, snapshotRetry,
     timing, setTiming, status, setStatus, error, setError,
@@ -45,8 +45,8 @@ export function LiveTiming() {
     return startLiveListPolling(refreshLists, session, autoFollow, listRequest, setSession, setDriver);
   }, [refreshLists, session, autoFollow, listRequest, setSession, setDriver]);
   useEffect(() => {
-    return startLiveRecordPolling(session, clearError, setCompletedLaps, setLiveIncidents, setLivePitStops, setRecordsError);
-  }, [clearError, session, setCompletedLaps, setLiveIncidents, setLivePitStops, setRecordsError]);
+    return startLiveRecordPolling(session, clearError, setCompletedLaps, setLiveIncidents, setLivePitStops, setRecordsError, { setLoading: setRecordsLoading, retryRef: recordsRetry });
+  }, [clearError, session, setCompletedLaps, setLiveIncidents, setLivePitStops, setRecordsError, setRecordsLoading, recordsRetry]);
   const demoActions = () => createLiveDemoActions({
     session,
     deleteRace,
@@ -150,7 +150,7 @@ export function LiveTiming() {
             </div>
           )}
           <TimingTower orderRows={orderRows} status={status} selectedDriver={driver} onSelectDriver={setDriver} loading={snapshotView.loading} error={snapshotView.error} retry={() => snapshotRetry.current?.()} />
-          <RaceRecords selectedLaps={selectedLaps} recordsError={recordsError} showAllLaps={showAllLaps} setShowAllLaps={setShowAllLaps} visibleLaps={visibleLaps} namedDrivers={namedDrivers} liveIncidents={liveIncidents} livePitStops={livePitStops} />
+          <RaceRecords selectedLaps={selectedLaps} recordsError={recordsError} loading={recordsLoading} retry={() => recordsRetry.current?.()} showAllLaps={showAllLaps} setShowAllLaps={setShowAllLaps} visibleLaps={visibleLaps} namedDrivers={namedDrivers} liveIncidents={liveIncidents} livePitStops={livePitStops} />
           <SnapshotStrip snapshot={snapshot} />
           <TelemetryCharts
             driver={driver}
