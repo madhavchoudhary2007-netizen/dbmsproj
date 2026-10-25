@@ -142,6 +142,7 @@ from .session_measurements import clear_measurements, ensure_reset_allowed
 from .simulation_core import MAX_SESSION_LAPS
 from .simulation_core import Simulation as Simulation
 from .simulation_core import calculate_sector_performance as calculate_sector_performance
+from .simulation_finish import finalize_results
 from .simulation_incidents import record_generated_incidents
 from .simulation_pit import (
     cancel_automatic_reservations,
@@ -778,55 +779,20 @@ async def _finalize_simulation_results(
     fastest_driver_id: str | None,
     championship_id: UUID,
 ) -> None:
-    rows = []
-    with connection() as conn, conn.cursor() as cur:
-        for position, packet in enumerate(ordered, start=1):
-            driver_id = packet["driver_id"]
-            best_lap_ms = best_laps.get(driver_id, packet["last_lap_ms"])
-            pole = driver_id == pole_driver_id
-            fastest_lap = driver_id == fastest_driver_id
-            cur.execute(
-                "INSERT INTO session_results(session_id,driver_id,position,"
-                "lap_time_ms,pole,fastest_lap,"
-                "classified) VALUES (%s,%s,%s,%s,%s,%s,TRUE) "
-                "ON CONFLICT(session_id,driver_id) "
-                "DO UPDATE SET "
-                "position=excluded.position,lap_time_ms=excluded.lap_time_ms,"
-                "pole=excluded.pole,fastest_lap=excluded.fastest_lap,classified=TRUE",
-                (sim.session_id, driver_id, position, best_lap_ms, pole, fastest_lap),
-            )
-            rows.append(
-                {
-                    "driver_id": driver_id,
-                    "position": position,
-                    "lap_time_ms": best_lap_ms,
-                    "pole": pole,
-                    "fastest_lap": fastest_lap,
-                    "classified": True,
-                }
-            )
-        cur.execute(
-            (
-                "UPDATE race_sessions SET state='COMPLETED',ended_at=%s WHERE id=%s A"
-                "ND state='ACTIVE' RETURNING *"
-            ),
-            (datetime.now(UTC), sim.session_id),
-        )
-        completed = cur.fetchone()
-        if completed:
-            cur.execute("SELECT recalculate_standings(%s)", (championship_id,))
-    sim.status = "stopped"
-    publish(sim.session_id, "timing.update", rows)
-    if completed:
-        publish(sim.session_id, "session.state", completed)
-    sim.runs_completed += 1
-    cancel_automatic_pit_reservations(sim.session_id)
-    if not sim.auto_repeat or not completed:
-        return
-    await asyncio.sleep(5)
-    race = await asyncio.to_thread(_make_demo_race, None, True)
-    launch_demo_simulation(race["session_id"])
-    simulations.pop(str(sim.session_id), None)
+    await finalize_results(
+        sim,
+        ordered,
+        best_laps,
+        pole_driver_id,
+        fastest_driver_id,
+        championship_id,
+        connection,
+        publish,
+        cancel_automatic_pit_reservations,
+        _make_demo_race,
+        launch_demo_simulation,
+        simulations,
+    )
 
 
 def _persist_simulation_tick(

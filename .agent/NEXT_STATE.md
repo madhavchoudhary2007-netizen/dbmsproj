@@ -3,15 +3,15 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44323 W1 — OPEN
+- target_files: frontend/components/pages/live/telemetry-charts.tsx
+- contract: T379 stage exact selected-driver telemetry chart region into live/telemetry-charts.tsx; leave old page unchanged.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
+
 ### T-44322 W2 — OPEN
 - target_files: backend/app/main.py, backend/app/simulation_finish.py
 - contract: T331 move exact _finalize_simulation_results into typed simulation_finish module; retain main legacy async wrapper with current callbacks.
 - verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/simulation_finish.py
-
-### T-44321 W1 — OPEN
-- target_files: frontend/components/special-pages.tsx, frontend/components/pages/dbms-center.tsx
-- contract: T379 move exact DbmsCenter page into pages/dbms-center.tsx and retain compatibility reexport.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
 ## Blocked
 - None currently. Owner switched workers to gpt-6-luna/high; T44318 interrupted before edits, fresh worker required.
@@ -20,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44321 accepted8d44b1f; verify0.
 - T-44318 accepted3b7ca06; verify0.
 - T-44320 accepted4645e52; verify0.
 - T-44319 acceptedba3fa7c; verify0.

@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 3b7ca06
+git_head: 8d44b1f
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high (latest owner override2026-10-25), cap2
@@ -49,3 +49,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44318 accepted3b7ca06: Stage exact PitWall state, effects and actions in a typed hook; original presentation remains unchanged. Verify0.
 
 - T44321 worker envelope overreported removals16vsactual14; root normalized realstats beforeaccept, no out-of-scope changes.
+
+- T-44321 accepted8d44b1f: Move exact DbmsCenter page and retain compatibility reexport, auth guard and overview hash. Verify0.
