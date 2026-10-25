@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { api, asArray, listAll, Row, API_BASE } from "@/lib/api";
 import { createLiveDemoActions } from "@/lib/live-demo-actions";
-import { deriveLiveTimingData } from "@/lib/live-timing-data";
+import { belongsToLiveRun, deriveLiveTimingData } from "@/lib/live-timing-data";
 import { startLiveRecordPolling } from "@/lib/live-record-polling";
 import {
   PageHeader,
@@ -163,17 +163,8 @@ export function LiveTiming() {
       else if (sessionState === "CANCELLED") setStatus("Cancelled · stream stopped");
       else setStatus(streamConnected ? "Connected · live stream" : "Connecting · live stream");
     };
-    const belongsToCurrentRun = (packet: Row) => {
-      if (String(packet.session_id || session) !== session) return false;
-      if (!startedAt || !packet.ts) return true;
-      const packetTime = new Date(String(packet.ts)).getTime();
-      const runStart = new Date(String(startedAt)).getTime();
-      return (
-        !Number.isFinite(packetTime) ||
-        !Number.isFinite(runStart) ||
-        packetTime >= runStart
-      );
-    };
+    const belongsToCurrentRun = (packet: Row) =>
+      belongsToLiveRun(packet, session, startedAt);
     const refresh = async () => {
       const request = ++refreshRequest;
       try {
