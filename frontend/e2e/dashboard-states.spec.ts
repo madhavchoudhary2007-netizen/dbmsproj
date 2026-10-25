@@ -72,9 +72,9 @@ test("keeps healthy status labels readable and the sessions link visible", async
   await page.goto("/dashboard");
   await expect(page.locator('.dashboard-summary[data-testid="state-populated"]')).toBeVisible();
   const healthLabels = page.locator(".dashboard-health-card .green");
-  await expect(healthLabels).toHaveCount(3);
-  expect(await healthLabels.evaluateAll((labels) => labels.map((label) => getComputedStyle(label).color))).toEqual(["rgb(0, 0, 0)", "rgb(0, 0, 0)", "rgb(0, 0, 0)"]);
-  expect(await healthLabels.evaluateAll((labels) => labels.map((label) => getComputedStyle(label).backgroundColor))).toEqual(["rgb(124, 245, 176)", "rgb(124, 245, 176)", "rgb(124, 245, 176)"]);
+  await expect(healthLabels).toHaveCount(4);
+  expect(await healthLabels.evaluateAll((labels) => labels.map((label) => getComputedStyle(label).color))).toEqual(Array(4).fill("rgb(0, 0, 0)"));
+  expect(await healthLabels.evaluateAll((labels) => labels.map((label) => getComputedStyle(label).backgroundColor))).toEqual(Array(4).fill("rgb(124, 245, 176)"));
 
   const sessionsLink = page.getByRole("link", { name: "View sessions" });
   const face = sessionsLink.locator(".nb-face");

@@ -3,15 +3,20 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44421 W3 — OPEN
+- target_files: backend/tests/test_request_dependencies.py
+- contract: T332 eliminate new request-auth tests per-request cookie deprecations without changing coverage.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q -W error::DeprecationWarning backend/tests/test_request_dependencies.py backend/tests/test_runtime_dependencies.py backend/tests/test_contract_snapshot.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/tests/test_request_dependencies.py
+
+### T-44420 W2 — OPEN
+- target_files: backend/app/membership_router.py, backend/app/main.py
+- contract: T332 adopt request-scoped Depends in the membership router, replacing its positional factory without wire changes.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_request_dependencies.py backend/tests/test_runtime_dependencies.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/membership_router.py
+
 ### T-44419 W3 — OPEN
 - target_files: frontend/e2e/dashboard-connectivity.spec.ts, frontend/e2e/dashboard-states.spec.ts
 - contract: T381 browser proof of actual readiness/WebSocket source indicators and lifecycle behavior.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/dashboard-connectivity.spec.ts e2e/dashboard-states.spec.ts --list
-
-### T-44418 W2 — OPEN
-- target_files: backend/app/membership_repository.py, backend/app/core/request_database.py
-- contract: T332 prepare membership repository for injected database sessions while preserving current router callers.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_request_dependencies.py backend/tests/test_runtime_dependencies.py backend/tests/test_contract_snapshot.py && .venv/bin/mypy --strict --follow-imports=silent backend/app/core/request_database.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/membership_repository.py backend/app/core/request_database.py
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -22,6 +27,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44418 accepted304c32b; verify0.
 - T-44417 accepted93b90e0; verify0.
 - T-44416 accepted3cc777a; verify0.
 - T-44415 accepted2676edf; verify0.
