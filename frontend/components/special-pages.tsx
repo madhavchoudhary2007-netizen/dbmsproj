@@ -10,6 +10,7 @@ import { api, asArray, listAll, Row, API_BASE } from "@/lib/api";
 import { createLiveDemoActions } from "@/lib/live-demo-actions";
 import { belongsToLiveRun, deriveLiveTimingData } from "@/lib/live-timing-data";
 import { startLiveRecordPolling } from "@/lib/live-record-polling";
+import { startInitialLiveSelection, startLiveListPolling } from "@/lib/live-list-polling";
 import { startLiveStream } from "@/lib/live-stream";
 import {
   PageHeader,
@@ -83,43 +84,10 @@ export function LiveTiming() {
     return { sessionRows, raceRows, current: request === listRequest.current };
   }, [clearError]);
   useEffect(() => {
-    let disposed = false;
-    refreshLists()
-      .then(({ sessionRows, raceRows, current }) => {
-        if (disposed || !current || !autoFollow.current) return;
-        const activeDemo = raceRows.find((r: Row) => r.state === "ACTIVE");
-        const active = activeDemo
-          ? sessionRows.find((r: Row) => String(r.id) === String(activeDemo.session_id))
-          : sessionRows.find((r: Row) => r.state === "ACTIVE");
-        if (active) setSession(String(active.id));
-      })
-      .catch((e) => { if (!disposed) reportError("lists", e instanceof Error ? e.message : "Unable to load live sessions"); });
-    return () => { disposed = true; };
+    return startInitialLiveSelection(refreshLists, autoFollow, setSession, reportError);
   }, [refreshLists, reportError]);
   useEffect(() => {
-    let disposed = false;
-    let timer: ReturnType<typeof setTimeout>;
-    const poll = async () => {
-      try {
-        const { sessionRows, raceRows, current } = await refreshLists();
-        if (!disposed && current && autoFollow.current) {
-          const active = raceRows.find((race: Row) => race.state === "ACTIVE");
-          if (active) {
-            const selected = sessionRows.find((row: Row) => String(row.id) === session);
-            if (!selected || selected.state === "COMPLETED") {
-              const nextSession = String(active.session_id);
-              if (nextSession !== session) {
-                setSession(nextSession);
-                setDriver("");
-              }
-            }
-          }
-        }
-      } catch {}
-      if (!disposed) timer = setTimeout(() => { void poll(); }, 5000);
-    };
-    timer = setTimeout(() => { void poll(); }, 5000);
-    return () => { disposed = true; listRequest.current += 1; clearTimeout(timer); };
+    return startLiveListPolling(refreshLists, session, autoFollow, listRequest, setSession, setDriver);
   }, [refreshLists, session]);
   useEffect(() => {
     return startLiveRecordPolling(session, clearError, setCompletedLaps, setLiveIncidents, setLivePitStops, setRecordsError);
