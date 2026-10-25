@@ -8,18 +8,14 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T331 extract exact WebSocket runtime lease, idle-event and token user helpers into core module preserving main wrappers.
 - verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py backend/tests/test_token_revocation.py -k "websocket or token" && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/core/websocket_runtime.py
 
-### T-44366 W2 — OPEN
-- target_files: frontend/components/special-pages.tsx, frontend/lib/use-live-timing-state.ts
-- contract: T379 move LiveTiming local state/ref/error callbacks into useLiveTimingState without behavior changes.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
 ## Blocked
 - None currently. Owner switch gpt-6-luna/high implemented and freshworkers succeeded.
 
 ## Deferred
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
-## Done (full accepted history: git log and .agent/results)
+## Done
+- T-44366 accepted627d48a; verify0. (full accepted history: git log and .agent/results)
 - Worker switch: T44319 ba3fa7c, T44320 4645e52; custom roles gpt-6-luna/high.
 - T44360 065361e stream wire; T44361 5bba15e CRUD router stage; T44362 cc361aa live polling.
 - T44363 70bf3a3 nested-router test traversal; T44365 68e26c9 list refresh; T44364 a52fd5b CRUD wire.

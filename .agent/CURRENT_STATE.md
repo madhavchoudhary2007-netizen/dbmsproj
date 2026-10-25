@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: a52fd5b
+git_head: 627d48a
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -46,3 +46,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T44366 initial extraction introduced five exhaustive-deps warnings despite worker describing them as existing. Not accepted; repair1 requires stable setters/refs in deps and max-warnings0, no suppression.
 
 - RootT44367 Verify mistakenly included DB-backed lease tests in worker scope; three active-owner failures, no accept. Corrected offline selection; root disposable full suite covers lease tests separately. No assertions changed.
+
+- T-44366 accepted627d48a: Move live state/ref/error hooks verbatim with stable dependencies and zero lint warnings. Verify0.
