@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: d868cac
+git_head: 3f2d1fc
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -46,6 +46,4 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - Current production source build/lint/types0 T383-385-build.raw.log (beforeSessions). T385 all empty/loading/error/retry/retention browser cases15PASS across focused runs; T44518 repaired snapshot contrast and table keyboard scrolling. Focused populated run4PASS/1 fixture locator collision, T44521 repairs tooltip/tile scoping. M13firstdraw remainsopen.
 - T332 demo DELETE uses request DatabaseSession c48443f; exact helper AST unchanged; missing-marker404 precedes lazyMongo503. Four request-override tests dede5cd accepted; root full249PASS0skip/live acceptance PASS. No schema/API changes.
 
-- T-44517 accepteddede5cd: Test generated-race DELETE with request database overrides and exact 204/404/503/409 ordering and simulation state. Verify0.
-
-- T-44519 acceptedd868cac: Use labelled 48px lifecycle controls and associated simulator inputs inside a cream card, preserving callbacks and disabled conditions. Verify0.
+- T386 layout and controls accepted 7023bc4/d868cac; results/native dialogs under review. Actual 249 backend tests and live acceptance passed.

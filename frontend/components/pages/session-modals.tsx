@@ -2,7 +2,8 @@
 
 import type { ComponentProps } from "react";
 import type { Row } from "@/lib/api";
-import { Modal, ResourceEditor } from "../ui";
+import { NbModal } from "@/components/nb/modal";
+import { ResourceEditor } from "../ui";
 
 type SessionResultModalProps = {
   drivers: Row[];
@@ -18,9 +19,10 @@ export function SessionResultModal({
   setResultModal,
 }: SessionResultModalProps) {
   return (
-    <Modal
+    <NbModal
+      open={true}
       title="Add or update session result"
-      close={() => setResultModal(false)}
+      onClose={() => setResultModal(false)}
     >
       <ResourceEditor
         fields={[
@@ -40,8 +42,9 @@ export function SessionResultModal({
         ]}
         save={saveResult}
         busy={busy}
+        primary
       />
-    </Modal>
+    </NbModal>
   );
 }
 
@@ -63,9 +66,10 @@ export function SessionEditorModal({
   setModal,
 }: SessionEditorModalProps) {
   return (
-    <Modal
+    <NbModal
+      open={true}
       title={editModal ? "Edit session" : "Schedule session"}
-      close={() => setModal(false)}
+      onClose={() => setModal(false)}
     >
       <div className="form-hint">
         Event IDs are taken from the event records loaded above.
@@ -75,7 +79,8 @@ export function SessionEditorModal({
         initial={editModal ? current : undefined}
         save={save}
         busy={busy}
+        primary
       />
-    </Modal>
+    </NbModal>
   );
 }

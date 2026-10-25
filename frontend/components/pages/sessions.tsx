@@ -1,5 +1,6 @@
-import { Button, StateMessage } from "@/components/ui";
+import { StateMessage } from "@/components/ui";
 import { NbBadge } from "@/components/nb/badge";
+import { NbButton } from "@/components/nb/button";
 import { NbCard } from "@/components/nb/card";
 import { useSessionPage } from "@/lib/use-session-page";
 import { SessionControls } from "./session-controls";
@@ -67,7 +68,7 @@ export function SessionPage() {
       />
       {current && (
         <NbCard className="session-control min-w-0">
-          {actionMsg && <div className="notice">{actionMsg}</div>}
+          {actionMsg && <div className="notice border-4 border-ink bg-paper p-4 text-ink shadow-nb-4">{actionMsg}</div>}
           <div className="panel-heading">
             <div>
               <div className="eyebrow">SELECTED SESSION</div>
@@ -100,7 +101,7 @@ export function SessionPage() {
               simulate={simulate}
             />
           )}
-          {simMessage && <div className="notice">{simMessage}</div>}
+          {simMessage && <div className="notice border-4 border-ink bg-paper p-4 text-ink shadow-nb-4">{simMessage}</div>}
           {resultsLoaded && results.length === 0 && (
             <StateMessage empty="No result rows are recorded for this session." />
           )}
@@ -113,13 +114,13 @@ export function SessionPage() {
           )}
           {canManage && (
             <div className="form-actions destructive-row">
-              <Button
-                kind="danger"
+              <NbButton
+                variant="danger"
                 disabled={busy}
                 onClick={() => void deleteSession()}
               >
                 Delete session
-              </Button>
+              </NbButton>
             </div>
           )}
           {resultModal && canControl && (
@@ -134,7 +135,7 @@ export function SessionPage() {
       )}
       {!current && (
         <NbCard className="session-control min-w-0">
-          {actionMsg && <div className="notice">{actionMsg}</div>}
+          {actionMsg && <div className="notice border-4 border-ink bg-paper p-4 text-ink shadow-nb-4">{actionMsg}</div>}
           <p className="eyebrow text-[length:var(--fs-label)]">SELECTED SESSION</p>
           <h2 className="text-[length:var(--fs-h3)] font-bold">No session selected</h2>
           <p>Select a session from the list to review its controls and classified results.</p>
