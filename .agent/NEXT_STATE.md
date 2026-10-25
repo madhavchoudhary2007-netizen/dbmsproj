@@ -3,15 +3,15 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44362 W2 — OPEN
+- target_files: frontend/components/special-pages.tsx, frontend/lib/live-list-polling.ts
+- contract: T379 extract exact initial live selection and recurring session-list polling into helper module and wire original effects.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
+
 ### T-44361 W2 — OPEN
 - target_files: backend/app/api/crud.py
 - contract: T331 stage generic CRUD API router factory with existing handler bodies, projections and dependency objects; do not wire main yet.
 - verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/api/crud.py
-
-### T-44360 W2 — OPEN
-- target_files: frontend/components/special-pages.tsx
-- contract: T379 activate exact staged live stream helper inside original effect; remove only moved callback body.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
 ## Blocked
 - None currently. Owner switch gpt-6-luna/high implemented and freshworkers succeeded.
@@ -20,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44360 accepted065361e; verify0.
 - T-44359 accepted709c866; verify0.
 - T-44358 acceptede66ff78; verify0.
 - T-44356 acceptedaeb35ee; verify0.
