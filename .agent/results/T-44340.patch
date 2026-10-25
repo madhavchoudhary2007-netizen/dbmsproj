@@ -1,0 +1,75 @@
+diff --git a/frontend/components/special-pages.tsx b/frontend/components/special-pages.tsx
+index 56ab191..f2ccad0 100644
+--- a/frontend/components/special-pages.tsx
++++ b/frontend/components/special-pages.tsx
+@@ -8,7 +8,7 @@ import {
+   Radio,
+   TriangleAlert,
+ } from "lucide-react";
+-import { api, asArray, listAll, Row, pretty, API_BASE } from "@/lib/api";
++import { api, asArray, listAll, Row, API_BASE } from "@/lib/api";
+ import {
+   Button,
+   Modal,
+@@ -22,6 +22,7 @@ import { TelemetryCharts } from "./pages/live/telemetry-charts";
+ import { RaceRecords } from "./pages/live/race-records";
+ import { TimingTower } from "./pages/live/timing-tower";
+ import { LatestTelemetry } from "./pages/live/latest-telemetry";
++import { SnapshotStrip } from "./pages/live/snapshot-strip";
+ export { Dashboard } from "@/components/pages/dashboard";
+ export { SessionPage } from "@/components/pages/sessions";
+ export { StewardDesk } from "@/components/pages/stewards";
+@@ -503,21 +504,7 @@ export function LiveTiming() {
+           )}
+           <TimingTower orderRows={orderRows} status={status} />
+           <RaceRecords selectedLaps={selectedLaps} recordsError={recordsError} showAllLaps={showAllLaps} setShowAllLaps={setShowAllLaps} visibleLaps={visibleLaps} namedDrivers={namedDrivers} liveIncidents={liveIncidents} livePitStops={livePitStops} />
+-          <div className="snapshot-strip">
+-            {Object.entries(snapshot || {})
+-              .filter(
+-                ([k, v]) =>
+-                  !["participants", "drivers", "timing", "safety_car"].includes(
+-                    k,
+-                  ) && typeof v !== "object",
+-              )
+-              .map(([k, v]) => (
+-                <div key={k}>
+-                  <small>{k.replaceAll("_", " ")}</small>
+-                  <b>{pretty(v)}</b>
+-                </div>
+-              ))}
+-          </div>
++          <SnapshotStrip snapshot={snapshot} />
+           <TelemetryCharts
+             driver={driver}
+             shown={shown}
+diff --git a/frontend/components/pages/live/snapshot-strip.tsx b/frontend/components/pages/live/snapshot-strip.tsx
+new file mode 100644
+index 0000000..5e161f0
+--- /dev/null
++++ b/frontend/components/pages/live/snapshot-strip.tsx
+@@ -0,0 +1,25 @@
++import { pretty } from "@/lib/api";
++
++export function SnapshotStrip({
++  snapshot,
++}: {
++  snapshot: Record<string, unknown> | null;
++}) {
++  return (
++    <div className="snapshot-strip">
++      {Object.entries(snapshot || {})
++        .filter(
++          ([k, v]) =>
++            !["participants", "drivers", "timing", "safety_car"].includes(
++              k,
++            ) && typeof v !== "object",
++        )
++        .map(([k, v]) => (
++          <div key={k}>
++            <small>{k.replaceAll("_", " ")}</small>
++            <b>{pretty(v)}</b>
++          </div>
++        ))}
++    </div>
++  );
++}

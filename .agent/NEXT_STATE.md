@@ -3,10 +3,15 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44339 W2 — OPEN
-- target_files: backend/app/main.py
-- contract: T331 activate staged exact simulation start helper via legacy async main wrapper.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "simulation_stop or session_lifecycle" && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/simulation_start.py
+### T-44341 W2 — OPEN
+- target_files: backend/app/main.py, backend/app/simulation_persist.py
+- contract: T331 extract exact tick persistence into simulation_persist helper; preserve legacy main wrapper.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "sector_lap_elapsed or simulation_stop or session_lifecycle" && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/simulation_persist.py
+
+### T-44340 W1 — OPEN
+- target_files: frontend/components/special-pages.tsx, frontend/components/pages/live/snapshot-strip.tsx
+- contract: T379 extract exact scalar snapshot strip into live/snapshot-strip.tsx and wire it.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
 ## Blocked
 - None currently. Owner switch gpt-6-luna/high implemented and freshworkers succeeded.
@@ -15,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44339 accepted642a40f; verify0.
 - T-44338 acceptedcf15b05; verify0.
 - T-44337 accepted7603ad3; verify0.
 - T-44336 acceptedeeeb579; verify0.
