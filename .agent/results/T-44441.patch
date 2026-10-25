@@ -1,0 +1,111 @@
+diff --git a/frontend/e2e/resource-flows.spec.ts b/frontend/e2e/resource-flows.spec.ts
+index 3a50a65..3d26a86 100644
+--- a/frontend/e2e/resource-flows.spec.ts
++++ b/frontend/e2e/resource-flows.spec.ts
+@@ -54,8 +54,10 @@ test("resource loading resolves to the API empty state", async ({ page }) => {
+   await page.goto("/championships");
+   const main = page.getByRole("main");
+   await requestStarted;
++  await expect(main.getByTestId("state-loading")).toBeVisible();
+   await expect(main.getByRole("status")).toContainText("Loading from API…");
+   release();
++  await expect(main.getByTestId("state-empty")).toBeVisible();
+   await expect(main.getByRole("status")).toContainText("No records returned by the API.");
+   expect(writes).toEqual([]);
+ });
+@@ -72,10 +74,12 @@ test("a failed request shows an error and retry loads the returned row", async (
+ 
+   await page.goto("/championships");
+   const main = page.getByRole("main");
++  await expect(main.getByTestId("state-error")).toBeVisible();
+   await expect(main.getByRole("alert")).toContainText("Temporary service failure");
+   await expect(main.getByRole("button", { name: "Try again", exact: true })).toBeVisible();
+   allowRecovery = true;
+   await main.getByRole("button", { name: "Try again", exact: true }).click();
++  await expect(main.getByTestId("state-populated")).toBeVisible();
+   await expect(main.getByRole("cell", { name: "Recovered championship" })).toBeVisible();
+   expect(writes).toEqual([]);
+ });
+@@ -89,6 +93,7 @@ test("filtering and paging keep the 50 row page boundary", async ({ page }) => {
+   await page.goto("/championships");
+   const main = page.getByRole("main");
+   const table = main.locator("table");
++  await expect(main.getByTestId("state-populated")).toBeVisible();
+   await expect(table.locator("tbody tr")).toHaveCount(50);
+   await expect(main.locator(".resource-range")).toHaveText("Showing 1–50 of 51");
+   await main.getByRole("button", { name: "Next", exact: true }).click();
+@@ -97,9 +102,11 @@ test("filtering and paging keep the 50 row page boundary", async ({ page }) => {
+   await main.getByRole("button", { name: "Previous", exact: true }).click();
+   await expect(table.locator("tbody tr")).toHaveCount(50);
+   await page.getByLabel("Filter records").fill("Championship 51");
++  await expect(main.getByTestId("state-partial")).toBeVisible();
+   await expect(table.locator("tbody tr")).toHaveCount(1);
+   await expect(main.locator(".resource-range")).toHaveText("Showing 1–1 of 1");
+   await page.getByLabel("Filter records").fill("no matching championship");
++  await expect(main.getByTestId("state-empty")).toBeVisible();
+   await expect(main.getByRole("status")).toContainText("No records match this filter.");
+   expect(writes).toEqual([]);
+ });
+@@ -111,6 +118,7 @@ test("the create dialog closes on Escape and restores focus without writing", as
+ 
+   await page.goto("/championships");
+   const main = page.getByRole("main");
++  await expect(main.getByTestId("state-empty")).toBeVisible();
+   await expect(main.getByRole("status")).toContainText("No records returned by the API.");
+   const create = main.getByRole("button", { name: "New record", exact: true });
+   await create.click();
+@@ -120,3 +128,54 @@ test("the create dialog closes on Escape and restores focus without writing", as
+   await expect(create).toBeFocused();
+   expect(writes).toEqual([]);
+ });
++
++test("refresh failure retains rows and retry restores populated state", async ({ page }) => {
++  let failRefresh = false;
++  const writes = await mockApi(page, async (route) => {
++    if (failRefresh) {
++      await route.fulfill({ status: 503, json: { detail: "Refresh unavailable" } });
++    } else {
++      await route.fulfill({ status: 200, json: [row(9, "Retained championship")] });
++    }
++  });
++
++  await page.goto("/championships");
++  const main = page.getByRole("main");
++  await expect(main.getByTestId("state-populated")).toBeVisible();
++  const retainedCell = main.getByRole("cell", { name: "Retained championship" });
++  await expect(retainedCell).toBeVisible();
++  failRefresh = true;
++  await main.getByRole("button", { name: "Refresh", exact: true }).click();
++  await expect(main.getByTestId("state-partial")).toBeVisible();
++  await expect(main.getByTestId("state-partial")).toContainText("Refresh unavailable");
++  await expect(retainedCell).toBeVisible();
++  failRefresh = false;
++  await main.getByRole("button", { name: "Try again", exact: true }).click();
++  await expect(main.getByTestId("state-populated")).toBeVisible();
++  await expect(retainedCell).toBeVisible();
++  expect(writes).toEqual([]);
++});
++
++test("clearing a filtered partial view restores the first page", async ({ page }) => {
++  const rows = Array.from({ length: 51 }, (_, index) => row(index + 1));
++  const writes = await mockApi(page, async (route) => {
++    await route.fulfill({ status: 200, json: rows });
++  });
++
++  await page.goto("/championships");
++  const main = page.getByRole("main");
++  const table = main.locator("table");
++  await main.getByRole("button", { name: "Next", exact: true }).click();
++  await expect(main.locator(".resource-range")).toHaveText("Showing 51–51 of 51");
++  const filter = page.getByLabel("Filter records");
++  await filter.fill("Championship 51");
++  await expect(main.getByTestId("state-partial")).toBeVisible();
++  await expect(main.getByRole("cell", { name: "Championship 51" })).toBeVisible();
++  await expect(main.locator(".resource-range")).toHaveText("Showing 1–1 of 1");
++  await main.getByRole("button", { name: "Clear filter", exact: true }).click();
++  await expect(filter).toHaveValue("");
++  await expect(main.getByTestId("state-populated")).toBeVisible();
++  await expect(table.locator("tbody tr")).toHaveCount(50);
++  await expect(main.locator(".resource-range")).toHaveText("Showing 1–50 of 51");
++  expect(writes).toEqual([]);
++});
