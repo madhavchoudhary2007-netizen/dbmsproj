@@ -3,10 +3,15 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44432 W3 — OPEN
-- target_files: backend/tests/test_analytics_router_serialization.py
-- contract: Add offline regression for exact numeric serialization of migrated analytics routes.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_analytics_router_serialization.py backend/tests/test_contract_snapshot.py backend/tests/test_dashboard_next_event.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/tests/test_analytics_router_serialization.py
+### T-44435 W3 — OPEN
+- target_files: frontend/e2e/resource-flows.spec.ts
+- contract: T382 characterize resource loading/empty/error/retry, filtering/paging, and create dialog without writes.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/resource-flows.spec.ts --list
+
+### T-44434 W2 — OPEN
+- target_files: frontend/lib/resource-view.ts
+- contract: T382 add pure typed resource-table state classification for all five presentation states.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -17,6 +22,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44432 accepted1479019; verify0.
 - T-44433 accepteddb1e96d; verify0.
 - T-44431 acceptedaf535f8; verify0.
 - T-44430 accepted19b7991; verify0.

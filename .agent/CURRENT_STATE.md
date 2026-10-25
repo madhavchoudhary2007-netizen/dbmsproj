@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: db1e96d
+git_head: 1479019
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -18,7 +18,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T382 resourceheader0ec278d/toolbar6139e34 accepted;300browserPASS T382-header-toolbar.browser.raw.log acrosssixroutes/axe/targets/primary/sixwidths. Exactrowstate/loadextractionaf535f8. Table/modal/5states/palette unfinished; parentnotcomplete.
 - Backend T331 main857lines,<=120 NOT achieved; T332unfinished. Genuine API/coreextracts retained. Appfactory22c7e77 exactleasebodyAST. TypedRuntimeState60c4999/providers4521ac9/lifespan d756a9f/b87fee6 share/clear realresourceidentities. Requestauth/DatabaseSession1ffce81 unitregressions6b6cf24.
 - MembershipDIcc18c4b +requiredrepo f311789: full243PASS0skip/livePASS T44424.full.raw.log, zero cookie warnings after3b54092. AnalyticsDIc18bce7 +requiredrepodb1e96d; directtestfixturesb2aae4b explicitlyinject. T331/T332 coupled because legacytests patchmain; no fake namespaceproxies/renames tohitlinebudget.
-- T44425fullgate242PASS1FAIL: typedreturnannotations inferredPydanticDecimal->string, existingnumericassertcaughtit. response_modelNone restoresoriginalencoding19b7991; fullrerunpending. Offline strongerserializationregressionT44432ready. Do not weakenexistingassertion.
+- T44425fullgate242PASS1FAIL: typedreturnannotations inferredPydanticDecimal->string, existingnumericassertcaughtit. response_modelNone restoresoriginalencoding19b7991; Full245PASS0skip/livePASS T44433.full.raw.log after1479019 exactnumericregressions. Do not weakenexistingassertion.
 
 ## Safety / workflow
 - Onlyoverhaul/neo-brutal; commits onlyaccept.sh; independentlyrerunVerify;2packet-onlycustomworkersmax, no model/effortoverrides. Isolatedclones .agent/orchestrate.py;<=3files/150added+deleted; normalizeactualstats. Every5tasks budget.
@@ -34,3 +34,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - Productglue14lines only inlongcontinuation; allcurrentproductimplementationworkers. Independentlycheckactualcounts/ASTmoves/assertions; newfileenvelopesoccasionallywrong, normalized.
 - EarlierfixtureStrictMode/duplicate-selector/E5aria/APIshape issues fixed withoutassertionweakening; actualinvalidincidentscrash fixed1924d64/regressionda48958. Connectivity15fixturefails repaired7122a27,165PASS. Healthink/plinthfaceTastedefects fixed5a0ad53/browserd018de6.
 - T44427W3editedrootinsteadpacketclone, causingT44425boundaryrejection. Transferredonlyownedpatchintoclone/restoredrootownedfileviaGit; W3retriedexplicitclone; T44425accept0thenT44427accept0. NoAPI/test/gatechange tohidefailure. Reviewtypedannotationsalsoexposednumericencodingregression, nowqueuedfullproof.
+
+- T-44432 accepted1479019: Exercise actual migrated routes in-process and require exact numeric Decimal JSON, nullable averages, UUID/date encoding and integer dashboard counts. Verify0.
+
+- Production frontend build/lint/types0 T382-current-build.raw.log afterresourceheader/toolbar/hook. ReviewcaughtW2partialretry callback and W3malformedadminmock beforebrowser; repairedwithinpackets.
