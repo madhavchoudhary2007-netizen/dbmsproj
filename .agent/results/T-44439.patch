@@ -1,0 +1,107 @@
+diff --git a/backend/app/main.py b/backend/app/main.py
+index da139c0..2159bc6 100644
+--- a/backend/app/main.py
++++ b/backend/app/main.py
+@@ -118,7 +118,7 @@ from .demo_race_router import (
+ from .demo_runtime import build_demo_race
+ from .membership_router import router as membership_router
+ from .pit_repository import PIT_RESERVATION_SELECT, load_pit_strategy_rows, load_pit_telemetry
+-from .pit_router import create_pit_router
++from .pit_router import router as pit_router
+ from .pit_strategy_router import create_pit_strategy_router
+ from .pit_strategy_service import PIT_TIRE_STINT_LAPS as PIT_TIRE_STINT_LAPS
+ from .pit_strategy_service import (
+@@ -397,7 +397,7 @@ decide_incident = stewards_handlers["decide_incident"]
+ app.include_router(stewards_router)
+ 
+ 
+-app.include_router(create_pit_router(current_user, jsonable))
++app.include_router(pit_router)
+ 
+ 
+ def _require_principal_own_team(team_id: UUID, user: dict[str, Any]) -> None:
+diff --git a/backend/app/pit_repository.py b/backend/app/pit_repository.py
+index 77af49a..80c2ad3 100644
+--- a/backend/app/pit_repository.py
++++ b/backend/app/pit_repository.py
+@@ -5,6 +5,7 @@ from uuid import UUID
+ 
+ from pymongo.collection import Collection
+ 
++from .core.request_database import DatabaseSession
+ from .database import fetch_all, fetch_one
+ 
+ PIT_RESERVATION_SELECT = """SELECT r.*,b.number AS box_number,t.name AS team_name,
+@@ -48,8 +49,8 @@ def load_pit_strategy_rows(
+     return session, drivers, reservations
+ 
+ 
+-def list_pit_boxes(event_id: UUID) -> list[dict[str, Any]]:
+-    return fetch_all(
++def list_pit_boxes(database: DatabaseSession, event_id: UUID) -> list[dict[str, Any]]:
++    return database.fetch_all(
+         """SELECT b.*,r.id AS reservation_id,r.session_id,r.driver_id,"""
+         """r.allocation_source,
+         r.starts_at,r.ends_at,r.status,t.name AS team_name,du.full_name AS driver_name,"""
+@@ -64,8 +65,8 @@ def list_pit_boxes(event_id: UUID) -> list[dict[str, Any]]:
+     )
+ 
+ 
+-def list_pit_reservations(session_id: UUID) -> list[dict[str, Any]]:
+-    return fetch_all(
++def list_pit_reservations(database: DatabaseSession, session_id: UUID) -> list[dict[str, Any]]:
++    return database.fetch_all(
+         PIT_RESERVATION_SELECT + " WHERE r.session_id=%s ORDER BY r.starts_at", (session_id,)
+     )
+ 
+diff --git a/backend/app/pit_router.py b/backend/app/pit_router.py
+index 430de2a..4333183 100644
+--- a/backend/app/pit_router.py
++++ b/backend/app/pit_router.py
+@@ -1,27 +1,31 @@
+ from __future__ import annotations
+ 
+-from collections.abc import Callable
+-from typing import Any
++from typing import Annotated, Any
+ from uuid import UUID
+ 
+ from fastapi import APIRouter, Depends
+ 
++from .core.request_auth import current_user
++from .core.request_database import DatabaseSession, get_database
++from .core.serialization import jsonable
+ from .pit_repository import list_pit_boxes, list_pit_reservations
+ 
++router = APIRouter()
+ 
+-def create_pit_router(
+-    current_user: Callable[..., Any],
+-    jsonable: Callable[[Any], Any],
+-) -> APIRouter:
+-    router = APIRouter()
+-    current_user_dep = Depends(current_user)
+ 
+-    @router.get("/api/pit-boxes")
+-    def pit_boxes(event_id: UUID, user=current_user_dep):
+-        return jsonable(list_pit_boxes(event_id))
++@router.get("/api/pit-boxes", response_model=None)
++def pit_boxes(
++    event_id: UUID,
++    user: Annotated[dict[str, Any], Depends(current_user)],
++    database: Annotated[DatabaseSession, Depends(get_database)],
++) -> Any:
++    return jsonable(list_pit_boxes(database, event_id))
+ 
+-    @router.get("/api/pit-reservations")
+-    def pit_reservations(session_id: UUID, user=current_user_dep):
+-        return jsonable(list_pit_reservations(session_id))
+ 
+-    return router
++@router.get("/api/pit-reservations", response_model=None)
++def pit_reservations(
++    session_id: UUID,
++    user: Annotated[dict[str, Any], Depends(current_user)],
++    database: Annotated[DatabaseSession, Depends(get_database)],
++) -> Any:
++    return jsonable(list_pit_reservations(database, session_id))

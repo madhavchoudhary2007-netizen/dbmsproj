@@ -1,27 +1,31 @@
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import Any
+from typing import Annotated, Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
 
+from .core.request_auth import current_user
+from .core.request_database import DatabaseSession, get_database
+from .core.serialization import jsonable
 from .pit_repository import list_pit_boxes, list_pit_reservations
 
+router = APIRouter()
 
-def create_pit_router(
-    current_user: Callable[..., Any],
-    jsonable: Callable[[Any], Any],
-) -> APIRouter:
-    router = APIRouter()
-    current_user_dep = Depends(current_user)
 
-    @router.get("/api/pit-boxes")
-    def pit_boxes(event_id: UUID, user=current_user_dep):
-        return jsonable(list_pit_boxes(event_id))
+@router.get("/api/pit-boxes", response_model=None)
+def pit_boxes(
+    event_id: UUID,
+    user: Annotated[dict[str, Any], Depends(current_user)],
+    database: Annotated[DatabaseSession, Depends(get_database)],
+) -> Any:
+    return jsonable(list_pit_boxes(database, event_id))
 
-    @router.get("/api/pit-reservations")
-    def pit_reservations(session_id: UUID, user=current_user_dep):
-        return jsonable(list_pit_reservations(session_id))
 
-    return router
+@router.get("/api/pit-reservations", response_model=None)
+def pit_reservations(
+    session_id: UUID,
+    user: Annotated[dict[str, Any], Depends(current_user)],
+    database: Annotated[DatabaseSession, Depends(get_database)],
+) -> Any:
+    return jsonable(list_pit_reservations(database, session_id))

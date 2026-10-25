@@ -118,7 +118,7 @@ from .demo_race_router import (
 from .demo_runtime import build_demo_race
 from .membership_router import router as membership_router
 from .pit_repository import PIT_RESERVATION_SELECT, load_pit_strategy_rows, load_pit_telemetry
-from .pit_router import create_pit_router
+from .pit_router import router as pit_router
 from .pit_strategy_router import create_pit_strategy_router
 from .pit_strategy_service import PIT_TIRE_STINT_LAPS as PIT_TIRE_STINT_LAPS
 from .pit_strategy_service import (
@@ -397,7 +397,7 @@ decide_incident = stewards_handlers["decide_incident"]
 app.include_router(stewards_router)
 
 
-app.include_router(create_pit_router(current_user, jsonable))
+app.include_router(pit_router)
 
 
 def _require_principal_own_team(team_id: UUID, user: dict[str, Any]) -> None:

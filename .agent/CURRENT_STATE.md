@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 458e68e
+git_head: 403815e
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -26,7 +26,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - Preserveeveryroute/feature/chart/modal/copy/aria/data/stateclass/DBMShash; fiveStates/44targets/tokens/reducedmotion. Thresholds/testsunchanged. Latesttypecheck/strictlint/fourCSS0.
 
 ## Open risks / next
-- T331/T332globals/factorycallbacks, strictmypy212errors/24files atT44256(stale), target0T339; coverage/batching/DBMSshowcase/finaleval pending.
+- T331/T332globals/factorycallbacks, strictmypy190errors/34files measured T332-current-mypy.raw.log (improvedfrom212), target0T339; coverage/batching/DBMSshowcase/finaleval pending.
 - T44132 bundlechecker misseslayout/sharedassets; repairbeforeP3 with170KBunchanged. Lighthouseabsent,FPS17untilT41316.7,hostedCIunverified. Final>=95/allhardgates/noNOT_RUN.
 - TASTE-381-1 fourKPIaccents vsT400max3; consolidatebeforeA5. OtherPhase7layouts mustrepairT379A3. DBMSredesign dependsPhase4.
 
@@ -46,3 +46,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44436 accepted4d76acf: Render resource table through NbTable and typed five-state classifier, preserving exact pretty formatting, headers, 50-row paging and row inspection. Verify0.
 
 - T-44437 accepted458e68e: Execute actual resource classifier in VM; verify five states, retained-source retry identity, whitespace filters, pagination and immutable useful falsy values. Verify0.
+
+- T-44438 accepted403815e: Scope resource journey assertions to main and exact pagination controls; supply the actual zero-metric dashboard contract, preserving every test assertion. Verify0.

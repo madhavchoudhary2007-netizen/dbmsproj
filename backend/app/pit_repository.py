@@ -5,6 +5,7 @@ from uuid import UUID
 
 from pymongo.collection import Collection
 
+from .core.request_database import DatabaseSession
 from .database import fetch_all, fetch_one
 
 PIT_RESERVATION_SELECT = """SELECT r.*,b.number AS box_number,t.name AS team_name,
@@ -48,8 +49,8 @@ def load_pit_strategy_rows(
     return session, drivers, reservations
 
 
-def list_pit_boxes(event_id: UUID) -> list[dict[str, Any]]:
-    return fetch_all(
+def list_pit_boxes(database: DatabaseSession, event_id: UUID) -> list[dict[str, Any]]:
+    return database.fetch_all(
         """SELECT b.*,r.id AS reservation_id,r.session_id,r.driver_id,"""
         """r.allocation_source,
         r.starts_at,r.ends_at,r.status,t.name AS team_name,du.full_name AS driver_name,"""
@@ -64,8 +65,8 @@ def list_pit_boxes(event_id: UUID) -> list[dict[str, Any]]:
     )
 
 
-def list_pit_reservations(session_id: UUID) -> list[dict[str, Any]]:
-    return fetch_all(
+def list_pit_reservations(database: DatabaseSession, session_id: UUID) -> list[dict[str, Any]]:
+    return database.fetch_all(
         PIT_RESERVATION_SELECT + " WHERE r.session_id=%s ORDER BY r.starts_at", (session_id,)
     )
 
