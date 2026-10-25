@@ -1,5 +1,6 @@
 import os
 from datetime import UTC, datetime, timedelta
+from types import SimpleNamespace
 from urllib.parse import urlparse
 from uuid import UUID
 
@@ -49,7 +50,7 @@ def _add(conn, n, name, kind, state, when):
     return ids[0]
 
 
-def _patch_fetch(monkeypatch, conn):
+def _database_with_fetch(conn):
     old = iter([{"count": 2}, {"count": 3}, {"count": 1}, {"count": 24}, None])
     calls = []
 
@@ -60,18 +61,17 @@ def _patch_fetch(monkeypatch, conn):
         row = conn.execute(sql, params).fetchone()
         return dict(row) if row else None
 
-    monkeypatch.setattr(analytics_repository, "fetch_one", fetch_one)
-    return calls
+    return SimpleNamespace(fetch_one=fetch_one), calls
 
 
-def test_next_event_orders_future_ties_by_session_id(monkeypatch, disposable_db):
+def test_next_event_orders_future_ties_by_session_id(disposable_db):
     now = datetime.now(UTC) + timedelta(minutes=5)
     _add(disposable_db, 3, "later", "RACE", "SCHEDULED", now + timedelta(minutes=1))
     _add(disposable_db, 2, "higher", "RACE", "SCHEDULED", now)
     expected = _add(disposable_db, 1, "lower", "RACE", "SCHEDULED", now)
-    calls = _patch_fetch(monkeypatch, disposable_db)
+    database, calls = _database_with_fetch(disposable_db)
 
-    dashboard = analytics_repository.get_dashboard_data()
+    dashboard = analytics_repository.get_dashboard_data(database)
 
     assert dashboard["next_event"]["session_id"] == expected
     assert dashboard["next_event"]["name"] == "lower"
@@ -84,7 +84,7 @@ def test_next_event_orders_future_ties_by_session_id(monkeypatch, disposable_db)
     assert len(calls) == 6
 
 
-def test_next_event_excludes_past_non_race_and_terminal_sessions(monkeypatch, disposable_db):
+def test_next_event_excludes_past_non_race_and_terminal_sessions(disposable_db):
     now = datetime.now(UTC)
     for n, name, kind, state, delta in (
         (1, "past", "RACE", "SCHEDULED", -1),
@@ -96,9 +96,9 @@ def test_next_event_excludes_past_non_race_and_terminal_sessions(monkeypatch, di
         (7, "qualifying", "QUALIFYING", "SCHEDULED", 6),
     ):
         _add(disposable_db, n, name, kind, state, now + timedelta(minutes=delta))
-    calls = _patch_fetch(monkeypatch, disposable_db)
+    database, calls = _database_with_fetch(disposable_db)
 
-    dashboard = analytics_repository.get_dashboard_data()
+    dashboard = analytics_repository.get_dashboard_data(database)
 
     assert dashboard["next_event"] is None
     assert len(calls) == 6

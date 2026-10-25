@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from types import SimpleNamespace
 from uuid import UUID
 
 import pytest
@@ -18,7 +19,7 @@ from app import analytics_repository
         },
     ],
 )
-def test_dashboard_next_event_preserves_old_fields_and_candidate(monkeypatch, candidate):
+def test_dashboard_next_event_preserves_old_fields_and_candidate(candidate):
     rows = iter(
         [
             {"count": 2},
@@ -29,9 +30,9 @@ def test_dashboard_next_event_preserves_old_fields_and_candidate(monkeypatch, ca
             candidate,
         ]
     )
-    monkeypatch.setattr(analytics_repository, "fetch_one", lambda *_args: next(rows))
+    database = SimpleNamespace(fetch_one=lambda *_args: next(rows))
 
-    dashboard = analytics_repository.get_dashboard_data()
+    dashboard = analytics_repository.get_dashboard_data(database)
 
     assert dashboard == {
         "active_sessions": 2,

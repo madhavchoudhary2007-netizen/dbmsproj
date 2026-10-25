@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 7122a27
+git_head: 6139e34
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -50,3 +50,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44426 accepted0ec278d: Introduce shared resource-page cream hero, observed count sticker and preserved New record/membership callbacks with neo-brutal controls. Verify0.
 
 - T-44427 accepted7122a27: Observe mocked socket URL/messages/closure through WebSocketRoute and exercise existing exact 503 readiness failure; preserve all eight regression assertions. Verify0.
+
+- T-44429 accepted6139e34: Use tokenized search and reload controls in resource toolbar, preserving callbacks and accessible names while showing the actual result range. Verify0.
+
+- T44425 fullgate242PASS1FAIL: addedreturnannotations invoked Pydantic Decimal-to-string serializer, breaking existing analytics numeric assertion. T44430 restores original response_model=None; test unchanged. Parentgate remainsFAILED pending repair.

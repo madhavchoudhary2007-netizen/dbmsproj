@@ -3,10 +3,10 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44429 W1 — OPEN
-- target_files: frontend/components/resource-page.tsx, frontend/app/styles/resources.css
-- contract: T382 convert resource search/reload toolbar to NbInput/NbButton and expose current result range.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh
+### T-44430 W2 — OPEN
+- target_files: backend/app/analytics_router.py
+- contract: Restore pre-refactor numeric analytics serialization while retaining typed handler annotations.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_dashboard_next_event.py backend/tests/test_request_dependencies.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/analytics_router.py
 
 ### T-44428 W3 — OPEN
 - target_files: backend/tests/test_dashboard_next_event.py, backend/tests/test_dashboard_next_event_db.py
@@ -22,6 +22,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44429 accepted6139e34; verify0.
 - T-44427 accepted7122a27; verify0.
 - T-44426 accepted0ec278d; verify0.
 - T-44425 acceptedc18bce7; verify0.
