@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 20b8d27
+git_head: 96cabf5
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -54,3 +54,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - RootT44348accept failed due unrelated acceptedT44350 testharness constmodule violating Nextlint. Restored only rootT44348target, kept its patch referenced; W1T44351 samebaselinefailure. W3T44353 exactvariablerename repair queued, allassertions unchanged; rerun independentaccepts afterward.
 
 - T-44353 accepted20b8d27: Rename test harness local module binding only; retain all four tests and assertions, full frontend lint passes. Verify0.
+
+- T-44348 accepted96cabf5: Activate exact live record polling helper while retaining effect position, stable dependencies and all page JSX. Verify0.
+
+- T44349 eagerfactory proposal failed react-hooks/refs (originalevent-time T44342 correct). Restored onlyisolatedtarget; repair uses one lazycontextconstructor/event-timecalls, no suppression/behaviorchange. T44351 localRowtype boundary corrected to existingAPIimport beforeaccept.

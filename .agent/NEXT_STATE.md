@@ -5,17 +5,12 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 ## Queue
 ### T-44349 W2 — OPEN
 - target_files: frontend/components/special-pages.tsx
-- contract: T379 remove duplicated demo action factory context wiring by instantiating it once per render, as the original packet specified.
+- contract: T379 share lazy demo action factory context, avoiding render-time ref access rejected by lint.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint && node --experimental-vm-modules --test frontend/e2e/runtime/live-demo-actions.test.mjs
 
 ### T-44351 W1 — OPEN
 - target_files: frontend/components/pages/live/live-selectors.tsx
 - contract: T379 stage exact session/driver selection toolbar in live/live-selectors.tsx; leave source unchanged.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
-
-### T-44348 W2 — OPEN
-- target_files: frontend/components/special-pages.tsx
-- contract: T379 activate exact live record polling helper inside original effect; preserve effect dependency array and position.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
 ## Blocked
@@ -25,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44348 accepted96cabf5; verify0.
 - T-44353 accepted20b8d27; verify0.
 - T-44350 accepted266e518; verify0.
 - T-44347 accepteda14c234; verify0.
