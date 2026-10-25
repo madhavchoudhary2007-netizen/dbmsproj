@@ -1,0 +1,13 @@
+diff --git a/frontend/components/pages/dashboard.tsx b/frontend/components/pages/dashboard.tsx
+index 8b6edb9..8726f9a 100644
+--- a/frontend/components/pages/dashboard.tsx
++++ b/frontend/components/pages/dashboard.tsx
+@@ -44,7 +44,7 @@ export function Dashboard() {
+                 label={String(k).replaceAll("_", " ")}
+                 value={pretty(v)}
+                 delta="API reported"
+-                className="[&_dd]:text-5xl"
++                className="stat-card [&_dd]:text-5xl"
+                 tone={tone}
+                 stickerTilt={tilt}
+               />

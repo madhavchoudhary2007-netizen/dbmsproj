@@ -44,7 +44,7 @@ export function Dashboard() {
                 label={String(k).replaceAll("_", " ")}
                 value={pretty(v)}
                 delta="API reported"
-                className="[&_dd]:text-5xl"
+                className="stat-card [&_dd]:text-5xl"
                 tone={tone}
                 stickerTilt={tilt}
               />

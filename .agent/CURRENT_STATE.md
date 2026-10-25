@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 02486b3
+git_head: 07b8e27
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -50,3 +50,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - Newrootgates caught regressions: T44381 removed .stat-card testedhook (5dashboardretryfailures); fixT44384 preserveshookwithoutoldCSS. T44382 removed main.jwt export (14fullfailures217PASS); repairT44385 restoresexplicit alias, assertions unchanged. Focusedverifies hadpassed; do not claim latestfullgreen.
 
 - T-44383 accepted02486b3: Add scoped dashboard hero and single Open live timing primary while preserving reload and existing data logic. Verify0.
+
+- T-44385 accepted07b8e27: Restore legacy jwt module export required by existing auth and WebSocket compatibility tests. Verify0.
