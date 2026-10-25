@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 60d910d
+git_head: cf0cfba
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -54,3 +54,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 
 
 - T-44445 accepted60d910d: Characterize resource validation, typed zero payloads, pending-save coalescing and error recovery; add strict expected-failure reproducer for missing delete confirmation. Verify0.
+
+- T-44447 acceptedcf0cfba: Style existing record guidance as readable paper panel with ink text and wrapping; adjust resource surface balance without new content or wider palette bands. Verify0.
+
+- T382paletteall6PASS aftercf0cfba. Resourceeditor55cases50reportedPASS(includes5strictdeleteexpectedfailures)/5FAIL: actual20POSTs vs1 inrapidsave atallwidths. F-382-SAVE P1 queuedT44448; missingdeleteconfirmation strictreproducerT44445, T44449fix. No realDBwrites, browserPOST/DELETE locallymocked.

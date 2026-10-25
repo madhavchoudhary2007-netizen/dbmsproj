@@ -3,10 +3,15 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44447 W1 — OPEN
-- target_files: frontend/app/styles/resources.css
-- contract: Finish T382 palette repair by making existing record guidance a readable paper panel.
+### T-44449 W1 — OPEN
+- target_files: frontend/components/resource-page.tsx
+- contract: T382 add functional native delete confirmation using existing remove callback.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh
+
+### T-44448 W2 — OPEN
+- target_files: frontend/components/ui.tsx
+- contract: Fix F-382-SAVE: ResourceEditor must synchronously exclude overlapping save submissions.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && npm --prefix frontend run test:runtime
 
 ### T-44446 W3 — OPEN
 - target_files: .agent/audit/T44446-di-map.md
@@ -22,6 +27,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44447 acceptedcf0cfba; verify0.
 - T-44445 accepted60d910d; verify0.
 - T-44444 acceptedad4420d; verify0.
 - T-44443 accepteda7cb405; verify0.
