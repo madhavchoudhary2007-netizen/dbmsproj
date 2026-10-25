@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 2e68037
+git_head: 9a68302
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -36,16 +36,10 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - Latestacceptedpacket/hashes/evidence: Git/.agent/results; queue/stateupdatedaftereachacceptance. No newdependencies, no realDBwrites.
 
 ## Latest route verification
-- T382 finalmembership25browserPASS T382-memberships-gate.browser.raw.log, all45editor+30primitivePASS; native Escape/Reactclose race da4d3ee/bc67c9a, 15/15keyboardreopens. Readability/currentroster/fiveStates complete; finalproductionbuild stillrequired aftersharedmodalchanges. Earlier360resourcebrowserPASS. Bloat594linesdeferredT400.
-- T383 hero/list/nativeDelete/persistentmutationguard7ae0ac6 implemented. GeneratedlistfiveStates e52386c, observer6tests7e554e7; runtime64PASS. Readable scopedselectors/notices262f582. Root T383-list-final40PASS10FAIL: all20mutationcasespass; outagefixtures corrected0ba1b81; focused10/10recoveryPASS T383-list-recovery.browser.raw.log (combinedearlier40PASS). Initialroute50browserPASS T383-header-cards.
-- T384 interval/sector/fastest metadata1f267c0 with3VMcases37a230e; NbTabledriverselectionafe1acd/domaincells9f604dd/motionmobile401fdf1/fiveStatesf8b1888. Actualsnapshot5VMcases3518121; runtime64PASS. All25focusedbrowsercases havepassing evidence: T384-tower15PASS +T384-tower-repair8PASS +T384-mobile-selection2PASS. Driverclick/Enter/Space/selectedaria/mobileDetails/axe/overflow5widths, actualWSreorder/reducedmotion. NoAPIshapechanges. No newdependencies or realDBwrites. Rootproductedits0.
-
-- T385 chart theme/frames/corner tiles, record and latest-telemetry tables, timelines and poll/retry state implemented. Pit counts wired ad39af5 with real selected-race lap counters. Runtime64PASS. Production build/lint/types0 T383-385-build.raw.log (before Sessions).
-- T44503 one transient worker usage error; account tool reported ordinaryUsageAllowed=true; same-role retry succeeded. Its unaccepted236-line rewrite was restored only in clone, replacedwith57-line targeted change. No model substitution.
-
-- Current production source build/lint/types0 T383-385-build.raw.log (beforeSessions). T385 all empty/loading/error/retry/retention browser cases15PASS across focused runs; T44518 repaired snapshot contrast and table keyboard scrolling. Focused populated run4PASS/1 fixture locator collision, T44521 repairs tooltip/tile scoping. M13firstdraw remainsopen.
-- T332 demo DELETE uses request DatabaseSession c48443f; exact helper AST unchanged; missing-marker404 precedes lazyMongo503. Four request-override tests dede5cd accepted; root full249PASS0skip/live acceptance PASS. No schema/API changes.
-
-- T386 layout and controls accepted 7023bc4/d868cac; results/native dialogs under review. Actual 249 backend tests and live acceptance passed.
-
-- T-44520 accepted2e68037: Use formatted results NbTable with factual podium cells and provisional badge, native session dialogs with primary saves, and readable notices. Verify0.
+- T382 membership25/editor45/primitive30 and keyboard reopen15 browser PASS; resource-page594lines Taste bloat remains.
+- T383 real demo creation/deletion guard, list five states, truthful selected lap counter implemented; 40 cases passed plus focused10 outage recovery passed. No fake progress or real database writes.
+- T384 all25 focused cases have passing evidence: T384-tower15 + repair8 + mobile2. Selection keyboard/Details/axe/overflow/WS reorder/reduced motion tested. Metadata, unique completed pit counts wired. Runtime64PASS.
+- T385 charts/corner tiles, laps/latest telemetry tables, control timelines and retry/source states implemented. Fifteen loading/empty/error/retention browser cases PASS; populated4widths PASS. Mobile tooltip locator scope repaired9a68302, focused rerun in progress. M13 first draw remains open.
+- T386 layout/controls/results/native modals implemented7023bc4/d868cac/2e68037. Route gate69PASS1desktop paletteFAIL (red4.10%, minimum5). T44524 count-sticker/obsolete CSS fix underway; T44522 focused flow tests reviewed before root browser.
+- T332 request database demo DELETE + four dependency override cases accepted c48443f/dede5cd. Root249PASS0skip and live acceptance PASS T-44517.full.raw.log; exact helper ordering preserved.
+- T44503 transient worker usage error recovered with same role/model; oversized unaccepted clone diff replaced with targeted change. T44519 count envelope corrected before acceptance; no boundary spill. No dependencies added.
