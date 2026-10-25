@@ -121,7 +121,6 @@ test("failed POST preserves values and cause for a successful retry", async ({ p
 });
 
 test("T382-DELETE requires confirmation before writing", async ({ page }) => {
-  test.fail(!process.env.RUN_XFAIL);
   const api = await setup(page);
   await page.getByRole("row").filter({ hasText: "Pilot" }).click();
   const details = page.getByRole("dialog", { name: "Record details" });
@@ -137,4 +136,35 @@ test("T382-DELETE requires confirmation before writing", async ({ page }) => {
     for (let i = 0; i < 20; i += 1) (button as HTMLButtonElement).click();
   });
   await expect.poll(() => api.counts().deleteCount).toBe(1);
+});
+
+test("T382 primary action follows the active resource dialog", async ({ page }) => {
+  await setup(page);
+  const expectPrimary = async (label: string) => {
+    const primary = page.locator("[data-primary='true']");
+    await expect(primary).toHaveCount(1);
+    await expect(primary).toHaveAccessibleName(label);
+    await expect(primary).toBeVisible();
+  };
+
+  await expectPrimary("New record");
+  const create = await openCreate(page);
+  await expectPrimary("Save record");
+  await page.keyboard.press("Escape");
+  await expect(create).toBeHidden();
+  await expectPrimary("New record");
+
+  await page.getByRole("row").filter({ hasText: "Pilot" }).click();
+  const details = page.getByRole("dialog", { name: "Record details" });
+  await expectPrimary("Save record");
+  await details.getByRole("button", { name: "Delete record" }).click();
+  const confirmation = page.getByRole("dialog", { name: "Delete record" });
+  await expect(confirmation).toBeVisible();
+  await expectPrimary("Delete record");
+  await confirmation.getByRole("button", { name: "Cancel" }).click();
+  await expect(confirmation).toBeHidden();
+  await expectPrimary("Save record");
+  await page.keyboard.press("Escape");
+  await expect(details).toBeHidden();
+  await expectPrimary("New record");
 });

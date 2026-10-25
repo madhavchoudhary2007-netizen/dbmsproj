@@ -3,11 +3,6 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44456 W1 — OPEN
-- target_files: frontend/components/resource-page.tsx
-- contract: T382 add resource row edit/delete icon actions and driver eligibility/user role badges.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
-
 ### T-44455 W3 — OPEN
 - target_files: frontend/e2e/resource-editor.spec.ts
 - contract: T382 promote proven delete regression to normal gate and cover active dialog primary transitions.
@@ -22,6 +17,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44456 acceptedfe37650; verify0.
 - T-44454 acceptedd5d6796; verify0.
 - T-44453 accepted4514b8e; verify0.
 - T-44452 accepted6e28dd6; verify0.

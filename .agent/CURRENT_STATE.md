@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: d5d6796
+git_head: fe37650
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -43,3 +43,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - Isolatedclones maynotcontainignoredrawlogs: inlineactualdiagnostics inpackets. Rootnormalizesactualdiffcounts. No implementationblocker or newdependency.
 
 - T-44454 acceptedd5d6796: Mark the active resource dialog action as primary; keep hidden confirmation and background header/editor unmarked. Optional ResourceEditor prop preserves other callers. Verify0.
+
+- T-44456 acceptedfe37650: Add admin-only 44px resource row edit/delete icon actions using existing dialogs; render driver eligibility and user role badges while preserving original cell text. Verify0.
