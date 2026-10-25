@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: f8b1888
+git_head: b1247fd
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -57,3 +57,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44497 accepted3518121: Test actual snapshot settlement/retry, stale generation isolation and retry-handle cleanup identity. Verify0.
 
 - T-44498 acceptedf8b1888: Render timing loading, retryable error, retained partial, populated and empty states from actual snapshot settlement; style live errors. Verify0.
+
+- T-44499 acceptedb1247fd: Test actual timing snapshot five states, driver selection, mobile details, WebSocket reorder and reduced motion across five widths. Verify0.

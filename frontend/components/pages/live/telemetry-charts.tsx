@@ -8,6 +8,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { NbActiveDot, NbChartTooltip } from "@/components/nb/chart-frame";
+import { chartTheme } from "@/components/nb/chart-theme";
 
 export function TelemetryCharts({
   driver,
@@ -25,12 +27,12 @@ export function TelemetryCharts({
       {driver && shown.length > 0 && (
         <div className="telemetry-charts">
           {[
-            ["speed_kph", "Speed · km/h", "#d9ff3f"],
-            ["throttle_pct", "Throttle · %", "#8eafff"],
-            ["brake_pct", "Brake · %", "#ff6b62"],
-            ["lap_time_ms", "Lap time · ms", "#4fd4bd"],
-            ["tire_wear_pct", "Tire wear · %", "#ffc45c"],
-          ].map(([key, title, color]) => (
+            ["speed_kph", "Speed · km/h"],
+            ["throttle_pct", "Throttle · %"],
+            ["brake_pct", "Brake · %"],
+            ["lap_time_ms", "Lap time · ms"],
+            ["tire_wear_pct", "Tire wear · %"],
+          ].map(([key, title]) => (
             <div className="panel chart-panel" key={key}>
               <div className="eyebrow">SELECTED DRIVER TELEMETRY</div>
               <h2>{title}</h2>
@@ -40,32 +42,34 @@ export function TelemetryCharts({
                     data={chartPackets}
                     margin={{ top: 15, right: 8, bottom: 0, left: -16 }}
                   >
-                    <CartesianGrid stroke="#29313a" strokeDasharray="3 4" />
+                    <CartesianGrid {...chartTheme.grid} />
                     <XAxis
                       dataKey="lap"
-                      stroke="#77818b"
-                      tick={{ fontSize: 9 }}
-                      tickLine={false}
-                    />
-                    <YAxis
-                      stroke="#77818b"
-                      tick={{ fontSize: 9 }}
-                      tickLine={false}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        background: "#11161c",
-                        border: "1px solid #37414b",
-                        fontSize: 10,
+                      stroke={chartTheme.line.stroke}
+                      axisLine={chartTheme.axis.axisLine}
+                      tickLine={chartTheme.axis.tickLine}
+                      tick={{
+                        fontFamily: chartTheme.axis.fontFamily,
+                        fontSize: chartTheme.axis.fontSize,
                       }}
                     />
+                    <YAxis
+                      stroke={chartTheme.line.stroke}
+                      axisLine={chartTheme.axis.axisLine}
+                      tickLine={chartTheme.axis.tickLine}
+                      tick={{
+                        fontFamily: chartTheme.axis.fontFamily,
+                        fontSize: chartTheme.axis.fontSize,
+                      }}
+                    />
+                    <Tooltip content={<NbChartTooltip />} />
                     <Line
                       type="monotone"
                       dataKey={key}
-                      stroke={color}
-                      dot={false}
+                      {...chartTheme.line}
+                      activeDot={<NbActiveDot />}
                       connectNulls
-                      strokeWidth={2}
+                      isAnimationActive={false}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -82,60 +86,67 @@ export function TelemetryCharts({
                     data={chartPackets}
                     margin={{ top: 15, right: 8, bottom: 0, left: -16 }}
                   >
-                    <CartesianGrid stroke="#29313a" strokeDasharray="3 4" />
+                    <CartesianGrid {...chartTheme.grid} />
                     <XAxis
                       dataKey="lap"
-                      stroke="#77818b"
-                      tick={{ fontSize: 9 }}
-                      tickLine={false}
-                    />
-                    <YAxis
-                      stroke="#77818b"
-                      tick={{ fontSize: 9 }}
-                      tickLine={false}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        background: "#11161c",
-                        border: "1px solid #37414b",
-                        fontSize: 10,
+                      stroke={chartTheme.line.stroke}
+                      axisLine={chartTheme.axis.axisLine}
+                      tickLine={chartTheme.axis.tickLine}
+                      tick={{
+                        fontFamily: chartTheme.axis.fontFamily,
+                        fontSize: chartTheme.axis.fontSize,
                       }}
                     />
+                    <YAxis
+                      stroke={chartTheme.line.stroke}
+                      axisLine={chartTheme.axis.axisLine}
+                      tickLine={chartTheme.axis.tickLine}
+                      tick={{
+                        fontFamily: chartTheme.axis.fontFamily,
+                        fontSize: chartTheme.axis.fontSize,
+                      }}
+                    />
+                    <Tooltip content={<NbChartTooltip />} />
                     <Line
                       type="monotone"
                       dataKey="temp_fl"
                       name="Front left"
-                      stroke="#ff6b62"
-                      dot={false}
+                      {...chartTheme.line}
+                      activeDot={<NbActiveDot />}
                       connectNulls
-                      strokeWidth={2}
+                      isAnimationActive={false}
                     />
                     <Line
                       type="monotone"
                       dataKey="temp_fr"
                       name="Front right"
-                      stroke="#ffc45c"
-                      dot={false}
+                      {...chartTheme.line}
+                      {...chartTheme.secondary}
+                      activeDot={<NbActiveDot />}
                       connectNulls
-                      strokeWidth={2}
+                      isAnimationActive={false}
                     />
                     <Line
                       type="monotone"
                       dataKey="temp_rl"
                       name="Rear left"
-                      stroke="#8eafff"
-                      dot={false}
+                      {...chartTheme.line}
+                      {...chartTheme.tertiary}
+                      activeDot={<NbActiveDot />}
                       connectNulls
-                      strokeWidth={2}
+                      isAnimationActive={false}
                     />
                     <Line
                       type="monotone"
                       dataKey="temp_rr"
                       name="Rear right"
-                      stroke="#4fd4bd"
-                      dot={false}
+                      stroke={chartTheme.line.stroke}
+                      strokeDasharray="1 3"
+                      strokeWidth={chartTheme.line.strokeWidth}
+                      dot={chartTheme.line.dot}
+                      activeDot={<NbActiveDot />}
                       connectNulls
-                      strokeWidth={2}
+                      isAnimationActive={false}
                     />
                   </LineChart>
                 </ResponsiveContainer>
