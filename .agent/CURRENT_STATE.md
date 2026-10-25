@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 133240e
+git_head: 1924d64
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -35,3 +35,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - Productglue14lines only in long continuation (T44250 +2imports); workers implement other product changes.
 - Actual stats normalized independently. Worker T44393 newfile reported0/0, corrected actual121 before accept; T44398 actual147. Root browser interruption cleaned own Next processes/restored next-env. Existing assertions never weakened.
 - T381 remaining: verify complete dashboard5widths/axe/targets/palette and all source regressions; service WS/lease actual observation not yet wired. Four KPI accents conflictT400max3 (TASTE-381-1), resolve before A5.
+
+- T-44399 accepted1924d64: Validate incident JSON at runtime and show recoverable source errors instead of crashing on malformed payloads. Verify0.
