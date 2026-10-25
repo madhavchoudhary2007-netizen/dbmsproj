@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: dbb62d5
+git_head: f1a5c17
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -53,3 +53,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 
 
 - T387 source browser24PASS plus focused15PASS T387-records-repair.browser.raw.log completes all35 cases across five widths, including outage/retention and palette. Production build pending. T388 header/native reservation modal a4ef7b6 accepted; remaining strategy/grid/queue/history. Backend helper19c41c6 root262PASS0skip/livePASS T-44543.full.raw.log.
+
+- T-44548 acceptedf1a5c17: Render truthful strategy cards with retained refresh data and five-state source boundary. Verify0.

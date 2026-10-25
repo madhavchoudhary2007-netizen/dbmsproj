@@ -1,5 +1,5 @@
 from collections.abc import Callable, Mapping
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException
@@ -84,17 +84,24 @@ def create_results_write_router(
 ) -> tuple[APIRouter, dict[str, Callable[..., Any]]]:
     router = APIRouter()
 
-    @router.post("/api/sessions/{session_id}/results")
-    def save_results(session_id: UUID, rows: list[ResultIn], user=admin_steward_dependency):
-        return _save_results(
-            session_id,
-            rows,
-            user,
-            fetch_one,
-            connection,
-            simulations_provider(),
-            publish,
-            jsonable,
+    @router.post("/api/sessions/{session_id}/results", response_model=None)
+    def save_results(
+        session_id: UUID,
+        rows: list[ResultIn],
+        user: dict[str, object] = admin_steward_dependency,
+    ) -> list[dict[str, object]]:
+        return cast(
+            list[dict[str, object]],
+            _save_results(
+                session_id,
+                rows,
+                user,
+                fetch_one,
+                connection,
+                simulations_provider(),
+                publish,
+                jsonable,
+            ),
         )
 
     return router, {"save_results": save_results}

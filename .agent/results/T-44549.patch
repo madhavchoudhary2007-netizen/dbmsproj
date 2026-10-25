@@ -1,0 +1,166 @@
+diff --git a/backend/app/api/results_read.py b/backend/app/api/results_read.py
+index 4666a50..e7f557d 100644
+--- a/backend/app/api/results_read.py
++++ b/backend/app/api/results_read.py
+@@ -1,5 +1,5 @@
+ from collections.abc import Callable
+-from typing import Any
++from typing import Any, cast
+ from uuid import UUID
+ 
+ from fastapi import APIRouter
+@@ -16,9 +16,11 @@ def create_results_read_router(
+ ) -> tuple[APIRouter, dict[str, Callable[..., Any]]]:
+     router = APIRouter()
+ 
+-    @router.get("/api/sessions/{session_id}/results")
+-    def results(session_id: UUID, user=authenticated_user_dependency):
+-        return jsonable(
++    @router.get("/api/sessions/{session_id}/results", response_model=None)
++    def results(
++        session_id: UUID, user: dict[str, object] = authenticated_user_dependency
++    ) -> list[dict[str, object]]:
++        result = jsonable(
+             fetch_all(
+                 """SELECT r.*,u.full_name AS driver_name,d.number,t.name AS team_name,
+       EXISTS(SELECT 1 FROM incident_reports i JOIN penalties p ON p.incident_id=i.id
+@@ -33,16 +35,21 @@ def create_results_read_router(
+                 (session_id,),
+             )
+         )
++        return cast(list[dict[str, object]], result)
+ 
+-    @router.post("/api/championships/{championship_id}/recalculate")
+-    def recalculate(championship_id: UUID, user=admin_steward_dependency):
++    @router.post("/api/championships/{championship_id}/recalculate", response_model=None)
++    def recalculate(
++        championship_id: UUID, user: dict[str, object] = admin_steward_dependency
++    ) -> dict[str, object]:
+         with connection() as conn, conn.cursor() as cur:
+             cur.execute("SELECT recalculate_standings(%s)", (championship_id,))
+         return {"championship_id": str(championship_id), "recalculated": True}
+ 
+-    @router.get("/api/championships/{championship_id}/standings")
+-    def standings(championship_id: UUID, user=authenticated_user_dependency):
+-        return jsonable(
++    @router.get("/api/championships/{championship_id}/standings", response_model=None)
++    def standings(
++        championship_id: UUID, user: dict[str, object] = authenticated_user_dependency
++    ) -> list[dict[str, object]]:
++        result = jsonable(
+             fetch_all(
+                 """SELECT s.*,u.full_name AS driver_name,d.number,t.name AS team_name,
+       EXISTS(SELECT 1 FROM race_events re JOIN race_sessions rs ON rs.event_id=re.id
+@@ -55,5 +62,6 @@ def create_results_read_router(
+                 (championship_id,),
+             )
+         )
++        return cast(list[dict[str, object]], result)
+ 
+     return router, {"results": results, "standings": standings, "recalculate": recalculate}
+diff --git a/backend/app/api/results_write.py b/backend/app/api/results_write.py
+index d51196f..77a63a5 100644
+--- a/backend/app/api/results_write.py
++++ b/backend/app/api/results_write.py
+@@ -1,5 +1,5 @@
+ from collections.abc import Callable, Mapping
+-from typing import Any
++from typing import Any, cast
+ from uuid import UUID
+ 
+ from fastapi import APIRouter, HTTPException
+@@ -84,17 +84,24 @@ def create_results_write_router(
+ ) -> tuple[APIRouter, dict[str, Callable[..., Any]]]:
+     router = APIRouter()
+ 
+-    @router.post("/api/sessions/{session_id}/results")
+-    def save_results(session_id: UUID, rows: list[ResultIn], user=admin_steward_dependency):
+-        return _save_results(
+-            session_id,
+-            rows,
+-            user,
+-            fetch_one,
+-            connection,
+-            simulations_provider(),
+-            publish,
+-            jsonable,
++    @router.post("/api/sessions/{session_id}/results", response_model=None)
++    def save_results(
++        session_id: UUID,
++        rows: list[ResultIn],
++        user: dict[str, object] = admin_steward_dependency,
++    ) -> list[dict[str, object]]:
++        return cast(
++            list[dict[str, object]],
++            _save_results(
++                session_id,
++                rows,
++                user,
++                fetch_one,
++                connection,
++                simulations_provider(),
++                publish,
++                jsonable,
++            ),
+         )
+ 
+     return router, {"save_results": save_results}
+diff --git a/backend/app/api/session_action.py b/backend/app/api/session_action.py
+index c8dc661..39f226a 100644
+--- a/backend/app/api/session_action.py
++++ b/backend/app/api/session_action.py
+@@ -1,7 +1,7 @@
+ from __future__ import annotations
+ 
+ from collections.abc import Callable, Mapping
+-from typing import Any
++from typing import Any, cast
+ from uuid import UUID
+ 
+ from fastapi import APIRouter
+@@ -25,22 +25,29 @@ def create_session_action_router(
+ ) -> tuple[APIRouter, dict[str, Callable[..., Any]]]:
+     router = APIRouter()
+ 
+-    @router.post("/api/sessions/{session_id}/action")
+-    async def session_action(session_id: UUID, body: Action, user=admin_steward_dependency):
+-        return await run_session_action(
+-            session_id,
+-            body,
+-            user,
+-            _require_crud_record,
+-            fetch_one,
+-            ensure_session_reset_allowed,
+-            simulations_provider(),
+-            connection,
+-            clear_session_measurements,
+-            sync_simulation_lifecycle,
+-            cancel_automatic_pit_reservations,
+-            jsonable,
+-            publish,
++    @router.post("/api/sessions/{session_id}/action", response_model=None)
++    async def session_action(
++        session_id: UUID,
++        body: Action,
++        user: dict[str, object] = admin_steward_dependency,
++    ) -> dict[str, object]:
++        return cast(
++            dict[str, object],
++            await run_session_action(
++                session_id,
++                body,
++                user,
++                _require_crud_record,
++                fetch_one,
++                ensure_session_reset_allowed,
++                simulations_provider(),
++                connection,
++                clear_session_measurements,
++                sync_simulation_lifecycle,
++                cancel_automatic_pit_reservations,
++                jsonable,
++                publish,
++            ),
+         )
+ 
+     return router, {"session_action": session_action}

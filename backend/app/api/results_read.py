@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 from fastapi import APIRouter
@@ -16,9 +16,11 @@ def create_results_read_router(
 ) -> tuple[APIRouter, dict[str, Callable[..., Any]]]:
     router = APIRouter()
 
-    @router.get("/api/sessions/{session_id}/results")
-    def results(session_id: UUID, user=authenticated_user_dependency):
-        return jsonable(
+    @router.get("/api/sessions/{session_id}/results", response_model=None)
+    def results(
+        session_id: UUID, user: dict[str, object] = authenticated_user_dependency
+    ) -> list[dict[str, object]]:
+        result = jsonable(
             fetch_all(
                 """SELECT r.*,u.full_name AS driver_name,d.number,t.name AS team_name,
       EXISTS(SELECT 1 FROM incident_reports i JOIN penalties p ON p.incident_id=i.id
@@ -33,16 +35,21 @@ def create_results_read_router(
                 (session_id,),
             )
         )
+        return cast(list[dict[str, object]], result)
 
-    @router.post("/api/championships/{championship_id}/recalculate")
-    def recalculate(championship_id: UUID, user=admin_steward_dependency):
+    @router.post("/api/championships/{championship_id}/recalculate", response_model=None)
+    def recalculate(
+        championship_id: UUID, user: dict[str, object] = admin_steward_dependency
+    ) -> dict[str, object]:
         with connection() as conn, conn.cursor() as cur:
             cur.execute("SELECT recalculate_standings(%s)", (championship_id,))
         return {"championship_id": str(championship_id), "recalculated": True}
 
-    @router.get("/api/championships/{championship_id}/standings")
-    def standings(championship_id: UUID, user=authenticated_user_dependency):
-        return jsonable(
+    @router.get("/api/championships/{championship_id}/standings", response_model=None)
+    def standings(
+        championship_id: UUID, user: dict[str, object] = authenticated_user_dependency
+    ) -> list[dict[str, object]]:
+        result = jsonable(
             fetch_all(
                 """SELECT s.*,u.full_name AS driver_name,d.number,t.name AS team_name,
       EXISTS(SELECT 1 FROM race_events re JOIN race_sessions rs ON rs.event_id=re.id
@@ -55,5 +62,6 @@ def create_results_read_router(
                 (championship_id,),
             )
         )
+        return cast(list[dict[str, object]], result)
 
     return router, {"results": results, "standings": standings, "recalculate": recalculate}
