@@ -13,11 +13,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T379 wire useAnalytics hook replacing only Analytics pre-return state/effect/derived logic.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
-### T-44329 W1 — OPEN
-- target_files: frontend/components/special-pages.tsx
-- contract: T379 activate standalone PitWall with compatibility reexport; remove duplicate function and hook import.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
-
 ## Blocked
 - None currently. Owner switched workers to gpt-6-luna/high; T44318 interrupted before edits, fresh worker required.
 
@@ -25,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44329 accepted28eb2e1; verify0.
 - T-44328 acceptedfa95df4; verify0.
 - T-44327 acceptedc0c4f52; verify0.
 - T-44326 accepted33b3818; verify0.

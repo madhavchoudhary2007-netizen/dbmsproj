@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: fa95df4
+git_head: 28eb2e1
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high (latest owner override2026-10-25), cap2
@@ -69,3 +69,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44328 acceptedfa95df4: Extract exact lifecycle synchronization with legacy wrapper and current simulation mapping. Verify0.
 
 - Root dispatch mistakeT44331 andT44330 both named special-pages despite isolatedclones; interrupted44331 immediately before edits, deferred until44330 completes/accepts. Never over2workers.
+
+- T-44329 accepted28eb2e1: Activate exact standalone PitWall compatibility export and remove duplicate implementation. Verify0.
+
+- T44330 root patch context collided with alreadyaccepted PitWall import removal; mechanical reviewed Analytics-only patch applied with one import integration line, all other rootpagebytes retained. Root rerunsaccept; no authored logic.
