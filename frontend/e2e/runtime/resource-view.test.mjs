@@ -1,0 +1,81 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import * as vm from "node:vm";
+
+const require = createRequire(import.meta.url);
+const typescript = require("../../node_modules/typescript");
+const source = readFileSync(new URL("../../lib/resource-view.ts", import.meta.url), "utf8");
+
+async function load() {
+  const realm = vm.createContext({});
+  const output = typescript.transpileModule(source, {
+    compilerOptions: { module: typescript.ModuleKind.ESNext, target: typescript.ScriptTarget.ES2022 },
+  }).outputText;
+  const sourceModule = new vm.SourceTextModule(output, { context: realm, identifier: "./resource-view.ts" });
+  await sourceModule.link(() => { throw new Error("Unexpected runtime import"); });
+  await sourceModule.evaluate();
+  return sourceModule.namespace.resourceViewState;
+}
+
+test("resourceViewState classifies all five view states and preserves inputs", async () => {
+  const classify = await load();
+  let retryCount = 0;
+  let clearCount = 0;
+  const retry = () => { retryCount += 1; };
+  const clear = () => { clearCount += 1; };
+  const row = Object.freeze({ id: 1, zero: 0, disabled: false, missing: null });
+  const rows = Object.freeze([row, Object.freeze({ id: 2 })]);
+  const visibleRows = Object.freeze([row]);
+  const input = (overrides = {}) => ({
+    rows, visibleRows, loading: false, error: "", term: "", retry, clear, ...overrides,
+  });
+
+  assert.equal(classify(input({ loading: true, error: "offline", rows: [] })).status, "loading");
+
+  const failed = classify(input({ rows: [], visibleRows: [], error: "offline" }));
+  assert.equal(failed.status, "error");
+  assert.equal(failed.error.message, "offline");
+  assert.equal(failed.error.retryable, true);
+  assert.equal(failed.retry, retry);
+  failed.retry();
+  assert.equal(retryCount, 1);
+
+  const retained = classify(input({ error: "stale data" }));
+  assert.equal(retained.status, "partial");
+  assert.equal(retained.data, visibleRows);
+  assert.equal(retained.totalCount, 2);
+  assert.equal(retained.filter.label, "stale data");
+  assert.equal(retained.filter.clear, retry);
+  retained.filter.clear();
+  assert.equal(retryCount, 2);
+  assert.equal(clearCount, 0);
+
+  const firstUse = classify(input({ rows: [], visibleRows: [] }));
+  assert.equal(firstUse.status, "empty");
+  assert.equal(firstUse.reason, "first-use");
+  const noData = classify(input({ visibleRows: [] }));
+  assert.equal(noData.status, "empty");
+  assert.equal(noData.reason, "no-data");
+
+  const filtered = classify(input({ term: "   " }));
+  assert.equal(filtered.status, "partial");
+  assert.equal(filtered.data, visibleRows);
+  assert.equal(filtered.totalCount, 2);
+  assert.equal(filtered.filter.label, "   ");
+  assert.equal(filtered.filter.clear, clear);
+  filtered.filter.clear();
+  assert.equal(clearCount, 1);
+  assert.equal(retryCount, 2);
+
+  const populated = classify(input());
+  assert.equal(populated.status, "populated");
+  assert.equal(populated.data, visibleRows);
+  assert.equal(populated.data[0], row);
+  assert.deepEqual(populated.data[0], { id: 1, zero: 0, disabled: false, missing: null });
+  assert.deepEqual(Object.keys(populated).sort(), ["data", "status"]);
+  assert.equal(Object.isFrozen(rows), true);
+  assert.equal(Object.isFrozen(visibleRows), true);
+  assert.equal(rows[0], row);
+});
