@@ -25,20 +25,13 @@ from fastapi import (
     HTTPException,
     Query,
     Request,
-    Response,
     WebSocket,
 )
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from psycopg import IntegrityError, OperationalError
-from psycopg.errors import ExclusionViolation, ForeignKeyViolation, UniqueViolation
 from psycopg.rows import dict_row
-from psycopg_pool import PoolClosed, PoolTimeout
 from pymongo import DESCENDING as DESCENDING
 from pymongo import MongoClient
 from pymongo.collection import Collection
-from starlette.middleware.base import RequestResponseEndpoint
 
 from . import token_revocation
 from .analytics_router import create_analytics_router
@@ -72,16 +65,11 @@ from .config import (
     MONGODB_DATABASE,
     MONGODB_URL,
 )
+from .core.application import create_application
 from .core.auth_dependencies import (
     check_allowed_origin,
     create_role_check,
     token_is_revoked,
-)
-from .core.errors import (
-    conflict_handler,
-    database_unavailable_handler,
-    integrity_handler,
-    reference_conflict_handler,
 )
 from .core.events import EventBus
 from .core.http_auth import authenticate_http_user
@@ -148,7 +136,6 @@ from .schemas_operations import IncidentIn as IncidentIn
 from .schemas_operations import ReservationIn as ReservationIn
 from .schemas_operations import ReservationStatus as ReservationStatus
 from .schemas_simulation import DemoRaceCreate, SimulationControl
-from .security_headers import SecurityHeadersMiddleware
 from .session_measurements import clear_measurements, ensure_reset_allowed
 from .simulation_core import MAX_SESSION_LAPS
 from .simulation_core import Simulation as Simulation
@@ -224,47 +211,12 @@ async def lifespan(application: FastAPI):
             runtime_lease.close()
 
 
-app = FastAPI(title="ApexGrid API", version="1.0.0", lifespan=lifespan)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+app, require_runtime_lease = create_application(
+    lifespan,
+    CORS_ORIGINS,
+    lambda lease: check_runtime_lease(lease),
+    os.getenv("COOKIE_SECURE") == "1",
 )
-
-
-@app.middleware("http")
-async def require_runtime_lease(request: Request, call_next: RequestResponseEndpoint) -> Response:
-    if request.url.path in {"/health/live", "/health/ready"}:
-        return await call_next(request)
-    runtime_lease = getattr(request.app.state, "runtime_lease", None)
-    if runtime_lease is not None:
-        try:
-            check_runtime_lease(runtime_lease)
-        except RuntimeError:
-            return JSONResponse(
-                status_code=503,
-                content={
-                    "detail": (
-                        "PostgreSQL runtime ownership was lost. Restart the backend to "
-                        "restore service."
-                    )
-                },
-            )
-    return await call_next(request)
-
-
-app.add_middleware(SecurityHeadersMiddleware, secure=os.getenv("COOKIE_SECURE") == "1")
-
-
-app.add_exception_handler(UniqueViolation, conflict_handler)
-app.add_exception_handler(ExclusionViolation, conflict_handler)
-app.add_exception_handler(ForeignKeyViolation, reference_conflict_handler)
-app.add_exception_handler(IntegrityError, integrity_handler)
-app.add_exception_handler(OperationalError, database_unavailable_handler)
-app.add_exception_handler(PoolTimeout, database_unavailable_handler)
-app.add_exception_handler(PoolClosed, database_unavailable_handler)
 
 
 def require_db():
