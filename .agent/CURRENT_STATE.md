@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: effb424
+git_head: 7023bc4
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -17,8 +17,8 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T381 dashboard hero/context/KPIs/services/Nextup/incidents implemented. Actuallease503/notready/recovery +cookieWSopen/error/close/cleanup, no syntheticstatus. Root165browserPASS T381-connectivity-final.browser.raw.log; fivewidthvisuals0overflow/oneprimary/noerrors. Preserve .stat-card/.state.error/Try again. TASTE-381-1 fouraccenttiles vsT400max3 unresolved.
 - T382 resources header/toolbar/exactrowhook/classifier/NbTable/nativeModal/NbField/form/rowEditDelete/roleeligibilitybadges implemented; alloriginalcelltext/copy/pageSize50 preserved. Root360browserPASS T382-actions-primary.browser.raw.log, allsixpalettes/fivewidthaxe/targets/overflow/primary/dataflow. Build/lint/types0 T382-actions-build.raw.log. Inlinevalidation/twocolumnmemberships implemented; finalmodalaxe/partialfixtures andfocusedfileboundaries remain.
 - Real20POST/save and20DELETE/confirm duplicates repaired06330e6/6e28dd6, confirmation7838c2d. Strict25PASS T382-delete-guard.browser.raw.log; markerretired5cfe010, activeprimarytransitions5widthPASS. Browserwrites locallymocked only.
-- Backend main824lines, <=120T331 NOT met; T332unfinished. Genuine modules/core/extracts retained. TypedRuntimeState/providers/lifespan shareandclear identities; requestauth/DatabaseSession. Membership/analytics/pitreads useDI. Actualreturnannotation Decimalstringregression fixedresponse_modelNone19b7991; exactnumericserializationtests1479019 preservewireencoding.
-- Backendfull245PASS0skip/liveacceptancePASS T-44477.full.raw.log. Strictmypy134errors/25files T339-current-after-dbms.raw.log,target0T339. Runtime63PASS. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
+- Backend main823lines, <=120T331 NOT met; T332unfinished. Genuine modules/core/extracts retained. TypedRuntimeState/providers/lifespan shareandclear identities; requestauth/DatabaseSession. Membership/analytics/pitreads useDI. Actualreturnannotation Decimalstringregression fixedresponse_modelNone19b7991; exactnumericserializationtests1479019 preservewireencoding.
+- Backendfull245PASS0skip/liveacceptancePASS T-44514.full.raw.log. Strictmypy134errors/25files T339-current-after-dbms.raw.log,target0T339. Runtime64PASS. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
 
 ## Safety / workflow
 - Onlyoverhaul/neo-brutal; commits onlyaccept.sh; independentlyrerunVerify;2packet-onlycustomworkersmax, no model/effortoverrides. Isolatedclones .agent/orchestrate.py;<=3files/150added+deleted; normalizeactualstats. Every5tasks budget.
@@ -37,22 +37,13 @@ last_eval_score: obsolete51.2974; no current score; final T430
 
 ## Latest route verification
 - T382 finalmembership25browserPASS T382-memberships-gate.browser.raw.log, all45editor+30primitivePASS; native Escape/Reactclose race da4d3ee/bc67c9a, 15/15keyboardreopens. Readability/currentroster/fiveStates complete; finalproductionbuild stillrequired aftersharedmodalchanges. Earlier360resourcebrowserPASS. Bloat594linesdeferredT400.
-- T383 hero/list/nativeDelete/persistentmutationguard7ae0ac6 implemented. GeneratedlistfiveStates e52386c, observer6tests7e554e7; runtime63PASS. Readable scopedselectors/notices262f582. Root T383-list-final40PASS10FAIL: all20mutationcasespass; outagefixtures corrected0ba1b81; focused10/10recoveryPASS T383-list-recovery.browser.raw.log (combinedearlier40PASS). Initialroute50browserPASS T383-header-cards.
-- T384 interval/sector/fastest metadata1f267c0 with3VMcases37a230e; NbTabledriverselectionafe1acd/domaincells9f604dd/motionmobile401fdf1/fiveStatesf8b1888. Actualsnapshot5VMcases3518121; runtime63PASS. All25focusedbrowsercases havepassing evidence: T384-tower15PASS +T384-tower-repair8PASS +T384-mobile-selection2PASS. Driverclick/Enter/Space/selectedaria/mobileDetails/axe/overflow5widths, actualWSreorder/reducedmotion. NoAPIshapechanges. No newdependencies or realDBwrites. Rootproductedits0.
+- T383 hero/list/nativeDelete/persistentmutationguard7ae0ac6 implemented. GeneratedlistfiveStates e52386c, observer6tests7e554e7; runtime64PASS. Readable scopedselectors/notices262f582. Root T383-list-final40PASS10FAIL: all20mutationcasespass; outagefixtures corrected0ba1b81; focused10/10recoveryPASS T383-list-recovery.browser.raw.log (combinedearlier40PASS). Initialroute50browserPASS T383-header-cards.
+- T384 interval/sector/fastest metadata1f267c0 with3VMcases37a230e; NbTabledriverselectionafe1acd/domaincells9f604dd/motionmobile401fdf1/fiveStatesf8b1888. Actualsnapshot5VMcases3518121; runtime64PASS. All25focusedbrowsercases havepassing evidence: T384-tower15PASS +T384-tower-repair8PASS +T384-mobile-selection2PASS. Driverclick/Enter/Space/selectedaria/mobileDetails/axe/overflow5widths, actualWSreorder/reducedmotion. NoAPIshapechanges. No newdependencies or realDBwrites. Rootproductedits0.
 
 - T385 theme5f8c134/frames+4actualcornertilesa8a1741/partialretryandlayout040cb67; recorded-lapNbTable/incident+pit5State timelines38165fc/sourceflags63a8d91 +7VMcasesc96573a. LatestTelemetry44509underreview; livehistorybrowser44512pending. M13firstdrawpending.
 
 - Pit count metadata1d3180f deduplicates actual completed IDs; not yet wired into tower. T383 factual selected-race lap counter still pending; no inferred/fake progress.
 - T44503 one transient worker usage error; account tool reported ordinaryUsageAllowed=true; same-role retry succeeded. Its unaccepted236-line rewrite was restored only in clone, replacedwith57-line targeted change. No model substitution.
 
-- T-44509 accepted1b65d17: Render readable latest telemetry states and align record and snapshot retry accessible names with visible labels. Verify0.
-
-- T-44511 acceptedad39af5: Display selected-race actual lap progress and recorded completed pit counts, leaving unavailable data unknown. Verify0.
-
-- T-44512 acceptedbe6cc11: Add actual live-record and telemetry browser coverage, populated WCAG checks, and completed pit-history runtime cases. Verify0.
-
-- T-44514 acceptedc48443f: Inject request DatabaseSession for generated-race deletion while preserving the exact helper and lazy Mongo/error ordering. Verify0.
-
-- T-44515 accepted51b8121: Scope lap headers exactly, verify selected raw driver IDs in latest telemetry, and control the outage clock. Verify0.
-
-- T-44518 acceptedeffb424: Fix snapshot-label contrast and make overflowing tables labelled keyboard-scroll regions. Verify0.
+- Current production source build/lint/types0 T383-385-build.raw.log (beforeSessions). T385 all empty/loading/error/retry/retention browser cases15PASS across focused runs; final5populated cases exposed snapshot childcontrast+nonfocusabletable, repairedT44518 pendingbrowser. M13firstdraw remainsopen.
+- T332 demo DELETE now uses request DatabaseSession c48443f; exactdeletehelperAST unchanged, 245fullPASS +livePASS; missing-marker404 precedes lazyMongo503. Dedicated4overridecases T44517 readyforacceptance. No schema/API changes.

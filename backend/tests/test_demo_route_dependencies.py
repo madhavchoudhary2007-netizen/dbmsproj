@@ -1,0 +1,141 @@
+import sys
+from pathlib import Path
+from uuid import uuid4
+
+import pytest
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from backend.app.core.request_database import get_database
+from backend.app.demo_race_router import create_demo_race_router
+
+
+class Conflict(Exception):
+    pass
+
+
+class FakeDatabase:
+    def __init__(self, calls, sid, marker):
+        self.calls, self.sid, self.marker = calls, sid, marker
+
+    def connection(self):
+        return self
+
+    def __enter__(self):
+        self.calls.append("database.enter")
+        return self
+
+    def __exit__(self, *_):
+        self.calls.append("database.exit")
+
+    def cursor(self, row_factory=None):
+        assert row_factory is dict
+        return FakeCursor(self)
+
+
+class FakeCursor:
+    def __init__(self, database):
+        self.database = database
+
+    def __enter__(self):
+        self.database.calls.append("cursor.enter")
+        return self
+
+    def __exit__(self, *_):
+        self.database.calls.append("cursor.exit")
+
+    def execute(self, sql, params):
+        self.database.calls.append("execute")
+        assert params == (self.database.sid,)
+
+    def fetchone(self):
+        self.database.calls.append("fetchone")
+        return {"session_id": self.database.sid} if self.database.marker else None
+
+
+class FakeMongo:
+    def __init__(self, calls, sid):
+        self.calls, self.sid = calls, sid
+
+    def delete_many(self, query):
+        self.calls.append("mongo.delete")
+        assert query == {"session_id": str(self.sid)}
+
+
+class DeleteOperations:
+    def __init__(self, calls, sid, simulations, conflict):
+        self.calls, self.sid, self.simulations = calls, sid, simulations
+        self.conflict = conflict
+
+    def validate(self, cur, sid, row):
+        self.calls.append("validate")
+        assert sid == self.sid and row["session_id"] == self.sid
+        if self.conflict:
+            raise Conflict("race has results")
+
+    def delete(self, cur, sid, row):
+        self.calls.append("delete_records")
+        assert str(self.sid) in self.simulations
+        assert self.simulations[str(self.sid)].status == "stopped"
+
+
+def build_app(*, marker=True, mongo=True, conflict=False):
+    calls, sid = [], uuid4()
+    simulations = {str(sid): type("Sim", (), {"status": "running", "task": None})()}
+    database = FakeDatabase(calls, sid, marker)
+    operations = DeleteOperations(calls, sid, simulations, conflict)
+
+    app = FastAPI()
+    app.dependency_overrides[get_database] = lambda: database
+    app.include_router(
+        create_demo_race_router(
+            current_user=lambda: {"id": "synthetic"},
+            admin_steward=lambda: {"id": "synthetic"},
+            demo_race_row=lambda row: row,
+            list_demo_race_ids=lambda limit, offset: [],
+            make_demo_race=lambda cars: {},
+            launch_demo_simulation=lambda sid: None,
+            get_simulations=lambda: simulations,
+            row_factory=dict,
+            mongo_ready=lambda: (
+                calls.append("mongo.ready") or (FakeMongo(calls, sid) if mongo else None)
+            ),
+            delete_conflict=Conflict,
+            validate_delete=operations.validate,
+            delete_records=operations.delete,
+        )
+    )
+    return app, sid, simulations, calls
+
+
+BASE = ["database.enter", "cursor.enter", "execute", "fetchone"]
+AFTER_SQL = ["mongo.ready", "validate", "delete_records", "cursor.exit", "database.exit"]
+
+
+def test_delete_uses_request_database_and_orders_successful_deletion():
+    app, sid, simulations, calls = build_app()
+    with TestClient(app) as client:
+        response = client.delete(f"/api/demo-races/{sid}")
+    assert response.status_code == 204 and response.content == b""
+    assert calls == BASE + AFTER_SQL + ["mongo.delete"]
+    assert str(sid) not in simulations
+
+
+@pytest.mark.parametrize(
+    ("options", "status", "tail"),
+    [
+        ({"marker": False}, 404, ["cursor.exit", "database.exit"]),
+        ({"mongo": False}, 503, ["mongo.ready", "cursor.exit", "database.exit"]),
+        ({"conflict": True}, 409, ["mongo.ready", "validate", "cursor.exit", "database.exit"]),
+    ],
+)
+def test_delete_errors_stop_at_the_expected_stage(options, status, tail):
+    app, sid, simulations, calls = build_app(**options)
+    with TestClient(app) as client:
+        response = client.delete(f"/api/demo-races/{sid}")
+    assert response.status_code == status
+    assert calls == BASE + tail
+    assert str(sid) in simulations
+    assert simulations[str(sid)].status == "running"
