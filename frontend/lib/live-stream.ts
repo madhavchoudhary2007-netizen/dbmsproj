@@ -7,10 +7,16 @@ export function startLiveStream(context: LiveStreamContext): (() => void) | unde
     session, clearError, reportError, setStatus,
     setSessionDrivers, setPackets, setCompletedLaps,
     setLiveIncidents, setLivePitStops, setTiming, setSnapshot,
+    setSnapshotView, snapshotRetry,
   } = context;
 
-  if (!session) { setStatus("Choose an active session"); return; }
+  if (!session) {
+    setStatus("Choose an active session");
+    setSnapshotView?.({ loading: false, error: "" });
+    return;
+  }
   setStatus("Connecting · live stream");
+  setSnapshotView?.({ loading: true, error: "" });
   setSessionDrivers([]);
   setPackets([]);
   setTiming({ cars: [], safety_car: false });
@@ -50,15 +56,21 @@ export function startLiveStream(context: LiveStreamContext): (() => void) | unde
         if (Array.isArray(s.packets))
           setPackets(s.packets.filter(belongsToCurrentRun));
         clearError("snapshot");
+        setSnapshotView?.({ loading: false, error: "" });
         updateStreamStatus();
         if (sessionState === "COMPLETED" || sessionState === "CANCELLED")
           ws?.close();
       }
     } catch (e) {
-      if (alive && request === refreshRequest)
-        reportError("snapshot", e instanceof Error ? e.message : "Unable to fetch snapshot");
+      if (alive && request === refreshRequest) {
+        const message = e instanceof Error ? e.message : "Unable to fetch snapshot";
+        reportError("snapshot", message);
+        setSnapshotView?.({ loading: false, error: message });
+      }
     }
   };
+  const retry = () => { void refresh(); };
+  if (snapshotRetry) snapshotRetry.current = retry;
   const connect = () => {
     if (!alive) return;
     const wsBase = API_BASE.replace(/^http/, "ws");
@@ -139,6 +151,7 @@ export function startLiveStream(context: LiveStreamContext): (() => void) | unde
   connect();
   return () => {
     alive = false;
+    if (snapshotRetry?.current === retry) snapshotRetry.current = null;
     clearTimeout(timer);
     ws?.close();
   };

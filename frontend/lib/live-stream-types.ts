@@ -1,4 +1,4 @@
-import type { Dispatch, SetStateAction } from "react";
+import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import type { Row } from "./api";
 
 export type LiveTimingState = {
@@ -21,4 +21,6 @@ export type LiveStreamContext = {
   setLivePitStops: Dispatch<SetStateAction<Row[]>>;
   setTiming: Dispatch<SetStateAction<LiveTimingState>>;
   setSnapshot: Dispatch<SetStateAction<Record<string, unknown> | null>>;
+  setSnapshotView?: Dispatch<SetStateAction<{ loading: boolean; error: string }>>;
+  snapshotRetry?: MutableRefObject<(() => void) | null>;
 };

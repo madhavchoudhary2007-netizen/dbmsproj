@@ -1,0 +1,101 @@
+diff --git a/frontend/lib/live-stream-types.ts b/frontend/lib/live-stream-types.ts
+index 4e6def1..92d95d6 100644
+--- a/frontend/lib/live-stream-types.ts
++++ b/frontend/lib/live-stream-types.ts
+@@ -1,4 +1,4 @@
+-import type { Dispatch, SetStateAction } from "react";
++import type { Dispatch, MutableRefObject, SetStateAction } from "react";
+ import type { Row } from "./api";
+ 
+ export type LiveTimingState = {
+@@ -21,4 +21,6 @@ export type LiveStreamContext = {
+   setLivePitStops: Dispatch<SetStateAction<Row[]>>;
+   setTiming: Dispatch<SetStateAction<LiveTimingState>>;
+   setSnapshot: Dispatch<SetStateAction<Record<string, unknown> | null>>;
++  setSnapshotView?: Dispatch<SetStateAction<{ loading: boolean; error: string }>>;
++  snapshotRetry?: MutableRefObject<(() => void) | null>;
+ };
+diff --git a/frontend/lib/live-stream.ts b/frontend/lib/live-stream.ts
+index 8d0d291..86e5dab 100644
+--- a/frontend/lib/live-stream.ts
++++ b/frontend/lib/live-stream.ts
+@@ -7,10 +7,16 @@ export function startLiveStream(context: LiveStreamContext): (() => void) | unde
+     session, clearError, reportError, setStatus,
+     setSessionDrivers, setPackets, setCompletedLaps,
+     setLiveIncidents, setLivePitStops, setTiming, setSnapshot,
++    setSnapshotView, snapshotRetry,
+   } = context;
+ 
+-  if (!session) { setStatus("Choose an active session"); return; }
++  if (!session) {
++    setStatus("Choose an active session");
++    setSnapshotView?.({ loading: false, error: "" });
++    return;
++  }
+   setStatus("Connecting · live stream");
++  setSnapshotView?.({ loading: true, error: "" });
+   setSessionDrivers([]);
+   setPackets([]);
+   setTiming({ cars: [], safety_car: false });
+@@ -50,15 +56,21 @@ export function startLiveStream(context: LiveStreamContext): (() => void) | unde
+         if (Array.isArray(s.packets))
+           setPackets(s.packets.filter(belongsToCurrentRun));
+         clearError("snapshot");
++        setSnapshotView?.({ loading: false, error: "" });
+         updateStreamStatus();
+         if (sessionState === "COMPLETED" || sessionState === "CANCELLED")
+           ws?.close();
+       }
+     } catch (e) {
+-      if (alive && request === refreshRequest)
+-        reportError("snapshot", e instanceof Error ? e.message : "Unable to fetch snapshot");
++      if (alive && request === refreshRequest) {
++        const message = e instanceof Error ? e.message : "Unable to fetch snapshot";
++        reportError("snapshot", message);
++        setSnapshotView?.({ loading: false, error: message });
++      }
+     }
+   };
++  const retry = () => { void refresh(); };
++  if (snapshotRetry) snapshotRetry.current = retry;
+   const connect = () => {
+     if (!alive) return;
+     const wsBase = API_BASE.replace(/^http/, "ws");
+@@ -139,6 +151,7 @@ export function startLiveStream(context: LiveStreamContext): (() => void) | unde
+   connect();
+   return () => {
+     alive = false;
++    if (snapshotRetry?.current === retry) snapshotRetry.current = null;
+     clearTimeout(timer);
+     ws?.close();
+   };
+diff --git a/frontend/lib/use-live-timing-state.ts b/frontend/lib/use-live-timing-state.ts
+index 4f3ef3e..54562ea 100644
+--- a/frontend/lib/use-live-timing-state.ts
++++ b/frontend/lib/use-live-timing-state.ts
+@@ -16,6 +16,7 @@ export function useLiveTimingState() {
+     [livePitStops, setLivePitStops] = useState<Row[]>([]),
+     [recordsError, setRecordsError] = useState(""),
+     [snapshot, setSnapshot] = useState<Record<string, unknown> | null>(null),
++    [snapshotView, setSnapshotView] = useState({ loading: false, error: "" }),
+     [timing, setTiming] = useState<{ cars?: Row[]; safety_car?: boolean; [key: string]: unknown }>({ cars: [], safety_car: false }),
+     [status, setStatus] = useState("Choose an active session"),
+     [error, setError] = useState(""),
+@@ -27,6 +28,7 @@ export function useLiveTimingState() {
+   const { user } = useAuth();
+   const canManageDemos = user?.role === "ADMIN" || user?.role === "STEWARD";
+   const autoFollow = useRef(true);
++  const snapshotRetry = useRef<(() => void) | null>(null);
+   const demoInFlight = useRef(false);
+   const listRequest = useRef(0);
+   const errorSource = useRef<"lists" | "snapshot" | "demo" | "">("");
+@@ -46,7 +48,8 @@ export function useLiveTimingState() {
+     sessionDrivers, setSessionDrivers, driver, setDriver, packets, setPackets,
+     completedLaps, setCompletedLaps, liveIncidents, setLiveIncidents,
+     livePitStops, setLivePitStops, recordsError, setRecordsError,
+-    snapshot, setSnapshot, timing, setTiming, status, setStatus, error, setError,
++    snapshot, setSnapshot, snapshotView, setSnapshotView, snapshotRetry,
++    timing, setTiming, status, setStatus, error, setError,
+     demoBusy, setDemoBusy, showCompletedDemos, setShowCompletedDemos,
+     showAllLaps, setShowAllLaps, deleteRace, setDeleteRace, demoMessage,
+     setDemoMessage, canManageDemos, autoFollow, demoInFlight, listRequest, reportError, clearError,

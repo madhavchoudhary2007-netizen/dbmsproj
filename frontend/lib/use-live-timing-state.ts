@@ -16,6 +16,7 @@ export function useLiveTimingState() {
     [livePitStops, setLivePitStops] = useState<Row[]>([]),
     [recordsError, setRecordsError] = useState(""),
     [snapshot, setSnapshot] = useState<Record<string, unknown> | null>(null),
+    [snapshotView, setSnapshotView] = useState({ loading: false, error: "" }),
     [timing, setTiming] = useState<{ cars?: Row[]; safety_car?: boolean; [key: string]: unknown }>({ cars: [], safety_car: false }),
     [status, setStatus] = useState("Choose an active session"),
     [error, setError] = useState(""),
@@ -27,6 +28,7 @@ export function useLiveTimingState() {
   const { user } = useAuth();
   const canManageDemos = user?.role === "ADMIN" || user?.role === "STEWARD";
   const autoFollow = useRef(true);
+  const snapshotRetry = useRef<(() => void) | null>(null);
   const demoInFlight = useRef(false);
   const listRequest = useRef(0);
   const errorSource = useRef<"lists" | "snapshot" | "demo" | "">("");
@@ -46,7 +48,8 @@ export function useLiveTimingState() {
     sessionDrivers, setSessionDrivers, driver, setDriver, packets, setPackets,
     completedLaps, setCompletedLaps, liveIncidents, setLiveIncidents,
     livePitStops, setLivePitStops, recordsError, setRecordsError,
-    snapshot, setSnapshot, timing, setTiming, status, setStatus, error, setError,
+    snapshot, setSnapshot, snapshotView, setSnapshotView, snapshotRetry,
+    timing, setTiming, status, setStatus, error, setError,
     demoBusy, setDemoBusy, showCompletedDemos, setShowCompletedDemos,
     showAllLaps, setShowAllLaps, deleteRace, setDeleteRace, demoMessage,
     setDemoMessage, canManageDemos, autoFollow, demoInFlight, listRequest, reportError, clearError,
