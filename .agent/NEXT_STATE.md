@@ -3,14 +3,14 @@ updated_at: 2026-10-26
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44547 W2 — OPEN
+- target_files: backend/app/telemetry_router.py, backend/app/pit_strategy_router.py
+- contract: T339 annotate telemetry and pit strategy handlers without changing wire encoding or contracts.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_request_dependencies.py backend/tests/test_runtime_dependencies.py && .venv/bin/mypy --strict backend/app/telemetry_router.py backend/app/pit_strategy_router.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/telemetry_router.py backend/app/pit_strategy_router.py
+
 ### T-44546 W1 — OPEN
 - target_files: frontend/components/pages/pit-wall.tsx
 - contract: T388 restyle Pit Wall header, selectors and native reservation modal only.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
-
-### T-44545 W1 — OPEN
-- target_files: frontend/components/pages/stewards.tsx
-- contract: T387 adjust stewardship layout surface balance to unchanged palette bands.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Blocked
@@ -23,6 +23,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44545 accepted290d2e7; verify0.
 - T-44544 acceptedc09bfdd; verify0.
 - T-44543 accepted19c41c6; verify0.
 - T-44542 accepted1800077; verify0.
