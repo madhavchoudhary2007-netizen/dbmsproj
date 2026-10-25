@@ -23,6 +23,9 @@ export type NbTableProps<T extends Record<string, unknown>> = {
   className?: string;
   pageSize?: number;
   sourceMessage?: string;
+  partialSummary?: string;
+  partialActionLabel?: string;
+  partialActionAriaLabel?: string;
   ref?: Ref<HTMLTableElement>;
 };
 
@@ -36,6 +39,9 @@ export function NbTable<T extends Record<string, unknown>>({
   className,
   pageSize = 8,
   sourceMessage,
+  partialSummary,
+  partialActionLabel,
+  partialActionAriaLabel,
   ref,
 }: NbTableProps<T>) {
   const isNestedControl = (target: EventTarget | null) => target instanceof HTMLElement && Boolean(target.closest("a,button,input,select,textarea,[role=button],[role=link],[contenteditable=true]"));
@@ -78,5 +84,5 @@ export function NbTable<T extends Record<string, unknown>>({
     </div>
   );
 
-  return <NbState state={state} empty={empty} className={className} sourceMessage={sourceMessage} skeletonRows={pageSize}>{renderTable}</NbState>;
+  return <NbState state={state} empty={empty} className={className} sourceMessage={sourceMessage} skeletonRows={pageSize} partialSummary={partialSummary} partialActionLabel={partialActionLabel} partialActionAriaLabel={partialActionAriaLabel}>{renderTable}</NbState>;
 }
