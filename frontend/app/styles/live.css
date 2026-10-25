@@ -1,0 +1,110 @@
+.nb-shell .demo-races-panel {
+  margin: 12px 0;
+}
+.nb-shell .demo-races-container {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  background: var(--nb-paper);
+  color: var(--nb-ink);
+}
+.nb-shell .demo-races-container > .panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 0;
+}
+.nb-shell .demo-races-container .panel-heading h2 {
+  margin: 4px 0 0;
+  font-size: var(--fs-h3);
+  line-height: 1.2;
+}
+.nb-shell .demo-races-container .muted {
+  color: var(--nb-ink);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+}
+.nb-shell .demo-race-list {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.nb-shell .demo-race-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  min-width: 0;
+  padding: 16px;
+  background: var(--nb-paper);
+  color: var(--nb-ink);
+  box-shadow: var(--shadow-nb-4);
+}
+.nb-shell .demo-race-select {
+  flex: 1 1 240px;
+  min-width: 0;
+  min-height: 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--nb-ink);
+  text-align: left;
+  cursor: pointer;
+}
+.nb-shell .demo-race-select:hover .demo-race-name {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+.nb-shell .demo-race-select:focus-visible {
+  outline: 4px solid var(--nb-ink);
+  outline-offset: 4px;
+}
+.nb-shell .demo-race-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: var(--fs-body);
+  font-weight: 700;
+  line-height: 1.35;
+}
+.nb-shell .demo-race-meta {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--nb-ink);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+.nb-shell .demo-races-container .icon-button {
+  flex: 0 0 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+}
+.nb-shell .demo-races-container .icon-button .nb-face {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px;
+}
+.nb-shell .demo-races-container .danger-icon:hover:not(:disabled) .nb-face {
+  background: var(--nb-red);
+}
+.nb-shell .demo-race-hero h2 {
+  font-weight: 700;
+}
+@media (max-width: 620px) {
+  .nb-shell .demo-race-row {
+    gap: 12px;
+    padding: 16px;
+  }
+  .nb-shell .demo-race-select {
+    flex-basis: 100%;
+  }
+}

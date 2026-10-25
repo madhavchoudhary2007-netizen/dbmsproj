@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: a9e7dde
+git_head: eb229b7
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -47,3 +47,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44478 accepted0443c82: Replace legacy dark/tiny membership roster styling with scoped ink-on-paper, readable token typography and wrapping, preserving other state colors. Verify0.
 
 - T-44479 accepteda9e7dde: Scope membership mutation to exact Open Driver row and assert partial source cause by exact text, retaining all strict retry/write/count assertions. Verify0.
+
+- T-44480 acceptedeb229b7: Match exact partial-error HTTP formatting and retry accessible name while preserving retained-data, write-count and recovery assertions. Verify0.
