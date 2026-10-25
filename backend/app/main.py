@@ -23,7 +23,6 @@ from fastapi import (
     Depends,
     FastAPI,
     HTTPException,
-    Query,
     Request,
     WebSocket,
 )
@@ -474,15 +473,6 @@ def demo_race_row(session_id: UUID | str):
     sim = simulations.get(str(session_id))
     result["simulation_state"] = sim.status if sim else "stopped"
     return result
-
-
-def list_demo_races(
-    limit: int = Query(50, ge=1, le=200),
-    offset: int = Query(0, ge=0),
-    user=authenticated_user_dependency,
-):
-    ids = list_demo_race_ids(limit, offset)
-    return [demo_race_row(row["session_id"]) for row in ids]
 
 
 def _make_demo_race(cars: int | None = None, auto_repeat: bool = False):
