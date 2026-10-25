@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 18baed1
+git_head: 3b54092
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -46,3 +46,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44418 accepted304c32b: Prepare injected membership repository sessions and get_database dependency; current callers retain unchanged SQL and temporary fallback. Verify0.
 
 - T-44419 accepted18baed1: Add mocked readiness and WebSocket lifecycle regressions; retain strict health contrast assertions for all four observed healthy sources. Verify0.
+
+- T-44421 accepted3b54092: Move test cookie setup to TestClient cookie jar; preserve every assertion and request order while treating deprecation warnings as errors. Verify0.

@@ -3,11 +3,6 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44421 W3 — OPEN
-- target_files: backend/tests/test_request_dependencies.py
-- contract: T332 eliminate new request-auth tests per-request cookie deprecations without changing coverage.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q -W error::DeprecationWarning backend/tests/test_request_dependencies.py backend/tests/test_runtime_dependencies.py backend/tests/test_contract_snapshot.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/tests/test_request_dependencies.py
-
 ### T-44420 W2 — OPEN
 - target_files: backend/app/membership_router.py, backend/app/main.py
 - contract: T332 adopt request-scoped Depends in the membership router, replacing its positional factory without wire changes.
@@ -22,6 +17,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44421 accepted3b54092; verify0.
 - T-44419 accepted18baed1; verify0.
 - T-44418 accepted304c32b; verify0.
 - T-44417 accepted93b90e0; verify0.

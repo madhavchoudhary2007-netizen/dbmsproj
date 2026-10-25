@@ -116,7 +116,7 @@ from .demo_race_router import (
     run_demo_race_delete,
 )
 from .demo_runtime import build_demo_race
-from .membership_router import create_membership_router
+from .membership_router import router as membership_router
 from .pit_repository import PIT_RESERVATION_SELECT, load_pit_strategy_rows, load_pit_telemetry
 from .pit_router import create_pit_router
 from .pit_strategy_router import create_pit_strategy_router
@@ -323,7 +323,7 @@ def crud_routes(
 register_resources(crud_routes)
 
 
-app.include_router(create_membership_router(current_user, roles, jsonable))
+app.include_router(membership_router)
 
 
 app.include_router(
