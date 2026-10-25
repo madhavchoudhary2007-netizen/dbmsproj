@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: dc0ff28
+git_head: 2c7283c
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -41,3 +41,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44470 accepted17b9763: Type SQL exception handler requests/responses and historical backfill connection, collection and lap-time map; preserve all executable behavior. Verify0.
 
 - T-44469 accepteddc0ff28: Cover membership pending/retry, date-correct current roster, responsive columns, native nested Escape/primary restoration and five-width axe, with every write rejected. Verify0.
+
+- T-44471 accepted2c7283c: Restyle live-session header with cream card, LIVE identity, fluid typography and actual connection status, preserving all hooks and controls. Verify0.

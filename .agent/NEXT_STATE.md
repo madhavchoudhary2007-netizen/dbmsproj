@@ -13,11 +13,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T339 eliminate strict typing errors in DBMS SQL handlers without query or wire changes.
 - verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k constraint_demo_rolls_back && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_request_dependencies.py backend/tests/test_runtime_dependencies.py && .venv/bin/mypy --strict --follow-imports=silent backend/app/api/dbms_sql.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/api/dbms_sql.py
 
-### T-44471 W1 — OPEN
-- target_files: frontend/components/pages/live/index.tsx
-- contract: T383 restyle live-session header with truthful connection status and LIVE identity.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
-
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
 
@@ -28,6 +23,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44471 accepted2c7283c; verify0.
 - T-44469 accepteddc0ff28; verify0.
 - T-44470 accepted17b9763; verify0.
 - T-44468 acceptedddbf765; verify0.
