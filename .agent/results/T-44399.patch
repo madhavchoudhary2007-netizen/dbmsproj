@@ -1,0 +1,37 @@
+diff --git a/frontend/lib/use-dashboard-incidents.ts b/frontend/lib/use-dashboard-incidents.ts
+index 6573d34..721b064 100644
+--- a/frontend/lib/use-dashboard-incidents.ts
++++ b/frontend/lib/use-dashboard-incidents.ts
+@@ -6,6 +6,19 @@ function messageOf(reason: unknown): string {
+   return reason instanceof Error ? reason.message : String(reason);
+ }
+ 
++function validateRows(value: unknown): Row[] {
++  if (
++    !Array.isArray(value) ||
++    !value.every((row) =>
++      typeof row === "object" && row !== null && !Array.isArray(row) &&
++      (!("id" in row) || typeof row.id === "string"),
++    )
++  ) {
++    throw new Error("Invalid latest incidents response: expected an array of incident objects with string IDs.");
++  }
++  return value;
++}
++
+ export function useDashboardIncidents(): {
+   state: ViewState<Row[]>;
+   reload: () => void;
+@@ -25,9 +38,10 @@ export function useDashboardIncidents(): {
+     if (rowsRef.current === null) setLoading(true);
+     setError("");
+ 
+-    void api<Row[]>("/incidents?limit=5", { signal: controller.signal })
+-      .then((latest) => {
++    void api<unknown>("/incidents?limit=5", { signal: controller.signal })
++      .then((response) => {
+         if (controller.signal.aborted || generation.current !== current) return;
++        const latest = validateRows(response);
+         rowsRef.current = latest;
+         setRows(latest);
+         setError("");

@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 894f75e
+git_head: 133240e
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -14,12 +14,12 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - Login T3800a3e206 COMPLETE: root80browserPASS T380.final.browser.raw.log; settled5widthvisuals reviewed; build/types/lint0 T380.build.raw.log. Authlogic/copy unchanged; mobilegeometry/keyboardfeed and calleraria-busy fixes covered.
 
 ## Active work / evidence
-- Worker switch implementedba3fa7c/4645e52; allcustom-role toolmetadata gpt-6-luna/high, <=2workers; freshroles succeeded repeatedly. No deps added.
-- T379 exactsplit source complete: special-pages9lines re-export7pages; live standalone149lines1af6714 andwireb0d6bcc. Dashboard/Sessions/Stewards/Pit/Analytics/DBMS source moves checked exactbytes/AST. Rootfocusedbrowser totals120sessions/55stewards/100pitDBMS/105analyticslive/60live; evidence T379*.browser.raw.log. Runtime24PASS0skip (--experimental-vm-modules), script added0752dcf; browserdiscovery remains1100cases.
-- ParentT379 remainsUNACCEPTED: build/types/lint0 T379.final-build.raw.log; full1100mocked1020PASS80FAIL. Rootfixedbodydarkboot7a6fde5, actualheadingready445b08c, residualCSSmotionac27b29. Failure-only85cases70PASS15FAIL: all5motionPASS, body/headingchecksPASS;15remainingdesktopA3surface-sharefailures belong Phase7layouts. No gates waived. Use Phase7layouttasks as parentgate repairs, rerunfull beforeaccept.
-- T44379 band64px regressed existing40px feed assertion; repaired09cae83 restoringoriginalCSS. Root95dashboard/primitive/feedbrowserPASS T381-hero-recovery.browser.raw.log afterrestoration. No assertionchanged. Packet missed sizeinvariant; recorded honestly.
-- Backend latestfull T44386 e0f42fd:231PASS0fail/skip/xfailed plus liveacceptancePASS, T44386.full.raw.log. CRUD/WS/simulatorroutes extracted5bba15e/a52fd5b/1d7f717/a5bb1f7; WShelpers5ac053e; runnerbody7f62291 ASTexact. Main894lines, T331<=120stillopen; mainlegacyaliases/currentcallbacklookups retained untilT332.
-- T381 KPIec4c854/hero02486b3/stat-hookd36776d accepted; root95browserPASS incl recovery and original40pxfeed. SharedNbStat defaults preserved; readonlytuple props. T44387 layout61cfaa0 root59browserPASS/1A3FAIL; planned lowerpaper panels pending.
+- GPT6Luna/high custom roles, fresh packet-only clones; <=2. Switch ba3fa7c/4645e52. No new dependencies.
+- T379 seven exact route moves complete, special-pages9line exports. Parent UNACCEPTED: full1100mocked1020PASS80FAIL, after body/heading/motion fixes85rerun70PASS15desktopA3FAIL. Phase7 layouts repair parent gate; rerun full before accept; no gates waived.
+- Dashboard T381 hero/KPIs/layout/source states/Next up/incidents implemented in atomic commits through133240e; .stat-card/.state.error/Try again preserved. Independent sources, cancel/generation/reload guard; actual-module runtime27PASS. Latest incidents independent5-state hook and mini-table, limit5 readonlyAPI. New browser fixtures use StrictMode-safe phase flags and scoped event text.
+- Backend T331 main846lines (<=120 NOT achieved). Genuine CRUD/WS/simulator/runtime/auth modules extracted; main compatibility aliases/current callbacks retained until T332. Latest core app factory22c7e77 exact lease-body AST, offline21PASS; root T44395 full231PASS0skip/live acceptancePASS. T332DI still pending.
+- Root55browserPASS5E5FAIL fixed3226b70; next30PASS15newfixtureFAIL corrected133240e (no assertions weakened). Broader T381-final-panels INTERRUPTED exit130 after repeated dashboard crash: malformed incidents {} accepted as Row[]; T44399 validation ready for acceptance, W3 T44398 includes regression. No claim full current browser green.
+- Original40px feed restored09cae83 after T44379 size regression, root95PASS including original assertions. Body boot light/readiness/residual-motion fixes preserved. T44389 exactCSS movea74019e.
 
 ## Safety / workflow
 - Branchonly overhaul/neo-brutal; commits onlyaccept.sh, root independently reruns Verify; <=2 packet-onlycustomworkers, no model/effortoverride. Isolatedclones .agent/orchestrate.py; <=3files/150changedlines/task; normalize envelopes with actualstats.
@@ -32,25 +32,6 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - FinishT379 palettegate via Phase7dashboard/resources/live/sessions/stewards/pit/standings/analytics/DBMS perplan; DBMSredesign dependsPhase4.
 
 ## Orchestrator direct edits / process findings
-- Productglue this turn14lines only, previous T44250 plus2importintegration lines. Workers implement all otherproductchanges.
-- Actualstats normalized independently; worker countmisreports caughtpreaccept. Clone dependencyrace44348 and testharnesslint44350 repaired withoutassertchanges. W1localRow boundary44351 correctedpreaccept. Root44349 eagerfactory proposal repairedlazyrefs.
-- T44366 introduced5newdepswarnings, repairedstabledeps/max-warnings0 beforeaccept627d48a; root60livebrowserPASS. T44367 rootpacket mistakenlyselected DBlease tests; active-owner failures, correctedoffline24PASS and rootfull231PASS0skip/livePASS. No assertionschanged.
-- Exact bytes/AST verified for all moves; evidence/results/Githistory retain details. Rootruntime command firstomittedrequired VMflag; correct --experimental-vm-modules gives24PASS0skip. No productdefect.
-
-- T44388 accepted0f0ec37: independent sources, guarded reload/abort and five-state pureclassification. Root24runtimePASS/types/lint0; new actual-module regression tests next. T44389 CSSmove accepteda74019e, exactCSS unchanged.
-
-- T-44388 accepted0f0ec37: Independent dashboard and health source results with five-state classification, guarded reloads and abort/generation cleanup. Verify0.
-
-- T-44390 accepted09d5636: Actual-module VM regressions for independent dashboard source results, abort forwarding and five-state classification. Verify0.
-
-- T-44391 acceptedfb08ca2: Dashboard KPIs and Next up event card use the real five-state boundary; partial source retry labels preserve shared defaults. Verify0.
-
-- T-44392 accepted6f7d543: Latest-five incidents hook with guarded requests, abort/generation cleanup and retained-data partial failure state. Verify0.
-
-- T-44394 accepted3226b70: Preserve offline partial error class and Try again accessible action; correct health up/healthy/ok status colours. Verify0.
-
-- T-44393 accepted69e17d0: Six browser scenarios for dashboard states, actual next event, partial health recovery, coalesced reload and unmount safety; collection only so far. Verify0.
-
-- T-44395 accepted22c7e77: FastAPI factory assembles unchanged CORS/lease/security middleware and exception mappings; main aliases preserved. Verify0.
-
-- T-44396 accepted894f75e: Latest incidents paper card uses the independent five-state source and existing table, with source-specific retry copy. Verify0.
+- Productglue14lines only in long continuation (T44250 +2imports); workers implement other product changes.
+- Actual stats normalized independently. Worker T44393 newfile reported0/0, corrected actual121 before accept; T44398 actual147. Root browser interruption cleaned own Next processes/restored next-env. Existing assertions never weakened.
+- T381 remaining: verify complete dashboard5widths/axe/targets/palette and all source regressions; service WS/lease actual observation not yet wired. Four KPI accents conflictT400max3 (TASTE-381-1), resolve before A5.
