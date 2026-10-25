@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 5bba15e
+git_head: cc361aa
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -45,3 +45,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44360 accepted065361e: Activate exact live stream helper with original effect position/dependencies and unchanged page JSX. Verify0.
 
 - T-44361 accepted5bba15e: Stage CRUD router with unchanged five handler bodies and late-bound telemetry lookup. Verify0.
+
+- T-44362 acceptedcc361aa: Move initial live selection and recurring list polling verbatim to helpers, retaining original effect dependencies. Verify0.

@@ -921,9 +921,11 @@ def test_session_crud_does_not_accept_lifecycle_timestamps():
     from fastapi import HTTPException
     from fastapi.routing import APIRoute
 
+    from backend.tests.test_route_registration import _flatten_routes
+
     route = next(
         route
-        for route in app.routes
+        for route in _flatten_routes(app.routes)
         if isinstance(route, APIRoute)
         and route.path == "/api/sessions/{item_id}"
         and "PATCH" in route.methods

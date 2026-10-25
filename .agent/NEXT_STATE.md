@@ -8,11 +8,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T331 retain lifecycle timestamp rejection test through included API routers using existing route traversal helper.
 - verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k session_crud_does_not_accept_lifecycle_timestamps && .venv/bin/ruff check backend/tests/test_api.py
 
-### T-44362 W2 — OPEN
-- target_files: frontend/components/special-pages.tsx, frontend/lib/live-list-polling.ts
-- contract: T379 extract exact initial live selection and recurring session-list polling into helper module and wire original effects.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
-
 ## Blocked
 - None currently. Owner switch gpt-6-luna/high implemented and freshworkers succeeded.
 
@@ -20,6 +15,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44362 acceptedcc361aa; verify0.
 - T-44361 accepted5bba15e; verify0.
 - T-44360 accepted065361e; verify0.
 - T-44359 accepted709c866; verify0.
