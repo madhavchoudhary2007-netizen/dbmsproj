@@ -1,0 +1,94 @@
+diff --git a/frontend/components/pages/live/delete-demo-modal.tsx b/frontend/components/pages/live/delete-demo-modal.tsx
+index 4b7cddd..beb9446 100644
+--- a/frontend/components/pages/live/delete-demo-modal.tsx
++++ b/frontend/components/pages/live/delete-demo-modal.tsx
+@@ -1,5 +1,6 @@
+ import type { Row } from "@/lib/api";
+-import { Button, Modal } from "@/components/ui";
++import { NbButton } from "@/components/nb/button";
++import { NbModal } from "@/components/nb/modal";
+ 
+ export function DeleteDemoModal({
+   deleteRace,
+@@ -15,15 +16,15 @@ export function DeleteDemoModal({
+   return (
+     <>
+       {deleteRace && (
+-        <Modal title="Delete generated race?" close={() => !demoBusy && setDeleteRace(null)}>
++        <NbModal title="Delete generated race?" open={Boolean(deleteRace)} onClose={() => !demoBusy && setDeleteRace(null)}>
+           <div className="decision-form">
+             <p>Delete <strong>{String(deleteRace.event_name || "this generated race")}</strong> and its generated drivers and telemetry? This action cannot be undone.</p>
+             <div className="form-actions">
+-              <Button kind="secondary" disabled={demoBusy} onClick={() => setDeleteRace(null)}>Keep race</Button>
+-              <Button kind="danger" disabled={demoBusy} onClick={() => void removeDemoRace()}>{demoBusy ? "Deleting…" : "Delete race"}</Button>
++              <NbButton variant="secondary" disabled={demoBusy} onClick={() => setDeleteRace(null)}>Keep race</NbButton>
++              <NbButton variant="danger" disabled={demoBusy} data-primary="true" onClick={() => void removeDemoRace()}>{demoBusy ? "Deleting…" : "Delete race"}</NbButton>
+             </div>
+           </div>
+-        </Modal>
++        </NbModal>
+       )}
+     </>
+   );
+diff --git a/frontend/components/pages/live/demo-controls.tsx b/frontend/components/pages/live/demo-controls.tsx
+index ad7fde5..ff77ac2 100644
+--- a/frontend/components/pages/live/demo-controls.tsx
++++ b/frontend/components/pages/live/demo-controls.tsx
+@@ -1,11 +1,14 @@
+ import type { MutableRefObject } from "react";
+ import { Plus, Trash2 } from "lucide-react";
+ import { Button } from "../../ui";
++import { NbButton } from "@/components/nb/button";
++import { NbCard } from "@/components/nb/card";
+ import type { Row } from "../../../lib/api";
+ 
+ interface DemoControlsProps {
+   canManageDemos: boolean;
+   demoBusy: boolean;
++  createPrimary?: boolean;
+   createDemoRace: () => Promise<void>;
+   demoMessage: string;
+   demoRaces: Row[];
+@@ -21,6 +24,7 @@ interface DemoControlsProps {
+ export function DemoControls({
+   canManageDemos,
+   demoBusy,
++  createPrimary = true,
+   createDemoRace,
+   demoMessage,
+   demoRaces,
+@@ -35,16 +39,16 @@ export function DemoControls({
+   return (
+     <>
+       {canManageDemos && (
+-        <section className="demo-race-hero panel" aria-labelledby="demo-race-title">
++        <NbCard tone="yellow" className="demo-race-hero my-3 flex flex-wrap items-center justify-between gap-4 !border-ink !bg-yellow !text-ink" aria-labelledby="demo-race-title">
+           <div>
+             <div className="eyebrow">LIVE DEMO / READY TO RUN</div>
+-            <h2 id="demo-race-title">Put a full grid on track</h2>
+-            <p>Start a generated race with 8–16 fictional drivers and live timing. Sessions support up to 72 laps.</p>
++            <h2 id="demo-race-title" className="!text-ink !text-[length:var(--fs-h2)] leading-[1.2]">Put a full grid on track</h2>
++            <p className="!text-ink !text-[length:var(--fs-body)] leading-[1.5]">Start a generated race with 8–16 fictional drivers and live timing. Sessions support up to 72 laps.</p>
+           </div>
+-          <Button disabled={demoBusy} data-primary="true" onClick={() => void createDemoRace()}>
++          <NbButton variant="primary" size="lg" disabled={demoBusy} data-primary={createPrimary ? "true" : undefined} onClick={() => void createDemoRace()}>
+             <Plus size={15} /> {demoBusy ? "Starting race…" : "Create live race"}
+-          </Button>
+-        </section>
++          </NbButton>
++        </NbCard>
+       )}
+       {demoMessage && <div className="notice" role="status">{demoMessage}</div>}
+       {demoRaces.length > 0 && (
+diff --git a/frontend/components/pages/live/index.tsx b/frontend/components/pages/live/index.tsx
+index 6dc8ac4..2c1f681 100644
+--- a/frontend/components/pages/live/index.tsx
++++ b/frontend/components/pages/live/index.tsx
+@@ -108,6 +108,7 @@ export function LiveTiming() {
+       <DemoControls
+         canManageDemos={canManageDemos}
+         demoBusy={demoBusy}
++        createPrimary={!deleteRace}
+         createDemoRace={createDemoRace}
+         demoMessage={demoMessage}
+         demoRaces={demoRaces}

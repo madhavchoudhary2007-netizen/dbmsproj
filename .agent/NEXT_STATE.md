@@ -3,9 +3,24 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44475 W1 — OPEN
-- target_files: frontend/components/nb/modal.tsx
-- contract: Fix controlled NbModal header close to notify parent immediately.
+### T-44479 W3 — OPEN
+- target_files: frontend/e2e/resource-memberships.spec.ts
+- contract: Repair membership partial-state test locators while retaining strict cause and mutation assertions.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/resource-memberships.spec.ts --list
+
+### T-44478 W1 — OPEN
+- target_files: frontend/app/styles/resources.css
+- contract: Repair serious membership roster contrast and tiny legacy type at all widths.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+
+### T-44477 W2 — OPEN
+- target_files: backend/app/core/simulation_tick.py, backend/app/core/validation.py, backend/app/crud_repository.py
+- contract: T339 complete strict types for simulation ticks and CRUD validation boundaries.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_simulation_replay.py backend/tests/test_telemetry_ordering.py backend/tests/test_telemetry_ingest_contract.py backend/tests/test_contract_snapshot.py && .venv/bin/mypy --strict --follow-imports=silent backend/app/core/simulation_tick.py backend/app/core/validation.py backend/app/crud_repository.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/core/simulation_tick.py backend/app/core/validation.py backend/app/crud_repository.py
+
+### T-44476 W1 — OPEN
+- target_files: frontend/components/pages/live/demo-controls.tsx, frontend/components/pages/live/delete-demo-modal.tsx, frontend/components/pages/live/index.tsx
+- contract: T383 restyle live-demo hero and native delete confirmation with one active primary.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Blocked
@@ -18,6 +33,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44475 acceptedbc67c9a; verify0.
 - T-44474 acceptedda4d3ee; verify0.
 - T-44473 accepteddcbb14e; verify0.
 - T-44472 acceptedb5df2f8; verify0.

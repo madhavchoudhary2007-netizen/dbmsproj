@@ -108,6 +108,7 @@ export function LiveTiming() {
       <DemoControls
         canManageDemos={canManageDemos}
         demoBusy={demoBusy}
+        createPrimary={!deleteRace}
         createDemoRace={createDemoRace}
         demoMessage={demoMessage}
         demoRaces={demoRaces}

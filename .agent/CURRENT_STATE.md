@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: da4d3ee
+git_head: bc67c9a
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -15,10 +15,10 @@ last_eval_score: obsolete51.2974; no current score; final T430
 ## Active work / evidence
 - T379 exact seven-route split complete(special-pages9exports), parent NOT accepted: initial1100mocked1020PASS80FAIL; aftersharedbody/heading/motionrepairs85targeted70PASS15desktopA3FAIL. RemainingroutePhase7layouts thenfullrerun; no gatewaived.
 - T381 dashboard hero/context/KPIs/services/Nextup/incidents implemented. Actuallease503/notready/recovery +cookieWSopen/error/close/cleanup, no syntheticstatus. Root165browserPASS T381-connectivity-final.browser.raw.log; fivewidthvisuals0overflow/oneprimary/noerrors. Preserve .stat-card/.state.error/Try again. TASTE-381-1 fouraccenttiles vsT400max3 unresolved.
-- T382 resources header/toolbar/exactrowhook/classifier/NbTable/nativeModal/NbField/form/rowEditDelete/roleeligibilitybadges implemented; alloriginalcelltext/copy/pageSize50 preserved. Root360browserPASS T382-actions-primary.browser.raw.log, allsixpalettes/fivewidthaxe/targets/overflow/primary/dataflow. Build/lint/types0 T382-actions-build.raw.log. Parent unfinished: inlinevalidation, twocolumnmemberships, focusedfileboundaries/finalvisuals.
+- T382 resources header/toolbar/exactrowhook/classifier/NbTable/nativeModal/NbField/form/rowEditDelete/roleeligibilitybadges implemented; alloriginalcelltext/copy/pageSize50 preserved. Root360browserPASS T382-actions-primary.browser.raw.log, allsixpalettes/fivewidthaxe/targets/overflow/primary/dataflow. Build/lint/types0 T382-actions-build.raw.log. Inlinevalidation/twocolumnmemberships implemented; finalmodalaxe/partialfixtures andfocusedfileboundaries remain.
 - Real20POST/save and20DELETE/confirm duplicates repaired06330e6/6e28dd6, confirmation7838c2d. Strict25PASS T382-delete-guard.browser.raw.log; markerretired5cfe010, activeprimarytransitions5widthPASS. Browserwrites locallymocked only.
 - Backend main824lines, <=120T331 NOT met; T332unfinished. Genuine modules/core/extracts retained. TypedRuntimeState/providers/lifespan shareandclear identities; requestauth/DatabaseSession. Membership/analytics/pitreads useDI. Actualreturnannotation Decimalstringregression fixedresponse_modelNone19b7991; exactnumericserializationtests1479019 preservewireencoding.
-- Backendfull245PASS0skip/liveacceptancePASS T44453.full.raw.log. Strictmypy162errors/28files T339-current.raw.log,target0T339. Runtime42PASS. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
+- Backendfull245PASS0skip/liveacceptancePASS T44472.full.raw.log. Strictmypy134errors/25files T339-current-after-dbms.raw.log,target0T339. Runtime42PASS. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
 
 ## Safety / workflow
 - Onlyoverhaul/neo-brutal; commits onlyaccept.sh; independentlyrerunVerify;2packet-onlycustomworkersmax, no model/effortoverrides. Isolatedclones .agent/orchestrate.py;<=3files/150added+deleted; normalizeactualstats. Every5tasks budget.
@@ -38,14 +38,4 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T382 inlinevalidation/rowkeyboard/cancellation45browserPASS T382-inline-row.browser.raw.log. Native closeeventtest now waits actualdialogteardown/focus, no sleeps/assertionsremoved. Inlinehookactual7VMcases and membershiphook3VMcases, runtime42PASS.
 - T382 two-column selectedcurrentroster+addform0308663, sharedfiveStateview978192d at2callsites, abort/latesthistorye1470ec. Browsermembership/layout/axe/rootbuild pending; parent remainsopen. Currentdatebounds inclusive(futureend active/futurestart excluded), no fakecurrentroster.
 
-- T-44470 accepted17b9763: Type SQL exception handler requests/responses and historical backfill connection, collection and lap-time map; preserve all executable behavior. Verify0.
-
-- T-44469 accepteddc0ff28: Cover membership pending/retry, date-correct current roster, responsive columns, native nested Escape/primary restoration and five-width axe, with every write rejected. Verify0.
-
-- T-44471 accepted2c7283c: Restyle live-session header with cream card, LIVE identity, fluid typography and actual connection status, preserving all hooks and controls. Verify0.
-
-- T-44472 acceptedb5df2f8: Type DBMS SQL handlers and guaranteed single-row projections; explicitly preserve original response encoding with response_model=None and unchanged SQL. Verify0.
-
-- T-44473 accepteddcbb14e: Fix relative current-roster locator and cover no-selection zero reads, empty history and retained partial history with retry and one locally mocked mutation. Verify0.
-
-- T-44474 acceptedda4d3ee: Notify controlled dialog closure synchronously on Escape/backdrop while native state remains open until parent commits; preserve close guards/focus cleanup. Verify0.
+- Repeatedkeyboardreopen realnative/Reactrace fixed da4d3ee/bc67c9a; root15/15reopencycles T382-keyboard-after.raw.log, all45editor+30primitivebrowsercasesPASS. Currentmembership10fails:5actuallegacycontrast1.09:1,5testEndmembershiplocatorambiguity; queuedT44478/79. T383liveheader2c7283c, yellowhero/nativeDelete next.
