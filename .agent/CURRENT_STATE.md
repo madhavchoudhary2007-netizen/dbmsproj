@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 38165fc
+git_head: 040cb67
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -55,3 +55,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44507 acceptedab9660e: Click the actual driver name for mobile row selection, preserving disclosure, keyboard, ARIA, select-value and accessibility checks. Verify0.
 
 - T-44505 accepted38165fc: Render actual lap and control record states with retries, complete lap expansion and labeled incident/pit timelines, preserving original headers and values. Verify0.
+
+- T-44508 accepted040cb67: Use truthful chart retry labels and scoped live chart, snapshot metadata and safety-car layout. Verify0.

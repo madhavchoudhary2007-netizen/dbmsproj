@@ -1,0 +1,37 @@
+diff --git a/frontend/lib/live-timing-data.ts b/frontend/lib/live-timing-data.ts
+index 0a327d4..6df6ae6 100644
+--- a/frontend/lib/live-timing-data.ts
++++ b/frontend/lib/live-timing-data.ts
+@@ -25,6 +25,7 @@ export function deriveLiveTimingData(
+   demoRaces: Row[],
+   showCompletedDemos: boolean,
+   showAllLaps: boolean,
++  pitStops?: Row[],
+ ) {
+   const shown = packets.filter((p) => !driver || p.driver_id === driver);
+   const namedDrivers = new Map<string, Row>();
+@@ -68,6 +69,14 @@ export function deriveLiveTimingData(
+     ...latestByDriver.keys(),
+     ...timingByDriver.keys(),
+   ]);
++  const pitStopCounts = new Map<string, { ids: Set<string>; withoutId: number }>();
++  for (const stop of pitStops || []) {
++    if (typeof stop.driver_id !== "string" || !stop.driver_id || stop.status !== "COMPLETED") continue;
++    const count = pitStopCounts.get(stop.driver_id) || { ids: new Set<string>(), withoutId: 0 };
++    if (stop.id === undefined || stop.id === null) count.withoutId += 1;
++    else count.ids.add(String(stop.id));
++    pitStopCounts.set(stop.driver_id, count);
++  }
+   const runningOrder: Row[] = [...driverIds]
+     .map((id): Row => {
+       const packet = latestByDriver.get(id) || {};
+@@ -85,6 +94,9 @@ export function deriveLiveTimingData(
+         team_name: person.team_name || "—",
+         number: person.number,
+         licence_number: person.licence_number || "—",
++        pit_count: pitStops === undefined
++          ? undefined
++          : (pitStopCounts.get(id)?.ids.size || 0) + (pitStopCounts.get(id)?.withoutId || 0),
+         last_lap_ms: car.last_lap_ms ?? packet.last_lap_ms ?? car.lap_time_ms ?? packet.lap_time_ms,
+         best_lap_ms: laps.length ? Math.min(...laps) : undefined,
+         sector_times_ms: Array.isArray(car.sector_ms)
