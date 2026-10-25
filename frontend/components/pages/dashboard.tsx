@@ -10,10 +10,13 @@ import { NbButton } from "@/components/nb/button";
 import { NbState } from "@/components/nb/state";
 import { NbTable } from "@/components/nb/table";
 import { useDashboardIncidents } from "@/lib/use-dashboard-incidents";
+import { useDashboardConnectivity } from "@/lib/use-dashboard-connectivity";
 
 export function Dashboard() {
   const { state: incidentsState, reload: reloadIncidents } = useDashboardIncidents();
   const { data, health, err, healthError, state, fetchData } = useDashboard();
+  const activeSessionId = typeof data?.active_session?.id === "string" ? data.active_session.id : undefined;
+  const connectivity = useDashboardConnectivity(activeSessionId);
   return (
     <>
       <div className="dashboard-overview-grid">
@@ -70,6 +73,20 @@ export function Dashboard() {
                 <h2>Platform status</h2>
               </div>
             </div>
+            <div className="detail-row">
+              <span>WebSocket</span>
+              <b className={connectivity.websocket === "up" ? "green" : connectivity.websocket === "down" ? "red" : "pending"}>
+                {connectivity.websocket === "idle" ? "No active session" : connectivity.websocket === "connecting" ? "Connecting" : pretty(connectivity.websocket)}
+              </b>
+            </div>
+            <div className="detail-row">
+              <span>Runtime lease</span>
+              <b className={connectivity.lease === "up" ? "green" : connectivity.lease === "down" ? "red" : "pending"}>
+                {connectivity.loading && connectivity.lease === "unknown" ? "Checking" : connectivity.lease === "unknown" ? "Unknown" : `${pretty(connectivity.lease)}${connectivity.error ? " · Last observed" : ""}`}
+              </b>
+            </div>
+            {connectivity.error && <p className="dashboard-connectivity-error" role="alert">Connectivity check: {connectivity.error}</p>}
+            <NbButton variant="secondary" onClick={connectivity.reload}>Recheck runtime lease</NbButton>
             {Object.entries(health?.services || {}).map(([k, v]) => (
               <div className="detail-row" key={k}>
                 <span>{k}</span>

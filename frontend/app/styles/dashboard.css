@@ -33,6 +33,11 @@
 }
 .nb-shell .dashboard-health-card .green { background: var(--nb-mint); }
 .nb-shell .dashboard-health-card .red { background: var(--nb-red); }
+.nb-shell .dashboard-health-card .pending,
+.nb-shell .dashboard-connectivity-error {
+  display: inline-block; padding: 4px 8px; color: var(--nb-ink); background: var(--nb-yellow); font-weight: 700;
+}
+.nb-shell .dashboard-connectivity-error { margin: 12px 0; }
 
 @media (min-width: 768px) {
   .nb-shell .dashboard-hero-title, .nb-shell .dashboard-hero-title-stroke {

@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 2676edf
+git_head: 3cc777a
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -38,3 +38,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T381 health ink/plinthface Taste defects fixed5a0ad53 andbrowserprovedd018de6. Remaining fourKPIaccents vsT400max3 TASTE-381-1 mustresolvebeforeA5. Servicehealth source rows notyetcomplete. History/results retain repair details.
 
 - T-44415 accepted2676edf: Import-only platform fixture adoption; byte-exact original feed test bodies and all 40px/polling assertions preserved. Verify0.
+
+- T-44416 accepted3cc777a: Execute actual readiness/WebSocket URL helpers in VM; reject malformed and inconsistent status contracts, preserve observed up/down. Verify0.
