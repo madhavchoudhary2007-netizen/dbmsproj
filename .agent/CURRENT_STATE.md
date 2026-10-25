@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 7f62291
+git_head: 9a764f0
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -55,3 +55,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T379 failure-onlyrerun85cases:70PASS15FAIL, all5reduced-motionPASS and body/headinggatesPASS. Remaining15desktopA3surface-share failures are Phase7 layouts; parentfullgate remainsunaccepted. T379split source complete, Phase7visualrepairs resolve parentgate without skipping assertions.
 
 - T-44377 accepted7f62291: Stage exact simulation runner body with explicit dependencies, preserving tick and completion behavior. Verify0.
+
+- T-44379 accepted9a764f0: Give desktop race-control feed a readable64px band while preserving mobile layout and existing behavior. Verify0.

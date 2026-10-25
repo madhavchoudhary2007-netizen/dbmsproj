@@ -39,7 +39,6 @@ from psycopg_pool import PoolClosed, PoolTimeout
 from pymongo import DESCENDING as DESCENDING
 from pymongo import MongoClient
 from pymongo.collection import Collection
-from pymongo.errors import PyMongoError
 from starlette.middleware.base import RequestResponseEndpoint
 
 from . import token_revocation
@@ -164,6 +163,7 @@ from .simulation_restore import (
     restore_or_create_demo,
     restore_telemetry_state,
 )
+from .simulation_runner import run_simulation_loop
 from .simulation_start import start_simulation
 from .telemetry_router import create_telemetry_router
 from .user_router import create_user_router
@@ -726,79 +726,26 @@ def _persist_simulation_tick(
 
 
 async def simulation_loop(sim: Simulation):
-    if not _simulation_lease_is_valid(sim):
-        return
-    col = mongo_ready()
-    while sim.status in {"running", "paused"}:
-        if not _simulation_lease_is_valid(sim):
-            return
-        if sim.status == "paused":
-            await asyncio.sleep(0.05)
-            continue
-        try:
-            session = fetch_one(
-                """SELECT s.state,s.safety_car,e.championship_id
-                FROM race_sessions s JOIN race_events e ON e.id=s.event_id WHERE s.id=%s""",
-                (sim.session_id,),
-            )
-            if not session or session["state"] != "ACTIVE":
-                if session and session["state"] == "PAUSED":
-                    sim.status = "paused"
-                    continue
-                sim.status = "error" if not session else "stopped"
-                return
-            timestamp = datetime.now(UTC)
-            pit_assignments = refresh_simulation_pit_state(sim, timestamp)
-            packets, timing = advance_simulation_tick(
-                sim, timestamp, safety_car=session["safety_car"], pit_assignments=pit_assignments
-            )
-            _persist_simulation_tick(col, sim, packets, timing)
-            completion_lap = min(sim.total_laps or MAX_SESSION_LAPS, MAX_SESSION_LAPS)
-            if all(packet["lap"] == completion_lap and packet["sector"] == 3 for packet in packets):
-                ordered = sorted(packets, key=lambda packet: packet["elapsed_ms"])
-                best_laps = {
-                    row["_id"]: row["best_lap_ms"]
-                    for row in col.aggregate(
-                        [
-                            {
-                                "$match": {
-                                    "session_id": str(sim.session_id),
-                                    "lap_time_ms": {"$gt": 0},
-                                }
-                            },
-                            {
-                                "$group": {
-                                    "_id": "$driver_id",
-                                    "best_lap_ms": {"$min": "$lap_time_ms"},
-                                }
-                            },
-                        ]
-                    )
-                }
-                fastest_driver_id = min(best_laps, key=best_laps.get) if best_laps else None
-                pole_driver_id = (
-                    min(sim.pace_offsets_ms, key=sim.pace_offsets_ms.get)
-                    if sim.is_generated and sim.pace_offsets_ms
-                    else None
-                )
-                await _finalize_simulation_results(
-                    sim,
-                    ordered,
-                    best_laps,
-                    pole_driver_id,
-                    fastest_driver_id,
-                    session["championship_id"],
-                )
-                return
-        except PyMongoError:
-            sim.status = "error"
-            log.exception("Telemetry simulator could not write packet")
-            return
-        except Exception:
-            sim.status = "error"
-            log.exception("Telemetry simulator could not advance state")
-            return
-        await asyncio.sleep(1 / sim.rate_hz)
+    await run_simulation_loop(
+        sim,
+        _simulation_lease_is_valid=lambda *args, **kwargs: _simulation_lease_is_valid(
+            *args, **kwargs
+        ),
+        mongo_ready=lambda *args, **kwargs: mongo_ready(*args, **kwargs),
+        fetch_one=lambda *args, **kwargs: fetch_one(*args, **kwargs),
+        refresh_simulation_pit_state=lambda *args, **kwargs: refresh_simulation_pit_state(
+            *args, **kwargs
+        ),
+        advance_simulation_tick=lambda *args, **kwargs: advance_simulation_tick(*args, **kwargs),
+        _persist_simulation_tick=lambda *args, **kwargs: _persist_simulation_tick(*args, **kwargs),
+        _finalize_simulation_results=lambda *args, **kwargs: _finalize_simulation_results(
+            *args, **kwargs
+        ),
+        log=log,
+        MAX_SESSION_LAPS=MAX_SESSION_LAPS,
+        datetime=datetime,
+        UTC=UTC,
+    )
 
 
 async def _start_session_simulation(

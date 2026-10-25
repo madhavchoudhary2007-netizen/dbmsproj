@@ -3,11 +3,6 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44379 W1 — OPEN
-- target_files: frontend/app/styles/shell.css
-- contract: T379 A3 gap: enlarge desktop race-control marquee to legal64px for readable primary feed and approved red palette band.
-- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
 ### T-44378 W2 — OPEN
 - target_files: backend/app/main.py
 - contract: T331 activate exact extracted simulation runner through legacy simulation_loop wrapper.
@@ -20,6 +15,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44379 accepted9a764f0; verify0.
 - T-44377 accepted7f62291; verify0.
 - T-44376 acceptedac27b29; verify0.
 - T-44375 accepted445b08c; verify0.
