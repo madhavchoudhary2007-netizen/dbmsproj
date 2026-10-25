@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: 19c41c6
+git_head: c09bfdd
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -48,3 +48,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T386-387 prior route batch99PASS1desktopSteward paletteFAIL; all30 Session resilience cases passed after01e561c spam guard. Shared form readability7c1a7c7 and Steward count sticker8f08922 need current combined browser/build proof.
 
 - T-44543 accepted19c41c6: Narrow guaranteed SQL rows with DatabaseRow and preserve ranking using nonoptional dictionary comparators. Verify0.
+
+- T-44544 acceptedc09bfdd: Disambiguate route Refresh while preserving every source outage and retention assertion. Verify0.
