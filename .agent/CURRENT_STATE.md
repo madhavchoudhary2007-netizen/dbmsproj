@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 19b7991
+git_head: af535f8
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -45,7 +45,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 
 - T-44429 accepted6139e34: Use tokenized search and reload controls in resource toolbar, preserving callbacks and accessible names while showing the actual result range. Verify0.
 
-- T44425 fullgate242PASS1FAIL: addedreturnannotations invoked Pydantic Decimal-to-string serializer, breaking existing analytics numeric assertion. T44430 restores original response_model=None; test unchanged. Parentgate remainsFAILED pending repair.
+- T44425 fullgate242PASS1FAIL: addedreturnannotations invoked Pydantic Decimal-to-string serializer, breaking existing analytics numeric assertion. T44430 restores original response_model=None; test unchanged. Repair19b7991 accepted; parentfullgate pending rerun.
 
 - T-44428 acceptedb2aae4b: Inject explicit database adapters into dashboard characterization fixtures; preserve exact assertions, disposable safety guard, query logic and rollback. Verify0.
 
@@ -53,4 +53,6 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 
 - T-44430 accepted19b7991: Disable inferred response-model encoding for migrated analytics routes; retain Python annotations and restore original numeric Decimal JSON contract. Verify0.
 
-- T44430 fixes analytics Decimalserialization by explicit response_modelNone, fullgate pending. T381root165PASS connectivity/states/accessibility/palette; resourceheaders/toolbar300PASS.
+- Analytics response_modelNone fix19b7991 accepted; fullgate pending. T381165browserPASS; T382300browserPASS, states/table/modal unfinished.
+
+- T-44431 acceptedaf535f8: Move existing resource row loading state and exact async callback/effect into focused hook, preserving all CRUD, filtering and pagination behavior. Verify0.
