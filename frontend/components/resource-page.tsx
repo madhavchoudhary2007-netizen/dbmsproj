@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { api, asArray, listAll, Row } from "@/lib/api";
-import { Plus } from "lucide-react";
+import { Plus, RefreshCw, Search } from "lucide-react";
 import { useAuth } from "./auth";
 import { NbButton } from "./nb/button";
 import { NbCard } from "./nb/card";
@@ -9,11 +9,10 @@ import {
   Button,
   DataTable,
   Modal,
-  ReloadButton,
   ResourceEditor,
-  SearchBox,
   StateMessage,
 } from "./ui";
+import { NbInput } from "./nb/input";
 
 type FieldOption = string | { value: string; label: string };
 type Field = {
@@ -307,14 +306,35 @@ export function ResourcePage({
           )}
         </div>
       </NbCard>
-      <div className="toolbar">
-        <SearchBox value={term} onChange={(value) => { setTerm(value); setPage(0); }} />
+      <div className="toolbar resource-toolbar">
+        <label className="resource-filter">
+          <Search size={16} aria-hidden="true" />
+          <NbInput
+            aria-label="Filter records"
+            placeholder="Filter records"
+            value={term}
+            onChange={(event) => {
+              setTerm(event.target.value);
+              setPage(0);
+            }}
+          />
+        </label>
         <span className="record-count">
           {loading
             ? "—"
             : `${filtered.length} RECORD${filtered.length === 1 ? "" : "S"}`}
         </span>
-        <ReloadButton onClick={() => void load()} />
+        <span className="resource-range" aria-live="polite">
+          Showing {filtered.length ? visiblePage * pageSize + 1 : 0}–
+          {filtered.length ? visiblePage * pageSize + visibleRows.length : 0} of {filtered.length}
+        </span>
+        <NbButton
+          variant="secondary"
+          aria-label="Refresh"
+          onClick={() => void load()}
+        >
+          <RefreshCw size={16} aria-hidden="true" />
+        </NbButton>
       </div>
       {error || loading ? (
         <StateMessage

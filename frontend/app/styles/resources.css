@@ -37,6 +37,28 @@
   align-items: center;
   gap: 12px;
 }
+.nb-shell .resource-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.nb-shell .resource-filter {
+  display: flex;
+  flex: 1 1 240px;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+.nb-shell .resource-filter svg {
+  flex: 0 0 auto;
+}
+.nb-shell .resource-filter input {
+  flex: 1 1 auto;
+}
+.nb-shell .resource-range {
+  white-space: nowrap;
+}
 @media (max-width: 619px) {
   .nb-shell .resource-hero {
     align-items: stretch;

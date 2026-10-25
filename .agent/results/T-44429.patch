@@ -1,0 +1,98 @@
+diff --git a/frontend/app/styles/resources.css b/frontend/app/styles/resources.css
+index 1605396..2177ca4 100644
+--- a/frontend/app/styles/resources.css
++++ b/frontend/app/styles/resources.css
+@@ -37,6 +37,28 @@
+   align-items: center;
+   gap: 12px;
+ }
++.nb-shell .resource-toolbar {
++  display: flex;
++  flex-wrap: wrap;
++  align-items: center;
++  gap: 12px;
++}
++.nb-shell .resource-filter {
++  display: flex;
++  flex: 1 1 240px;
++  min-width: 0;
++  align-items: center;
++  gap: 8px;
++}
++.nb-shell .resource-filter svg {
++  flex: 0 0 auto;
++}
++.nb-shell .resource-filter input {
++  flex: 1 1 auto;
++}
++.nb-shell .resource-range {
++  white-space: nowrap;
++}
+ @media (max-width: 619px) {
+   .nb-shell .resource-hero {
+     align-items: stretch;
+diff --git a/frontend/components/resource-page.tsx b/frontend/components/resource-page.tsx
+index 5d09633..7846c91 100644
+--- a/frontend/components/resource-page.tsx
++++ b/frontend/components/resource-page.tsx
+@@ -1,7 +1,7 @@
+ "use client";
+ import { useCallback, useEffect, useMemo, useState } from "react";
+ import { api, asArray, listAll, Row } from "@/lib/api";
+-import { Plus } from "lucide-react";
++import { Plus, RefreshCw, Search } from "lucide-react";
+ import { useAuth } from "./auth";
+ import { NbButton } from "./nb/button";
+ import { NbCard } from "./nb/card";
+@@ -9,11 +9,10 @@ import {
+   Button,
+   DataTable,
+   Modal,
+-  ReloadButton,
+   ResourceEditor,
+-  SearchBox,
+   StateMessage,
+ } from "./ui";
++import { NbInput } from "./nb/input";
+ 
+ type FieldOption = string | { value: string; label: string };
+ type Field = {
+@@ -307,14 +306,35 @@ export function ResourcePage({
+           )}
+         </div>
+       </NbCard>
+-      <div className="toolbar">
+-        <SearchBox value={term} onChange={(value) => { setTerm(value); setPage(0); }} />
++      <div className="toolbar resource-toolbar">
++        <label className="resource-filter">
++          <Search size={16} aria-hidden="true" />
++          <NbInput
++            aria-label="Filter records"
++            placeholder="Filter records"
++            value={term}
++            onChange={(event) => {
++              setTerm(event.target.value);
++              setPage(0);
++            }}
++          />
++        </label>
+         <span className="record-count">
+           {loading
+             ? "—"
+             : `${filtered.length} RECORD${filtered.length === 1 ? "" : "S"}`}
+         </span>
+-        <ReloadButton onClick={() => void load()} />
++        <span className="resource-range" aria-live="polite">
++          Showing {filtered.length ? visiblePage * pageSize + 1 : 0}–
++          {filtered.length ? visiblePage * pageSize + visibleRows.length : 0} of {filtered.length}
++        </span>
++        <NbButton
++          variant="secondary"
++          aria-label="Refresh"
++          onClick={() => void load()}
++        >
++          <RefreshCw size={16} aria-hidden="true" />
++        </NbButton>
+       </div>
+       {error || loading ? (
+         <StateMessage
