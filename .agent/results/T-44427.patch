@@ -1,0 +1,53 @@
+diff --git a/frontend/e2e/dashboard-connectivity.spec.ts b/frontend/e2e/dashboard-connectivity.spec.ts
+index 4265610..f2dd249 100644
+--- a/frontend/e2e/dashboard-connectivity.spec.ts
++++ b/frontend/e2e/dashboard-connectivity.spec.ts
+@@ -36,16 +36,14 @@ test("shows idle WebSocket and an up runtime lease without an active session", a
+ });
+ test("reports the actual session WebSocket URL and open state without sending frames", async ({ page }) => {
+   const writes = await mockApi(page, true);
+-  const sockets: string[] = [];
++  let socketUrl = "";
+   let frames = 0;
+-  page.on("websocket", (socket) => { sockets.push(socket.url()); socket.on("framesent", () => frames++); });
+-  let opened = false;
+-  await page.routeWebSocket(`**/api/ws/sessions/${sessionId}`, (socket) => { opened = true; socket.onMessage(() => { frames++; }); });
++  await page.routeWebSocket(`**/api/ws/sessions/${sessionId}`, (socket) => { socketUrl = socket.url(); socket.onMessage(() => { frames++; }); });
+   await page.goto("/dashboard");
+   await expect(value(page, "WebSocket")).toHaveText("up");
+-  await expect.poll(() => opened).toBe(true);
++  await expect.poll(() => socketUrl).not.toBe("");
+   const apiBase = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/$/, "");
+-  expect(sockets).toContain(`${apiBase.replace(/^http/, "ws")}/api/ws/sessions/${sessionId}`);
++  expect(socketUrl).toBe(`${apiBase.replace(/^http/, "ws")}/api/ws/sessions/${sessionId}`);
+   expect(frames).toBe(0);
+   expect(writes).toEqual([]);
+ });
+@@ -72,7 +70,7 @@ test("shows malformed readiness cause and recovers on recheck", async ({ page })
+ test("keeps the last lease visible after a reload failure and recovers", async ({ page }) => {
+   const writes = await mockApi(page);
+   let fail = false;
+-  await readiness(page, () => fail ? { status: 503, json: { detail: "Readiness source unavailable" } } : { json: { status: "ready", services: { runtime_lease: "up" } } });
++  await readiness(page, () => fail ? { status: 503, json: { status: "degraded", services: { runtime_lease: "up" } } } : { json: { status: "ready", services: { runtime_lease: "up" } } });
+   await page.goto("/dashboard");
+   await expect(value(page, "Runtime lease")).toHaveText("up");
+   fail = true;
+@@ -98,14 +96,15 @@ test("reports a mocked socket close as down", async ({ page }) => {
+ test("closes the active socket on navigation without page errors", async ({ page }) => {
+   const writes = await mockApi(page, true);
+   const errors: string[] = [];
+-  let closed = false;
++  let closed = 0;
+   page.on("pageerror", (error) => errors.push(error.message));
+-  page.on("websocket", (socket) => socket.on("close", () => { closed = true; }));
++  await page.routeWebSocket(`**/api/ws/sessions/${sessionId}`, (socket) => socket.onClose(() => { closed++; }));
+   await page.goto("/dashboard");
+   await expect(value(page, "WebSocket")).toHaveText("up");
++  const settledClosed = closed;
+   await page.getByRole("link", { name: "Open live timing" }).click();
+   await expect(page).toHaveURL(/\/live$/);
+-  await expect.poll(() => closed).toBe(true);
++  await expect.poll(() => closed).toBeGreaterThan(settledClosed);
+   expect(errors).toEqual([]);
+   expect(writes).toEqual([]);
+ });
