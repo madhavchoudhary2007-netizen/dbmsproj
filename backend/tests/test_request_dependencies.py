@@ -126,10 +126,11 @@ def test_cookie_post_requires_csrf_and_accepts_matching_token_and_origin():
     session = token()
     csrf = create_csrf_token("session-1", KEY)
     with TestClient(app(pool)) as client:
-        missing = client.post("/cookie", cookies={"apexgrid_session": session})
+        client.cookies.set("apexgrid_session", session)
+        missing = client.post("/cookie")
+        client.cookies.set("apexgrid_csrf", csrf)
         accepted = client.post(
             "/cookie",
-            cookies={"apexgrid_session": session, "apexgrid_csrf": csrf},
             headers={"x-csrf-token": csrf, "origin": "https://app.test"},
         )
     assert missing.status_code == 403
