@@ -82,3 +82,62 @@ test("filters live-run packets by session and run start while retaining missing 
     belongsToLiveRun({ session_id: "session", ts: start }, "session", undefined),
   ], [false, false, true, true, true, true, true, true]);
 });
+
+test("derives intervals from the preceding car while preserving leader gaps", async () => {
+  const { deriveLiveTimingData } = await load();
+  const { orderRows } = deriveLiveTimingData([
+    { driver_id: "l", position: 1, lap: 4, sector: 3, elapsed_ms: 120000 },
+    { driver_id: "a", position: 2, lap: 4, sector: 3, elapsed_ms: 123000 },
+    { driver_id: "b", position: 3, lap: 4, sector: 3, elapsed_ms: 123450 },
+    { driver_id: "s", position: 4, lap: 4, sector: 2, elapsed_ms: 123500 },
+    { driver_id: "x", position: 5, lap: 3, sector: 3, elapsed_ms: 110000 },
+    { driver_id: "u", position: 6, lap: 4, sector: 3, elapsed_ms: null },
+    { driver_id: "n", position: 7, lap: 4, sector: 3, elapsed_ms: "124000" },
+  ], "", [], {}, [], [], false, false);
+  assert.deepEqual(plain(orderRows.map(row => [row.interval, row.gap])), [
+    ["LEADER", "LEADER"], ["+3.000 s", "+3.000 s"], ["+0.450 s", "+3.450 s"],
+    ["+1 sector", "+1 sector"], ["+1 lap", "+1 lap"], ["—", "+0.000 s"], ["—", "+4.000 s"],
+  ]);
+});
+
+test("derives three sector cells from shuffled driver history without mutating inputs", async () => {
+  const { deriveLiveTimingData } = await load();
+  const packets = [
+    { driver_id: "a", position: 1, sector_ms: [90, 200, 301] },
+    { driver_id: "b", position: 2, sector_ms: [120, 180, 290] },
+    { driver_id: "c", position: 3, sector_ms: [130, 400, 320] },
+    { driver_id: "d", position: 4 },
+  ];
+  const history = [
+    { driver_id: "b", sector_ms: [110, 180] },
+    { driver_id: "a", sector_ms: [100, 200] },
+    { driver_id: "a", sector_ms: [95, null] },
+    { driver_id: "z", sector_ms: [0, -5, NaN] },
+  ];
+  const before = plain([packets, history]);
+  const { orderRows } = deriveLiveTimingData(packets, "", [], {}, history, [], false, false);
+  assert.deepEqual(plain(orderRows.map(row => row.sector_cells)), [
+    [{ ms: 90, kind: "overall" }, { ms: 200, kind: "personal" }, { ms: 301, kind: "unknown" }],
+    [{ ms: 120, kind: "slower" }, { ms: 180, kind: "overall" }, { ms: 290, kind: "unknown" }],
+    [{ ms: 130, kind: "unknown" }, { ms: 400, kind: "unknown" }, { ms: 320, kind: "unknown" }],
+    [{ ms: null, kind: "unknown" }, { ms: null, kind: "unknown" }, { ms: null, kind: "unknown" }],
+  ]);
+  assert.deepEqual(plain([packets, history]), before);
+});
+
+test("marks every tied positive fastest lap and leaves drivers without one unmarked", async () => {
+  const { deriveLiveTimingData } = await load();
+  const { orderRows } = deriveLiveTimingData([
+    { driver_id: "a", position: 1 }, { driver_id: "b", position: 2 },
+    { driver_id: "c", position: 3 }, { driver_id: "d", position: 4 },
+  ], "", [], {}, [
+    { driver_id: "b", lap_time_ms: 85000 }, { driver_id: "a", lap_time_ms: 85000 },
+    { driver_id: "c", lap_time_ms: 0 }, { driver_id: "c", lap_time_ms: -1 },
+    { driver_id: "c", lap_time_ms: NaN },
+  ], [], false, false);
+  assert.deepEqual(plain(orderRows.map(row => [row.best_lap_ms, row.fastest_lap])), [
+    [85000, true], [85000, true], [null, false], [null, false],
+  ]);
+  assert.equal(orderRows[2].best_lap_ms, undefined);
+  assert.equal(orderRows[3].best_lap_ms, undefined);
+});
