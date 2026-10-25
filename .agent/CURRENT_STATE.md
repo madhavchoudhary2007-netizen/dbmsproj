@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: 95cc69c
+git_head: 1800077
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -44,22 +44,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T332 request database demo DELETE + four dependency override cases accepted c48443f/dede5cd. Root249PASS0skip and live acceptance PASS T-44517.full.raw.log; exact helper ordering preserved.
 - Review corrected worker envelope counts, fixture schema/labels, UUID types and missing source partial state before acceptance. No dependencies added.
 
-- T387 case cards b301b9c and native dialogs/header82138ba implemented; sanction field styling44532 and session spam/result resilience tests44531 active. Penalty history/licence meter need an actual readable API source (drivers response has no season_points); never fabricate totals.
-
-
-
-- ADR-013 records missing T387 read models; focused Phase C and lock renewed. lock.sh embeds git commit, so identical hash/banner generation used to obey accept.sh-only commits. No API implementation yet.
-
-
-- Runtime69PASS; T386 dialog five-width browser5PASS. Session spam regression recorded three failures, each20 requests; W2 guard ready for acceptance. ADR-013 focused Phase C/lock verified; official stewarding read implementation pending.
-
-
-
-- T386-387 route batch99PASS1desktopSteward paletteFAIL; all30 Session resilience tests passed (spam fixed01e561c). Five native session dialogs passed after shared form readability7c1a7c7. T387 official reads823c270, twelve HTTP cases779e680, real SQL comparisonf4e0e36: root262PASS0skip/livePASS.
-
-
-
-
-- T387 independent paged source e6dfc57 accepted; typed UUIDs and one queued refresh after pending read. Twelve HTTP read tests passed; dedicated read-only SQL comparison added, full disposable gate pending. Root current continuation0 product edits.
-
-- T-44541 accepted95cc69c: Render official penalty NbTable and factual seasonal 12-cell licence meters with independent five states and bounded paging. Verify0.
+- T387 case files/native dialogs/official records UI implemented through95cc69c; ADR013 permits two read-only paged endpoints; lock verified. Root262PASS0skip/livePASS T-44540.full.raw.log. Paged source handles abort/stale/queued refresh; penalties and seasonal 12-cell meters retain real totals. T44542 browser tests accepted1800077, actual browser milestone pending.
+- T386-387 prior route batch99PASS1desktopSteward paletteFAIL; all30 Session resilience cases passed after01e561c spam guard. Shared form readability7c1a7c7 and Steward count sticker8f08922 need current combined browser/build proof.

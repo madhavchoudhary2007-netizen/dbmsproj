@@ -10,7 +10,7 @@ import bcrypt
 from psycopg import Cursor
 from psycopg.rows import dict_row
 
-from .database import connection, fetch_all, fetch_one
+from .database import DatabaseRow, connection, fetch_all, fetch_one
 from .simulation_core import MAX_SESSION_LAPS
 
 
@@ -136,7 +136,8 @@ def create_demo_race_records(
                 "INSERT INTO championships(name,season) VALUES ('ApexGrid Live Demo',"
                 "extract(year from current_date)::int) RETURNING id"
             )
-            championship = cur.fetchone()
+            # A successful INSERT with RETURNING yields its id row.
+            championship = cast(DatabaseRow, cur.fetchone())
         cur.execute("SELECT id,name FROM circuits ORDER BY name")
         circuits = cur.fetchall()
         cur.execute("SELECT id,name FROM teams ORDER BY name")
@@ -149,7 +150,8 @@ def create_demo_race_records(
             "FROM race_events WHERE championship_id=%s",
             (championship["id"],),
         )
-        round_number = cur.fetchone()["round"]
+        # The aggregate SELECT returns a row even when there are no events.
+        round_number = cast(DatabaseRow, cur.fetchone())["round"]
         numbers = rng.sample(range(11, 100), len(names))
         circuit = rng.choice(circuits)
         event_name = (

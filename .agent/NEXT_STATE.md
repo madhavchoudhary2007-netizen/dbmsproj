@@ -3,15 +3,20 @@ updated_at: 2026-10-26
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44545 W1 — OPEN
+- target_files: frontend/components/pages/stewards.tsx
+- contract: T387 adjust stewardship layout surface balance to unchanged palette bands.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+
+### T-44544 W3 — OPEN
+- target_files: frontend/e2e/steward-records.spec.ts
+- contract: Repair the ambiguous steward records Refresh test locator without changing assertions.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && npx playwright test e2e/steward-records.spec.ts --list
+
 ### T-44543 W2 — OPEN
 - target_files: backend/app/demo_race_repository.py, backend/app/core/lock_demo.py, backend/app/simulation_runner.py
 - contract: T339 fix seven narrow helper typing errors without changing SQL, outputs or simulation order.
 - verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_request_dependencies.py backend/tests/test_runtime_dependencies.py && .venv/bin/mypy --strict backend/app/demo_race_repository.py backend/app/core/lock_demo.py backend/app/simulation_runner.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/demo_race_repository.py backend/app/core/lock_demo.py backend/app/simulation_runner.py
-
-### T-44542 W3 — OPEN
-- target_files: frontend/e2e/steward-records.spec.ts
-- contract: T387 add browser proof for official records, licence meters, independent five states and paging.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && npx playwright test e2e/steward-records.spec.ts --list
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -23,6 +28,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44542 accepted1800077; verify0.
 - T-44541 accepted95cc69c; verify0.
 - T-44540 acceptedf4e0e36; verify0.
 - T-44539 acceptede6dfc57; verify0.
@@ -65,5 +71,5 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - Earlier tasks: Git/.agent/results; parent milestones require full gates.
 
 ## Plan dependencies still required
-- T387 penalty history and licence meter: existing incident/driver APIs expose no penalty history or season totals. Add documented read-only contracts under a dedicated ADR before wiring; do not infer zero.
+- T387 official records API/source/UI implemented under ADR013; focused browser milestone/build pending. Then T388 Pit Wall.
 - T385/M13 first chart draw animation remains for T400; actual stream updates remain animation-free.

@@ -4,7 +4,7 @@ from collections.abc import Callable
 from concurrent.futures import Future, ThreadPoolExecutor
 from contextlib import AbstractContextManager, suppress
 from datetime import datetime
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 from psycopg import Connection
@@ -25,7 +25,10 @@ def create_lock_demo_helpers(
     ) -> dict[str, Any]:
         with connection() as conn, conn.transaction():
             conn.execute("SET LOCAL lock_timeout='8s'")
-            pid = conn.execute("SELECT pg_backend_pid() AS pid").fetchone()["pid"]
+            # pg_backend_pid() returns exactly one row.
+            pid = cast(DatabaseRow, conn.execute("SELECT pg_backend_pid() AS pid").fetchone())[
+                "pid"
+            ]
             competitor["pid"] = pid
             ready.set()
             started = time.perf_counter()
@@ -40,6 +43,8 @@ def create_lock_demo_helpers(
                         ends_at,
                     ),
                 ).fetchone()
+                # A successful reservation function call returns its id row.
+                row = cast(DatabaseRow, row)
                 return {
                     "outcome": "reserved",
                     "reservation_id": row["id"],

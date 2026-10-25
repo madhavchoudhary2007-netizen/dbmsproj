@@ -77,9 +77,13 @@ async def run_simulation_loop(
                         ]
                     )
                 }
-                fastest_driver_id = min(best_laps, key=best_laps.get) if best_laps else None
+                fastest_driver_id = (
+                    min(best_laps, key=lambda driver_id: best_laps[driver_id])
+                    if best_laps
+                    else None
+                )
                 pole_driver_id = (
-                    min(sim.pace_offsets_ms, key=sim.pace_offsets_ms.get)
+                    min(sim.pace_offsets_ms, key=lambda driver_id: sim.pace_offsets_ms[driver_id])
                     if sim.is_generated and sim.pace_offsets_ms
                     else None
                 )
