@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 480ae39
+git_head: a54f000
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high (latest owner override2026-10-25), cap2
@@ -55,3 +55,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44322 accepteddc23dbc: Extract exact result finalization with legacy wrapper and late-bound callbacks; preserve completion and auto-repeat. Verify0.
 
 - T-44323 accepted480ae39: Stage exact selected-driver telemetry chart region, preserving conditionals, labels, props and series. Verify0.
+
+- T-44324 accepteda54f000: Wire exact PitWall hook; preserve all return JSX and remaining page functions byte-for-byte. Verify0.
