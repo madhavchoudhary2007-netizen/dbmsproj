@@ -5,11 +5,11 @@ from fastapi import HTTPException
 from ..simulation_core import MAX_SESSION_LAPS
 
 
-def limit_offset(limit: int, offset: int):
+def limit_offset(limit: int, offset: int) -> tuple[int, int]:
     return min(limit, 200), max(offset, 0)
 
 
-def validate_session_laps(table: str, values: dict[str, Any]):
+def validate_session_laps(table: str, values: dict[str, Any]) -> None:
     if table != "race_sessions" or "total_laps" not in values or values["total_laps"] is None:
         return
     value = values["total_laps"]

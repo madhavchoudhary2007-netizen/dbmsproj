@@ -32,7 +32,7 @@ def get_crud_row(base: str, table: str, item_id: UUID) -> DatabaseRow | None:
             SQL("{} WHERE {}.id=%s").format(SQL(base), Identifier(table)),
             (item_id,),
         )
-        return cast(DatabaseRow | None, cur.fetchone())
+        return cur.fetchone()
 
 
 def create_crud_row(table: str, values: dict[str, object]) -> DatabaseRow:
@@ -64,7 +64,7 @@ def update_crud_row(table: str, item_id: UUID, values: dict[str, object]) -> Dat
     )
     with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
         cur.execute(sql, [values[key] for key in keys] + [item_id])
-        return cast(DatabaseRow | None, cur.fetchone())
+        return cur.fetchone()
 
 
 def _ensure_no_reference(cur: Any, query: Composable | str, params: tuple[UUID, ...]) -> None:

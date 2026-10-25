@@ -3,19 +3,24 @@ from __future__ import annotations
 import hashlib
 import random
 from datetime import datetime
-from typing import Any
+from typing import Any, cast
 
-from ..simulation_core import MAX_SESSION_LAPS, Simulation, calculate_sector_performance
+from ..simulation_core import (
+    MAX_SESSION_LAPS,
+    Simulation,
+    SimulationRandom,
+    calculate_sector_performance,
+)
 
 
 def advance_simulation_tick(
     sim: Simulation,
     timestamp: datetime,
-    rng=None,
+    rng: SimulationRandom | None = None,
     safety_car: bool = False,
     pit_driver_ids: set[str] | None = None,
     pit_assignments: dict[str, dict[str, Any]] | None = None,
-):
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Advance every car by one sector and return internally consistent packets and timing."""
     injected_rng = rng
     pit_driver_ids = pit_driver_ids or set()
@@ -46,7 +51,7 @@ def advance_simulation_tick(
         else:
             driver_rng = random
 
-        number = int(driver.get("number") or 1)
+        number = int(cast(int | str, driver.get("number") or 1))
         pace_offset = sim.pace_offsets_ms.get(driver_id, (number % 7 - 3) * 95)
         assignment = pit_assignments.get(driver_id)
         in_pit = (driver_id in pit_driver_ids) or bool(

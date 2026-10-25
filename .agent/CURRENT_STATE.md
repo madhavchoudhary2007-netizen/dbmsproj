@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: bc67c9a
+git_head: 0fb8de5
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -39,3 +39,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T382 two-column selectedcurrentroster+addform0308663, sharedfiveStateview978192d at2callsites, abort/latesthistorye1470ec. Browsermembership/layout/axe/rootbuild pending; parent remainsopen. Currentdatebounds inclusive(futureend active/futurestart excluded), no fakecurrentroster.
 
 - Repeatedkeyboardreopen realnative/Reactrace fixed da4d3ee/bc67c9a; root15/15reopencycles T382-keyboard-after.raw.log, all45editor+30primitivebrowsercasesPASS. Currentmembership10fails:5actuallegacycontrast1.09:1,5testEndmembershiplocatorambiguity; queuedT44478/79. T383liveheader2c7283c, yellowhero/nativeDelete next.
+
+- T-44476 accepted0fb8de5: Render live-demo hero as yellow card with primary CTA and native delete confirmation; keep one active primary and every existing action/copy. Verify0.
