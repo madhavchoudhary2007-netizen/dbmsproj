@@ -1,8 +1,8 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: f92abda
+git_head: 2e88c3d
 branch: overhaul/neo-brutal
-architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
+architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
 archetype: Neo-Brutal Motorsport light, approved ADR007
 last_eval_score: obsolete51.2974; no current score; final T430
@@ -47,3 +47,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T387 case cards b301b9c and native dialogs/header82138ba implemented; sanction field styling44532 and session spam/result resilience tests44531 active. Penalty history/licence meter need an actual readable API source (drivers response has no season_points); never fabricate totals.
 
 - T-44532 acceptedf92abda: Use associated sanction fields with mobile stacking and unchanged disabled timing/grid guards and explanation. Verify0.
+
+- T-44531 accepted2e88c3d: Add gated same-frame official/simulator/delete spam, actual result loading/error/retry/retention and obsolete-session response checks. Verify0.
+
+- ADR-013 records missing T387 read models; focused Phase C and lock renewed. lock.sh embeds git commit, so identical hash/banner generation used to obey accept.sh-only commits. No API implementation yet.

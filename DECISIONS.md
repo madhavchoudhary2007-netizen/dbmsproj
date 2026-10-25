@@ -55,3 +55,5 @@ Perfection loop authorizations: `.agent/adr/ADR-001-perfection-loop-authorizatio
 - ADR-011 health probes: .agent/adr/ADR-011-health-probes.md; additive liveness/readiness only, health slice moved before T-323 to satisfy T-320 tests.
 
 - ADR-012 dashboard next event: .agent/adr/ADR-012-dashboard-next-event.md; additive read-only nullable field for plan T-370, existing fields retained.
+
+- ADR-013 stewarding read models: .agent/adr/ADR-013-stewarding-read-models.md; planned read-only official penalty history and explicit seasonal licence points for T-387.

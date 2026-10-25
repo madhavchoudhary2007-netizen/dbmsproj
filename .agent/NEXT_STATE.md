@@ -3,15 +3,20 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44535 Orchestrator — OPEN
+- target_files: .agent/ARCHITECT.md, .agent/adr/ADR-013-stewarding-read-models.md, DECISIONS.md
+- contract: Record required read-only T387 data sources, typed contracts and focused Phase C; renew lock without a direct git commit.
+- verify: bash scripts/agent/verify-lock.sh && bash scripts/agent/budget.sh
+
+### T-44534 W2 — OPEN
+- target_files: frontend/lib/use-session-page.ts
+- contract: T386 suppress same-frame duplicate lifecycle, simulator and delete mutations with synchronous guards that survive rerenders.
+- verify: npm --prefix frontend run test:runtime && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+
 ### T-44533 W1 — OPEN
 - target_files: frontend/app/styles/shell.css
 - contract: TASTE386 restore approved label sizing and four-pixel control borders where legacy form CSS overrides new primitives.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
-
-### T-44531 W3 — OPEN
-- target_files: frontend/e2e/session-resilience.spec.ts
-- contract: T386 test same-frame session mutation spam and real result loading/error/retention/retry in the browser.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && npx playwright test e2e/session-resilience.spec.ts --list
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -23,6 +28,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44531 accepted2e88c3d; verify0.
 - T-44532 acceptedf92abda; verify0.
 - T-44529 accepted82138ba; verify0.
 - T-44527 accepted378faa0; verify0.

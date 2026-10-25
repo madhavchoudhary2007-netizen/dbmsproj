@@ -1,7 +1,7 @@
 <!-- LOCK:BEGIN -->
 > STATUS: LOCKED
-> SHA256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
-> LOCKED_AT: 2026-10-24T11:56:02Z
+> SHA256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
+> LOCKED_AT: 2026-10-25T18:27:01Z
 > LOCKED_BY: orchestrator
 <!-- LOCK:END -->
 # ApexGrid architecture — existing system, improvement in place
@@ -53,6 +53,7 @@ API groups live in `backend/app/main.py`. Existing test commands shown here are 
 | API-10 | DBMS SQL schema/tables/races/EER/indexes/plans/locks | `.venv/bin/pytest -q backend/tests/test_api.py -k 'dbms_workspace or admin_lock_demo'` |
 | API-11 | DBMS Mongo collections/documents and cross-store | `.venv/bin/pytest -q backend/tests/test_api.py -k 'dbms_mongo'` (cross-store case needed) |
 | API-12 | DBMS constraint, transaction, lock, recalculate | `.venv/bin/pytest -q backend/tests/test_api.py -k 'constraint_demo or admin_lock_demo'` (transaction/recalculate cases needed) |
+| API-13 | ADR-013 read-only stewarding penalties and seasonal licences (planned) | `.venv/bin/pytest -q backend/tests/test_stewarding_reads.py`; stewarding browser flows |
 
 Core gates: `bash scripts/agent/verify-lock.sh`; `npm --prefix frontend run typecheck`; `npm --prefix frontend run lint`; `.venv/bin/pytest -q backend/tests` with database URLs configured; `npm --prefix frontend run build`; `E2E_CMD=none` until W3 adds browser tests. A check passes only at exit 0 with required tests collected, not when database cases are skipped.
 
@@ -127,8 +128,13 @@ type LiveEvent = { type: "session.state" | "timing.update" | "telemetry.sample" 
 type RaceArchive = { session: Session; results: unknown[]; incidents: unknown[]; pit_reservations: PitReservation[]; laps?: Telemetry[]; laps_included?: boolean; completed_driver_laps?: number; telemetry_count: number; updated_at: UTC };
 // ADR-012 permits one additive dashboard field; implementation/tests pending.
 type DashboardNextEvent = { id: UUID; name: string; session_id: UUID; scheduled_at: UTC; circuit_name: string } | null;
+// ADR-013 planned authenticated reads, limit1..200(default50), offset>=0.
+type StewardPenalty = { id: UUID; incident_id: UUID; driver_id: UUID; driver_name: string | null; session_id: UUID; lap: number; points: number; time_seconds: number; grid_places: number; created_at: UTC };
+type StewardLicence = { driver_id: UUID; driver_name: string | null; licence_number: string; eligibility: string; season: number; points: number };
 type DataState<T> = { kind: "empty" } | { kind: "loading"; previous?: T } | { kind: "populated"; data: T } | { kind: "error"; message: string; retry: () => void } | { kind: "partial"; data: T; message: string; retry: () => void };
 ```
+
+ADR-013 permits only the two planned authenticated GET /api/stewarding/penalties and /api/stewarding/licences read models above. Existing schema and endpoints stay unchanged; season defaults to current UTC year, bounds1..9999, ordering/pagination and authoritative zero semantics follow that ADR. Implement and test before claiming T-387 complete.
 
 ADR-005 authorizes one API-07 ingest error-contract addition for F-DOM-04: nonidentical or older telemetry returns HTTP 409. An exact retry keeps the existing HTTP 202 response shape and packet ID without another write or live event. This is approved work, not a claim that the current ingest path enforces it.
 
@@ -185,6 +191,8 @@ The live simulator and WebSocket event bus are process-local. ADR-004 keeps a si
 ### B.7 Performance targets (unverified)
 
 Mid-tier mobile LCP <=2.5s, INP <=200ms, CLS <=0.05; route initial JS <=170 KB gzip; animation frames <=16.7ms. Keep visible DOM rows bounded (current 50/100-row paging), dedupe polling, cap stream history and avoid loading full lap archives during live ticks. Measure in W3 browser gates before claiming targets.
+
+ADR-013 focused Phase C: goal traced T-387 to existing official tables with W2/W1/W3 owners; expert required exact fields/auth/422/order/season and full isolated tests; taste retained factual season/total labels and no dependency; technical retained request-scoped providers, parameterized read-only SQL and stable paging; edge required unavailable-vs-zero, historical seasons, >12 totals and cancellation/recovery. Pass2 all five lenses yielded zero additional amendments. New reads remain planned, not verified.
 
 ## Gap list against protocol
 
