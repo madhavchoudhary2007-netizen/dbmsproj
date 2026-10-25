@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 09c2730
+git_head: 7c1a7c7
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -15,8 +15,8 @@ last_eval_score: obsolete51.2974; no current score; final T430
 ## Active work / evidence
 - T379 exact seven-route split complete(special-pages9exports), parent NOT accepted: initial1100mocked1020PASS80FAIL; aftersharedbody/heading/motionrepairs85targeted70PASS15desktopA3FAIL. RemainingroutePhase7layouts thenfullrerun; no gatewaived.
 - T381 dashboard hero/context/KPIs/services/Nextup/incidents implemented. Actuallease503/notready/recovery +cookieWSopen/error/close/cleanup, no syntheticstatus. Root165browserPASS T381-connectivity-final.browser.raw.log; fivewidthvisuals0overflow/oneprimary/noerrors. Preserve .stat-card/.state.error/Try again. TASTE-381-1 fouraccenttiles vsT400max3 unresolved.
-- T382 resources header/toolbar/exactrowhook/classifier/NbTable/nativeModal/NbField/form/rowEditDelete/roleeligibilitybadges implemented; alloriginalcelltext/copy/pageSize50 preserved. Root360browserPASS T382-actions-primary.browser.raw.log, allsixpalettes/fivewidthaxe/targets/overflow/primary/dataflow. Build/lint/types0 T382-actions-build.raw.log. Inlinevalidation/twocolumnmemberships implemented; finalmodalaxe/partialfixtures andfocusedfileboundaries remain.
-- Real20POST/save and20DELETE/confirm duplicates repaired06330e6/6e28dd6, confirmation7838c2d. Strict25PASS T382-delete-guard.browser.raw.log; markerretired5cfe010, activeprimarytransitions5widthPASS. Browserwrites locallymocked only.
+- T382 resource CRUD/native modals/memberships/eligibility implemented, copy/hooks/pageSize50 preserved. Browser360PASS T382-actions-primary; final modal/accessibility coverage retained below. Resource page bloat remains T400.
+- Resource20-click save/delete duplicates repaired; strict25PASS T382-delete-guard.browser.raw.log; primary transitions5widthPASS, locally mocked writes only.
 - Backend main823lines, <=120T331 NOT met; T332unfinished. Genuine modules/core/extracts retained. TypedRuntimeState/providers/lifespan shareandclear identities; requestauth/DatabaseSession. Membership/analytics/pitreads useDI. Actualreturnannotation Decimalstringregression fixedresponse_modelNone19b7991; exactnumericserializationtests1479019 preservewireencoding.
 - Backend full249PASS0skip/live acceptance PASS T-44517.full.raw.log. Strictmypy134errors/25files T339-current-after-dbms.raw.log,target0T339. Runtime69PASS T44530 accept log. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
 
@@ -55,3 +55,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44535 accepted09c2730: ADR-013 documents required read-only stewarding contracts, focused Phase C and renewed architecture lock; implementation pending. Verify0.
 
 - Runtime69PASS; T386 dialog five-width browser5PASS. Session spam regression recorded three failures, each20 requests; W2 guard ready for acceptance. ADR-013 focused Phase C/lock verified; official stewarding read implementation pending.
+
+- T-44533 accepted7c1a7c7: Restore token-sized labels and four-pixel ink control borders where legacy form rules overrode primitives. Verify0.

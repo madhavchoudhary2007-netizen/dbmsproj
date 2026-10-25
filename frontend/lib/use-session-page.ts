@@ -32,6 +32,21 @@ export function useSessionPage() {
   const resultsRequest = useRef<AbortController | null>(null);
   const resultsRequestId = useRef(0);
   const selectedRef = useRef(selected);
+  const mutationLocks = useRef(new Set<string>());
+  const runMutation = async (
+    family: string,
+    session: string,
+    operation: () => Promise<void>,
+  ) => {
+    const key = `${family}:${session}`;
+    if (mutationLocks.current.has(key)) return;
+    mutationLocks.current.add(key);
+    try {
+      await operation();
+    } finally {
+      mutationLocks.current.delete(key);
+    }
+  };
   useLayoutEffect(() => {
     selectedRef.current = selected;
   }, [selected]);
@@ -46,7 +61,9 @@ export function useSessionPage() {
   }, [drivers, simCarsInitialized]);
   const current = rows.find((r) => r.id === selected);
   const perform = async (action: string) =>
-    performSessionAction(action, selected, setActionMsg, load);
+    runMutation("lifecycle", selected, () =>
+      performSessionAction(action, selected, setActionMsg, load),
+    );
   const saveResult = async (v: Row) =>
     saveSessionResult(
       v,
@@ -57,7 +74,9 @@ export function useSessionPage() {
       setResultModal,
     );
   const simulate = async (action: string) =>
-    simulateSession(action, selected, setSimMessage, simCars, simRate, load);
+    runMutation("simulator", selected, () =>
+      simulateSession(action, selected, setSimMessage, simCars, simRate, load),
+    );
   useEffect(() => {
     setResultsLoading(false);
     setResultsError("");
@@ -111,13 +130,15 @@ export function useSessionPage() {
       load,
     );
   const deleteSession = async () =>
-    deleteSessionRecord(
-      selected,
-      setBusy,
-      setSelected,
-      setResults,
-      load,
-      setActionMsg,
+    runMutation("delete", selected, () =>
+      deleteSessionRecord(
+        selected,
+        setBusy,
+        setSelected,
+        setResults,
+        load,
+        setActionMsg,
+      ),
     );
   return {
     resultModal,
