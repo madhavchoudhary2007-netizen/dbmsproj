@@ -1,0 +1,128 @@
+diff --git a/frontend/components/pages/live/index.tsx b/frontend/components/pages/live/index.tsx
+index 4f71ab5..d2bf76d 100644
+--- a/frontend/components/pages/live/index.tsx
++++ b/frontend/components/pages/live/index.tsx
+@@ -157,6 +157,9 @@ export function LiveTiming() {
+             shown={shown}
+             chartPackets={chartPackets}
+             hasTireTemperatures={hasTireTemperatures}
++            loading={snapshotView.loading}
++            error={snapshotView.error}
++            retry={() => snapshotRetry.current?.()}
+           />
+           <LatestTelemetry shown={shown} status={status} />
+         </>
+diff --git a/frontend/components/pages/live/telemetry-charts.tsx b/frontend/components/pages/live/telemetry-charts.tsx
+index ecea848..1b6a64c 100644
+--- a/frontend/components/pages/live/telemetry-charts.tsx
++++ b/frontend/components/pages/live/telemetry-charts.tsx
+@@ -1,4 +1,5 @@
+ import type { Row } from "@/lib/api";
++import type { ViewState } from "@/lib/data-state";
+ import {
+   CartesianGrid,
+   Line,
+@@ -8,24 +9,38 @@ import {
+   XAxis,
+   YAxis,
+ } from "recharts";
+-import { NbActiveDot, NbChartTooltip } from "@/components/nb/chart-frame";
++import { NbActiveDot, NbChartFrame, NbChartTooltip } from "@/components/nb/chart-frame";
+ import { chartTheme } from "@/components/nb/chart-theme";
+ 
+ export function TelemetryCharts({
+   driver,
+-  shown,
+   chartPackets,
+   hasTireTemperatures,
++  loading,
++  error,
++  retry,
+ }: {
+   driver: string;
+   shown: Row[];
+   chartPackets: Row[];
+   hasTireTemperatures: boolean;
++  loading: boolean;
++  error: string;
++  retry: () => void;
+ }) {
++  const state: ViewState<Row[]> = chartPackets.length
++    ? error
++      ? { status: "partial", data: chartPackets, filter: { label: "Retry snapshot", clear: retry }, totalCount: chartPackets.length }
++      : { status: "populated", data: chartPackets }
++    : loading
++      ? { status: "loading" }
++      : error
++        ? { status: "error", error: { message: error, retryable: true }, retry }
++        : { status: "empty", reason: "no-data" };
+   return (
+     <>
+-      {driver && shown.length > 0 && (
+-        <div className="telemetry-charts">
++      {driver && (
++        <div className="telemetry-charts min-w-0">
+           {[
+             ["speed_kph", "Speed · km/h"],
+             ["throttle_pct", "Throttle · %"],
+@@ -33,13 +48,11 @@ export function TelemetryCharts({
+             ["lap_time_ms", "Lap time · ms"],
+             ["tire_wear_pct", "Tire wear · %"],
+           ].map(([key, title]) => (
+-            <div className="panel chart-panel" key={key}>
+-              <div className="eyebrow">SELECTED DRIVER TELEMETRY</div>
+-              <h2>{title}</h2>
+-              <div className="chart">
++            <NbChartFrame key={key} title={title} state={state} empty="Waiting for timing and telemetry packets from this session." description="SELECTED DRIVER TELEMETRY" sourceMessage={error || undefined} className="min-w-0">
++              {(data) => <div className="chart min-w-0">
+                 <ResponsiveContainer width="100%" height={190}>
+                   <LineChart
+-                    data={chartPackets}
++                    data={data}
+                     margin={{ top: 15, right: 8, bottom: 0, left: -16 }}
+                   >
+                     <CartesianGrid {...chartTheme.grid} />
+@@ -73,17 +86,25 @@ export function TelemetryCharts({
+                     />
+                   </LineChart>
+                 </ResponsiveContainer>
+-              </div>
+-            </div>
++              </div>}
++            </NbChartFrame>
+           ))}
+           {hasTireTemperatures && (
+-            <div className="panel chart-panel">
+-              <div className="eyebrow">SELECTED DRIVER TELEMETRY</div>
+-              <h2>Tire temperatures · °C</h2>
+-              <div className="chart">
++            <NbChartFrame title="Tire temperatures · °C" state={state} empty="Waiting for timing and telemetry packets from this session." description="SELECTED DRIVER TELEMETRY" sourceMessage={error || undefined} className="min-w-0">
++              {(data) => <div className="chart min-w-0">
++                <dl className="mb-4 grid min-w-0 grid-cols-2 gap-3 sm:grid-cols-4">
++                  {(["temp_fl", "temp_fr", "temp_rl", "temp_rr"] as const).map((key, index) => {
++                    const value = data[data.length - 1]?.[key];
++                    const label = ["Front left", "Front right", "Rear left", "Rear right"][index];
++                    return <div className="min-w-0 border-4 border-ink p-3" key={key}>
++                      <dt className="text-[length:var(--fs-label)] font-bold">{label}</dt>
++                      <dd className="font-mono tabular-nums">{typeof value === "number" && Number.isFinite(value) ? value : "—"}</dd>
++                    </div>;
++                  })}
++                </dl>
+                 <ResponsiveContainer width="100%" height={190}>
+                   <LineChart
+-                    data={chartPackets}
++                    data={data}
+                     margin={{ top: 15, right: 8, bottom: 0, left: -16 }}
+                   >
+                     <CartesianGrid {...chartTheme.grid} />
+@@ -150,8 +171,8 @@ export function TelemetryCharts({
+                     />
+                   </LineChart>
+                 </ResponsiveContainer>
+-              </div>
+-            </div>
++              </div>}
++            </NbChartFrame>
+           )}
+         </div>
+       )}

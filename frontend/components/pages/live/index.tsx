@@ -157,6 +157,9 @@ export function LiveTiming() {
             shown={shown}
             chartPackets={chartPackets}
             hasTireTemperatures={hasTireTemperatures}
+            loading={snapshotView.loading}
+            error={snapshotView.error}
+            retry={() => snapshotRetry.current?.()}
           />
           <LatestTelemetry shown={shown} status={status} />
         </>

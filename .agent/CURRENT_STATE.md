@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 63a8d91
+git_head: 1d24522
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -43,3 +43,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T385 sharedcharttheme5f8c134 retainedallseries; frames/cornertilesnextT44503. Recordsourceflags T44501underreview. M13firstdrawpending.
 
 - T-44501 accepted63a8d91: Expose record loading/retry with latest-request isolation and one polling timer chain, retaining actual data and errors. Verify0.
+
+- T-44502 accepted1d24522: Scope timing assertions to visible responsive sector cells and hold snapshot outages until explicit user retry. Verify0.
