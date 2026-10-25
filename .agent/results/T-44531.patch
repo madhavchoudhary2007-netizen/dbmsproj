@@ -1,0 +1,146 @@
+diff --git a/frontend/e2e/session-resilience.spec.ts b/frontend/e2e/session-resilience.spec.ts
+new file mode 100644
+index 0000000..ccf678c
+--- /dev/null
++++ b/frontend/e2e/session-resilience.spec.ts
+@@ -0,0 +1,140 @@
++import { expect, test, type Page } from "./mock-platform";
++
++const id = "7b481fa3-795d-4c65-95e5-a3639306f1a1";
++const eventId = "82ad5b7b-1567-4be6-94c1-50a82185a544";
++const otherId = "c81b20e7-e135-40aa-b6e7-9003eb9638f2";
++const sessionRows = (state: string) => [
++  { id, event_id: eventId, event_name: "Fixture Grand Prix", session_type: "RACE", state, scheduled_at: "2026-12-01T12:00:00Z", total_laps: 18 },
++  { id: otherId, event_id: eventId, event_name: "Fixture Grand Prix", session_type: "PRACTICE", state: "COMPLETED", scheduled_at: "2026-11-30T12:00:00Z", total_laps: 10 },
++];
++const saved = [{ position: 1, driver_name: "Fixture Driver", classified: true, fastest_lap: false }];
++type Write = { method: string; path: string; body: unknown };
++
++async function fixture(page: Page, state: string, results: (count: number) => Promise<unknown[] | void> | unknown[] | void, mutationGate?: Promise<void>) {
++  const writes: Write[] = [];
++  const unexpected: string[] = [];
++  let resultReads = 0;
++  await page.route("**/api/**", async (route) => {
++    const request = route.request();
++    const path = new URL(request.url()).pathname;
++    if (request.method() !== "GET") {
++      const allowed = (request.method() === "POST" && [
++        `/api/sessions/${id}/action`, `/api/sessions/${id}/simulate`,
++      ].includes(path)) || (request.method() === "DELETE" && path === `/api/sessions/${id}`);
++      if (!allowed) unexpected.push(`${request.method()} ${path}`);
++      writes.push({ method: request.method(), path, body: request.method() === "POST" ? request.postDataJSON() : null });
++      if (allowed && mutationGate) await mutationGate;
++      if (allowed) await route.fulfill({ status: 200, json: {} });
++      else await route.fulfill({ status: 405, json: { detail: "Unexpected session write" } });
++      return;
++    }
++    if (path.endsWith("/results")) {
++      resultReads += 1;
++      try {
++        const rows = await results(resultReads);
++        await route.fulfill({ status: 200, json: rows ?? saved });
++      } catch {
++        await route.fulfill({ status: 503, json: { detail: "Results temporarily unavailable" } });
++      }
++      return;
++    }
++    const known = ["/api/auth/me", "/api/sessions", "/api/events", "/api/drivers", "/api/dashboard"].includes(path);
++    if (!known) unexpected.push(`GET ${path}`);
++    const data = path === "/api/auth/me" ? { id: "admin", email: "admin@apexgrid.test", full_name: "Fixture Admin", role: "ADMIN" }
++      : path === "/api/sessions" ? sessionRows(state)
++      : path === "/api/events" ? [{ id: eventId, name: "Fixture Grand Prix", round_number: 4 }]
++      : path === "/api/drivers" ? [{ id: "driver-1", number: 7, full_name: "Fixture Driver", eligibility: "ACTIVE" }]
++      : { counts: { active_sessions: 1, scheduled_events: 0, open_incidents: 0, drivers: 1 }, latest_incidents: [] };
++    await route.fulfill({ status: known ? 200 : 405, json: data });
++  });
++  return { writes, unexpected, resultReads: () => resultReads };
++}
++
++async function twentyClicks(button: ReturnType<Page["getByRole"]>) {
++  await button.evaluate((element) => {
++    for (let i = 0; i < 20; i += 1) (element as HTMLButtonElement).click();
++  });
++}
++
++for (const action of [
++  { name: "lifecycle start", state: "SCHEDULED", method: "POST", path: "action", body: { action: "start" } },
++  { name: "simulator start", state: "ACTIVE", method: "POST", path: "simulate", body: { action: "start", cars: 1, rate_hz: 5 } },
++  { name: "Delete session", state: "SCHEDULED", method: "DELETE", path: "", body: null },
++]) test(`same-frame ${action.name} sends one mutation`, async ({ page }) => {
++  let release!: () => void;
++  const gate = new Promise<void>((resolve) => { release = resolve; });
++  const api = await fixture(page, action.state, () => {}, gate);
++  try {
++    await page.goto("/sessions");
++    await page.getByRole("row").filter({ hasText: "Fixture Grand Prix" }).filter({ hasText: "RACE" }).click();
++    const button = action.path === "action" ? page.getByRole("group", { name: "Session lifecycle" }).getByRole("button", { name: "Start", exact: true })
++      : page.getByRole("button", { name: action.path ? "start" : "Delete session", exact: true });
++    await twentyClicks(button);
++    await expect.poll(() => api.writes.length).toBe(1);
++    await page.waitForTimeout(100);
++    expect(api.writes).toEqual([{ method: action.method, path: `/api/sessions/${id}/${action.path}`.replace(/\/$/, ""), body: action.body }]);
++    expect(api.unexpected).toEqual([]);
++  } finally { release(); }
++});
++
++test("results show loading, actual 503, and retry rows", async ({ page }) => {
++  let release!: () => void;
++  const first = new Promise<void>((resolve) => { release = resolve; });
++  const api = await fixture(page, "ACTIVE", async (count) => { if (count === 1) { await first; throw new Error("503"); } });
++  await page.goto("/sessions");
++  await page.getByRole("row").filter({ hasText: "Fixture Grand Prix" }).filter({ hasText: "RACE" }).click();
++  const load = page.getByRole("button", { name: "Load results", exact: true });
++  await load.click();
++  await expect(page.getByTestId("state-loading")).toBeVisible();
++  release();
++  await expect(page.getByTestId("state-error")).toBeVisible();
++  await expect(page.locator(".results-table")).toContainText("Results temporarily unavailable");
++  await page.getByRole("button", { name: "Try again", exact: true }).click();
++  await expect(page.getByTestId("state-partial")).toHaveCount(0);
++  await expect(page.getByText("Fixture Driver")).toBeVisible();
++  await expect(page.getByRole("columnheader", { name: "driver name", exact: true })).toBeVisible();
++  await expect(page.getByRole("columnheader", { name: "fastest lap", exact: true })).toBeVisible();
++  await expect(page.getByRole("cell", { name: "Yes", exact: true })).toBeVisible();
++  await expect(page.getByRole("cell", { name: "No", exact: true })).toBeVisible();
++  expect(api.writes).toEqual([]);
++  expect(api.unexpected).toEqual([]);
++});
++
++test("failed results refresh retains exact saved cells and retries", async ({ page }) => {
++  const api = await fixture(page, "ACTIVE", async (count) => { if (count === 2) throw new Error("503"); });
++  await page.goto("/sessions");
++  await page.getByRole("row").filter({ hasText: "Fixture Grand Prix" }).filter({ hasText: "RACE" }).click();
++  const load = page.getByRole("button", { name: "Load results", exact: true });
++  await load.click();
++  await expect(page.getByText("Fixture Driver")).toBeVisible();
++  const table = page.locator(".results-table");
++  const originalCells = await table.locator("tbody tr").first().locator("td").allTextContents();
++  await load.click();
++  await expect(page.getByTestId("state-partial")).toBeVisible();
++  await expect(page.getByRole("button", { name: "Retry loading session results", exact: true })).toBeVisible();
++  expect(await table.locator("tbody tr").first().locator("td").allTextContents()).toEqual(originalCells);
++  await page.getByRole("button", { name: "Retry loading session results", exact: true }).click();
++  await expect(page.getByTestId("state-partial")).toHaveCount(0);
++  expect(api.writes).toEqual([]);
++  expect(api.unexpected).toEqual([]);
++});
++
++test("stale results from the prior session do not replace the selected session", async ({ page }) => {
++  let release!: () => void;
++  const first = new Promise<void>((resolve) => { release = resolve; });
++  const api = await fixture(page, "ACTIVE", async (count) => {
++    if (count === 1) { await first; return [{ position: 1, driver_name: "Old Session" }]; }
++    return [{ position: 1, driver_name: "Current Session" }];
++  });
++  await page.goto("/sessions");
++  await page.getByRole("row").filter({ hasText: "RACE" }).click();
++  await page.getByRole("button", { name: "Load results", exact: true }).click();
++  await expect.poll(() => api.resultReads()).toBe(1);
++  await page.getByRole("row").filter({ hasText: "PRACTICE" }).click();
++  await page.getByRole("button", { name: "Load results", exact: true }).click();
++  await expect(page.getByText("Current Session")).toBeVisible();
++  release();
++  await expect(page.getByText("Old Session")).toHaveCount(0);
++  expect(api.writes).toEqual([]);
++  expect(api.unexpected).toEqual([]);
++});

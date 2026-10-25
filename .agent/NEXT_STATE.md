@@ -3,9 +3,9 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44532 W1 — OPEN
-- target_files: frontend/components/pages/steward-sanctions.tsx
-- contract: T387 make steward sanction fields readable and accessible with approved primitives while retaining unsupported-sanction guards.
+### T-44533 W1 — OPEN
+- target_files: frontend/app/styles/shell.css
+- contract: TASTE386 restore approved label sizing and four-pixel control borders where legacy form CSS overrides new primitives.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ### T-44531 W3 — OPEN
@@ -23,6 +23,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44532 acceptedf92abda; verify0.
 - T-44529 accepted82138ba; verify0.
 - T-44527 accepted378faa0; verify0.
 - T-44530 accepted8e83f3c; verify0.

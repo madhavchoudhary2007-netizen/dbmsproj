@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 82138ba
+git_head: f92abda
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -45,3 +45,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T44503 transient worker usage error recovered with same role/model; oversized unaccepted clone diff replaced with targeted change. T44519 count envelope corrected before acceptance; no boundary spill. No dependencies added.
 
 - T387 case cards b301b9c and native dialogs/header82138ba implemented; sanction field styling44532 and session spam/result resilience tests44531 active. Penalty history/licence meter need an actual readable API source (drivers response has no season_points); never fabricate totals.
+
+- T-44532 acceptedf92abda: Use associated sanction fields with mobile stacking and unchanged disabled timing/grid guards and explanation. Verify0.
