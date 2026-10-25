@@ -11,6 +11,7 @@ interface LiveSelectorsProps {
   namedDrivers: Map<string, Row>;
   driverIds: Set<string>;
   status: string;
+  primary?: boolean;
 }
 
 export function LiveSelectors({
@@ -23,12 +24,13 @@ export function LiveSelectors({
   namedDrivers,
   driverIds,
   status,
+  primary = false,
 }: LiveSelectorsProps) {
   return (
     <div className="toolbar select-toolbar">
       <label>
         Session
-        <select value={session} onChange={(e) => { autoFollowRef.current = false; setSession(e.target.value); setDriver(""); }}>
+        <select data-primary={primary ? "true" : undefined} value={session} onChange={(e) => { autoFollowRef.current = false; setSession(e.target.value); setDriver(""); }}>
           <option value="">Select session</option>
           {sessions.map((s) => (
             <option key={String(s.id)} value={String(s.id)}>

@@ -3,10 +3,15 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44485 W3 — OPEN
-- target_files: frontend/e2e/live-demo-actions.spec.ts
-- contract: Scope populated generated-race assertion to the actual race card and assert one primary.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/live-demo-actions.spec.ts --list
+### T-44487 W3 — OPEN
+- target_files: frontend/e2e/runtime/live-list-refresh.test.mjs
+- contract: T383 test actual live-list settlement observer and stale request isolation.
+- verify: npm --prefix frontend run test:runtime && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
+### T-44486 W1 — OPEN
+- target_files: frontend/components/pages/live/demo-controls.tsx, frontend/components/pages/live/index.tsx, frontend/components/pages/live/live-selectors.tsx
+- contract: T383 render all five generated-race list states and keep one primary for reader roles.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -18,6 +23,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44485 accepted60148e6; verify0.
 - T-44484 accepted7ae0ac6; verify0.
 - T-44482 accepteda13ec92; verify0.
 - T-44483 accepted702e3cc; verify0.

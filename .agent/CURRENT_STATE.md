@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 7ae0ac6
+git_head: 60148e6
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -44,3 +44,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T383 header/yellowhero/paperracecards/nativeDelete implemented1d68f7b. Root50route/axe/primary/target/responsivePASS T383-header-cards.browser.raw.log. Newstrictmutationtests T383-demo-before expose20POST/20DELETE instead1; W2persistentguard pendingaccept. Five-state list/sourceflags next.
 
 - T-44484 accepted7ae0ac6: Synchronously guard generated-race create/delete across recreated action factories using one persistent ref, releasing in finally and preserving existing API/reset/retry behavior. Verify0.
+
+- T-44485 accepted60148e6: Scope populated generated-race assertion to its actual card and assert one global primary through creation and confirmation/cancellation transitions. Verify0.

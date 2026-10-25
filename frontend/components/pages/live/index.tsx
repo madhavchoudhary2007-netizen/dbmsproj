@@ -25,7 +25,7 @@ export function LiveTiming() {
     sessionDrivers, setSessionDrivers, driver, setDriver, packets, setPackets,
     completedLaps, setCompletedLaps, liveIncidents, setLiveIncidents,
     livePitStops, setLivePitStops, recordsError, setRecordsError,
-    setListLoading, setListError,
+    listLoading, listError, setListLoading, setListError,
     snapshot, setSnapshot, timing, setTiming, status, setStatus, error, setError,
     demoBusy, setDemoBusy, showCompletedDemos, setShowCompletedDemos,
     showAllLaps, setShowAllLaps, deleteRace, setDeleteRace, demoMessage,
@@ -123,6 +123,9 @@ export function LiveTiming() {
         setDeleteRace={setDeleteRace}
         setShowCompletedDemos={setShowCompletedDemos}
         showCompletedDemos={showCompletedDemos}
+        listLoading={listLoading}
+        listError={listError}
+        retryLists={() => { refreshLists().catch(() => undefined); }}
       />
       <LiveSelectors
         session={session}
@@ -134,6 +137,7 @@ export function LiveTiming() {
         namedDrivers={namedDrivers}
         driverIds={driverIds}
         status={status}
+        primary={!canManageDemos}
       />
       {error && <div className="notice error-notice">{error}</div>}
       {session && (
