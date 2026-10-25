@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: ddbf765
+git_head: 17b9763
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -37,3 +37,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 
 - T382 inlinevalidation/rowkeyboard/cancellation45browserPASS T382-inline-row.browser.raw.log. Native closeeventtest now waits actualdialogteardown/focus, no sleeps/assertionsremoved. Inlinehookactual7VMcases and membershiphook3VMcases, runtime42PASS.
 - T382 two-column selectedcurrentroster+addform0308663, sharedfiveStateview978192d at2callsites, abort/latesthistorye1470ec. Browsermembership/layout/axe/rootbuild pending; parent remainsopen. Currentdatebounds inclusive(futureend active/futurestart excluded), no fakecurrentroster.
+
+- T-44470 accepted17b9763: Type SQL exception handler requests/responses and historical backfill connection, collection and lap-time map; preserve all executable behavior. Verify0.

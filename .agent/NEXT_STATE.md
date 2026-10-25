@@ -3,11 +3,6 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44470 W2 — OPEN
-- target_files: backend/app/core/errors.py, backend/app/race_archive.py
-- contract: T339 add precise leaf-module types for SQL error handlers and historical archive backfill.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k historical_archive_fills_missing_laps_without_replacing_recorded_data && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_runtime_dependencies.py && .venv/bin/mypy --strict --follow-imports=silent backend/app/core/errors.py backend/app/race_archive.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/core/errors.py backend/app/race_archive.py
-
 ### T-44469 W3 — OPEN
 - target_files: frontend/e2e/resource-memberships.spec.ts
 - contract: T382 cover real membership dialog loading/retry/current roster/layout and safe cancellation.
@@ -23,6 +18,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44470 accepted17b9763; verify0.
 - T-44468 acceptedddbf765; verify0.
 - T-44467 accepted0308663; verify0.
 - T-44466 accepted978192d; verify0.
