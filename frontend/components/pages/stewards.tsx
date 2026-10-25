@@ -1,7 +1,10 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { AddButton, Button, Modal, PageHeader } from "../ui";
+import { NbButton } from "../nb/button";
+import { NbCard } from "../nb/card";
+import { NbField } from "../nb/field";
+import { NbModal } from "../nb/modal";
 import { StewardReport } from "./steward-report";
 import { StewardSanctions } from "./steward-sanctions";
 import { StewardCases } from "./steward-cases";
@@ -33,19 +36,20 @@ export function StewardDesk() {
   } = useStewardDesk();
   return (
     <>
-      <PageHeader
-        eyebrow="RACE CONTROL / STEWARDING"
-        title="Steward desk"
-        description="Review reported incidents and record decisions. Approved penalties update driver points and eligibility in PostgreSQL."
-        action={
-          canSteward ? (
-            <AddButton
-              onClick={() => setActive({ __new: true })}
-              children="Report incident"
-            />
-          ) : null
-        }
-      />
+      <NbCard tone="cream" className="mb-8">
+        <header className="flex min-w-0 flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="mb-2 text-sm font-bold uppercase">RACE CONTROL / STEWARDING</p>
+            <h1 className="text-[length:var(--fs-h1)] font-bold">Steward desk</h1>
+            <p className="mt-4 max-w-[68ch]">Review reported incidents and record decisions. Approved penalties update driver points and eligibility in PostgreSQL.</p>
+          </div>
+          {!(active && canSteward) && (canSteward ? (
+            <NbButton variant="primary" data-primary="true" onClick={() => setActive({ __new: true })}>Report incident</NbButton>
+          ) : (
+            <NbButton variant="primary" data-primary="true" onClick={() => void load()}>Refresh</NbButton>
+          ))}
+        </header>
+      </NbCard>
       <StewardCases
         rows={rows.map((r) => ({
             ...r,
@@ -67,11 +71,12 @@ export function StewardDesk() {
             setGrid(0);
         }}
       />
-      {message && <div className="notice">{message}</div>}
+      {message && <NbCard tone="cream" className="mb-4" role="status">{message}</NbCard>}
       {active && canSteward && (
-        <Modal
+        <NbModal
+          open
           title={active.__new ? "Report incident" : "Incident review"}
-          close={() => setActive(undefined)}
+          onClose={() => setActive(undefined)}
         >
           {active.__new ? (
             <StewardReport
@@ -82,7 +87,7 @@ export function StewardDesk() {
             />
           ) : (
             <div className="decision-form">
-              <p>
+              <p className="mb-4 min-w-0 break-words">
                 <b>
                   {String(active.description || "Incident details unavailable")}
                 </b>
@@ -91,17 +96,17 @@ export function StewardDesk() {
                 Lap {String(active.lap)} · {String(active.state)}
               </p>
               {active.state !== "OPEN" && (
-                <div className="notice">
+                <NbCard tone="cream" className="mb-4" role="status">
                   This incident already has a decision recorded.
-                </div>
+                </NbCard>
               )}
-              <label>
-                Decision notes
+              <NbField id="steward-decision-notes" label="Decision notes">
                 <textarea
+                  className="min-h-32 w-full border-4 border-ink bg-paper p-3 text-ink"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                 />
-              </label>
+              </NbField>
               <StewardSanctions
                 points={points}
                 seconds={seconds}
@@ -111,24 +116,26 @@ export function StewardDesk() {
                 setGrid={setGrid}
               />
               <div className="form-actions">
-                <Button
+                <NbButton
                   disabled={busy || active.state !== "OPEN"}
                   onClick={() => void decide(false)}
-                  kind="secondary"
+                  variant="danger"
                 >
                   Reject report
-                </Button>
-                <Button
+                </NbButton>
+                <NbButton
                   disabled={busy || active.state !== "OPEN"}
                   onClick={() => void decide(true)}
-                  kind="danger"
+                  variant="primary"
+                  data-primary={active.state === "OPEN" ? "true" : undefined}
                 >
                   <Check size={15} /> Approve penalty
-                </Button>
+                </NbButton>
+                {active.state !== "OPEN" && <NbButton variant="primary" data-primary="true" onClick={() => setActive(undefined)}>Close review</NbButton>}
               </div>
             </div>
           )}
-        </Modal>
+        </NbModal>
       )}
     </>
   );

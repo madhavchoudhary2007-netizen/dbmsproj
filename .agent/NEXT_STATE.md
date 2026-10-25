@@ -3,10 +3,10 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44527 W1 — OPEN
-- target_files: frontend/components/pages/session-results.tsx, frontend/components/pages/sessions.tsx
-- contract: T386 render all five session-result states using the verified result source flags, keeping actual rows on refresh failures.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+### T-44531 W3 — OPEN
+- target_files: frontend/e2e/session-resilience.spec.ts
+- contract: T386 test same-frame session mutation spam and real result loading/error/retention/retry in the browser.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && npx playwright test e2e/session-resilience.spec.ts --list
 
 ### T-44529 W1 — OPEN
 - target_files: frontend/components/pages/stewards.tsx, frontend/components/pages/steward-report.tsx, frontend/components/pages/steward-cases.tsx
@@ -23,6 +23,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44527 accepted378faa0; verify0.
 - T-44530 accepted8e83f3c; verify0.
 - T-44528 accepted885b8ac; verify0.
 - T-44526 accepted7897a78; verify0.

@@ -39,6 +39,7 @@ export function StewardReport({
       ]}
       save={report}
       busy={busy}
+      primary
     />
   );
 }

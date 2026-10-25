@@ -47,14 +47,14 @@ export function StewardCases({ rows, loading, error, retry, onSelect }: Props) {
                 onSelect(row);
               }
             }}
-            className="min-h-12 cursor-pointer border-4 border-ink bg-paper p-4 shadow-nb-4 focus-visible:outline-4 focus-visible:outline-[var(--nb-yellow)] focus-visible:outline-offset-4"
+            className="min-h-12 min-w-0 cursor-pointer border-4 border-ink bg-paper p-4 shadow-nb-4 focus-visible:outline-4 focus-visible:outline-[var(--nb-yellow)] focus-visible:outline-offset-4"
           >
-            <div role="cell" className="mb-4 inline-block border-4 border-ink bg-cream px-3 py-2 font-bold">CASE #{pretty(row.id)}</div>
+            <div role="cell" className="mb-4 inline-block min-w-0 break-all border-4 border-ink bg-cream px-3 py-2 font-bold">CASE #{pretty(row.id)}</div>
             <div role="presentation" className="grid gap-3 sm:grid-cols-2">
               {fields.map(([label, key]) => (
-                <div role="cell" key={key} className={key === "description" ? "sm:col-span-2" : ""}>
+                <div role="cell" key={key} className={key === "description" ? "min-w-0 sm:col-span-2" : "min-w-0"}>
                   <span className="block text-sm font-bold uppercase">{label}</span>
-                  <span>{pretty(row[key])}</span>
+                  <span className="block min-w-0 break-words">{pretty(row[key])}</span>
                 </div>
               ))}
               <div role="cell">
