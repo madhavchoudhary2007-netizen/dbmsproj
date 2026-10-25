@@ -1,0 +1,65 @@
+diff --git a/frontend/components/ui.tsx b/frontend/components/ui.tsx
+index b2d4e82..b62f49b 100644
+--- a/frontend/components/ui.tsx
++++ b/frontend/components/ui.tsx
+@@ -12,6 +12,7 @@ import { Row, pretty } from "@/lib/api";
+ import { NbField } from "@/components/nb/field";
+ import { NbButton } from "@/components/nb/button";
+ import { NbInput, NbSelect } from "@/components/nb/input";
++import { useFieldValidation } from "@/lib/use-field-validation";
+ export function PageHeader({
+   eyebrow,
+   title,
+@@ -311,6 +312,7 @@ export function ResourceEditor({
+ }) {
+   const [vals, setVals] = useState<Row>(initial || {}),
+     [err, setErr] = useState("");
++  const { errors, validate, revalidate } = useFieldValidation();
+   const saveInFlight = useRef(false);
+   const formId = useId();
+   return (
+@@ -339,7 +341,7 @@ export function ResourceEditor({
+       }}
+     >
+       {fields.map((f) => (
+-        <NbField key={f.name} id={`${formId}-${f.name}`} label={f.label || f.name.replaceAll("_", " ")}>
++        <NbField key={f.name} id={`${formId}-${f.name}`} label={f.label || f.name.replaceAll("_", " ")} error={errors[f.name]}>
+           {f.options ? (
+             <NbSelect
+               required={f.required}
+@@ -351,7 +353,12 @@ export function ResourceEditor({
+                       .slice(0, 16)
+                   : String(vals[f.name] ?? "")
+               }
+-              onChange={(e) => setVals({ ...vals, [f.name]: e.target.value })}
++              onBlur={(e) => validate(f.name, e.currentTarget)}
++              onInvalid={(e) => validate(f.name, e.currentTarget)}
++              onChange={(e) => {
++                revalidate(f.name, e.currentTarget);
++                setVals({ ...vals, [f.name]: e.target.value });
++              }}
+             >
+               <option value="">Select…</option>
+               {f.options.map((x) => {
+@@ -378,15 +385,18 @@ export function ResourceEditor({
+                       .slice(0, 16)
+                   : String(vals[f.name] ?? "")
+               }
+-              onChange={(e) =>
++              onBlur={(e) => validate(f.name, e.currentTarget)}
++              onInvalid={(e) => validate(f.name, e.currentTarget)}
++              onChange={(e) => {
++                revalidate(f.name, e.currentTarget);
+                 setVals({
+                   ...vals,
+                   [f.name]:
+                     f.type === "number"
+                       ? e.target.value === "" ? undefined : Number(e.target.value)
+                       : e.target.value,
+-                })
+-              }
++                });
++              }}
+             />
+           )}
+         </NbField>

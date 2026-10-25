@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 18211b0
+git_head: e5c4a2a
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -36,3 +36,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - Latestacceptedpacket/hashes/evidence: Git/.agent/results; queue/stateupdatedaftereachacceptance. No newdependencies, no realDBwrites.
 
 - T-44459 accepted18211b0: Add native field-validation hook with blur/invalid validation and change revalidation only after error, preserving unrelated errors and no-op identity. Verify0.
+
+- T-44460 acceptede5c4a2a: Cover row Edit click/keyboard and Delete cancellation boundaries, exact record values, single dialog/primary restoration and zero writes. Verify0.
