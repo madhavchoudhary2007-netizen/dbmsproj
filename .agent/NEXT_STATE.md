@@ -3,15 +3,20 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44415 W3 — OPEN
+- target_files: frontend/e2e/race-control-feed.spec.ts
+- contract: T381 adopt explicit platform mocks in the remaining mocked dashboard race-control feed suite.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/race-control-feed.spec.ts --list
+
+### T-44414 W3 — OPEN
+- target_files: frontend/e2e/data-primary.spec.ts, frontend/e2e/edge-resilience.spec.ts, frontend/e2e/shell-navigation.spec.ts
+- contract: T381 adopt explicit platform mocks in primary-action, edge-recovery and shell-navigation suites.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/data-primary.spec.ts e2e/edge-resilience.spec.ts e2e/shell-navigation.spec.ts --list
+
 ### T-44413 W3 — OPEN
 - target_files: frontend/e2e/accessibility.spec.ts, frontend/e2e/palette.spec.ts, frontend/e2e/touch-targets.spec.ts
 - contract: T381 adopt explicit platform mocks in accessibility, palette and touch-target mock-only suites.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/accessibility.spec.ts e2e/palette.spec.ts e2e/touch-targets.spec.ts --list
-
-### T-44412 W3 — OPEN
-- target_files: frontend/e2e/routes.spec.ts, frontend/e2e/states-matrix.spec.ts, frontend/e2e/responsive.spec.ts
-- contract: T381 adopt explicit platform mocks in route, state-matrix and responsive mock-only suites.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/routes.spec.ts e2e/states-matrix.spec.ts e2e/responsive.spec.ts --list
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -22,6 +27,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44412 acceptedfd9629d; verify0.
 - T-44411 accepted6b9fd8c; verify0.
 - T-44410 accepted6b6cf24; verify0.
 - T-44409 accepted5b1d8f4; verify0.

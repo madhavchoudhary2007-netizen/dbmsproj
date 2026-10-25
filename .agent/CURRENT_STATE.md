@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 6b9fd8c
+git_head: fd9629d
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -51,3 +51,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44410 accepted6b6cf24: Offline request-auth characterization for lazy pool access, valid/revoked credentials, cookie CSRF, roles and injected database cleanup. Verify0.
 
 - T-44411 accepted6b9fd8c: Observe actual readiness runtime lease and session WebSocket with abort/stale guards and listener/socket cleanup; no synthetic health. Verify0.
+
+- T-44412 acceptedfd9629d: Adopt explicit mock platform fixture by import-only changes; all test bodies and gates unchanged. Verify0.

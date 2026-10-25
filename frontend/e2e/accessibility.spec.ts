@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./mock-platform";
 
 const routes = [
   ["E2E-R01", "/"], ["E2E-R02", "/login"], ["E2E-R03", "/dashboard"],

@@ -1,0 +1,31 @@
+diff --git a/frontend/e2e/accessibility.spec.ts b/frontend/e2e/accessibility.spec.ts
+index 2adf8ee..ba7020f 100644
+--- a/frontend/e2e/accessibility.spec.ts
++++ b/frontend/e2e/accessibility.spec.ts
+@@ -1,5 +1,5 @@
+ import AxeBuilder from "@axe-core/playwright";
+-import { expect, test, type Page } from "@playwright/test";
++import { expect, test, type Page } from "./mock-platform";
+ 
+ const routes = [
+   ["E2E-R01", "/"], ["E2E-R02", "/login"], ["E2E-R03", "/dashboard"],
+diff --git a/frontend/e2e/palette.spec.ts b/frontend/e2e/palette.spec.ts
+index dac1f7c..850b5e3 100644
+--- a/frontend/e2e/palette.spec.ts
++++ b/frontend/e2e/palette.spec.ts
+@@ -1,4 +1,4 @@
+-import { expect, test, type Page } from "@playwright/test";
++import { expect, test, type Page } from "./mock-platform";
+ import sharp from "sharp";
+ import { scorePixels } from "../../scripts/eval/palette-core";
+ import { measurePalette } from "./palette-measure";
+diff --git a/frontend/e2e/touch-targets.spec.ts b/frontend/e2e/touch-targets.spec.ts
+index 542a2df..b040eb0 100644
+--- a/frontend/e2e/touch-targets.spec.ts
++++ b/frontend/e2e/touch-targets.spec.ts
+@@ -1,4 +1,4 @@
+-import { expect, test } from "@playwright/test";
++import { expect, test } from "./mock-platform";
+ 
+ const routes = [
+   "/login", "/dashboard", "/live", "/sessions", "/stewards", "/pit-wall",

@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./mock-platform";
 import sharp from "sharp";
 import { scorePixels } from "../../scripts/eval/palette-core";
 import { measurePalette } from "./palette-measure";
