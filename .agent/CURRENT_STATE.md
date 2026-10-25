@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 885b8ac
+git_head: 8e83f3c
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -53,3 +53,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44526 accepted7897a78: Expose selected-session result loading/errors, abort obsolete reads and suppress stale updates while retaining successful results. Verify0.
 
 - T-44528 accepted885b8ac: Correct result-dialog accessible labels and numeric/boolean expectations, preserving exact request, focus and accessibility assertions. Verify0.
+
+- T-44530 accepted8e83f3c: Prove actual result-reader loading, signal forwarding, retention on errors, abort silence and stale response suppression using VM imports. Verify0.

@@ -1,4 +1,3 @@
-import { StateMessage } from "@/components/ui";
 import { NbBadge } from "@/components/nb/badge";
 import { NbButton } from "@/components/nb/button";
 import { NbCard } from "@/components/nb/card";
@@ -16,6 +15,8 @@ export function SessionPage() {
     editModal,
     setEditModal,
     resultsLoaded,
+    resultsLoading,
+    resultsError,
     setResultsLoaded,
     selected,
     setSelected,
@@ -102,12 +103,13 @@ export function SessionPage() {
             />
           )}
           {simMessage && <div className="notice border-4 border-ink bg-paper p-4 text-ink shadow-nb-4">{simMessage}</div>}
-          {resultsLoaded && results.length === 0 && (
-            <StateMessage empty="No result rows are recorded for this session." />
-          )}
-          {results.length > 0 && (
+          {(resultsLoaded || resultsLoading || resultsError || results.length > 0) && (
             <SessionResults
               results={results}
+              resultsLoaded={resultsLoaded}
+              resultsLoading={resultsLoading}
+              resultsError={resultsError}
+              getResults={getResults}
               canControl={canControl}
               setResultModal={setResultModal}
             />

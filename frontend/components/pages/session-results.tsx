@@ -2,18 +2,27 @@ import { pretty, type Row } from "@/lib/api";
 import { NbBadge } from "@/components/nb/badge";
 import { NbButton } from "@/components/nb/button";
 import { NbTable } from "@/components/nb/table";
+import type { ViewState } from "@/lib/data-state";
 
 export function SessionResults({
   results,
+  resultsLoaded,
+  resultsLoading,
+  resultsError,
+  getResults,
   canControl,
   setResultModal,
 }: {
   results: Row[];
+  resultsLoaded: boolean;
+  resultsLoading: boolean;
+  resultsError: string;
+  getResults: () => void;
   canControl: boolean;
   setResultModal: (value: boolean) => void;
 }) {
   const provisional = results.some((result) => result.provisional === true);
-  const columns = Object.keys(results[0]).filter(
+  const columns = Object.keys(results[0] ?? {}).filter(
     (key) => typeof results[0][key] !== "object",
   ).map((key) => ({
     key,
@@ -29,6 +38,32 @@ export function SessionResults({
       );
     },
   }));
+  const state: ViewState<readonly Row[]> = resultsLoading
+    ? results.length > 0
+      ? {
+          status: "partial",
+          data: results,
+          filter: { label: "results refresh", clear: getResults },
+          totalCount: results.length,
+        }
+      : { status: "loading" }
+    : resultsError
+      ? results.length > 0
+        ? {
+            status: "partial",
+            data: results,
+            filter: { label: "results refresh", clear: getResults },
+            totalCount: results.length,
+          }
+        : {
+            status: "error",
+            error: { message: resultsError, retryable: true },
+            retry: getResults,
+          }
+      : resultsLoaded && results.length === 0
+        ? { status: "empty", reason: "no-data" }
+        : { status: "populated", data: results };
+  const partial = state.status === "partial";
 
   return (
     <div className="results-table">
@@ -53,10 +88,15 @@ export function SessionResults({
         )}
       </div>
       <NbTable
-        state={{ status: "populated", data: results }}
+        state={state}
         columns={columns}
         rowKey={(row, index) => String(row.id || index)}
         caption="Session results"
+        empty="No result rows are recorded for this session."
+        sourceMessage={partial && resultsError ? resultsError : undefined}
+        partialSummary={partial ? resultsLoading ? "Showing saved results while an update is in progress." : "Showing saved results because the latest update failed." : undefined}
+        partialActionLabel={partial ? "Retry results" : undefined}
+        partialActionAriaLabel={partial ? "Retry loading session results" : undefined}
       />
     </div>
   );

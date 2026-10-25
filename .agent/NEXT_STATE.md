@@ -8,11 +8,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T386 render all five session-result states using the verified result source flags, keeping actual rows on refresh failures.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
-### T-44530 W3 — OPEN
-- target_files: frontend/e2e/runtime/session-operations.test.mjs
-- contract: T386 prove actual session result reader loading, failure, abort and stale-response behavior with the existing VM harness.
-- verify: npm --prefix frontend run test:runtime && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
-
 ### T-44529 W1 — OPEN
 - target_files: frontend/components/pages/stewards.tsx, frontend/components/pages/steward-report.tsx, frontend/components/pages/steward-cases.tsx
 - contract: T387 restyle the steward header and native decision/report modal while preserving exact decision semantics.
@@ -28,6 +23,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44530 accepted8e83f3c; verify0.
 - T-44528 accepted885b8ac; verify0.
 - T-44526 accepted7897a78; verify0.
 - T-44525 acceptedb301b9c; verify0.
