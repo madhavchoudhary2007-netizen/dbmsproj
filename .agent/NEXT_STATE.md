@@ -8,23 +8,19 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: Owner requested GPT6Luna/high worker bindings only.
 - verify: python3 -c 'import pathlib,tomllib; assert tomllib.loads(pathlib.Path('"'"'.codex/agents/w2-state.toml'"'"').read_text())["model"] == "gpt-6-luna" and tomllib.loads(pathlib.Path('"'"'.codex/agents/w2-state.toml'"'"').read_text())["model_reasoning_effort"] == "high"; assert tomllib.loads(pathlib.Path('"'"'.codex/agents/w3-eval.toml'"'"').read_text())["model"] == "gpt-6-luna" and tomllib.loads(pathlib.Path('"'"'.codex/agents/w3-eval.toml'"'"').read_text())["model_reasoning_effort"] == "high"; print("PASS owner requested gpt-6-luna/high")'
 
-### T-44319 Orchestrator — OPEN
-- target_files: .agent/models.env, .codex/agents/w1-ui.toml
-- contract: Owner requested GPT6Luna/high worker bindings only.
-- verify: python3 -c 'import pathlib,tomllib; assert "gpt-6-luna" in pathlib.Path('"'"'.agent/models.env'"'"').read_text(); assert tomllib.loads(pathlib.Path('"'"'.codex/agents/w1-ui.toml'"'"').read_text())["model"] == "gpt-6-luna" and tomllib.loads(pathlib.Path('"'"'.codex/agents/w1-ui.toml'"'"').read_text())["model_reasoning_effort"] == "high"; print("PASS owner requested gpt-6-luna/high")'
-
 ### T-44318 W2 — OPEN
 - target_files: frontend/lib/use-pit-wall.ts
 - contract: T379 stage exact PitWall state/effects/actions into use-pit-wall hook; do not wire presentation yet.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
 ## Blocked
-- None currently. Owner5.6/high override2bc94fb verified byfreshsuccessfulworkers.
+- None currently. Owner switched workers to gpt-6-luna/high; T44318 interrupted before edits, fresh worker required.
 
 ## Deferred
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44319 acceptedba3fa7c; verify0.
 - T-44316 acceptedf2ef65e; verify0.
 - T-44317 acceptede0e553d; verify0.
 - T-44315 accepted7bc73c9; verify0.
@@ -59,5 +55,5 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - Phase6 T370/T371 complete;481 browser checks and build/static0.
 - Login parentT380 accepted0a3e206; root80browserchecks and build/types/lint0.
 - Dashboard exactmove complete; SessionPage split complete, Steward split underway (T379), existingbehavior retained.
-- Backend latest full231pass0skip/livePASS afterb0972ed; main1264lines, T331 remains.
+- Backend latest full231pass0skip/livePASS afterb0972ed; main1220lines, T331 remains.
 - Detailed accepted IDs/evidence in CURRENT_STATE, git and .agent/results.

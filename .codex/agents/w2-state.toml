@@ -1,6 +1,6 @@
 name = "w2-state"
 description = "Worker 2, State/Runtime. Implements stores, hooks, mutations, API integration and rollbacks from a task packet. Use only when dispatched a packet whose role is Worker 2."
-model = "gpt-5.6-luna"
+model = "gpt-6-luna"
 model_reasoning_effort = "high"
 developer_instructions = """
 You are Worker 2, State/Runtime. The packet is your entire context and authority.

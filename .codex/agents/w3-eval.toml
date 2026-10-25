@@ -1,6 +1,6 @@
 name = "w3-eval"
 description = "Worker 3, Evaluation/QA. Writes and runs Playwright suites, AST checks, invariants and unit tests, and reports scores. Use only when dispatched a packet whose role is Worker 3."
-model = "gpt-5.6-luna"
+model = "gpt-6-luna"
 model_reasoning_effort = "high"
 developer_instructions = """
 You are Worker 3, Evaluation/QA. The packet is your entire context and authority.
