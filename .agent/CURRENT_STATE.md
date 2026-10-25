@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 6391ea2
+git_head: af7f9bb
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -13,12 +13,12 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - Login T3800a3e206 complete80browser/build/static0; fivewidthvisuals reviewed, keyboard/aria-busy covered.
 
 ## Active work / evidence
-- T379 seven-route exactsplit complete,special-pages9exports. Parent UNACCEPTED: original1100mocked1020PASS80FAIL; targetedafterbody/heading/motionfix85cases70PASS15desktopA3FAIL. Finishlayoutgates inPhase7 thenrerunfull; no gateswaived.
-- T381 dashboardhero/KPIs/context/Nextup/incidents,5states, actual lease/WS sources wired. Root165browserPASS T381-connectivity-final.browser.raw.log incl eightconnectivityscenarios/fiveprojects, sourcefailures/retry/spam/unmount/malformed/axe/responsive/palette. Fivewidthvisuals0overflow/oneprimary/noerrors. Activecontextfieldhierarchy+rawdetails1373d88. Lastprod build/types/lint0 T381-current-build.raw.log (beforelatestchanges). Runtime31PASS. Keep .stat-card/.state.error/Try again.
-- T382 resourceheader0ec278d/toolbar6139e34 accepted;300browserPASS T382-header-toolbar.browser.raw.log acrosssixroutes/axe/targets/primary/sixwidths. Exactrowstate/loadextractionaf535f8. Table/modal/5states/palette unfinished; parentnotcomplete.
-- Backend T331 main834lines,<=120 NOT achieved; T332unfinished. Genuine API/coreextracts retained. Appfactory22c7e77 exactleasebodyAST. TypedRuntimeState60c4999/providers4521ac9/lifespan d756a9f/b87fee6 share/clear realresourceidentities. Requestauth/DatabaseSession1ffce81 unitregressions6b6cf24.
-- MembershipDIcc18c4b +requiredrepo f311789: full243PASS0skip/livePASS T44424.full.raw.log, zero cookie warnings after3b54092. AnalyticsDIc18bce7 +requiredrepodb1e96d; directtestfixturesb2aae4b explicitlyinject. T331/T332 coupled because legacytests patchmain; no fake namespaceproxies/renames tohitlinebudget.
-- T44425fullgate242PASS1FAIL: typedreturnannotations inferredPydanticDecimal->string, existingnumericassertcaughtit. response_modelNone restoresoriginalencoding19b7991; Full245PASS0skip/livePASS T44433.full.raw.log after1479019 exactnumericregressions. Do not weakenexistingassertion.
+- T379 exact seven-route split complete(special-pages9exports), parent NOT accepted: initial1100mocked1020PASS80FAIL; aftersharedbody/heading/motionrepairs85targeted70PASS15desktopA3FAIL. RemainingroutePhase7layouts thenfullrerun; no gatewaived.
+- T381 dashboard hero/context/KPIs/services/Nextup/incidents implemented. Actuallease503/notready/recovery +cookieWSopen/error/close/cleanup, no syntheticstatus. Root165browserPASS T381-connectivity-final.browser.raw.log; fivewidthvisuals0overflow/oneprimary/noerrors. Preserve .stat-card/.state.error/Try again. TASTE-381-1 fouraccenttiles vsT400max3 unresolved.
+- T382 resources header/toolbar/exactrowhook/classifier/NbTable/nativeModal/NbField/form/rowEditDelete/roleeligibilitybadges implemented; alloriginalcelltext/copy/pageSize50 preserved. Root360browserPASS T382-actions-primary.browser.raw.log, allsixpalettes/fivewidthaxe/targets/overflow/primary/dataflow. Build/lint/types0 T382-actions-build.raw.log. Parent unfinished: inlinevalidation, twocolumnmemberships, focusedfileboundaries/finalvisuals.
+- Real20POST/save and20DELETE/confirm duplicates repaired06330e6/6e28dd6, confirmation7838c2d. Strict25PASS T382-delete-guard.browser.raw.log; markerretired5cfe010, activeprimarytransitions5widthPASS. Browserwrites locallymocked only.
+- Backend main824lines, <=120T331 NOT met; T332unfinished. Genuine modules/core/extracts retained. TypedRuntimeState/providers/lifespan shareandclear identities; requestauth/DatabaseSession. Membership/analytics/pitreads useDI. Actualreturnannotation Decimalstringregression fixedresponse_modelNone19b7991; exactnumericserializationtests1479019 preservewireencoding.
+- Backendfull245PASS0skip/liveacceptancePASS T44453.full.raw.log. Strictmypy177errors/30files T332-current-types.raw.log,target0T339. Runtime32PASS. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
 
 ## Safety / workflow
 - Onlyoverhaul/neo-brutal; commits onlyaccept.sh; independentlyrerunVerify;2packet-onlycustomworkersmax, no model/effortoverrides. Isolatedclones .agent/orchestrate.py;<=3files/150added+deleted; normalizeactualstats. Every5tasks budget.
@@ -26,26 +26,11 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - Preserveeveryroute/feature/chart/modal/copy/aria/data/stateclass/DBMShash; fiveStates/44targets/tokens/reducedmotion. Thresholds/testsunchanged. Latesttypecheck/strictlint/fourCSS0.
 
 ## Open risks / next
-- T331/T332globals/factorycallbacks, strictmypy177errors/30files measured T332-current-types.raw.log (improvedfrom212/190), target0T339; coverage/batching/DBMSshowcase/finaleval pending.
-- T44132 bundlechecker misseslayout/sharedassets; repairbeforeP3 with170KBunchanged. Lighthouseabsent,FPS17untilT41316.7,hostedCIunverified. Final>=95/allhardgates/noNOT_RUN.
-- TASTE-381-1 fourKPIaccents vsT400max3; consolidatebeforeA5. OtherPhase7layouts mustrepairT379A3. DBMSredesign dependsPhase4.
+- Backend globals/factorycallbacks/strictmypy/batching/migrationledger, Phase4DBMSshowcase andfinalfullE2E/eval remain. Do not claimcompletion or current95score.
+- T44132 bundlechecker omitslayout/sharedassets; fixbeforeP3 while170KBunchanged. Lighthouseabsent, FPS17untilT41316.7, hostedCIunverified. TASTE-382-BLOAT resourcepage586lines>300; genuineboundarysplitsneeded.
+- HostPython3.14/Node26 vsDocker3.12/22; productionfrontendimage lackssource/lintconfig(hostchecks). Acceptancefixture dependsoldchampionshipround3(T021backlog, ownfixtureplanrequired).
 
 ## Orchestrator direct edits / process findings
-- Productglue14lines only inlongcontinuation; allcurrentproductimplementationworkers. Independentlycheckactualcounts/ASTmoves/assertions; newfileenvelopesoccasionallywrong, normalized.
-- Earlier source/fixture regressions and repairs retain Git/results evidence. Actual malformedincident crash1924d64/da48958, connectivity165PASS, healthink/plinthface5a0ad53/d018de6.
-- T44427wrongworkspace boundary repaired by transferringownedpatch toclone/restoringroot; rootaccept0 afterexplicitcloneverify. Actualnumericencodingregression repaired19b7991 with245PASS fullproof. No tests/gates weakened.
-
-## Latest accepted work
-- T382 header/toolbar/row hook/classifier/NbTable/native modals/NbField editor/palette accepted in Git. Six resource palettes PASS aftercf0cfba; all30 five-state/filter/retry/paging cases PASS. Parent unfinished: row actions/badges, modal primary/two-column roster/inline validation, file bloat, final broad/browser/build.
-- F-382-SAVE real20POST duplicate fixed06330e6. F-382-DELETE native confirmation7838c2d plus synchronousguard6e28dd6. Root strict RUN_XFAIL=1 T382-delete-guard.browser.raw.log:25PASS acrossfivewidths; no realwrites(allmocked). Retire only strict test.fail marker next; retain20click/Cancel/error assertions.
-- T44451 actual demo-delete helper characterization246153e preservesallassertions; T44453 unused main demo wrappersremoved4514b8e. main834lines, parent<=120 unfinished. Backend latestfull245PASS0skip/livePASS T44440.full.raw.log(beforeT44451/53); rerunrequired.
-- Strictmypy177errors/30files; backendDIaudit8b7e8d8 .agent/audit/T44446-di-map.md. Typedpitreads e55086a/c53cd59. Runtime32PASS. Latestfrontendbuild T382-current-build.raw.log predateslatesttable/dialog/guards; rerunrequired.
-- Isolatedclones maynotcontainignoredrawlogs: inlineactualdiagnostics inpackets. Rootnormalizesactualdiffcounts. No implementationblocker or newdependency.
-
-- T-44454 acceptedd5d6796: Mark the active resource dialog action as primary; keep hidden confirmation and background header/editor unmarked. Optional ResourceEditor prop preserves other callers. Verify0.
-
-- T-44456 acceptedfe37650: Add admin-only 44px resource row edit/delete icon actions using existing dialogs; render driver eligibility and user role badges while preserving original cell text. Verify0.
-
-- T-44455 accepted5cfe010: Promote proven delete confirmation regression to normal gate; assert one global primary action with exact accessible name through create/details/confirmation/cancel/Escape transitions. Verify0.
-
-- T-44457 accepted6391ea2: Remove unused main list-demo wrapper and unused Query import; keep actual registered handler and repository wiring. Verify0.
+- Priorlongcontinuation14productgluelines; currentcontinuation0productlines. AllimplementationcustomLunahighworkers, cap2. Independentaccept.sh reruns, actualdiffcounts/unchangedassertionAST checked.
+- Worker T44427wrongworkspacerepairedinpreviouscontext. Reviewcaughtfixture/APIshape errors, serializationregression andhiddenconfirmationprimary; repairedwithouttest/gaterelaxation. Rawlogsabsentclones: inlinefactsinpackets.
+- Latestacceptedpacket/hashes/evidence: Git/.agent/results; queue/stateupdatedaftereachacceptance. No newdependencies, no realDBwrites.
