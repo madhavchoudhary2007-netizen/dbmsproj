@@ -20,6 +20,9 @@ export type NbStateProps<T> = {
   sourceMessage?: string;
   loadingLabel?: string;
   skeletonRows?: number;
+  partialSummary?: string;
+  partialActionLabel?: string;
+  partialActionAriaLabel?: string;
 };
 
 const stateCardStyle: CSSProperties = {
@@ -39,6 +42,9 @@ export function NbState<T>({
   sourceMessage,
   loadingLabel,
   skeletonRows,
+  partialSummary,
+  partialActionLabel,
+  partialActionAriaLabel,
 }: NbStateProps<T>) {
   switch (state.status) {
     case "loading":
@@ -77,13 +83,13 @@ export function NbState<T>({
       const count = shownCount ?? (Array.isArray(state.data) ? state.data.length : 0);
       return <NbCard className={cn("state", className)} data-testid="state-partial" tone="yellow" style={{ ...stateCardStyle, background: "var(--nb-yellow)" }} role="status">
           <div className="tx-caution" aria-hidden="true" />
-          <p style={{ color: "inherit" }}>Showing {count} of {state.totalCount} records</p>
+          <p style={{ color: "inherit" }}>{partialSummary ?? `Showing ${count} of ${state.totalCount} records`}</p>
           <NbButton
             variant="secondary"
             onClick={state.filter.clear}
-            aria-label={`Clear filter: ${state.filter.label}`}
+            aria-label={partialActionAriaLabel ?? `Clear filter: ${state.filter.label}`}
           >
-            Clear filter
+            {partialActionLabel ?? "Clear filter"}
           </NbButton>
           {sourceMessage && <p style={{ color: "inherit" }}>{sourceMessage}</p>}
           {children(state.data)}

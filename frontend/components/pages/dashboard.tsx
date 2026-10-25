@@ -3,12 +3,14 @@
 import { pretty } from "@/lib/api";
 import { useDashboard } from "@/lib/use-dashboard";
 import Link from "next/link";
-import { ReloadButton, StateMessage } from "@/components/ui";
+import { ReloadButton } from "@/components/ui";
 import { NbCard } from "@/components/nb/card";
 import { NbStat } from "@/components/nb/stat";
+import { NbButton } from "@/components/nb/button";
+import { NbState } from "@/components/nb/state";
 
 export function Dashboard() {
-  const { data, health, err, load, fetchData } = useDashboard();
+  const { data, health, err, healthError, state, fetchData } = useDashboard();
   return (
     <>
       <div className="dashboard-overview-grid">
@@ -82,15 +84,25 @@ export function Dashboard() {
           </NbCard>
         )}
       </div>
-      <StateMessage error={err} loading={load} retry={fetchData} />
-      {data && (
-        <>
+      <NbState
+        state={state}
+        empty="No dashboard data is currently available."
+        nextAction={<NbButton variant="secondary" onClick={fetchData}>Reload dashboard data</NbButton>}
+        shownCount={4}
+        partialSummary="Showing 4 dashboard metrics"
+        sourceMessage={state.status === "partial"
+          ? [state.filter.label, err, healthError].filter(Boolean).join(": ")
+          : healthError || err || undefined}
+        partialActionLabel="Try again"
+        partialActionAriaLabel="Retry dashboard data"
+      >
+        {(dashboard) => (
           <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {([
-              ["active_sessions", data.active_sessions, "red", -2],
-              ["scheduled_events", data.scheduled_events, "yellow", 2],
-              ["open_incidents", data.open_incidents, "violet", -2],
-              ["drivers", data.drivers, "mint", 2],
+              ["active_sessions", dashboard.active_sessions, "red", -2],
+              ["scheduled_events", dashboard.scheduled_events, "yellow", 2],
+              ["open_incidents", dashboard.open_incidents, "violet", -2],
+              ["drivers", dashboard.drivers, "mint", 2],
             ] as const).map(([k, v, tone, tilt]) => (
               <NbStat
                 key={String(k)}
@@ -102,9 +114,22 @@ export function Dashboard() {
                 stickerTilt={tilt}
               />
             ))}
+            <NbCard tone="paper" shadow={8} className="col-span-full min-w-0">
+              <div className="eyebrow">NEXT UP</div>
+              {dashboard.next_event ? (
+                <div className="min-w-0 [overflow-wrap:anywhere]">
+                  <h2>{pretty(dashboard.next_event.name)}</h2>
+                  <p>{pretty(dashboard.next_event.circuit_name)}</p>
+                  <p>{pretty(dashboard.next_event.scheduled_at)}</p>
+                </div>
+              ) : <p>No upcoming event.</p>}
+              <Link className="nb-plinth mt-4 inline-flex min-h-11 min-w-11 items-center justify-center border-4 border-ink bg-paper px-4 py-2 font-bold" href="/sessions">
+                View sessions
+              </Link>
+            </NbCard>
           </div>
-        </>
-      )}
+        )}
+      </NbState>
     </>
   );
 }
