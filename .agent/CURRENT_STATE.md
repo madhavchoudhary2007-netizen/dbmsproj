@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: a8a1741
+git_head: d13765d
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -47,3 +47,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44502 accepted1d24522: Scope timing assertions to visible responsive sector cells and hold snapshot outages until explicit user retry. Verify0.
 
 - T-44503 accepteda8a1741: Render existing telemetry series in five-state chart frames with four actual temperature corner tiles. Verify0.
+
+- T-44504 acceptedd13765d: Use exact visible sector-best count and actual accessible combobox name in timing browser checks. Verify0.
