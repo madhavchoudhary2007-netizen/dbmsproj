@@ -1,0 +1,163 @@
+diff --git a/frontend/components/nb/table.tsx b/frontend/components/nb/table.tsx
+index 079917b..da3e24c 100644
+--- a/frontend/components/nb/table.tsx
++++ b/frontend/components/nb/table.tsx
+@@ -20,6 +20,7 @@ export type NbTableProps<T extends Record<string, unknown>> = {
+   caption: string;
+   empty?: string;
+   onSelect?: (row: T) => void;
++  isSelected?: (row: T) => boolean;
+   className?: string;
+   pageSize?: number;
+   sourceMessage?: string;
+@@ -36,6 +37,7 @@ export function NbTable<T extends Record<string, unknown>>({
+   caption,
+   empty = "No records returned by the API.",
+   onSelect,
++  isSelected,
+   className,
+   pageSize = 8,
+   sourceMessage,
+@@ -64,6 +66,7 @@ export function NbTable<T extends Record<string, unknown>>({
+               <tr
+                 key={rowKey(row, index)}
+                 className={cn("h-12 odd:!bg-[var(--nb-paper)] even:!bg-[var(--nb-cream)] hover:!bg-[var(--nb-yellow)] focus-visible:outline-4 focus-visible:outline-[var(--nb-yellow)] focus-visible:outline-offset-[-4px]", selectable && "clickable")}
++                aria-selected={isSelected ? isSelected(row) : undefined}
+                 onClick={onSelect ? (event) => { if (!isNestedControl(event.target)) select(); } : undefined}
+                 onKeyDown={onSelect ? (event) => {
+                   if ((event.key === "Enter" || event.key === " ") && !isNestedControl(event.target)) {
+diff --git a/frontend/components/pages/live/index.tsx b/frontend/components/pages/live/index.tsx
+index 5e465cc..02e7df6 100644
+--- a/frontend/components/pages/live/index.tsx
++++ b/frontend/components/pages/live/index.tsx
+@@ -147,7 +147,7 @@ export function LiveTiming() {
+               <TriangleAlert size={16} /> SAFETY CAR DEPLOYED
+             </div>
+           )}
+-          <TimingTower orderRows={orderRows} status={status} />
++          <TimingTower orderRows={orderRows} status={status} selectedDriver={driver} onSelectDriver={setDriver} />
+           <RaceRecords selectedLaps={selectedLaps} recordsError={recordsError} showAllLaps={showAllLaps} setShowAllLaps={setShowAllLaps} visibleLaps={visibleLaps} namedDrivers={namedDrivers} liveIncidents={liveIncidents} livePitStops={livePitStops} />
+           <SnapshotStrip snapshot={snapshot} />
+           <TelemetryCharts
+diff --git a/frontend/components/pages/live/timing-tower.tsx b/frontend/components/pages/live/timing-tower.tsx
+index 0edca0f..0e75f72 100644
+--- a/frontend/components/pages/live/timing-tower.tsx
++++ b/frontend/components/pages/live/timing-tower.tsx
+@@ -1,59 +1,73 @@
+-import { Row } from "@/lib/api";
+-import { DataTable, StateMessage } from "../../ui";
++import { NbCard } from "@/components/nb/card";
++import { NbTable, type NbTableColumn } from "@/components/nb/table";
++import type { ViewState } from "@/lib/data-state";
++import { pretty, type Row } from "@/lib/api";
++
++const columns: readonly NbTableColumn<Row>[] = [
++  { key: "position", title: "position", numeric: true, render: (row) => pretty(row.position) },
++  { key: "number", title: "number", numeric: true, render: (row) => pretty(row.number) },
++  { key: "driver_name", title: "driver name", render: (row) => pretty(row.driver_name) },
++  { key: "licence_number", title: "licence number", numeric: true, render: (row) => pretty(row.licence_number) },
++  { key: "team_name", title: "team name", render: (row) => pretty(row.team_name) },
++  { key: "gap", title: "gap", numeric: true, render: (row) => pretty(row.gap) },
++  { key: "lap", title: "lap", numeric: true, render: (row) => pretty(row.lap) },
++  { key: "sector", title: "sector", numeric: true, render: (row) => pretty(row.sector) },
++  { key: "sector_times_ms", title: "sector times ms", numeric: true, render: (row) => pretty(row.sector_times_ms) },
++  { key: "last_lap_ms", title: "last lap ms", numeric: true, render: (row) => pretty(row.last_lap_ms) },
++  { key: "best_lap_ms", title: "best lap ms", numeric: true, render: (row) => pretty(row.best_lap_ms) },
++  { key: "tire_compound", title: "tire compound", render: (row) => pretty(row.tire_compound) },
++  { key: "tire_age_laps", title: "tire age laps", numeric: true, render: (row) => pretty(row.tire_age_laps) },
++  { key: "tire_wear_pct", title: "tire wear pct", numeric: true, render: (row) => pretty(row.tire_wear_pct) },
++  { key: "pit_state", title: "pit state", render: (row) => pretty(row.pit_state) },
++  { key: "pit_box_number", title: "pit box number", numeric: true, render: (row) => pretty(row.pit_box_number) },
++];
+ 
+ export function TimingTower({
+   orderRows,
+   status,
++  selectedDriver,
++  onSelectDriver,
+ }: {
+   orderRows: Row[];
+   status: string;
++  selectedDriver: string;
++  onSelectDriver: (id: string) => void;
+ }) {
++  const rows = orderRows.map((car) => ({
++    ...car,
++    position: car.position ?? "—",
++    sector: car.sector ?? "—",
++    last_lap_ms: car.last_lap_ms ?? "—",
++    best_lap_ms: car.best_lap_ms ?? "—",
++    tire_compound: car.tire_compound ?? "—",
++    tire_age_laps: car.tire_age_laps ?? "—",
++    tire_wear_pct: car.tire_wear_pct ?? "—",
++    pit_state: car.pit_state ?? "—",
++  }));
++  const state: ViewState<readonly Row[]> = rows.length
++    ? { status: "populated", data: rows }
++    : { status: "empty", reason: "no-data" };
++
+   return (
+-    <div className="panel running-order-panel">
+-      <div className="panel-heading">
+-        <div>
+-          <div className="eyebrow">LIVE TIMING / RUNNING ORDER</div>
+-          <h2>{orderRows.length} cars on timing</h2>
++    <NbCard tone="paper" className="panel running-order-panel !bg-paper !p-4">
++      <div className="panel-heading flex min-w-0 flex-wrap items-center justify-between gap-4">
++        <div className="min-w-0">
++          <div className="eyebrow !text-[length:var(--fs-label)] !leading-normal">LIVE TIMING / RUNNING ORDER</div>
++          <h2 className="!text-[length:var(--fs-h3)] !leading-tight">{orderRows.length} cars on timing</h2>
+         </div>
+-        <span className="live-badge">
++        <span className="live-badge inline-flex max-w-full flex-wrap !bg-paper !text-ink !text-[length:var(--fs-label)] !leading-normal">
+           <i /> {status}
+         </span>
+       </div>
+-      {orderRows.length ? (
+-        <DataTable
+-          rows={orderRows.map((car) => ({
+-            ...car,
+-            position: car.position ?? "—",
+-            sector: car.sector ?? "—",
+-            last_lap_ms: car.last_lap_ms ?? "—",
+-            best_lap_ms: car.best_lap_ms ?? "—",
+-            tire_compound: car.tire_compound ?? "—",
+-            tire_age_laps: car.tire_age_laps ?? "—",
+-            tire_wear_pct: car.tire_wear_pct ?? "—",
+-            pit_state: car.pit_state ?? "—",
+-          }))}
+-          columns={[
+-            "position",
+-            "number",
+-            "driver_name",
+-            "licence_number",
+-            "team_name",
+-            "gap",
+-            "lap",
+-            "sector",
+-            "sector_times_ms",
+-            "last_lap_ms",
+-            "best_lap_ms",
+-            "tire_compound",
+-            "tire_age_laps",
+-            "tire_wear_pct",
+-            "pit_state",
+-            "pit_box_number",
+-          ]}
+-        />
+-      ) : (
+-        <StateMessage empty="Waiting for timing and telemetry packets from this session." />
+-      )}
+-    </div>
++      <NbTable
++        state={state}
++        columns={columns}
++        rowKey={(row) => String(row.driver_id)}
++        caption="LIVE TIMING / RUNNING ORDER"
++        empty="Waiting for timing and telemetry packets from this session."
++        onSelect={(row) => onSelectDriver(String(row.driver_id))}
++        isSelected={(row) => String(row.driver_id) === selectedDriver}
++      />
++    </NbCard>
+   );
+ }

@@ -20,6 +20,7 @@ export type NbTableProps<T extends Record<string, unknown>> = {
   caption: string;
   empty?: string;
   onSelect?: (row: T) => void;
+  isSelected?: (row: T) => boolean;
   className?: string;
   pageSize?: number;
   sourceMessage?: string;
@@ -36,6 +37,7 @@ export function NbTable<T extends Record<string, unknown>>({
   caption,
   empty = "No records returned by the API.",
   onSelect,
+  isSelected,
   className,
   pageSize = 8,
   sourceMessage,
@@ -64,6 +66,7 @@ export function NbTable<T extends Record<string, unknown>>({
               <tr
                 key={rowKey(row, index)}
                 className={cn("h-12 odd:!bg-[var(--nb-paper)] even:!bg-[var(--nb-cream)] hover:!bg-[var(--nb-yellow)] focus-visible:outline-4 focus-visible:outline-[var(--nb-yellow)] focus-visible:outline-offset-[-4px]", selectable && "clickable")}
+                aria-selected={isSelected ? isSelected(row) : undefined}
                 onClick={onSelect ? (event) => { if (!isNestedControl(event.target)) select(); } : undefined}
                 onKeyDown={onSelect ? (event) => {
                   if ((event.key === "Enter" || event.key === " ") && !isNestedControl(event.target)) {

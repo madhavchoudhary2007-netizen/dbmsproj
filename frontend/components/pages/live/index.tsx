@@ -147,7 +147,7 @@ export function LiveTiming() {
               <TriangleAlert size={16} /> SAFETY CAR DEPLOYED
             </div>
           )}
-          <TimingTower orderRows={orderRows} status={status} />
+          <TimingTower orderRows={orderRows} status={status} selectedDriver={driver} onSelectDriver={setDriver} />
           <RaceRecords selectedLaps={selectedLaps} recordsError={recordsError} showAllLaps={showAllLaps} setShowAllLaps={setShowAllLaps} visibleLaps={visibleLaps} namedDrivers={namedDrivers} liveIncidents={liveIncidents} livePitStops={livePitStops} />
           <SnapshotStrip snapshot={snapshot} />
           <TelemetryCharts
