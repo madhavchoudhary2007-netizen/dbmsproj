@@ -1,6 +1,7 @@
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { api, asArray, listAll, Row } from "@/lib/api";
+import { useResourceRows } from "@/lib/use-resource-rows";
 import { Plus, RefreshCw, Search } from "lucide-react";
 import { useAuth } from "./auth";
 import { NbButton } from "./nb/button";
@@ -42,10 +43,8 @@ export function ResourcePage({
   userField?: string;
   userRole?: string;
 }) {
-  const [rows, setRows] = useState<Row[]>([]),
-    [loading, setLoading] = useState(true),
-    [error, setError] = useState(""),
-    [term, setTerm] = useState(""),
+  const { rows, loading, error, load } = useResourceRows(endpoint);
+  const [term, setTerm] = useState(""),
     [page, setPage] = useState(0),
     [modal, setModal] = useState(false),
     [edit, setEdit] = useState<Row | undefined>(),
@@ -61,20 +60,6 @@ export function ResourcePage({
   const supportsHistory = endpoint === "/drivers" || endpoint === "/teams";
   const { user } = useAuth();
   const canManage = user?.role === "ADMIN";
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError("");
-    try {
-      setRows(await listAll(endpoint));
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Unable to load records");
-    } finally {
-      setLoading(false);
-    }
-  }, [endpoint]);
-  useEffect(() => {
-    void load();
-  }, [load]);
   useEffect(() => {
     if (!userField || !canManage) return;
     listAll("/users")

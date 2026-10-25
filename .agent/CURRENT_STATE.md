@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: b2aae4b
+git_head: 19b7991
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -49,4 +49,8 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 
 - T-44428 acceptedb2aae4b: Inject explicit database adapters into dashboard characterization fixtures; preserve exact assertions, disposable safety guard, query logic and rollback. Verify0.
 
-- T382 resource header0ec278d/toolbar6139e34 accepted, full sixroutebrowsermatrix currentlyrunning. Parentunfinished; table/modal/5states/layout/palette remain.
+- T382 resource header0ec278d/toolbar6139e34 accepted, root300browserPASS T382-header-toolbar.browser.raw.log acrosssixresource routes. Parentunfinished; table/modal/5states/layout/palette remain.
+
+- T-44430 accepted19b7991: Disable inferred response-model encoding for migrated analytics routes; retain Python annotations and restore original numeric Decimal JSON contract. Verify0.
+
+- T44430 fixes analytics Decimalserialization by explicit response_modelNone, fullgate pending. T381root165PASS connectivity/states/accessibility/palette; resourceheaders/toolbar300PASS.
