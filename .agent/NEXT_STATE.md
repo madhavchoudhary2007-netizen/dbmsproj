@@ -3,24 +3,28 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44404 W1 — OPEN
+- target_files: frontend/components/pages/dashboard.tsx, frontend/app/styles/dashboard.css
+- contract: T381 visual-review defects: readable health labels, genuine secondary plinth link face and content-height health panel.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh
+
 ### T-44403 W3 — OPEN
 - target_files: backend/tests/test_runtime_dependencies.py
 - contract: T331/T332 test the new runtime providers in isolation before app-state wiring and router adoption.
 - verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_runtime_dependencies.py backend/tests/test_contract_snapshot.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/tests/test_runtime_dependencies.py
 
-### T-44402 W1 — OPEN
-- target_files: frontend/components/pages/dashboard.tsx, frontend/app/styles/dashboard.css
-- contract: T381 compact the dashboard supporting-paper cards with consistent legal spacing, resolving the last desktop palette-layout failure.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh
-
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
 
 ## Deferred
+- TASTE-381-2: health labels inherit yellow!important on mint; fix scoped ink override T44404.
+- TASTE-381-3: View sessions plinth lacks face, visually blacked out; restore face T44404.
+
 - TASTE-381-1: four KPIface accents followT381 but exceedT400 max3; consolidate supportingcolourbeforeA5, preserve data/features and thresholds.
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44402 accepted104bdb8; verify0.
 - T-44401 accepted60c4999; verify0.
 - T-44400 accepted67d0603; verify0.
 - T-44398 acceptedda48958; verify0.

@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 60c4999
+git_head: 104bdb8
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -45,3 +45,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T331/T332 sequencing finding: legacy tests patch main resource/dependency globals, so closure to120lines requires app.state dependency foundations before removing wrappers. Stage typed providers under T44401; retain main/API contracts and all assertions; neither parent declared complete.
 
 - T-44401 accepted60c4999: Typed application runtime container and HTTP/WebSocket dependency getters staged for T331/T332 integration; unavailable resources fail closed. Verify0.
+
+- T-44402 accepted104bdb8: Compact context and supporting event/incidents cards with legal 12px/8px padding; preserve content and action targets. Verify0.
+
+- T381-layout-final root130PASS incl dashboard/incidents5states/rapidreload/unmount/malformed/legacyoffline, route/axe/targets/palette/6widthresponsive across5projects. Probe fivewidths:0overflow/oneprimary/no pageerrors. Settledscreenshots show2Taste defects despite passingaxe: legacy green!important labelcontrast, missingsecondarylinkface; T44404 fixing +healthstretch.
