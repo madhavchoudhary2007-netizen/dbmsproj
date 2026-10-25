@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 378faa0
+git_head: 82138ba
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -18,7 +18,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T382 resources header/toolbar/exactrowhook/classifier/NbTable/nativeModal/NbField/form/rowEditDelete/roleeligibilitybadges implemented; alloriginalcelltext/copy/pageSize50 preserved. Root360browserPASS T382-actions-primary.browser.raw.log, allsixpalettes/fivewidthaxe/targets/overflow/primary/dataflow. Build/lint/types0 T382-actions-build.raw.log. Inlinevalidation/twocolumnmemberships implemented; finalmodalaxe/partialfixtures andfocusedfileboundaries remain.
 - Real20POST/save and20DELETE/confirm duplicates repaired06330e6/6e28dd6, confirmation7838c2d. Strict25PASS T382-delete-guard.browser.raw.log; markerretired5cfe010, activeprimarytransitions5widthPASS. Browserwrites locallymocked only.
 - Backend main823lines, <=120T331 NOT met; T332unfinished. Genuine modules/core/extracts retained. TypedRuntimeState/providers/lifespan shareandclear identities; requestauth/DatabaseSession. Membership/analytics/pitreads useDI. Actualreturnannotation Decimalstringregression fixedresponse_modelNone19b7991; exactnumericserializationtests1479019 preservewireencoding.
-- Backend full249PASS0skip/live acceptance PASS T-44517.full.raw.log. Strictmypy134errors/25files T339-current-after-dbms.raw.log,target0T339. Runtime64PASS. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
+- Backend full249PASS0skip/live acceptance PASS T-44517.full.raw.log. Strictmypy134errors/25files T339-current-after-dbms.raw.log,target0T339. Runtime69PASS T44530 accept log. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
 
 ## Safety / workflow
 - Onlyoverhaul/neo-brutal; commits onlyaccept.sh; independentlyrerunVerify;2packet-onlycustomworkersmax, no model/effortoverrides. Isolatedclones .agent/orchestrate.py;<=3files/150added+deleted; normalizeactualstats. Every5tasks budget.
@@ -38,22 +38,10 @@ last_eval_score: obsolete51.2974; no current score; final T430
 ## Latest route verification
 - T382 membership25/editor45/primitive30 and keyboard reopen15 browser PASS; resource-page594lines Taste bloat remains.
 - T383 real demo creation/deletion guard, list five states, truthful selected lap counter implemented; 40 cases passed plus focused10 outage recovery passed. No fake progress or real database writes.
-- T384 all25 focused cases have passing evidence: T384-tower15 + repair8 + mobile2. Selection keyboard/Details/axe/overflow/WS reorder/reduced motion tested. Metadata, unique completed pit counts wired. Runtime64PASS.
+- T384 all25 focused cases have passing evidence: T384-tower15 + repair8 + mobile2. Selection keyboard/Details/axe/overflow/WS reorder/reduced motion tested. Metadata, unique completed pit counts wired. Runtime69PASS T44530 accept log.
 - T385 charts/corner tiles, laps/latest telemetry tables, control timelines and retry/source states implemented. Fifteen loading/empty/error/retention browser cases PASS; populated4widths PASS. Mobile tooltip tile scope repaired9a68302; focused mobile1PASS T385-populated-mobile-final, completing five populated widths. M13 first draw remains open.
-- T386 layout/controls/results/native modals implemented7023bc4/d868cac/2e68037. Route gate69PASS1desktop paletteFAIL (red4.10%, minimum5). T44524 count-sticker/obsolete CSS fix underway; T44522 focused flow tests reviewed before root browser.
+- T386 layout/controls/results/native modals implemented7023bc4/d868cac/2e68037. Route gate69PASS1desktop paletteFAIL (red4.10%, minimum5). T44524 fixed desktop palette (all5palette cases PASS); focused lifecycle/simulator/result-read10PASS, dialog fixture corrected885b8ac, focused5/5 browser PASS T386-dialog-final. Desktop/mobile screenshots inspected; legacy field label/border styling remains a Taste defect. Result source7897a78 + five-state view378faa0 + five VM tests8e83f3c; no stale result writes.
 - T332 request database demo DELETE + four dependency override cases accepted c48443f/dede5cd. Root249PASS0skip and live acceptance PASS T-44517.full.raw.log; exact helper ordering preserved.
 - T44503 transient worker usage error recovered with same role/model; oversized unaccepted clone diff replaced with targeted change. T44519 count envelope corrected before acceptance; no boundary spill. No dependencies added.
 
-- T-44522 accepted0935ce7: Add mocked lifecycle/simulator exact request, native dialog keyboard/result entry and provisional/empty result tests. Browser execution remains root-owned. Verify0.
-
-- T-44524 accepted4666958: Style the factual session count as a mobile-shrinkable red sticker and remove obsolete simulator input CSS and session-control margin. Verify0.
-
-- T-44525 acceptedb301b9c: Render incident case files with original fields and keyboard row selection through NbState, retaining original empty copy and retryable partial errors. Verify0.
-
-- T-44526 accepted7897a78: Expose selected-session result loading/errors, abort obsolete reads and suppress stale updates while retaining successful results. Verify0.
-
-- T-44528 accepted885b8ac: Correct result-dialog accessible labels and numeric/boolean expectations, preserving exact request, focus and accessibility assertions. Verify0.
-
-- T-44530 accepted8e83f3c: Prove actual result-reader loading, signal forwarding, retention on errors, abort silence and stale response suppression using VM imports. Verify0.
-
-- T-44527 accepted378faa0: Render truthful session result loading, retryable error, empty and retained partial states only after a read starts or actual results exist. Verify0.
+- T387 case cards b301b9c and native dialogs/header82138ba implemented; sanction field styling44532 and session spam/result resilience tests44531 active. Penalty history/licence meter need an actual readable API source (drivers response has no season_points); never fabricate totals.

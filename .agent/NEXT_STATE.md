@@ -3,15 +3,15 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44532 W1 — OPEN
+- target_files: frontend/components/pages/steward-sanctions.tsx
+- contract: T387 make steward sanction fields readable and accessible with approved primitives while retaining unsupported-sanction guards.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+
 ### T-44531 W3 — OPEN
 - target_files: frontend/e2e/session-resilience.spec.ts
 - contract: T386 test same-frame session mutation spam and real result loading/error/retention/retry in the browser.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && npx playwright test e2e/session-resilience.spec.ts --list
-
-### T-44529 W1 — OPEN
-- target_files: frontend/components/pages/stewards.tsx, frontend/components/pages/steward-report.tsx, frontend/components/pages/steward-cases.tsx
-- contract: T387 restyle the steward header and native decision/report modal while preserving exact decision semantics.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -23,6 +23,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44529 accepted82138ba; verify0.
 - T-44527 accepted378faa0; verify0.
 - T-44530 accepted8e83f3c; verify0.
 - T-44528 accepted885b8ac; verify0.
@@ -51,3 +52,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44503 accepteda8a1741; verify0.
 - T-44502 accepted1d24522; verify0.
 - Earlier tasks: Git/.agent/results; parent milestones require full gates.
+
+## Plan dependencies still required
+- T387 penalty history and licence meter: existing incident/driver APIs expose no penalty history or season totals. Add documented read-only contracts under a dedicated ADR before wiring; do not infer zero.
+- T385/M13 first chart draw animation remains for T400; actual stream updates remain animation-free.
