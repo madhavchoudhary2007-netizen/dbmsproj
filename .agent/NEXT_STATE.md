@@ -8,11 +8,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T383 make error fixtures model an actual outage until recovery rather than failing one StrictMode request.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/live-list-states.spec.ts --list
 
-### T-44491 W1 — OPEN
-- target_files: frontend/components/pages/live/timing-tower.tsx, frontend/components/pages/live/index.tsx, frontend/components/nb/table.tsx
-- contract: T384 use the existing NbTable timing tower with driver selection and explicit selected-row accessibility, preserving every timing column.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
-
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
 
@@ -23,6 +18,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44491 acceptedafe1acd; verify0.
 - T-44490 accepted1f267c0; verify0.
 - T-44489 accepted2281e36; verify0.
 - T-44488 accepted262f582; verify0.

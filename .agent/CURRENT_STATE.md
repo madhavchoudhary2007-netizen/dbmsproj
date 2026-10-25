@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 1f267c0
+git_head: afe1acd
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -41,3 +41,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T384 derivedsector/interval/fastestmetadata underreviewT44490; interactiveNbTableT44491 underreview. NoAPIshapechanges. No newdependencies or realDBwrites. Rootproductedits0.
 
 - T-44490 accepted1f267c0: Derive factual three-sector comparisons, predecessor intervals and tied fastest-lap markers without changing existing gap logic. Verify0.
+
+- T-44491 acceptedafe1acd: Use NbTable for all timing fields and add keyboard driver selection with selected-row accessibility. Verify0.
