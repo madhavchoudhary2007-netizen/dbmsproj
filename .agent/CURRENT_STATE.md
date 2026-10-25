@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: b301b9c
+git_head: 7897a78
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -49,3 +49,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44524 accepted4666958: Style the factual session count as a mobile-shrinkable red sticker and remove obsolete simulator input CSS and session-control margin. Verify0.
 
 - T-44525 acceptedb301b9c: Render incident case files with original fields and keyboard row selection through NbState, retaining original empty copy and retryable partial errors. Verify0.
+
+- T-44526 accepted7897a78: Expose selected-session result loading/errors, abort obsolete reads and suppress stale updates while retaining successful results. Verify0.

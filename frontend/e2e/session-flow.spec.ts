@@ -111,20 +111,25 @@ test("session dialogs support Escape, focus return and recorded fields", async (
   dialog = page.getByRole("dialog", { name: "Add or update session result" });
   await expect(dialog).toBeVisible();
   await expect(dialog.locator("[data-primary]")).toHaveCount(1);
-  await dialog.getByLabel("driver_id").selectOption(driverIds[0]);
-  await dialog.getByLabel("position").fill("2"); await dialog.getByLabel("lap_time_ms").fill("90500");
-  await dialog.getByLabel("pole").selectOption("true"); await dialog.getByLabel("fastest_lap").selectOption("false");
+  await dialog.getByLabel("driver id").selectOption(driverIds[0]);
+  await dialog.getByLabel("position").fill("2"); await dialog.getByLabel("lap time ms").fill("90500");
+  await dialog.getByLabel("pole").selectOption("true"); await dialog.getByLabel("fastest lap").selectOption("false");
   await dialog.getByLabel("classified").selectOption("true");
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await dialog.screenshot({ path: testInfo.outputPath("session-result-dialog.png") });
   await dialog.getByRole("button", { name: "Save record", exact: true }).click();
-  await expect(page.getByRole("cell", { name: "90500" })).toBeVisible();
-  await expect(page.getByRole("cell", { name: "true" }).first()).toBeVisible();
+  const results = page.getByRole("table").filter({ has: page.getByRole("columnheader", { name: "position" }) });
+  for (const value of [pretty(2), pretty(90500)]) {
+    const cell = results.getByRole("cell", { name: value, exact: true });
+    await expect(cell).toHaveCount(1); await expect(cell).toBeVisible();
+  }
+  await expect(results.getByRole("cell", { name: pretty(true), exact: true })).toHaveCount(2);
+  await expect(results.getByRole("cell", { name: pretty(false), exact: true })).toHaveCount(1);
   expect(writes).toEqual([
     { path: `/api/sessions/${sessionId}/action`, body: { action: "start" } },
     {
       path: `/api/sessions/${sessionId}/results`,
-      body: [{ driver_id: driverIds[0], position: "2", lap_time_ms: "90500", pole: true, fastest_lap: false, classified: true }],
+      body: [{ driver_id: driverIds[0], position: 2, lap_time_ms: 90500, pole: true, fastest_lap: false, classified: true }],
     },
   ]);
   expect(unexpected).toEqual([]);
