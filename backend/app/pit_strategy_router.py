@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -25,9 +25,12 @@ def create_pit_strategy_router(
     jsonable: Callable[[Any], Any],
 ) -> tuple[APIRouter, Callable[..., Any]]:
     router = APIRouter()
+    authenticated_user = Depends(current_user)
 
-    @router.get("/api/sessions/{session_id}/pit-strategy")
-    def pit_strategy(session_id: UUID, user=Depends(current_user)):  # noqa: B008
+    @router.get("/api/sessions/{session_id}/pit-strategy", response_model=None)
+    def pit_strategy(
+        session_id: UUID, user: dict[str, object] = authenticated_user
+    ) -> dict[str, object]:
         session, drivers, reservations = load_strategy_rows(session_id)
         if not session:
             raise HTTPException(404, "Session not found")
@@ -76,6 +79,6 @@ def create_pit_strategy_router(
             sim,
             tire_stint_target,
         )
-        return jsonable(projected)
+        return cast(dict[str, object], jsonable(projected))
 
     return router, pit_strategy

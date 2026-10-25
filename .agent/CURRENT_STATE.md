@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: 290d2e7
+git_head: a4ef7b6
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -52,3 +52,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44544 acceptedc09bfdd: Disambiguate route Refresh while preserving every source outage and retention assertion. Verify0.
 
 - T-44545 accepted290d2e7: Restore dominant cream header surface without changing content or colour bands. Verify0.
+
+- T-44546 accepteda4ef7b6: Style Pit Wall selectors/header and native reservation modal while retaining management rules. Verify0.
