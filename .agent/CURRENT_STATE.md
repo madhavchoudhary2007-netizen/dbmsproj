@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 9a764f0
+git_head: 54689b4
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -57,3 +57,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44377 accepted7f62291: Stage exact simulation runner body with explicit dependencies, preserving tick and completion behavior. Verify0.
 
 - T-44379 accepted9a764f0: Give desktop race-control feed a readable64px band while preserving mobile layout and existing behavior. Verify0.
+
+- T-44378 accepted54689b4: Activate extracted simulation runner with late-bound helper callbacks and invocation-time clock values. Verify0.
+
+- T44379 desktopband change broke existing fixed40px feed assertion (64received). Rootcaught, repairingT44380withoutassertionchanges; palettebalance belongsPhase7route layouts. Rootpacket missed testedsize invariant.

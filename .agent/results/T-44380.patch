@@ -1,0 +1,14 @@
+diff --git a/frontend/app/styles/shell.css b/frontend/app/styles/shell.css
+index 4d3d7ca..ad9dec6 100644
+--- a/frontend/app/styles/shell.css
++++ b/frontend/app/styles/shell.css
+@@ -167,9 +167,6 @@
+   color: var(--nb-ink); border-bottom: 4px solid var(--nb-ink);
+   background: var(--nb-red); list-style: none; white-space: nowrap;
+ }
+-@media (min-width: 1000px) {
+-  .nb-shell .race-control-feed { height: 64px; min-height: 64px; }
+-}
+ .nb-shell .race-control-feed > li {
+   display: block; min-width: 0; flex: 1 1 0%; overflow: hidden;
+   text-overflow: ellipsis; white-space: nowrap;
