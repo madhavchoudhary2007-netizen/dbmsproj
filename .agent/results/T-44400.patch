@@ -1,0 +1,16 @@
+diff --git a/frontend/e2e/dashboard-states.spec.ts b/frontend/e2e/dashboard-states.spec.ts
+index a1d5f4e..62dea45 100644
+--- a/frontend/e2e/dashboard-states.spec.ts
++++ b/frontend/e2e/dashboard-states.spec.ts
+@@ -102,9 +102,9 @@ test("coalesces same-frame reload spam while health is pending", async ({ page }
+   await expect(page.locator('.dashboard-summary[data-testid="state-populated"]')).toBeVisible();
+   const baselineHealthCalls = api.calls["/api/health"];
+   deferHealth = true;
+-  await page.getByRole("button", { name: "Refresh" }).click();
++  await page.getByRole("button", { name: "Refresh", exact: true }).click();
+   await expect.poll(() => api.calls["/api/health"]).toBe(baselineHealthCalls + 1);
+-  await page.getByRole("button", { name: "Refresh" }).evaluate((button) => {
++  await page.getByRole("button", { name: "Refresh", exact: true }).evaluate((button) => {
+     for (let i = 0; i < 20; i++) button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+   });
+   await expect.poll(() => api.calls["/api/health"]).toBe(baselineHealthCalls + 1);

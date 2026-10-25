@@ -102,9 +102,9 @@ test("coalesces same-frame reload spam while health is pending", async ({ page }
   await expect(page.locator('.dashboard-summary[data-testid="state-populated"]')).toBeVisible();
   const baselineHealthCalls = api.calls["/api/health"];
   deferHealth = true;
-  await page.getByRole("button", { name: "Refresh" }).click();
+  await page.getByRole("button", { name: "Refresh", exact: true }).click();
   await expect.poll(() => api.calls["/api/health"]).toBe(baselineHealthCalls + 1);
-  await page.getByRole("button", { name: "Refresh" }).evaluate((button) => {
+  await page.getByRole("button", { name: "Refresh", exact: true }).evaluate((button) => {
     for (let i = 0; i < 20; i++) button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
   });
   await expect.poll(() => api.calls["/api/health"]).toBe(baselineHealthCalls + 1);
