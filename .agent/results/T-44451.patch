@@ -1,0 +1,88 @@
+diff --git a/backend/tests/test_api.py b/backend/tests/test_api.py
+index d995a34..355c10f 100644
+--- a/backend/tests/test_api.py
++++ b/backend/tests/test_api.py
+@@ -15,11 +15,18 @@ import pytest
+ from bson import BSON, ObjectId
+ from fastapi import HTTPException
+ from fastapi.testclient import TestClient
++from psycopg.rows import dict_row
+ from pydantic import ValidationError
+ 
+ os.environ["APP_ENV"] = "local"
+ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+ from backend.app import main as main_module
++from backend.app.demo_race_repository import (
++    DemoRaceDeleteConflict,
++    delete_demo_race_records,
++    validate_demo_race_delete,
++)
++from backend.app.demo_race_router import run_demo_race_delete
+ from backend.app.main import (
+     AutoReservationIn,
+     EventBus,
+@@ -2619,13 +2626,11 @@ def _demo_delete_cursor(session_id, event_id, championship_id, events, blocked):
+ 
+ 
+ @pytest.mark.parametrize("blocked", [False, True])
+-def test_demo_delete_waits_for_simulator_and_validates_before_stopping(monkeypatch, blocked):
++def test_demo_delete_waits_for_simulator_and_validates_before_stopping(blocked):
+     from contextlib import contextmanager
+ 
+     from fastapi import HTTPException
+ 
+-    from backend.app import main as main_module
+-
+     session_id, event_id, championship_id = uuid4(), uuid4(), uuid4()
+     events = []
+ 
+@@ -2653,24 +2658,43 @@ def test_demo_delete_waits_for_simulator_and_validates_before_stopping(monkeypat
+         task = asyncio.create_task(simulator())
+         await asyncio.sleep(0)
+         sim = Simulation(session_id, [], 2, task=task, status="running")
+-        monkeypatch.setitem(main_module.simulations, str(session_id), sim)
++        local_simulations = {str(session_id): sim}
++
++        def mongo_getter():
++            return Collection()
++
+         if blocked:
+             with pytest.raises(HTTPException) as error:
+-                await main_module.delete_demo_race(session_id, user={"role": "ADMIN"})
++                await run_demo_race_delete(
++                    session_id,
++                    local_simulations,
++                    fake_connection,
++                    dict_row,
++                    mongo_getter,
++                    DemoRaceDeleteConflict,
++                    validate_demo_race_delete,
++                    delete_demo_race_records,
++                )
+             assert error.value.status_code == 409
+             assert sim.status == "running" and not task.done()
+             assert "sql-delete" not in events
+             task.cancel()
+             await asyncio.gather(task, return_exceptions=True)
+         else:
+-            await main_module.delete_demo_race(session_id, user={"role": "ADMIN"})
++            await run_demo_race_delete(
++                session_id,
++                local_simulations,
++                fake_connection,
++                dict_row,
++                mongo_getter,
++                DemoRaceDeleteConflict,
++                validate_demo_race_delete,
++                delete_demo_race_records,
++            )
+             assert task.done() and sim.status == "stopped"
+             assert events.index("simulator-stopped") < events.index("sql-delete")
+             assert events.index("sql-delete") < events.index("mongo-delete")
+-        main_module.simulations.pop(str(session_id), None)
+ 
+-    monkeypatch.setattr(main_module, "connection", fake_connection)
+-    monkeypatch.setattr(main_module, "mongo_ready", lambda: Collection())
+     asyncio.run(exercise())
+ 
+ 
