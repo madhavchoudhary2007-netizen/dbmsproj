@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: c3d1e7c
+git_head: e517c82
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -43,3 +43,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 
 
 - T-44352 acceptedc3d1e7c: Stage exact current-run packet predicate with explicit captured inputs; retain timestamp and session fallback behavior. Verify0.
+
+- T-44354 acceptede517c82: Activate exact live selectors, preserving option labels, membership, status and manual-selection ordering. Verify0.

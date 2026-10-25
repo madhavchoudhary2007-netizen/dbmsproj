@@ -3,14 +3,19 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44357 W2 — OPEN
+- target_files: frontend/components/special-pages.tsx
+- contract: T379 wire exact current-run packet predicate into existing live stream effect.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
+
+### T-44356 W3 — OPEN
+- target_files: frontend/e2e/runtime/live-timing-data.test.mjs
+- contract: T379 verification gap: actual-module tests for driver-specific timing/laps/gaps and current-run packet filtering after extraction.
+- verify: npm --prefix frontend run lint && node --experimental-vm-modules --test frontend/e2e/runtime/live-timing-data.test.mjs
+
 ### T-44355 W2 — OPEN
 - target_files: frontend/lib/live-stream-types.ts
 - contract: T379 stage internal typed callback context for extracting the unchanged live WebSocket/snapshot effect.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
-
-### T-44354 W1 — OPEN
-- target_files: frontend/components/special-pages.tsx
-- contract: T379 activate exact staged LiveSelectors toolbar and remove duplicate toolbar JSX.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
 ## Blocked
@@ -20,6 +25,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44354 acceptede517c82; verify0.
 - T-44352 acceptedc3d1e7c; verify0.
 - T-44349 accepted57f81b3; verify0.
 - T-44351 accepted42321a7; verify0.
