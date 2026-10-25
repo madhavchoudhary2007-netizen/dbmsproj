@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 1ffce81
+git_head: 5b1d8f4
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -45,3 +45,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - W3 T44406 initially exceeded requestedfile150linecap153, repairedformatting to150 without assertionsremoved. Rootmalformedsource regression repaired1924d64 and coveredda48958. All counts normalized; no threshold changes.
 
 - T-44408 accepted1ffce81: Stage typed injected-pool database and auth dependencies; preserve credential checks, revocation, CSRF and role semantics with lazy resource queries. Verify0.
+
+- T-44409 accepted5b1d8f4: Explicit mock-only readiness and WebSocket fixture for dashboard suites; existing API mocks, assertions and real-stack suites unchanged. Verify0.
