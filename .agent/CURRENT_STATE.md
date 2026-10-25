@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 3f2d1fc
+git_head: 2e68037
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -47,3 +47,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T332 demo DELETE uses request DatabaseSession c48443f; exact helper AST unchanged; missing-marker404 precedes lazyMongo503. Four request-override tests dede5cd accepted; root full249PASS0skip/live acceptance PASS. No schema/API changes.
 
 - T386 layout and controls accepted 7023bc4/d868cac; results/native dialogs under review. Actual 249 backend tests and live acceptance passed.
+
+- T-44520 accepted2e68037: Use formatted results NbTable with factual podium cells and provisional badge, native session dialogs with primary saves, and readable notices. Verify0.
