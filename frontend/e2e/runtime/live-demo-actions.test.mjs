@@ -16,13 +16,13 @@ async function load(context, api) {
   const mockedApi = new vm.SyntheticModule(["api"], function () {
     this.setExport("api", api);
   }, { context: realm, identifier: "./api" });
-  const module = new vm.SourceTextModule(output, { context: realm, identifier: "./live-demo-actions.ts" });
-  await module.link(specifier => {
+  const sourceModule = new vm.SourceTextModule(output, { context: realm, identifier: "./live-demo-actions.ts" });
+  await sourceModule.link(specifier => {
     if (specifier === "./api") return mockedApi;
     throw new Error(`Unexpected import: ${specifier}`);
   });
-  await module.evaluate();
-  return { actions: module.namespace.createLiveDemoActions(context), Error: vm.runInContext("Error", realm) };
+  await sourceModule.evaluate();
+  return { actions: sourceModule.namespace.createLiveDemoActions(context), Error: vm.runInContext("Error", realm) };
 }
 
 function fixture(overrides = {}) {

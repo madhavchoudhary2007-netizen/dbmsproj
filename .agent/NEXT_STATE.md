@@ -3,15 +3,25 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44353 W3 — OPEN
+- target_files: frontend/e2e/runtime/live-demo-actions.test.mjs
+- contract: Fix test-harness lint defect in accepted T44350 by renaming local variable module to sourceModule; preserve all tests/assertions.
+- verify: npm --prefix frontend run lint && node --experimental-vm-modules --test frontend/e2e/runtime/live-demo-actions.test.mjs
+
+### T-44349 W2 — OPEN
+- target_files: frontend/components/special-pages.tsx
+- contract: T379 remove duplicated demo action factory context wiring by instantiating it once per render, as the original packet specified.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint && node --experimental-vm-modules --test frontend/e2e/runtime/live-demo-actions.test.mjs
+
+### T-44351 W1 — OPEN
+- target_files: frontend/components/pages/live/live-selectors.tsx
+- contract: T379 stage exact session/driver selection toolbar in live/live-selectors.tsx; leave source unchanged.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
+
 ### T-44348 W2 — OPEN
 - target_files: frontend/components/special-pages.tsx
 - contract: T379 activate exact live record polling helper inside original effect; preserve effect dependency array and position.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
-
-### T-44350 W3 — OPEN
-- target_files: frontend/e2e/runtime/live-demo-actions.test.mjs
-- contract: T379 verification gap: add actual-module regression cases for generated race create/delete actions after extraction.
-- verify: node --experimental-vm-modules --test frontend/e2e/runtime/live-demo-actions.test.mjs
 
 ## Blocked
 - None currently. Owner switch gpt-6-luna/high implemented and freshworkers succeeded.
@@ -20,6 +30,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44350 accepted266e518; verify0.
 - T-44347 accepteda14c234; verify0.
 - T-44346 accepted171cb46; verify0.
 - T-44345 accepted96b97d0; verify0.
