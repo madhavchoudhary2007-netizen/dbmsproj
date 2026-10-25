@@ -1,0 +1,144 @@
+diff --git a/frontend/e2e/resource-editor.spec.ts b/frontend/e2e/resource-editor.spec.ts
+new file mode 100644
+index 0000000..2714fda
+--- /dev/null
++++ b/frontend/e2e/resource-editor.spec.ts
+@@ -0,0 +1,138 @@
++import { expect, test as base, type Page } from "./mock-platform";
++
++const unexpectedByPage = new WeakMap<Page, string[]>();
++const test = base.extend<{ apiGuard: void }>({
++  apiGuard: [async ({ page }, use) => {
++    const unexpected: string[] = [];
++    unexpectedByPage.set(page, unexpected);
++    await use();
++    expect(unexpected).toEqual([]);
++  }, { auto: true }],
++});
++
++const pilot = { id: 7, name: "Pilot", season: 2026 };
++
++async function setup(page: Page, options: {
++  saveStatus?: number;
++  saveStatuses?: number[];
++  deferSave?: boolean;
++} = {}) {
++  let postCount = 0;
++  let deleteCount = 0;
++  let posted: unknown;
++  let releaseSave: (() => void) | undefined;
++  const unexpected = unexpectedByPage.get(page)!;
++  await page.route("**/api/**", async (route) => {
++    const request = route.request();
++    const url = new URL(request.url());
++    if (request.method() === "GET" && url.pathname === "/api/championships") {
++      await route.fulfill({ json: [pilot] });
++    } else if (request.method() === "GET" && url.pathname === "/api/auth/me") {
++      await route.fulfill({ json: { id: 1, email: "qa@example.test", full_name: "QA", role: "ADMIN" } });
++    } else if (request.method() === "GET" && url.pathname === "/api/dashboard") {
++      await route.fulfill({ json: { active_sessions: 0, scheduled_events: 0, open_incidents: 0, drivers: 0 } });
++    } else if (request.method() === "GET") {
++      await route.fulfill({ json: [] });
++    } else if (request.method() === "POST" && url.pathname === "/api/championships") {
++      postCount += 1;
++      posted = request.postDataJSON();
++      if (options.deferSave) {
++        await new Promise<void>((resolve) => { releaseSave = resolve; });
++      }
++      const status = options.saveStatuses?.[postCount - 1] ?? options.saveStatus ?? 201;
++      await route.fulfill({
++        status,
++        json: status >= 400 ? { detail: "Service unavailable" } : { ...pilot, ...posted as object },
++      });
++    } else if (request.method() === "DELETE" && url.pathname === "/api/championships/7") {
++      deleteCount += 1;
++      await route.fulfill({ status: 204, body: "" });
++    } else {
++      unexpected.push(`${request.method()} ${url.pathname}`);
++      await route.fulfill({ status: 405, json: { detail: "Unexpected test request" } });
++    }
++  });
++  await page.goto("/championships");
++  return {
++    counts: () => ({ postCount, deleteCount }),
++    payload: () => posted,
++    release: () => releaseSave?.(),
++  };
++}
++
++async function openCreate(page: Page) {
++  await page.getByRole("button", { name: "New record" }).click();
++  return page.getByRole("dialog", { name: "Create record" });
++}
++
++test("required resource fields prevent an empty POST", async ({ page }) => {
++  const api = await setup(page);
++  const dialog = await openCreate(page);
++  const name = dialog.getByRole("textbox", { name: "name" });
++  const season = dialog.getByRole("spinbutton", { name: "season" });
++  await expect(name).toHaveAttribute("required", "");
++  await expect(season).toHaveAttribute("required", "");
++  await dialog.getByRole("button", { name: "Save record" }).click();
++  await expect(name).toBeFocused();
++  expect(api.counts().postCount).toBe(0);
++});
++
++test("valid zero season posts the typed payload and closes on success", async ({ page }) => {
++  const api = await setup(page);
++  const dialog = await openCreate(page);
++  await dialog.getByRole("textbox", { name: "name" }).fill("Formula One");
++  await dialog.getByRole("spinbutton", { name: "season" }).fill("0");
++  await dialog.getByRole("button", { name: "Save record" }).click();
++  await expect(dialog).toBeHidden();
++  expect(api.payload()).toEqual({ name: "Formula One", season: 0 });
++  expect(api.counts().postCount).toBe(1);
++});
++
++test("deferred save disables submit and coalesces same-frame clicks", async ({ page }) => {
++  const api = await setup(page, { deferSave: true });
++  const dialog = await openCreate(page);
++  await dialog.getByRole("textbox", { name: "name" }).fill("Formula One");
++  await dialog.getByRole("spinbutton", { name: "season" }).fill("0");
++  const save = dialog.getByRole("button", { name: "Save record" });
++  await save.evaluate((button) => {
++    const submit = button as HTMLButtonElement;
++    for (let i = 0; i < 20; i += 1) submit.click();
++  });
++  await expect(dialog.getByRole("button", { name: "Saving…" })).toBeDisabled();
++  expect(api.counts().postCount).toBe(1);
++  api.release();
++  await expect(dialog).toBeHidden();
++});
++
++test("failed POST preserves values and cause for a successful retry", async ({ page }) => {
++  const api = await setup(page, { saveStatuses: [503, 201] });
++  const dialog = await openCreate(page);
++  await dialog.getByRole("textbox", { name: "name" }).fill("Formula One");
++  await dialog.getByRole("spinbutton", { name: "season" }).fill("0");
++  await dialog.getByRole("button", { name: "Save record" }).click();
++  await expect(dialog.getByRole("alert")).toContainText("Service unavailable");
++  await expect(dialog.getByRole("textbox", { name: "name" })).toHaveValue("Formula One");
++  await expect(dialog.getByRole("spinbutton", { name: "season" })).toHaveValue("0");
++  await expect(dialog).toBeVisible();
++  await dialog.getByRole("button", { name: "Save record" }).click();
++  await expect(dialog).toBeHidden();
++  expect(api.counts().postCount).toBe(2);
++  expect(api.counts().deleteCount).toBe(0);
++});
++
++test("T382-DELETE requires confirmation before writing", async ({ page }) => {
++  test.fail(!process.env.RUN_XFAIL);
++  const api = await setup(page);
++  await page.getByRole("row").filter({ hasText: "Pilot" }).click();
++  const details = page.getByRole("dialog", { name: "Record details" });
++  await details.getByRole("button", { name: "Delete record" }).click();
++  const confirmation = page.getByRole("dialog", { name: /delete/i });
++  await expect(confirmation).toBeVisible();
++  expect(api.counts().deleteCount).toBe(0);
++  await confirmation.getByRole("button", { name: "Cancel" }).click();
++  await expect(confirmation).toBeHidden();
++  expect(api.counts().deleteCount).toBe(0);
++  await details.getByRole("button", { name: "Delete record" }).click();
++  await page.getByRole("dialog", { name: /delete/i }).getByRole("button", { name: "Delete record" }).click();
++  await expect.poll(() => api.counts().deleteCount).toBe(1);
++});

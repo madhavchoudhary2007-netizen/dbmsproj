@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: a7cb405
+git_head: ad4420d
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -35,30 +35,20 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - Earlier source/fixture regressions and repairs retain Git/results evidence. Actual malformedincident crash1924d64/da48958, connectivity165PASS, healthink/plinthface5a0ad53/d018de6.
 - T44427wrongworkspace boundary repaired by transferringownedpatch toclone/restoringroot; rootaccept0 afterexplicitcloneverify. Actualnumericencodingregression repaired19b7991 with245PASS fullproof. No tests/gates weakened.
 
-- T-44432 accepted1479019: Exercise actual migrated routes in-process and require exact numeric Decimal JSON, nullable averages, UUID/date encoding and integer dashboard counts. Verify0.
 
 - Production frontend build/lint/types0 T382-current-build.raw.log afterresourceheader/toolbar/hook. ReviewcaughtW2partialretry callback and W3malformedadminmock beforebrowser; repairedwithinpackets.
 
-- T-44434 accepted8be4a2d: Classify resource loading, empty, error, populated and partial states without I/O; retained errors retry the source and active filters preserve clear action. Verify0.
 
-- T-44435 accepted164c755: Characterize resource loading/empty/error recovery, 50-row pagination and filters, plus create-dialog Escape/focus restoration; all writes rejected by mocks. Verify0.
 
-- T-44436 accepted4d76acf: Render resource table through NbTable and typed five-state classifier, preserving exact pretty formatting, headers, 50-row paging and row inspection. Verify0.
 
-- T-44437 accepted458e68e: Execute actual resource classifier in VM; verify five states, retained-source retry identity, whitespace filters, pagination and immutable useful falsy values. Verify0.
 
-- T-44438 accepted403815e: Scope resource journey assertions to main and exact pagination controls; supply the actual zero-metric dashboard contract, preserving every test assertion. Verify0.
 
-- T-44439 acceptede55086a: Migrate pit read handlers and two repository queries to request-scoped auth/database dependencies; preserve exact SQL and original numeric response encoding. Verify0.
 
-- T382table344browserPASS/6FAIL T382-table.browser.raw.log: onlydesktopA3resourcepalette (red3.97–4.13%,championshipcream74.9%). Existing20resourceflowsPASS. No thresholdschanged. T44443 layoutrepairnext. Backend245PASS0skip/livePASS T44439.full.raw.log.
+- T382latest359browserPASS/1FAIL T382-palette-dialog.browser.raw.log: onlychampionshipA3cream70.97/paper17.83/red11.19%; fiveotherresourcepalettesPASS andall30flowcasesPASS. T44447paper-guidance repairnext; no bandschanged. Backend245PASS0skip/livePASS T44440.full.raw.log.
 
-- T-44440 acceptedc53cd59: Resolve strict typing of known count rows and migrated analytics/membership handlers with runtime-neutral casts and explicit original response encoding. Verify0.
 
-- T-44441 accepted0bcc558: Assert all five resource states in browser; retain data during failed reload, retry the source, and clear filters back to the first 50 records. Verify0.
 
-- T-44442 acceptedbc22d8c: Use native NbModal for resource record and membership dialogs, preserving contents, titles, conditions and close callbacks. Verify0.
 
 - Ignoredrawlogs unavailable inclones; inlineverifieddiagnostics in futurepackets. No implementationblocker.
 
-- T-44443 accepteda7cb405: Arrange resource search/reload and count/range into a scoped red control bar with responsive rows, preserving all controls and palette thresholds. Verify0.
+
