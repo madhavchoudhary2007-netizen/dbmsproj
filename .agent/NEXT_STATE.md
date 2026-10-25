@@ -3,14 +3,19 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44320 Orchestrator — OPEN
+- target_files: .codex/agents/w2-state.toml, .codex/agents/w3-eval.toml
+- contract: Owner requested GPT6Luna/high worker bindings only.
+- verify: python3 -c 'import pathlib,tomllib; assert tomllib.loads(pathlib.Path('"'"'.codex/agents/w2-state.toml'"'"').read_text())["model"] == "gpt-6-luna" and tomllib.loads(pathlib.Path('"'"'.codex/agents/w2-state.toml'"'"').read_text())["model_reasoning_effort"] == "high"; assert tomllib.loads(pathlib.Path('"'"'.codex/agents/w3-eval.toml'"'"').read_text())["model"] == "gpt-6-luna" and tomllib.loads(pathlib.Path('"'"'.codex/agents/w3-eval.toml'"'"').read_text())["model_reasoning_effort"] == "high"; print("PASS owner requested gpt-6-luna/high")'
+
+### T-44319 Orchestrator — OPEN
+- target_files: .agent/models.env, .codex/agents/w1-ui.toml
+- contract: Owner requested GPT6Luna/high worker bindings only.
+- verify: python3 -c 'import pathlib,tomllib; assert "gpt-6-luna" in pathlib.Path('"'"'.agent/models.env'"'"').read_text(); assert tomllib.loads(pathlib.Path('"'"'.codex/agents/w1-ui.toml'"'"').read_text())["model"] == "gpt-6-luna" and tomllib.loads(pathlib.Path('"'"'.codex/agents/w1-ui.toml'"'"').read_text())["model_reasoning_effort"] == "high"; print("PASS owner requested gpt-6-luna/high")'
+
 ### T-44318 W2 — OPEN
 - target_files: frontend/lib/use-pit-wall.ts
 - contract: T379 stage exact PitWall state/effects/actions into use-pit-wall hook; do not wire presentation yet.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
-
-### T-44316 W1 — OPEN
-- target_files: frontend/components/special-pages.tsx
-- contract: T379 wire byte-identical standalone StewardDesk via compatibility reexport; remove old function and imports used only by it.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
 ## Blocked
@@ -20,6 +25,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44316 acceptedf2ef65e; verify0.
 - T-44317 acceptede0e553d; verify0.
 - T-44315 accepted7bc73c9; verify0.
 - T-44314 accepted45cbcad; verify0.
