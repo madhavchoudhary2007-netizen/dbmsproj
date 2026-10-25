@@ -3,11 +3,6 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44433 W2 — OPEN
-- target_files: backend/app/analytics_repository.py
-- contract: T332 remove analytics repository global fallback after characterization tests explicitly inject adapters.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_dashboard_next_event.py backend/tests/test_contract_snapshot.py backend/tests/test_request_dependencies.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/analytics_repository.py
-
 ### T-44432 W3 — OPEN
 - target_files: backend/tests/test_analytics_router_serialization.py
 - contract: Add offline regression for exact numeric serialization of migrated analytics routes.
@@ -22,6 +17,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44433 accepteddb1e96d; verify0.
 - T-44431 acceptedaf535f8; verify0.
 - T-44430 accepted19b7991; verify0.
 - T-44428 acceptedb2aae4b; verify0.
