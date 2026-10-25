@@ -1192,6 +1192,7 @@ def test_app_lifespan_starts_resources_and_awaits_simulator_shutdown(monkeypatch
     from threading import Event
 
     from backend.app import main as main_module
+    from backend.app.core.runtime import RuntimeState
 
     startup_calls = []
     closed = Event()
@@ -1261,7 +1262,16 @@ def test_app_lifespan_starts_resources_and_awaits_simulator_shutdown(monkeypatch
     monkeypatch.setattr(main_module, "resume_or_create_auto_demo_race", resume_demo)
     simulations.pop(session_id, None)
 
+    runtime = None
     with TestClient(app):
+        runtime = app.state.runtime
+        assert isinstance(runtime, RuntimeState)
+        assert runtime.pool is pool
+        assert runtime.mongo_client is main_module.mongo_client
+        assert runtime.telemetry_collection is main_module.telemetry_collection
+        assert runtime.bus is main_module.bus
+        assert runtime.simulations is main_module.simulations
+        assert runtime.runtime_lease is runtime_lease
         assert ("pool", "open") in startup_calls
         assert ("mongo", "ping") in startup_calls
         assert any(call[0] == "resume" for call in startup_calls)
@@ -1272,6 +1282,11 @@ def test_app_lifespan_starts_resources_and_awaits_simulator_shutdown(monkeypatch
     assert client_closed.is_set()
     assert ("pool", "close") in startup_calls
     assert runtime_lease.closed
+    assert app.state.runtime is None
+    assert runtime.pool is None
+    assert runtime.mongo_client is None
+    assert runtime.telemetry_collection is None
+    assert runtime.runtime_lease is None
     assert main_module.mongo_client is None
     assert main_module.telemetry_collection is None
     simulations.pop(session_id, None)

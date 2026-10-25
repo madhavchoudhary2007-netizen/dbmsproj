@@ -8,11 +8,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T331/T332 prove real app lifespan shares the existing runtime resources and clears the typed container on shutdown.
 - verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k app_lifespan_starts_resources && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_runtime_dependencies.py backend/tests/test_contract_snapshot.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/tests/test_api.py
 
-### T-44406 W3 — OPEN
-- target_files: frontend/e2e/dashboard-states.spec.ts
-- contract: T381 prevent recurrence of screenshot-only health contrast and obscured secondary-link defects.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/dashboard-states.spec.ts --list
-
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
 
@@ -24,6 +19,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44406 acceptedd018de6; verify0.
 - T-44405 acceptedd756a9f; verify0.
 - T-44404 accepted5a0ad53; verify0.
 - T-44403 accepted4521ac9; verify0.
