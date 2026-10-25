@@ -105,7 +105,7 @@ for (const source of ["penalties", "licences"] as const) test(`${source} outage 
   fixture.failures.delete(source); await failed.getByRole("button", { name: "Try again" }).click();
   if (source === "penalties") await expect(penalties.getByRole("row").filter({ hasText: "local-synthetic-penalty-9001" })).toBeVisible();
   else await expect(licences.getByRole("meter", { name: "Alex Morgan licence points" })).toHaveAttribute("aria-valuetext", `8 points in season ${season}`);
-  fixture.failures.add(source); await page.getByRole("button", { name: "Refresh" }).click();
+  fixture.failures.add(source); await page.getByRole("button", { name: "Refresh", exact: true }).click();
   await expect(failed.getByTestId("state-partial")).toBeVisible();
   if (source === "penalties") await expect(penalties.getByRole("row").filter({ hasText: "local-synthetic-penalty-9001" })).toBeVisible();
   else await expect(licences.getByRole("meter", { name: "Alex Morgan licence points" })).toHaveAttribute("aria-valuetext", `8 points in season ${season}`);
