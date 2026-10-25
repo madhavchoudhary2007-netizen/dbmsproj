@@ -1,26 +1,29 @@
 from typing import Any
 from uuid import UUID
 
+from .core.request_database import DatabaseSession
 from .database import fetch_all, fetch_one
 
 
-def get_dashboard_data() -> dict[str, Any]:
-    active_sessions = fetch_one("SELECT count(*) AS count FROM race_sessions WHERE state='ACTIVE'")
-    scheduled_events = fetch_one(
+def get_dashboard_data(database: DatabaseSession | None = None) -> dict[str, Any]:
+    # Direct repository calls remain compatible with characterization tests.
+    query_one = database.fetch_one if database else fetch_one
+    active_sessions = query_one("SELECT count(*) AS count FROM race_sessions WHERE state='ACTIVE'")
+    scheduled_events = query_one(
         "SELECT count(DISTINCT e.id) AS count FROM race_events e "
         "JOIN race_sessions s ON s.event_id=e.id "
         "WHERE s.session_type='RACE' AND s.state='SCHEDULED'"
     )
-    open_incidents = fetch_one("SELECT count(*) AS count FROM incident_reports WHERE state='OPEN'")
-    drivers = fetch_one("SELECT count(*) AS count FROM drivers")
-    active_session = fetch_one(
+    open_incidents = query_one("SELECT count(*) AS count FROM incident_reports WHERE state='OPEN'")
+    drivers = query_one("SELECT count(*) AS count FROM drivers")
+    active_session = query_one(
         "SELECT s.*,e.name AS event_name,c.name AS circuit_name "
         "FROM race_sessions s JOIN race_events e ON e.id=s.event_id "
         "JOIN circuits c ON c.id=e.circuit_id "
         "WHERE s.state IN ('ACTIVE','PAUSED') "
         "ORDER BY s.started_at DESC NULLS LAST LIMIT 1"
     )
-    next_event = fetch_one(
+    next_event = query_one(
         "SELECT e.id,e.name,s.id AS session_id,s.scheduled_at,c.name AS circuit_name "
         "FROM race_sessions s JOIN race_events e ON e.id=s.event_id "
         "JOIN circuits c ON c.id=e.circuit_id "
@@ -46,7 +49,10 @@ def get_driver_analytics(
     team_id: UUID | None,
     limit: int,
     offset: int,
+    database: DatabaseSession | None = None,
 ) -> list[dict[str, Any]]:
+    # Direct repository calls remain compatible with characterization tests.
+    query_all = database.fetch_all if database else fetch_all
     filters: list[str] = []
     params: list[Any] = []
     for value, expression in (
@@ -85,4 +91,4 @@ def get_driver_analytics(
         "ORDER BY points DESC,wins DESC,d.id LIMIT %s OFFSET %s"
     )
     params.extend((limit, offset))
-    return fetch_all(query, params)
+    return query_all(query, params)

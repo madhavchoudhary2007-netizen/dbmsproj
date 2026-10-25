@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 1373d88
+git_head: f311789
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -40,3 +40,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - Latest accepted: T44415–21 platformmocks, connectivityhelpers/UI/browser, membershipDI and cookie-warningcleanup; evidence Git/results. Backend243PASS0skip/livePASS T44420.full.raw.log.
 
 - T-44423 accepted1373d88: Show actual event, circuit, session and state in Race weekend; preserve every raw session field in a keyboard-accessible details disclosure. Verify0.
+
+- T-44424 acceptedf311789: Remove unused membership global database fallback; all four functions require the request-injected DatabaseSession and preserve SQL behavior. Verify0.

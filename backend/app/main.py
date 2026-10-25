@@ -34,7 +34,7 @@ from pymongo import MongoClient
 from pymongo.collection import Collection
 
 from . import token_revocation
-from .analytics_router import create_analytics_router
+from .analytics_router import router as analytics_router
 from .api.crud import create_crud_router
 from .api.dbms_lock import FutureTimeout as FutureTimeout
 from .api.dbms_lock import create_dbms_lock_router
@@ -746,7 +746,7 @@ live_router, session_ws = create_live_router(
 app.include_router(live_router)
 
 
-app.include_router(create_analytics_router(current_user, jsonable))
+app.include_router(analytics_router)
 
 
 health = register_legacy_health(lambda query: fetch_one(query), lambda: mongo_client)
