@@ -296,7 +296,7 @@ export function ResourcePage({
           {canManage && (
             <NbButton
               variant="primary"
-              data-primary="true"
+              data-primary={!modal && !memberModal && !deleteConfirm ? "true" : undefined}
               onClick={() => {
                 setEdit(undefined);
                 setActionError("");
@@ -417,6 +417,7 @@ export function ResourcePage({
                 initial={edit}
                 save={save}
                 busy={busy}
+                primary={!memberModal && !deleteConfirm}
               />
             </>
           ) : (
@@ -511,6 +512,7 @@ export function ResourcePage({
             </NbButton>
             <NbButton
               variant="danger"
+              data-primary={deleteConfirm ? "true" : undefined}
               disabled={busy}
               onClick={() => {
                 setDeleteConfirm(false);
@@ -537,6 +539,7 @@ export function ResourcePage({
             fields={memberFormFields}
             save={memberSave}
             busy={busy}
+            primary={!deleteConfirm}
           />
         </NbModal>
       )}

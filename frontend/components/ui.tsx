@@ -293,6 +293,7 @@ export function ResourceEditor({
   initial,
   save,
   busy,
+  primary = false,
 }: {
   fields: {
     name: string;
@@ -306,6 +307,7 @@ export function ResourceEditor({
   initial?: Row;
   save: (row: Row) => Promise<void>;
   busy: boolean;
+  primary?: boolean;
 }) {
   const [vals, setVals] = useState<Row>(initial || {}),
     [err, setErr] = useState("");
@@ -391,7 +393,7 @@ export function ResourceEditor({
       ))}
       {err && <div className="form-error" role="alert">{err}</div>}
       <div className="form-actions">
-        <NbButton type="submit" variant="primary" disabled={busy}>
+        <NbButton type="submit" variant="primary" data-primary={primary || undefined} disabled={busy}>
           {busy ? "Saving…" : "Save record"}
         </NbButton>
       </div>

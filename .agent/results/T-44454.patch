@@ -1,0 +1,66 @@
+diff --git a/frontend/components/resource-page.tsx b/frontend/components/resource-page.tsx
+index ca3a19b..12436dd 100644
+--- a/frontend/components/resource-page.tsx
++++ b/frontend/components/resource-page.tsx
+@@ -296,7 +296,7 @@ export function ResourcePage({
+           {canManage && (
+             <NbButton
+               variant="primary"
+-              data-primary="true"
++              data-primary={!modal && !memberModal && !deleteConfirm ? "true" : undefined}
+               onClick={() => {
+                 setEdit(undefined);
+                 setActionError("");
+@@ -417,6 +417,7 @@ export function ResourcePage({
+                 initial={edit}
+                 save={save}
+                 busy={busy}
++                primary={!memberModal && !deleteConfirm}
+               />
+             </>
+           ) : (
+@@ -511,6 +512,7 @@ export function ResourcePage({
+             </NbButton>
+             <NbButton
+               variant="danger"
++              data-primary={deleteConfirm ? "true" : undefined}
+               disabled={busy}
+               onClick={() => {
+                 setDeleteConfirm(false);
+@@ -537,6 +539,7 @@ export function ResourcePage({
+             fields={memberFormFields}
+             save={memberSave}
+             busy={busy}
++            primary={!deleteConfirm}
+           />
+         </NbModal>
+       )}
+diff --git a/frontend/components/ui.tsx b/frontend/components/ui.tsx
+index 5645fe6..b2d4e82 100644
+--- a/frontend/components/ui.tsx
++++ b/frontend/components/ui.tsx
+@@ -293,6 +293,7 @@ export function ResourceEditor({
+   initial,
+   save,
+   busy,
++  primary = false,
+ }: {
+   fields: {
+     name: string;
+@@ -306,6 +307,7 @@ export function ResourceEditor({
+   initial?: Row;
+   save: (row: Row) => Promise<void>;
+   busy: boolean;
++  primary?: boolean;
+ }) {
+   const [vals, setVals] = useState<Row>(initial || {}),
+     [err, setErr] = useState("");
+@@ -391,7 +393,7 @@ export function ResourceEditor({
+       ))}
+       {err && <div className="form-error" role="alert">{err}</div>}
+       <div className="form-actions">
+-        <NbButton type="submit" variant="primary" disabled={busy}>
++        <NbButton type="submit" variant="primary" data-primary={primary || undefined} disabled={busy}>
+           {busy ? "Saving…" : "Save record"}
+         </NbButton>
+       </div>
