@@ -1,0 +1,81 @@
+diff --git a/frontend/lib/live-record-polling.ts b/frontend/lib/live-record-polling.ts
+index 180b98f..8a00a63 100644
+--- a/frontend/lib/live-record-polling.ts
++++ b/frontend/lib/live-record-polling.ts
+@@ -7,8 +7,9 @@ export function startLiveRecordPolling(
+   setLiveIncidents: (rows: Row[]) => void,
+   setLivePitStops: (rows: Row[]) => void,
+   setRecordsError: (message: string) => void,
++  options: { setLoading?: (value: boolean) => void; retryRef?: { current: (() => void) | null } } = {},
+ ): (() => void) | undefined {
+-  if (!session) { clearError("snapshot"); setCompletedLaps([]); setLiveIncidents([]); setLivePitStops([]); setRecordsError(""); return; }
++  if (!session) { options.setLoading?.(false); clearError("snapshot"); setCompletedLaps([]); setLiveIncidents([]); setLivePitStops([]); setRecordsError(""); return; }
+   let alive = true;
+   setCompletedLaps([]);
+   setLiveIncidents([]);
+@@ -16,21 +17,30 @@ export function startLiveRecordPolling(
+   setRecordsError("");
+   clearError("snapshot");
+   let timer: ReturnType<typeof setTimeout> | undefined;
+-  const load = async () => {
++  let generation = 0;
++  const load = async (showLoading = false) => {
++    if (timer) clearTimeout(timer);
++    const request = ++generation;
++    if (showLoading) options.setLoading?.(true);
+     try {
+       const value = await api<{ laps?: Row[]; incidents?: Row[]; pit_reservations?: Row[] }>(`/sessions/${session}/laps`);
+-      if (alive) {
++      if (alive && request === generation) {
+         setCompletedLaps(asArray(value.laps));
+         setLiveIncidents(asArray(value.incidents));
+         setLivePitStops(asArray(value.pit_reservations));
+         setRecordsError("");
+       }
+     } catch (e) {
+-      if (alive) setRecordsError(e instanceof Error ? e.message : "Unable to load lap and race-control records");
++      if (alive && request === generation) setRecordsError(e instanceof Error ? e.message : "Unable to load lap and race-control records");
+     } finally {
+-      if (alive) timer = setTimeout(() => { void load(); }, 5000);
++      if (alive && request === generation) {
++        options.setLoading?.(false);
++        timer = setTimeout(() => { void load(); }, 5000);
++      }
+     }
+   };
+-  void load();
+-  return () => { alive = false; if (timer) clearTimeout(timer); };
++  const retry = () => { if (alive) void load(true); };
++  if (options.retryRef) options.retryRef.current = retry;
++  void load(true);
++  return () => { alive = false; if (options.retryRef?.current === retry) options.retryRef.current = null; if (timer) clearTimeout(timer); };
+ }
+diff --git a/frontend/lib/use-live-timing-state.ts b/frontend/lib/use-live-timing-state.ts
+index 54562ea..156ffdd 100644
+--- a/frontend/lib/use-live-timing-state.ts
++++ b/frontend/lib/use-live-timing-state.ts
+@@ -14,6 +14,7 @@ export function useLiveTimingState() {
+     [completedLaps, setCompletedLaps] = useState<Row[]>([]),
+     [liveIncidents, setLiveIncidents] = useState<Row[]>([]),
+     [livePitStops, setLivePitStops] = useState<Row[]>([]),
++    [recordsLoading, setRecordsLoading] = useState(false),
+     [recordsError, setRecordsError] = useState(""),
+     [snapshot, setSnapshot] = useState<Record<string, unknown> | null>(null),
+     [snapshotView, setSnapshotView] = useState({ loading: false, error: "" }),
+@@ -29,6 +30,7 @@ export function useLiveTimingState() {
+   const canManageDemos = user?.role === "ADMIN" || user?.role === "STEWARD";
+   const autoFollow = useRef(true);
+   const snapshotRetry = useRef<(() => void) | null>(null);
++  const recordsRetry = useRef<(() => void) | null>(null);
+   const demoInFlight = useRef(false);
+   const listRequest = useRef(0);
+   const errorSource = useRef<"lists" | "snapshot" | "demo" | "">("");
+@@ -47,7 +49,7 @@ export function useLiveTimingState() {
+     setListLoading, setListError, session, setSession,
+     sessionDrivers, setSessionDrivers, driver, setDriver, packets, setPackets,
+     completedLaps, setCompletedLaps, liveIncidents, setLiveIncidents,
+-    livePitStops, setLivePitStops, recordsError, setRecordsError,
++    livePitStops, setLivePitStops, recordsLoading, setRecordsLoading, recordsRetry, recordsError, setRecordsError,
+     snapshot, setSnapshot, snapshotView, setSnapshotView, snapshotRetry,
+     timing, setTiming, status, setStatus, error, setError,
+     demoBusy, setDemoBusy, showCompletedDemos, setShowCompletedDemos,

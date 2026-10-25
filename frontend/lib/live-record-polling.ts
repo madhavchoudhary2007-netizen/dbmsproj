@@ -7,8 +7,9 @@ export function startLiveRecordPolling(
   setLiveIncidents: (rows: Row[]) => void,
   setLivePitStops: (rows: Row[]) => void,
   setRecordsError: (message: string) => void,
+  options: { setLoading?: (value: boolean) => void; retryRef?: { current: (() => void) | null } } = {},
 ): (() => void) | undefined {
-  if (!session) { clearError("snapshot"); setCompletedLaps([]); setLiveIncidents([]); setLivePitStops([]); setRecordsError(""); return; }
+  if (!session) { options.setLoading?.(false); clearError("snapshot"); setCompletedLaps([]); setLiveIncidents([]); setLivePitStops([]); setRecordsError(""); return; }
   let alive = true;
   setCompletedLaps([]);
   setLiveIncidents([]);
@@ -16,21 +17,30 @@ export function startLiveRecordPolling(
   setRecordsError("");
   clearError("snapshot");
   let timer: ReturnType<typeof setTimeout> | undefined;
-  const load = async () => {
+  let generation = 0;
+  const load = async (showLoading = false) => {
+    if (timer) clearTimeout(timer);
+    const request = ++generation;
+    if (showLoading) options.setLoading?.(true);
     try {
       const value = await api<{ laps?: Row[]; incidents?: Row[]; pit_reservations?: Row[] }>(`/sessions/${session}/laps`);
-      if (alive) {
+      if (alive && request === generation) {
         setCompletedLaps(asArray(value.laps));
         setLiveIncidents(asArray(value.incidents));
         setLivePitStops(asArray(value.pit_reservations));
         setRecordsError("");
       }
     } catch (e) {
-      if (alive) setRecordsError(e instanceof Error ? e.message : "Unable to load lap and race-control records");
+      if (alive && request === generation) setRecordsError(e instanceof Error ? e.message : "Unable to load lap and race-control records");
     } finally {
-      if (alive) timer = setTimeout(() => { void load(); }, 5000);
+      if (alive && request === generation) {
+        options.setLoading?.(false);
+        timer = setTimeout(() => { void load(); }, 5000);
+      }
     }
   };
-  void load();
-  return () => { alive = false; if (timer) clearTimeout(timer); };
+  const retry = () => { if (alive) void load(true); };
+  if (options.retryRef) options.retryRef.current = retry;
+  void load(true);
+  return () => { alive = false; if (options.retryRef?.current === retry) options.retryRef.current = null; if (timer) clearTimeout(timer); };
 }

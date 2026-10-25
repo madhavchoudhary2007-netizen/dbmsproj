@@ -14,6 +14,7 @@ export function useLiveTimingState() {
     [completedLaps, setCompletedLaps] = useState<Row[]>([]),
     [liveIncidents, setLiveIncidents] = useState<Row[]>([]),
     [livePitStops, setLivePitStops] = useState<Row[]>([]),
+    [recordsLoading, setRecordsLoading] = useState(false),
     [recordsError, setRecordsError] = useState(""),
     [snapshot, setSnapshot] = useState<Record<string, unknown> | null>(null),
     [snapshotView, setSnapshotView] = useState({ loading: false, error: "" }),
@@ -29,6 +30,7 @@ export function useLiveTimingState() {
   const canManageDemos = user?.role === "ADMIN" || user?.role === "STEWARD";
   const autoFollow = useRef(true);
   const snapshotRetry = useRef<(() => void) | null>(null);
+  const recordsRetry = useRef<(() => void) | null>(null);
   const demoInFlight = useRef(false);
   const listRequest = useRef(0);
   const errorSource = useRef<"lists" | "snapshot" | "demo" | "">("");
@@ -47,7 +49,7 @@ export function useLiveTimingState() {
     setListLoading, setListError, session, setSession,
     sessionDrivers, setSessionDrivers, driver, setDriver, packets, setPackets,
     completedLaps, setCompletedLaps, liveIncidents, setLiveIncidents,
-    livePitStops, setLivePitStops, recordsError, setRecordsError,
+    livePitStops, setLivePitStops, recordsLoading, setRecordsLoading, recordsRetry, recordsError, setRecordsError,
     snapshot, setSnapshot, snapshotView, setSnapshotView, snapshotRetry,
     timing, setTiming, status, setStatus, error, setError,
     demoBusy, setDemoBusy, showCompletedDemos, setShowCompletedDemos,
