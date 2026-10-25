@@ -25,14 +25,18 @@ export function LiveTiming() {
     sessionDrivers, setSessionDrivers, driver, setDriver, packets, setPackets,
     completedLaps, setCompletedLaps, liveIncidents, setLiveIncidents,
     livePitStops, setLivePitStops, recordsError, setRecordsError,
+    setListLoading, setListError,
     snapshot, setSnapshot, timing, setTiming, status, setStatus, error, setError,
     demoBusy, setDemoBusy, showCompletedDemos, setShowCompletedDemos,
     showAllLaps, setShowAllLaps, deleteRace, setDeleteRace, demoMessage,
     setDemoMessage, canManageDemos, autoFollow, listRequest, reportError, clearError,
   } = useLiveTimingState();
   const refreshLists = useCallback(async () => {
-    return refreshLiveLists(listRequest, setSessions, setDemoRaces, clearError);
-  }, [clearError, listRequest, setDemoRaces, setSessions]);
+    return refreshLiveLists(listRequest, setSessions, setDemoRaces, clearError, (error) => {
+      setListLoading(false);
+      setListError(error);
+    });
+  }, [clearError, listRequest, setDemoRaces, setListError, setListLoading, setSessions]);
   useEffect(() => {
     return startInitialLiveSelection(refreshLists, autoFollow, setSession, reportError);
   }, [refreshLists, reportError, autoFollow, setSession]);

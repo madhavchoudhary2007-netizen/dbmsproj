@@ -5,6 +5,8 @@ import { useAuth } from "@/components/auth";
 export function useLiveTimingState() {
   const [sessions, setSessions] = useState<Row[]>([]),
     [demoRaces, setDemoRaces] = useState<Row[]>([]),
+    [listLoading, setListLoading] = useState(true),
+    [listError, setListError] = useState(""),
     [session, setSession] = useState(""),
     [sessionDrivers, setSessionDrivers] = useState<Row[]>([]),
     [driver, setDriver] = useState(""),
@@ -38,7 +40,8 @@ export function useLiveTimingState() {
     }
   }, []);
   return {
-    sessions, setSessions, demoRaces, setDemoRaces, session, setSession,
+    sessions, setSessions, demoRaces, setDemoRaces, listLoading, listError,
+    setListLoading, setListError, session, setSession,
     sessionDrivers, setSessionDrivers, driver, setDriver, packets, setPackets,
     completedLaps, setCompletedLaps, liveIncidents, setLiveIncidents,
     livePitStops, setLivePitStops, recordsError, setRecordsError,
