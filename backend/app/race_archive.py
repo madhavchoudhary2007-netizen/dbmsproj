@@ -2,9 +2,15 @@
 
 import random
 from datetime import timedelta
+from typing import Any
+
+from psycopg import Connection
+from pymongo.collection import Collection
 
 
-def seed_historical_laps(conn, collection):
+def seed_historical_laps(
+    conn: Connection[dict[str, Any]], collection: Collection[dict[str, Any]]
+) -> None:
     sessions = conn.execute("""SELECT s.* FROM race_sessions s JOIN race_events e ON e.id=s.event_id
       JOIN championships c ON c.id=e.championship_id WHERE c.name='ApexGrid World Series'
       AND c.season=2026 AND e.round_number<=2 AND s.session_type='RACE' AND s.state='COMPLETED'
@@ -15,7 +21,7 @@ def seed_historical_laps(conn, collection):
         # A partially recorded session must not suppress the rest of its archive.
         # Preserve existing telemetry and fill only missing driver/lap pairs.
         existing_laps = set()
-        recorded_lap_times = {}
+        recorded_lap_times: dict[tuple[str, int], int] = {}
         for doc in collection.find(
             {"session_id": sid}, {"driver_id": 1, "lap": 1, "sector": 1, "lap_time_ms": 1}
         ):

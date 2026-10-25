@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 0308663
+git_head: ddbf765
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -18,7 +18,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T382 resources header/toolbar/exactrowhook/classifier/NbTable/nativeModal/NbField/form/rowEditDelete/roleeligibilitybadges implemented; alloriginalcelltext/copy/pageSize50 preserved. Root360browserPASS T382-actions-primary.browser.raw.log, allsixpalettes/fivewidthaxe/targets/overflow/primary/dataflow. Build/lint/types0 T382-actions-build.raw.log. Parent unfinished: inlinevalidation, twocolumnmemberships, focusedfileboundaries/finalvisuals.
 - Real20POST/save and20DELETE/confirm duplicates repaired06330e6/6e28dd6, confirmation7838c2d. Strict25PASS T382-delete-guard.browser.raw.log; markerretired5cfe010, activeprimarytransitions5widthPASS. Browserwrites locallymocked only.
 - Backend main824lines, <=120T331 NOT met; T332unfinished. Genuine modules/core/extracts retained. TypedRuntimeState/providers/lifespan shareandclear identities; requestauth/DatabaseSession. Membership/analytics/pitreads useDI. Actualreturnannotation Decimalstringregression fixedresponse_modelNone19b7991; exactnumericserializationtests1479019 preservewireencoding.
-- Backendfull245PASS0skip/liveacceptancePASS T44453.full.raw.log. Strictmypy177errors/30files T332-current-types.raw.log,target0T339. Runtime32PASS. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
+- Backendfull245PASS0skip/liveacceptancePASS T44453.full.raw.log. Strictmypy162errors/28files T339-current.raw.log,target0T339. Runtime42PASS. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
 
 ## Safety / workflow
 - Onlyoverhaul/neo-brutal; commits onlyaccept.sh; independentlyrerunVerify;2packet-onlycustomworkersmax, no model/effortoverrides. Isolatedclones .agent/orchestrate.py;<=3files/150added+deleted; normalizeactualstats. Every5tasks budget.
@@ -35,20 +35,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - Worker T44427wrongworkspacerepairedinpreviouscontext. Reviewcaughtfixture/APIshape errors, serializationregression andhiddenconfirmationprimary; repairedwithouttest/gaterelaxation. Rawlogsabsentclones: inlinefactsinpackets.
 - Latestacceptedpacket/hashes/evidence: Git/.agent/results; queue/stateupdatedaftereachacceptance. No newdependencies, no realDBwrites.
 
-- T-44459 accepted18211b0: Add native field-validation hook with blur/invalid validation and change revalidation only after error, preserving unrelated errors and no-op identity. Verify0.
-
-- T-44460 acceptede5c4a2a: Cover row Edit click/keyboard and Delete cancellation boundaries, exact record values, single dialog/primary restoration and zero writes. Verify0.
-
-- T-44461 accepteda939d11: Wire native field errors through NbField with blur/invalid validation and change revalidation; preserve all value conversions and save behavior. Verify0.
-
-- T-44462 accepted4019403: Exercise actual field-validation hook using queued functional state updates, call-time native snapshots, error clearing/preservation and no-op identity. Verify0.
-
-- T-44464 accepteded47d9f: Type EventBus payload queues, identifiers and method signatures without changing queue/thread behavior; explicitly narrow JSON-safe telemetry return type. Verify0.
-
-- T-44463 acceptede6311f5: Assert actual dialog teardown and restored edit focus before keyboard reopen; cover native linked inline errors, clearing, blocked invalid submit and numeric-zero save. Verify0.
-
-- T-44465 acceptede1470ec: Isolate membership reads with cancellation/latest-request protection and pending/error state; derive current roster using inclusive UTC start/end dates. Verify0.
-
-- T-44466 accepted978192d: Create reusable membership history presentation covering five states, retry, retained partial records and original end-membership actions. Verify0.
-
-- T-44467 accepted0308663: Reuse five-state membership history and render current roster beside the existing add-membership form, with actual pending/error/retry and selected-record context. Verify0.
+- T382 inlinevalidation/rowkeyboard/cancellation45browserPASS T382-inline-row.browser.raw.log. Native closeeventtest now waits actualdialogteardown/focus, no sleeps/assertionsremoved. Inlinehookactual7VMcases and membershiphook3VMcases, runtime42PASS.
+- T382 two-column selectedcurrentroster+addform0308663, sharedfiveStateview978192d at2callsites, abort/latesthistorye1470ec. Browsermembership/layout/axe/rootbuild pending; parent remainsopen. Currentdatebounds inclusive(futureend active/futurestart excluded), no fakecurrentroster.
