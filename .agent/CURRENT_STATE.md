@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 3518121
+git_head: f8b1888
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -55,3 +55,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44496 accepted401fdf1: Wire reduced-motion-safe timing reorder/value flashes and mobile-only details while preserving row selection and all fields. Verify0.
 
 - T-44497 accepted3518121: Test actual snapshot settlement/retry, stale generation isolation and retry-handle cleanup identity. Verify0.
+
+- T-44498 acceptedf8b1888: Render timing loading, retryable error, retained partial, populated and empty states from actual snapshot settlement; style live errors. Verify0.

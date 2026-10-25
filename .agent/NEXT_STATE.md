@@ -3,6 +3,11 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44501 W2 — OPEN
+- target_files: frontend/lib/live-record-polling.ts, frontend/lib/use-live-timing-state.ts
+- contract: T385 expose recorded-lap/control loading and manual retry from the existing polling loop, preserving single-timer and stale-response safety.
+- verify: npm --prefix frontend run test:runtime && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
 ### T-44500 W1 — OPEN
 - target_files: frontend/components/pages/live/telemetry-charts.tsx
 - contract: T385 replace legacy telemetry chart colours, axes, tooltips and animation defaults with the existing approved chart theme.
@@ -12,11 +17,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - target_files: frontend/e2e/live-timing-tower.spec.ts
 - contract: T384 focused browser tests for timing tower states, native driver selection, responsive details, actual WebSocket reorder and reduced motion.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/live-timing-tower.spec.ts --list
-
-### T-44498 W1 — OPEN
-- target_files: frontend/components/pages/live/index.tsx, frontend/components/pages/live/timing-tower.tsx, frontend/app/styles/live.css
-- contract: T384 connect actual snapshot settlement and retry to all five timing-tower presentation states.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -28,6 +28,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44498 acceptedf8b1888; verify0.
 - T-44497 accepted3518121; verify0.
 - T-44496 accepted401fdf1; verify0.
 - T-44495 accepted9641a88; verify0.
