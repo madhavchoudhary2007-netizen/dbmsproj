@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, asArray, listAll, Row } from "@/lib/api";
 import { useAuth } from "@/components/auth";
+import { useStewardingLicences, useStewardingPenalties } from "@/lib/use-stewarding-records";
 
 export function useStewardDesk() {
   const [rows, setRows] = useState<Row[]>([]),
@@ -16,8 +17,12 @@ export function useStewardDesk() {
     [grid, setGrid] = useState(0),
     [message, setMessage] = useState("");
   const { user } = useAuth();
+  const penalties = useStewardingPenalties();
+  const licences = useStewardingLicences();
+  const reloadPenalties = penalties.reload;
+  const reloadLicences = licences.reload;
   const canSteward = user?.role === "ADMIN" || user?.role === "STEWARD";
-  const load = useCallback(async () => {
+  const load = useCallback(async (refreshRecords = true) => {
     setLoading(true);
     try {
       const [i, d, s] = await Promise.all([
@@ -29,14 +34,15 @@ export function useStewardDesk() {
       setDrivers(asArray(d));
       setSessions(asArray(s));
       setError("");
+      if (refreshRecords) await Promise.all([reloadPenalties(), reloadLicences()]);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to load incidents");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [reloadLicences, reloadPenalties]);
   useEffect(() => {
-    void load();
+    void load(false);
   }, [load]);
   const report = async (v: Row) => {
     setBusy(true);
@@ -98,6 +104,7 @@ export function useStewardDesk() {
     grid,
     setGrid,
     message,
+    records: { penalties, licences },
     canSteward,
     load,
     report,

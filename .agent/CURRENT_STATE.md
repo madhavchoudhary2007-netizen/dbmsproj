@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: 779e680
+git_head: 8f08922
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -56,3 +56,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 
 
 - T386-387 route batch99PASS1desktopSteward paletteFAIL; all30 Session resilience tests passed (spam fixed01e561c). Five native session dialogs passed after shared form readability7c1a7c7. T387 official read models823c270 + twelve HTTP cases779e680 passed offline; full disposable gate follows real SQL integration test.
+
+- T-44538 accepted8f08922: Use paper steward header and a truthful red case-count sticker to correct desktop palette balance. Verify0.
