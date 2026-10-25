@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: d36776d
+git_head: e0f42fd
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -17,9 +17,9 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - Worker switch implementedba3fa7c/4645e52; allcustom-role toolmetadata gpt-6-luna/high, <=2workers; freshroles succeeded repeatedly. No deps added.
 - T379 exactsplit source complete: special-pages9lines re-export7pages; live standalone149lines1af6714 andwireb0d6bcc. Dashboard/Sessions/Stewards/Pit/Analytics/DBMS source moves checked exactbytes/AST. Rootfocusedbrowser totals120sessions/55stewards/100pitDBMS/105analyticslive/60live; evidence T379*.browser.raw.log. Runtime24PASS0skip (--experimental-vm-modules), script added0752dcf; browserdiscovery remains1100cases.
 - ParentT379 remainsUNACCEPTED: build/types/lint0 T379.final-build.raw.log; full1100mocked1020PASS80FAIL. Rootfixedbodydarkboot7a6fde5, actualheadingready445b08c, residualCSSmotionac27b29. Failure-only85cases70PASS15FAIL: all5motionPASS, body/headingchecksPASS;15remainingdesktopA3surface-sharefailures belong Phase7layouts. No gates waived. Use Phase7layouttasks as parentgate repairs, rerunfull beforeaccept.
-- T44379 band64px regressed existing40px feed assertion; repaired09cae83 restoringoriginalCSS. Rootmust rerunfeed suite. No assertionchanged. Packet missed sizeinvariant; recorded honestly.
-- Backend latestT44378 runnerwire54689b4:231PASS0fail/skip/xfailed plus liveacceptancePASS, T44378.full.raw.log. CRUD/WS/simulatorroutes extracted5bba15e/a52fd5b/1d7f717/a5bb1f7; WShelpers5ac053e; runnerbody7f62291 ASTexact. Main927lines, T331<=120stillopen; mainlegacyaliases/currentcallbacklookups retained untilT332.
-- T381 KPI W1T44381 pendingreview/repair: newNbStat tones and dashboardcards plus orphan52CSSlines removed. Do not accept globalfontdefaultchange or unsafe mixedarraycasts; preserve defaults and use typedconstanttuples.
+- T44379 band64px regressed existing40px feed assertion; repaired09cae83 restoringoriginalCSS. Root95dashboard/primitive/feedbrowserPASS T381-hero-recovery.browser.raw.log afterrestoration. No assertionchanged. Packet missed sizeinvariant; recorded honestly.
+- Backend latestfull T44385 aliasfix07b8e27:231PASS0fail/skip/xfailed plus liveacceptancePASS, T44385.full.raw.log; T44386 fullrunning. CRUD/WS/simulatorroutes extracted5bba15e/a52fd5b/1d7f717/a5bb1f7; WShelpers5ac053e; runnerbody7f62291 ASTexact. Main894lines, T331<=120stillopen; mainlegacyaliases/currentcallbacklookups retained untilT332.
+- T381 KPIec4c854/hero02486b3/stat-hookd36776d accepted; root95browserPASS incl recovery and original40pxfeed. SharedNbStat defaults preserved; readonlytuple props. T44387 context/healthlayout pending rootbrowser.
 
 ## Safety / workflow
 - Branchonly overhaul/neo-brutal; commits onlyaccept.sh, root independently reruns Verify; <=2 packet-onlycustomworkers, no model/effortoverride. Isolatedclones .agent/orchestrate.py; <=3files/150changedlines/task; normalize envelopes with actualstats.
@@ -29,7 +29,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 ## Open risks / next
 - T331/T332 DI and strictmypy212errors/24files atT44256 (stale), zero requiredT339; coverage/batching/DBMSshowcase/finaleval pending. Transitional wrappers/factorycallbacks remain.
 - T44132 bundlechecker misses layout/sharedassets, repair beforeP3 with170KB unchanged. Lighthouseabsent, FPS17untilT41316.7, hostedCIunverified. Final>=95/allhardgates/noNOT_RUN; neverclaimobsoleteaggregate current.
-- FinishLive split then dashboard/resources/live/sessions/stewards/pit/standings/analytics/DBMS perplan; DBMSredesign dependsPhase4.
+- FinishT379 palettegate via Phase7dashboard/resources/live/sessions/stewards/pit/standings/analytics/DBMS perplan; DBMSredesign dependsPhase4.
 
 ## Orchestrator direct edits / process findings
 - Productglue this turn14lines only, previous T44250 plus2importintegration lines. Workers implement all otherproductchanges.
@@ -54,3 +54,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44385 accepted07b8e27: Restore legacy jwt module export required by existing auth and WebSocket compatibility tests. Verify0.
 
 - T-44384 acceptedd36776d: Restore stat-card compatibility hook on dashboard KPI tiles without restoring obsolete CSS. Verify0.
+
+- T-44386 acceptede0f42fd: Extract origin, revocation and role-check dependencies with exact guards and original main wrappers. Verify0.
