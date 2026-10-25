@@ -1,3 +1,7 @@
+> Historical perfection-loop log: superseded by the owner-approved twelve-phase docs/overhaul-plan.md.
+> Current branch: overhaul/neo-brutal. Current verified state and queue: CURRENT_STATE.md / NEXT_STATE.md.
+> Historical scores below are not a current overhaul score. Current overhaul remains unfinished; no presentable score is claimed.
+
 # Perfection loop
 
 ## OWNER OVERRIDE (2026-10-23), takes precedence over the phase plan

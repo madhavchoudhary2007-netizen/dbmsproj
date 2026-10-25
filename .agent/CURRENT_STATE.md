@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 1a4871f
+git_head: 95bf890
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -14,12 +14,13 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - Login T3800a3e206 COMPLETE: root80browserPASS T380.final.browser.raw.log; settled5widthvisuals reviewed; build/types/lint0 T380.build.raw.log. Authlogic/copy unchanged; mobilegeometry/keyboardfeed and calleraria-busy fixes covered.
 
 ## Active work / evidence
-- GPT6Luna/high custom roles, fresh packet-only clones; <=2. Switch ba3fa7c/4645e52. No new dependencies.
-- T379 seven exact route moves complete, special-pages9line exports. Parent UNACCEPTED: full1100mocked1020PASS80FAIL, after body/heading/motion fixes85rerun70PASS15desktopA3FAIL. Phase7 layouts repair parent gate; rerun full before accept; no gates waived.
-- Dashboard T381 hero/KPIs/layout/source states/Next up/incidents implemented in atomic commits through133240e; .stat-card/.state.error/Try again preserved. Independent sources, cancel/generation/reload guard; actual-module runtime27PASS. Latest incidents independent5-state hook and mini-table, limit5 readonlyAPI. New browser fixtures use StrictMode-safe phase flags and scoped event text.
-- Backend T331 main846lines (<=120 NOT achieved). Genuine CRUD/WS/simulator/runtime/auth modules extracted; main compatibility aliases/current callbacks retained until T332. Latest core app factory22c7e77 exact lease-body AST, offline21PASS; root T44395 full231PASS0skip/live acceptancePASS. T332DI still pending.
-- Root55browserPASS5E5FAIL fixed3226b70; next30PASS15newfixtureFAIL corrected133240e (no assertions weakened). Broader T381-final-panels INTERRUPTED exit130 after repeated dashboard crash: malformed incidents {} accepted as Row[]; T44399 validation ready for acceptance, W3 T44398 includes regression. No claim full current browser green.
-- Original40px feed restored09cae83 after T44379 size regression, root95PASS including original assertions. Body boot light/readiness/residual-motion fixes preserved. T44389 exactCSS movea74019e.
+- GPT6Luna/high customroles cap2; switchba3fa7c/4645e52. No newdependencies. Plan remains twelvephases, no currentfinalscore.
+- T379 exact seven-route split complete, special-pages9lineexports. Parent UNACCEPTED: originalfull1100mocked1020PASS80FAIL, targeted85afterbody/heading/motionfix70PASS15desktopA3FAIL. Dashboard nowpassesitsgate; otherlayouts requirePhase7, rerunfull beforeparentaccept. No gates waived.
+- T381 dashboard hero/KPIs/context/Next up/incidents + independent5-state sources implemented. Root135browserPASS T381-visual-verified.browser.raw.log incl route/axe/targets/6widthresponsive/palette/legacyoffline/spam/unmount/malformed/healthcontrast+visiblelink. Settled5widthscreenshotsreviewed,0overflow/oneprimary/noerrors. Productionbuild/types/lint0 T381-current-build.raw.log; rootruntime27PASS. Preserve .stat-card/.state.error/Try again.
+- T381 genuine lease/WS hook6b9fd8c stagednotyetUIwired; ready503down accepted, lifecycle abort/listenercleanup, no inventedup. TransportunitT44416 and UIrowsT44417 inprogress. Mock-only platformfixture5b1d8f4 importadoption ongoing, byte-exact originaltestbodies; realstack suites untouched.
+- Backend T331 main857lines (<=120 NOT achieved), T332unfinished. Existing genuine API/core extracts retained. Appfactory22c7e77 exactleasebodyAST; RuntimeState60c4999/providers4521ac9/lifespan d756a9f/b87fee6 share and clear realresourceidentities. Root239PASS0skip/livePASS T44407.full.raw.log.
+- Requestauth/injectedDBadapters1ffce81 +4offlineauthregressions6b6cf24 stagednotyetrouteradopted, ownmodule strictmypy0. Full243expected but notyetexecuted. T331/T332ordercoupling: legacytests patchmain, so providerfoundations required before removingcompat wrappers; neitherparentcomplete.
+- Original40pxfeed09cae83 restored androot95PASS; bodybootlight/actualheadingready/residualmotion fixes unchanged. T44389 exactCSSmovea74019e.
 
 ## Safety / workflow
 - Branchonly overhaul/neo-brutal; commits onlyaccept.sh, root independently reruns Verify; <=2 packet-onlycustomworkers, no model/effortoverride. Isolatedclones .agent/orchestrate.py; <=3files/150changedlines/task; normalize envelopes with actualstats.
@@ -32,26 +33,6 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - FinishT379 palettegate via Phase7dashboard/resources/live/sessions/stewards/pit/standings/analytics/DBMS perplan; DBMSredesign dependsPhase4.
 
 ## Orchestrator direct edits / process findings
-- Productglue14lines only in long continuation (T44250 +2imports); workers implement other product changes.
-- Actual stats normalized independently. Worker T44393 newfile reported0/0, corrected actual121 before accept; T44398 actual147. Root browser interruption cleaned own Next processes/restored next-env. Existing assertions never weakened.
-- T381 remaining: verify complete dashboard5widths/axe/targets/palette and all source regressions; service WS/lease actual observation not yet wired. Four KPI accents conflictT400max3 (TASTE-381-1), resolve before A5.
-
-- T-44399 accepted1924d64: Validate incident JSON at runtime and show recoverable source errors instead of crashing on malformed payloads. Verify0.
-
-- T-44398 acceptedda48958: Seven incidents browser scenarios: five states, reload coalescing, cancellation and malformed-response dashboard isolation; collection only. Verify0.
-
-- App runtime/provider foundation60c4999, actual HTTP+WS provider tests4521ac9, appstate wiringd756a9f and lifespan proofb87fee6 accepted. Root full239PASS0skip; liveacceptancePASS T44407.full.raw.log. Main857lines, T331<=120/T332 still NOT complete. Request auth/DB adapters T44408 stagedawaitreview, strict ownmodules0.
-- Dashboard latest root135PASS T381-visual-verified.browser.raw.log after visualfix5a0ad53 + actualcontrast/link regressiond018de6; fivewidth0overflow/oneprimary/noerrors. Secondaryface readable, greenlabels ink, healthwrapscontent. T381 still requires actualWS/lease source rows; testfixtureprerequisite T44409. No parentcompletion claim.
-- W3 T44406 initially exceeded requestedfile150linecap153, repairedformatting to150 without assertionsremoved. Rootmalformedsource regression repaired1924d64 and coveredda48958. All counts normalized; no threshold changes.
-
-- T-44408 accepted1ffce81: Stage typed injected-pool database and auth dependencies; preserve credential checks, revocation, CSRF and role semantics with lazy resource queries. Verify0.
-
-- T-44409 accepted5b1d8f4: Explicit mock-only readiness and WebSocket fixture for dashboard suites; existing API mocks, assertions and real-stack suites unchanged. Verify0.
-
-- T-44410 accepted6b6cf24: Offline request-auth characterization for lazy pool access, valid/revoked credentials, cookie CSRF, roles and injected database cleanup. Verify0.
-
-- T-44411 accepted6b9fd8c: Observe actual readiness runtime lease and session WebSocket with abort/stale guards and listener/socket cleanup; no synthetic health. Verify0.
-
-- T-44412 acceptedfd9629d: Adopt explicit mock platform fixture by import-only changes; all test bodies and gates unchanged. Verify0.
-
-- T-44413 accepted1a4871f: Adopt explicit mock platform fixture by import-only changes; all test bodies and gates unchanged. Verify0.
+- Productglue14lines only in long continuation, workers implement other productchanges. Actualnumstats checked independently; source moves byte/AST checked. Priornewfileenvelope0/0 normalizedactual121, no trust inreportedcounts.
+- E5partial legacyselector/aria regression fixed3226b70; invalidincidents{} crash fixed1924d64/testda48958. Rootinterruptedknown-failingbroadrun130exit, cleanedownNext/restorednext-env; later135PASS. Newfixture StrictMode/duplicate-text selectors fixedwithout weakening assertions. W3T44406 153linefile repaired150; T44414 extra type-onlyimport restored toboundary.
+- T381 health ink/plinthface Taste defects fixed5a0ad53 andbrowserprovedd018de6. Remaining fourKPIaccents vsT400max3 TASTE-381-1 mustresolvebeforeA5. Servicehealth source rows notyetcomplete. History/results retain repair details.

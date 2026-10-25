@@ -1,0 +1,10 @@
+diff --git a/frontend/e2e/race-control-feed.spec.ts b/frontend/e2e/race-control-feed.spec.ts
+index 42c7bd8..1ccd0de 100644
+--- a/frontend/e2e/race-control-feed.spec.ts
++++ b/frontend/e2e/race-control-feed.spec.ts
+@@ -1,4 +1,4 @@
+-import { expect, test, type Page } from "@playwright/test";
++import { expect, test, type Page } from "./mock-platform";
+ 
+ const admin = { id: "feed-admin", email: "feed@example.test", full_name: "Feed Admin", role: "ADMIN" };
+ const liveData = {

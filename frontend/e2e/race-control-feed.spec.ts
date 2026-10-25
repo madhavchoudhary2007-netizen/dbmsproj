@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./mock-platform";
 
 const admin = { id: "feed-admin", email: "feed@example.test", full_name: "Feed Admin", role: "ADMIN" };
 const liveData = {
