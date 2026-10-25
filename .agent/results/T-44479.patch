@@ -1,0 +1,21 @@
+diff --git a/frontend/e2e/resource-memberships.spec.ts b/frontend/e2e/resource-memberships.spec.ts
+index 69d2380..2fce1c4 100644
+--- a/frontend/e2e/resource-memberships.spec.ts
++++ b/frontend/e2e/resource-memberships.spec.ts
+@@ -155,11 +155,14 @@ test("partial membership refresh retains rows and recovers on retry", async ({ p
+   });
+   const dialog = await openTeam(page);
+   await expect(dialog.getByText("Open Driver")).toBeVisible();
+-  await dialog.getByRole("button", { name: "End membership", exact: true }).click();
++  const openDriverRow = dialog.locator(".membership-line").filter({ has: page.getByText("Open Driver", { exact: true }) });
++  const endMembership = openDriverRow.getByRole("button", { name: "End membership", exact: true });
++  await expect(endMembership).toHaveCount(1);
++  await endMembership.click();
+   const partial = dialog.getByTestId("state-partial");
+   await expect(partial).toBeVisible();
+   await expect(partial.getByText("Open Driver")).toBeVisible();
+-  await expect(partial.getByRole("alert")).toContainText("Roster refresh unavailable");
++  await expect(partial.getByText("Roster refresh unavailable", { exact: true })).toBeVisible();
+   await partial.getByRole("button", { name: "Try again", exact: true }).click();
+   await expect(dialog.getByTestId("state-populated")).toBeVisible();
+   await expect(dialog.getByText("Open Driver")).toBeVisible();

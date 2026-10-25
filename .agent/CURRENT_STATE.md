@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 5569250
+git_head: 0443c82
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -43,3 +43,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44476 accepted0fb8de5: Render live-demo hero as yellow card with primary CTA and native delete confirmation; keep one active primary and every existing action/copy. Verify0.
 
 - T-44477 accepted5569250: Type simulation tick RNG/return and known driver-number boundary, validation returns, and remove redundant CRUD row casts without runtime changes. Verify0.
+
+- T-44478 accepted0443c82: Replace legacy dark/tiny membership roster styling with scoped ink-on-paper, readable token typography and wrapping, preserving other state colors. Verify0.
