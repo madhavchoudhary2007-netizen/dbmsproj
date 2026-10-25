@@ -8,11 +8,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T331 extract exact six standard CRUD resource registrations into crud_resources helper; preserve registration order and contracts.
 - verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/crud_resources.py
 
-### T-44358 W2 — OPEN
-- target_files: frontend/lib/live-stream.ts
-- contract: T379 stage exact live WebSocket/snapshot effect body as startLiveStream helper; do not wire source yet.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
-
 ## Blocked
 - None currently. Owner switch gpt-6-luna/high implemented and freshworkers succeeded.
 
@@ -20,6 +15,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44358 acceptede66ff78; verify0.
 - T-44356 acceptedaeb35ee; verify0.
 - T-44357 accepted66bccc6; verify0.
 - T-44355 acceptedd181250; verify0.
