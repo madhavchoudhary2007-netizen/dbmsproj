@@ -100,7 +100,7 @@ test("driver selection supports click, Enter, and Space; mobile details preserve
   const first = rows(page).filter({ hasText: "Driver One" });
   const second = rows(page).filter({ hasText: "Driver Two" });
   const driverSelect = page.getByRole("combobox", { name: "Driver", exact: true });
-  await first.click();
+  await first.getByText("Driver One", { exact: true }).click();
   await expect(first).toHaveAttribute("aria-selected", "true");
   await expect(driverSelect).toHaveValue("d1");
   await second.focus(); await page.keyboard.press("Enter");
