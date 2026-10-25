@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: da48958
+git_head: 67d0603
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -39,3 +39,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44399 accepted1924d64: Validate incident JSON at runtime and show recoverable source errors instead of crashing on malformed payloads. Verify0.
 
 - T-44398 acceptedda48958: Seven incidents browser scenarios: five states, reload coalescing, cancellation and malformed-response dashboard isolation; collection only. Verify0.
+
+- T-44400 accepted67d0603: Use exact accessible Refresh name to distinguish dashboard reload from the existing race-control feed action. Verify0.
+
+- T331/T332 sequencing finding: legacy tests patch main resource/dependency globals, so closure to120lines requires app.state dependency foundations before removing wrappers. Stage typed providers under T44401; retain main/API contracts and all assertions; neither parent declared complete.

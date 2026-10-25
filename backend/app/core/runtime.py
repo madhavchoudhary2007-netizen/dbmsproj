@@ -1,0 +1,65 @@
+from dataclasses import dataclass, field
+from typing import Annotated, Any
+
+from fastapi import Depends, HTTPException
+from psycopg import Connection
+from psycopg_pool import ConnectionPool
+from pymongo.collection import Collection
+from pymongo.database import Database
+from pymongo.mongo_client import MongoClient
+from starlette.requests import HTTPConnection
+
+from ..config import MONGODB_DATABASE
+from ..simulation_core import Simulation
+from .events import EventBus
+
+
+@dataclass
+class RuntimeState:
+    pool: ConnectionPool[Connection[dict[str, Any]]] | None = None
+    mongo_client: MongoClient[dict[str, Any]] | None = None
+    telemetry_collection: Collection[dict[str, Any]] | None = None
+    bus: EventBus = field(default_factory=EventBus)
+    simulations: dict[str, Simulation] = field(default_factory=dict)
+    runtime_lease: Connection[Any] | None = None
+
+
+def get_runtime(connection: HTTPConnection) -> RuntimeState:
+    runtime = getattr(connection.app.state, "runtime", None)
+    if not isinstance(runtime, RuntimeState):
+        raise HTTPException(status_code=503, detail="Application runtime is unavailable")
+    return runtime
+
+
+def get_pool(
+    runtime: Annotated[RuntimeState, Depends(get_runtime)],
+) -> ConnectionPool[Connection[dict[str, Any]]]:
+    if runtime.pool is None or runtime.pool.closed:
+        raise HTTPException(status_code=503, detail="PostgreSQL is unavailable")
+    return runtime.pool
+
+
+def get_mongo(
+    runtime: Annotated[RuntimeState, Depends(get_runtime)],
+) -> Database[dict[str, Any]]:
+    if runtime.mongo_client is None:
+        raise HTTPException(status_code=503, detail="MongoDB document store is unavailable")
+    return runtime.mongo_client[MONGODB_DATABASE]
+
+
+def get_telemetry(
+    runtime: Annotated[RuntimeState, Depends(get_runtime)],
+) -> Collection[dict[str, Any]]:
+    if runtime.telemetry_collection is None:
+        raise HTTPException(status_code=503, detail="MongoDB telemetry store is unavailable")
+    return runtime.telemetry_collection
+
+
+def get_bus(runtime: Annotated[RuntimeState, Depends(get_runtime)]) -> EventBus:
+    return runtime.bus
+
+
+def get_simulations(
+    runtime: Annotated[RuntimeState, Depends(get_runtime)],
+) -> dict[str, Simulation]:
+    return runtime.simulations
