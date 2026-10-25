@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: e99a00d
+git_head: 1c47bc2
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high (latest owner override2026-10-25), cap2
@@ -64,3 +64,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 
 
 - T44331 isolatedpatch importcontext included alreadyremovedPitimport; root applied reviewed exactregion/newfile plus one importglue line preserving currentroot. Total authoredglue now15productlines, no authoredlogic.
+
+- T-44331 accepted1c47bc2: Extract exact recorded lap and race-control panels, preserving mappings, controls, state messages and table columns. Verify0.

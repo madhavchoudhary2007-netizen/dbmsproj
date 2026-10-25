@@ -3,14 +3,14 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44333 W1 — OPEN
+- target_files: frontend/components/special-pages.tsx, frontend/components/pages/analytics.tsx
+- contract: T379 move exact Analytics page to pages/analytics.tsx and retain compatibility reexport.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
+
 ### T-44332 W2 — OPEN
 - target_files: frontend/lib/live-demo-actions.ts
 - contract: T379 stage exact LiveTiming create/delete demo race actions in typed live-demo-actions module; keep source unchanged until separate wire.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
-
-### T-44331 W1 — OPEN
-- target_files: frontend/components/special-pages.tsx, frontend/components/pages/live/race-records.tsx
-- contract: T379 extract exact LiveTiming recorded laps and race-control records into live/race-records.tsx, wire same region.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
 ## Blocked
@@ -20,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44331 accepted1c47bc2; verify0.
 - T-44330 acceptede99a00d; verify0.
 - T-44329 accepted28eb2e1; verify0.
 - T-44328 acceptedfa95df4; verify0.
