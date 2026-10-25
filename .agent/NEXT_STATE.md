@@ -8,11 +8,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T379 wire exact usePitWall hook into legacy PitWall, replacing only pre-return state/effect/action logic.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
-### T-44323 W1 — OPEN
-- target_files: frontend/components/pages/live/telemetry-charts.tsx
-- contract: T379 stage exact selected-driver telemetry chart region into live/telemetry-charts.tsx; leave old page unchanged.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
-
 ## Blocked
 - None currently. Owner switched workers to gpt-6-luna/high; T44318 interrupted before edits, fresh worker required.
 
@@ -20,6 +15,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44323 accepted480ae39; verify0.
 - T-44322 accepteddc23dbc; verify0.
 - T-44321 accepted8d44b1f; verify0.
 - T-44318 accepted3b7ca06; verify0.
