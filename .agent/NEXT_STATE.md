@@ -3,15 +3,15 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44405 W2 — OPEN
+- target_files: backend/app/main.py
+- contract: T331/T332 populate the typed app.state runtime container from existing lifespan resources and clear it on shutdown.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k app_lifespan_starts_resources && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_runtime_dependencies.py backend/tests/test_contract_snapshot.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py
+
 ### T-44404 W1 — OPEN
 - target_files: frontend/components/pages/dashboard.tsx, frontend/app/styles/dashboard.css
 - contract: T381 visual-review defects: readable health labels, genuine secondary plinth link face and content-height health panel.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-neobrutal.sh
-
-### T-44403 W3 — OPEN
-- target_files: backend/tests/test_runtime_dependencies.py
-- contract: T331/T332 test the new runtime providers in isolation before app-state wiring and router adoption.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_runtime_dependencies.py backend/tests/test_contract_snapshot.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/tests/test_runtime_dependencies.py
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -24,6 +24,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44403 accepted4521ac9; verify0.
 - T-44402 accepted104bdb8; verify0.
 - T-44401 accepted60c4999; verify0.
 - T-44400 accepted67d0603; verify0.

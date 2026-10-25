@@ -125,8 +125,10 @@ export function Dashboard() {
                   <p>{pretty(dashboard.next_event.scheduled_at)}</p>
                 </div>
               ) : <p>No upcoming event.</p>}
-              <Link className="nb-plinth mt-4 inline-flex min-h-11 min-w-11 items-center justify-center border-4 border-ink bg-paper px-4 py-2 font-bold" href="/sessions">
-                View sessions
+              <Link className="nb-plinth mt-4 inline-flex min-h-11 min-w-11 items-center justify-center font-bold" href="/sessions">
+                <span className="nb-face flex min-h-11 min-w-11 items-center justify-center gap-2 border-4 border-ink bg-paper px-4 py-2 font-bold text-ink">
+                  View sessions
+                </span>
               </Link>
             </NbCard>
           </div>
