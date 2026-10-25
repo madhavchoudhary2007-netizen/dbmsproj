@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: ad281aa
+git_head: bd20525
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high (latest owner override2026-10-25), cap2
@@ -47,3 +47,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44332 acceptedad281aa: Stage exact generated race create/delete actions with typed callback context, retaining requests and setter ordering. Verify0.
 
 - Latest spacing/banned/motion0. Root mistakenly invoked absent lint-colors exit127; actual fourth gate is lint-neobrutal, separately run; inspect latest log.
+
+- T-44333 acceptedbd20525: Move exact Analytics page and preserve compatibility export; remaining LiveTiming body byte-identical. Verify0.
+
+- T44334 firstverifyFAILED exit5: root -k reset selected0tests. Corrected to existing lifecycle reset+stop tests; no assertion change. Discarded only isolated taskfiles, re-dispatchonce perprotocol.

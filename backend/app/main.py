@@ -150,6 +150,7 @@ from .simulation_pit import (
     refresh_pit_state,
     schedule_pit_stops,
 )
+from .simulation_reset import reset_simulation
 from .simulation_restore import (
     restore_incident_state,
     restore_or_create_demo,
@@ -927,21 +928,16 @@ async def _start_session_simulation(
 async def _reset_session_simulation(
     session_id: UUID, body: SimulationControl, sim: Simulation | None
 ) -> Simulation:
-    session = fetch_one("SELECT state FROM race_sessions WHERE id=%s", (session_id,))
-    if not session:
-        raise HTTPException(404, "Session not found")
-    if session["state"] != "PAUSED":
-        raise HTTPException(409, "Pause the session before resetting its simulation")
-    ensure_session_reset_allowed(session_id)
-    if sim:
-        sync_simulation_lifecycle(session_id, "reset")
-        if sim.task and not sim.task.done():
-            await asyncio.gather(sim.task, return_exceptions=True)
-    clear_session_measurements(session_id)
-    if not sim:
-        sim = Simulation(session_id, [], body.rate_hz or 2.0)
-        simulations[str(session_id)] = sim
-    return sim
+    return await reset_simulation(
+        session_id,
+        body,
+        sim,
+        fetch_one,
+        ensure_session_reset_allowed,
+        sync_simulation_lifecycle,
+        clear_session_measurements,
+        simulations,
+    )
 
 
 @app.post("/api/sessions/{session_id}/simulate")
