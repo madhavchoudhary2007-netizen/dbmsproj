@@ -1,0 +1,60 @@
+diff --git a/frontend/e2e/dashboard-incidents.spec.ts b/frontend/e2e/dashboard-incidents.spec.ts
+index a964b5d..0fb18b6 100644
+--- a/frontend/e2e/dashboard-incidents.spec.ts
++++ b/frontend/e2e/dashboard-incidents.spec.ts
+@@ -1,4 +1,4 @@
+-import { expect, test } from "@playwright/test";
++import { expect, test } from "./mock-platform";
+ 
+ const admin = { id: 999, email: "qa@example.test", full_name: "QA", role: "ADMIN" };
+ const incident = { id: "incident-7", driver_name: "A. Racer", event_name: "Night Grand Prix", lap: 12, state: "OPEN" };
+diff --git a/frontend/e2e/dashboard-states.spec.ts b/frontend/e2e/dashboard-states.spec.ts
+index 66277f7..1da0d8d 100644
+--- a/frontend/e2e/dashboard-states.spec.ts
++++ b/frontend/e2e/dashboard-states.spec.ts
+@@ -1,4 +1,4 @@
+-import { expect, test } from "@playwright/test";
++import { expect, test } from "./mock-platform";
+ 
+ const admin = { id: 999, email: "qa@example.test", full_name: "QA", role: "ADMIN" };
+ const metrics = { active_sessions: 0, scheduled_events: 0, open_incidents: 0, drivers: 0 };
+diff --git a/frontend/e2e/mock-platform.ts b/frontend/e2e/mock-platform.ts
+new file mode 100644
+index 0000000..7b8b075
+--- /dev/null
++++ b/frontend/e2e/mock-platform.ts
+@@ -0,0 +1,34 @@
++import { expect, test as base, type Page } from "@playwright/test";
++
++type PlatformFixtures = { mockPlatform: void };
++
++export const test = base.extend<PlatformFixtures>({
++  mockPlatform: [async ({ page }, use) => {
++    const unexpected: string[] = [];
++    await page.route("**/health/ready", async (route) => {
++      const request = route.request();
++      if (new URL(request.url()).pathname !== "/health/ready") {
++        await route.continue();
++      } else if (request.method() !== "GET") {
++        unexpected.push(`HTTP ${request.method()} ${request.url()}`);
++        await route.fulfill({ status: 405, json: { detail: "Unexpected readiness method" } });
++      } else {
++        await route.fulfill({
++          status: 200,
++          json: { status: "ready", services: { postgres: "up", mongodb: "up", runtime_lease: "up" } },
++        });
++      }
++    });
++    page.routeWebSocket("**/api/ws/sessions/*", (socket) => {
++      socket.onMessage(() => {
++        unexpected.push("Unexpected session WebSocket message");
++        socket.close({ code: 1008, reason: "Unexpected client message" });
++      });
++    });
++    await use();
++    expect(unexpected).toEqual([]);
++  }, { auto: true }],
++});
++
++export { expect };
++export type { Page };

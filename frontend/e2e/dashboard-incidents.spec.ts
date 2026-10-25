@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./mock-platform";
 
 const admin = { id: 999, email: "qa@example.test", full_name: "QA", role: "ADMIN" };
 const incident = { id: "incident-7", driver_name: "A. Racer", event_name: "Night Grand Prix", lap: 12, state: "OPEN" };

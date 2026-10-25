@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: b87fee6
+git_head: 1ffce81
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -40,6 +40,8 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 
 - T-44398 acceptedda48958: Seven incidents browser scenarios: five states, reload coalescing, cancellation and malformed-response dashboard isolation; collection only. Verify0.
 
-- App runtime/provider foundation60c4999, actual HTTP+WS provider tests4521ac9, appstate wiringd756a9f and lifespan proofb87fee6 accepted. Root full239PASS0skip; liveacceptance finalstatus pending T44407.full.raw.log. Main857lines, T331<=120/T332 still NOT complete. Request auth/DB adapters T44408 stagedawaitreview, strict ownmodules0.
+- App runtime/provider foundation60c4999, actual HTTP+WS provider tests4521ac9, appstate wiringd756a9f and lifespan proofb87fee6 accepted. Root full239PASS0skip; liveacceptancePASS T44407.full.raw.log. Main857lines, T331<=120/T332 still NOT complete. Request auth/DB adapters T44408 stagedawaitreview, strict ownmodules0.
 - Dashboard latest root135PASS T381-visual-verified.browser.raw.log after visualfix5a0ad53 + actualcontrast/link regressiond018de6; fivewidth0overflow/oneprimary/noerrors. Secondaryface readable, greenlabels ink, healthwrapscontent. T381 still requires actualWS/lease source rows; testfixtureprerequisite T44409. No parentcompletion claim.
 - W3 T44406 initially exceeded requestedfile150linecap153, repairedformatting to150 without assertionsremoved. Rootmalformedsource regression repaired1924d64 and coveredda48958. All counts normalized; no threshold changes.
+
+- T-44408 accepted1ffce81: Stage typed injected-pool database and auth dependencies; preserve credential checks, revocation, CSRF and role semantics with lazy resource queries. Verify0.
