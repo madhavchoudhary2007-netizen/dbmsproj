@@ -13,11 +13,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T384 make sector assertions inspect visible responsive cells rather than hidden duplicated detail content.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/live-timing-tower.spec.ts --list
 
-### T-44501 W2 — OPEN
-- target_files: frontend/lib/live-record-polling.ts, frontend/lib/use-live-timing-state.ts
-- contract: T385 expose recorded-lap/control loading and manual retry from the existing polling loop, preserving single-timer and stale-response safety.
-- verify: npm --prefix frontend run test:runtime && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
 
@@ -28,6 +23,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44501 accepted63a8d91; verify0.
 - T-44500 accepted5f8c134; verify0.
 - T-44499 acceptedb1247fd; verify0.
 - T-44498 acceptedf8b1888; verify0.

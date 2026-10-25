@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 5f8c134
+git_head: 63a8d91
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -41,3 +41,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T384 interval/sector/fastest metadata1f267c0 with3VMcases37a230e; NbTabledriverselectionafe1acd/domaincells9f604dd/motionmobile401fdf1/fiveStatesf8b1888. Actualsnapshot5VMcases3518121; runtime56PASS. Focusedbrowsernew25cases pendingT44499/44502. NoAPIshapechanges. No newdependencies or realDBwrites. Rootproductedits0.
 
 - T385 sharedcharttheme5f8c134 retainedallseries; frames/cornertilesnextT44503. Recordsourceflags T44501underreview. M13firstdrawpending.
+
+- T-44501 accepted63a8d91: Expose record loading/retry with latest-request isolation and one polling timer chain, retaining actual data and errors. Verify0.

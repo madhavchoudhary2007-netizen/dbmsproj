@@ -51,17 +51,22 @@ test("snapshot loading resolves to named timing rows with tyre, fastest lap, and
   await expect(tower(page).getByText("Driver Two")).toBeVisible();
   await expect(tower(page).getByText("FL")).toBeVisible();
   await expect(tower(page).getByText("SOFT")).toBeVisible();
-  await expect(tower(page).getByText("OB").first()).toBeVisible();
+  if (await page.evaluate(() => window.innerWidth < 768)) {
+    const firstDriver = rows(page).filter({ hasText: "Driver One" });
+    await firstDriver.locator("details").locator("summary[aria-label='Timing details for Driver One']").click();
+  }
+  await expect(tower(page).getByText("OB", { exact: true }).filter({ visible: true })).toBeVisible();
   expect(app.unexpected).toEqual([]);
 });
 
 test("failed initial snapshot retries and then shows the exact empty state copy", async ({ page }) => {
   let calls = 0;
   let outage = true;
-  const app = await fixture(page, async (route) => { calls += 1; if (outage) { outage = false; await route.fulfill({ status: 503, json: { detail: "Snapshot outage" } }); } else await ok(route, { session, drivers, packets: [] }); });
+  const app = await fixture(page, async (route) => { calls += 1; if (outage) { await route.fulfill({ status: 503, json: { detail: "Snapshot outage" } }); } else await ok(route, { session, drivers, packets: [] }); });
   const panel = tower(page);
   await expect(panel.getByTestId("state-error")).toContainText("Snapshot outage");
   const baselineCalls = calls;
+  outage = false;
   await panel.getByRole("button", { name: "Try again" }).click();
   await expect(panel.getByText("Waiting for timing and telemetry packets from this session.")).toBeVisible();
   expect(calls).toBe(baselineCalls + 1);
@@ -71,7 +76,7 @@ test("failed initial snapshot retries and then shows the exact empty state copy"
 test("session state outage preserves timing rows and retry recovers the snapshot", async ({ page }) => {
   let calls = 0;
   let outage = false;
-  const app = await fixture(page, async (route) => { calls += 1; if (outage) { outage = false; await route.fulfill({ status: 503, json: { detail: "Snapshot outage" } }); } else await ok(route, snapshot()); });
+  const app = await fixture(page, async (route) => { calls += 1; if (outage) { await route.fulfill({ status: 503, json: { detail: "Snapshot outage" } }); } else await ok(route, snapshot()); });
   const panel = tower(page);
   await expect(panel.getByText("Driver One")).toBeVisible();
   await expect.poll(app.connected).toBe(true);
@@ -80,6 +85,7 @@ test("session state outage preserves timing rows and retry recovers the snapshot
   app.push({ type: "session.state", session_id: "s1", data: { state: "PAUSED" } });
   await expect(panel.getByTestId("state-partial")).toContainText("Snapshot outage");
   await expect(panel.getByText("Driver One")).toBeVisible();
+  outage = false;
   await panel.getByRole("button", { name: "Retry snapshot" }).click();
   await expect(panel.getByTestId("state-partial")).toHaveCount(0);
   await expect(panel.getByText("Driver Two")).toBeVisible();
