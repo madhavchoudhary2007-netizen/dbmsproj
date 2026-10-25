@@ -9,6 +9,9 @@ import {
   LoaderCircle,
 } from "lucide-react";
 import { Row, pretty } from "@/lib/api";
+import { NbField } from "@/components/nb/field";
+import { NbButton } from "@/components/nb/button";
+import { NbInput, NbSelect } from "@/components/nb/input";
 export function PageHeader({
   eyebrow,
   title,
@@ -306,6 +309,7 @@ export function ResourceEditor({
 }) {
   const [vals, setVals] = useState<Row>(initial || {}),
     [err, setErr] = useState("");
+  const formId = useId();
   return (
     <form
       className="form-grid"
@@ -328,10 +332,9 @@ export function ResourceEditor({
       }}
     >
       {fields.map((f) => (
-        <label key={f.name}>
-          {f.label || f.name.replaceAll("_", " ")}
+        <NbField key={f.name} id={`${formId}-${f.name}`} label={f.label || f.name.replaceAll("_", " ")}>
           {f.options ? (
-            <select
+            <NbSelect
               required={f.required}
               value={
                 f.type === "datetime-local" && vals[f.name]
@@ -353,9 +356,9 @@ export function ResourceEditor({
                   </option>
                 );
               })}
-            </select>
+            </NbSelect>
           ) : (
-            <input
+            <NbInput
               required={f.required}
               type={f.type || "text"}
               min={f.min}
@@ -379,13 +382,13 @@ export function ResourceEditor({
               }
             />
           )}
-        </label>
+        </NbField>
       ))}
       {err && <div className="form-error" role="alert">{err}</div>}
       <div className="form-actions">
-        <Button type="submit" disabled={busy}>
+        <NbButton type="submit" variant="primary" disabled={busy}>
           {busy ? "Saving…" : "Save record"}
-        </Button>
+        </NbButton>
       </div>
     </form>
   );

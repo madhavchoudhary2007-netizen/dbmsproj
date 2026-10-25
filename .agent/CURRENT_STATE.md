@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: bc22d8c
+git_head: a7cb405
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -32,8 +32,8 @@ last_eval_score: obsolete51.2974; no current score; final T430
 
 ## Orchestrator direct edits / process findings
 - Productglue14lines only inlongcontinuation; allcurrentproductimplementationworkers. Independentlycheckactualcounts/ASTmoves/assertions; newfileenvelopesoccasionallywrong, normalized.
-- EarlierfixtureStrictMode/duplicate-selector/E5aria/APIshape issues fixed withoutassertionweakening; actualinvalidincidentscrash fixed1924d64/regressionda48958. Connectivity15fixturefails repaired7122a27,165PASS. Healthink/plinthfaceTastedefects fixed5a0ad53/browserd018de6.
-- T44427W3editedrootinsteadpacketclone, causingT44425boundaryrejection. Transferredonlyownedpatchintoclone/restoredrootownedfileviaGit; W3retriedexplicitclone; T44425accept0thenT44427accept0. NoAPI/test/gatechange tohidefailure. Reviewtypedannotationsalsoexposednumericencodingregression, nowqueuedfullproof.
+- Earlier source/fixture regressions and repairs retain Git/results evidence. Actual malformedincident crash1924d64/da48958, connectivity165PASS, healthink/plinthface5a0ad53/d018de6.
+- T44427wrongworkspace boundary repaired by transferringownedpatch toclone/restoringroot; rootaccept0 afterexplicitcloneverify. Actualnumericencodingregression repaired19b7991 with245PASS fullproof. No tests/gates weakened.
 
 - T-44432 accepted1479019: Exercise actual migrated routes in-process and require exact numeric Decimal JSON, nullable averages, UUID/date encoding and integer dashboard counts. Verify0.
 
@@ -59,4 +59,6 @@ last_eval_score: obsolete51.2974; no current score; final T430
 
 - T-44442 acceptedbc22d8c: Use native NbModal for resource record and membership dialogs, preserving contents, titles, conditions and close callbacks. Verify0.
 
-- Diagnosticrawlogs were unavailable in someclones (ignoredbyGit); packetinlinefailurefacts sufficed, allVerify0. Recordedmissingcontextasprocessfinding, no unresolvedimplementationblocker. Futurepacketsinlineexactdiagnosticsinstead ofunavailablepaths.
+- Ignoredrawlogs unavailable inclones; inlineverifieddiagnostics in futurepackets. No implementationblocker.
+
+- T-44443 accepteda7cb405: Arrange resource search/reload and count/range into a scoped red control bar with responsive rows, preserving all controls and palette thresholds. Verify0.
