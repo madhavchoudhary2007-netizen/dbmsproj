@@ -37,6 +37,33 @@ export function deriveLiveTimingData(
   const timingByDriver = new Map(
     timingCars.map((car) => [String(car.driver_id), car]),
   );
+  const validMs = (value: unknown): value is number =>
+    typeof value === "number" && Number.isFinite(value) && value > 0;
+  const validIndex = (value: unknown): value is number =>
+    typeof value === "number" && Number.isFinite(value) && value >= 0;
+  const sectorHistory = new Map<string, number[]>();
+  const overallSectorBest: number[] = [];
+  let fastestLapMs: number | undefined;
+  for (const sample of completedLaps) {
+    if (validMs(sample.lap_time_ms)) {
+      fastestLapMs = fastestLapMs === undefined
+        ? sample.lap_time_ms
+        : Math.min(fastestLapMs, sample.lap_time_ms);
+    }
+    if (!Array.isArray(sample.sector_ms)) continue;
+    const id = String(sample.driver_id);
+    const personal = sectorHistory.get(id) || [];
+    sample.sector_ms.forEach((value: unknown, sector: number) => {
+      if (!validMs(value)) return;
+      personal[sector] = personal[sector] === undefined
+        ? value
+        : Math.min(personal[sector], value);
+      overallSectorBest[sector] = overallSectorBest[sector] === undefined
+        ? value
+        : Math.min(overallSectorBest[sector], value);
+    });
+    sectorHistory.set(id, personal);
+  }
   const driverIds = new Set([
     ...latestByDriver.keys(),
     ...timingByDriver.keys(),
@@ -74,8 +101,51 @@ export function deriveLiveTimingData(
   const leaderElapsed = Number(runningOrder[0]?.elapsed_ms);
   const orderRows: Row[] = runningOrder.map((car: Row, index): Row => {
     const elapsed = Number(car.elapsed_ms);
+    const currentSectors = Array.isArray(car.sector_ms)
+      ? car.sector_ms
+      : Array.isArray(latestByDriver.get(String(car.driver_id))?.sector_ms)
+        ? latestByDriver.get(String(car.driver_id))?.sector_ms as unknown[]
+        : [];
+    const personalBest = sectorHistory.get(String(car.driver_id)) || [];
+    const sector_cells = Array.from({ length: 3 }, (_, sector) => {
+      const value: unknown = currentSectors[sector];
+      if (!validMs(value)) return { ms: null, kind: "unknown" as const };
+      const overall = overallSectorBest[sector];
+      const personal = personalBest[sector];
+      if (overall !== undefined && value <= overall)
+        return { ms: value, kind: "overall" as const };
+      if (personal !== undefined && value <= personal)
+        return { ms: value, kind: "personal" as const };
+      return personal !== undefined
+        ? { ms: value, kind: "slower" as const }
+        : { ms: value, kind: "unknown" as const };
+    });
+    const preceding = runningOrder[index - 1];
+    const lapDelta = preceding && validIndex(car.lap) && validIndex(preceding.lap)
+      ? preceding.lap - car.lap
+      : undefined;
+    const sectorDelta = preceding && lapDelta === 0 &&
+      Number.isFinite(car.sector) && Number.isFinite(preceding.sector)
+      ? Number(preceding.sector) - Number(car.sector)
+      : undefined;
+    const prevElapsed = preceding?.elapsed_ms;
+    const intervalMs = preceding && lapDelta === 0 && sectorDelta === 0 &&
+      validMs(car.elapsed_ms) && validMs(prevElapsed)
+      ? Math.max(0, car.elapsed_ms - prevElapsed)
+      : undefined;
     return {
       ...car,
+      interval: index === 0
+        ? "LEADER"
+        : lapDelta !== undefined && lapDelta > 0
+          ? `+${lapDelta} lap${lapDelta === 1 ? "" : "s"}`
+          : sectorDelta !== undefined && sectorDelta > 0
+            ? `+${sectorDelta} sector${sectorDelta === 1 ? "" : "s"}`
+            : intervalMs !== undefined
+              ? `+${(intervalMs / 1000).toFixed(3)} s`
+              : "—",
+      sector_cells,
+      fastest_lap: fastestLapMs !== undefined && car.best_lap_ms === fastestLapMs,
       gap:
         index === 0
           ? "LEADER"

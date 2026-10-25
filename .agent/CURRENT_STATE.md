@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 262f582
+git_head: 2281e36
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -18,7 +18,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T382 resources header/toolbar/exactrowhook/classifier/NbTable/nativeModal/NbField/form/rowEditDelete/roleeligibilitybadges implemented; alloriginalcelltext/copy/pageSize50 preserved. Root360browserPASS T382-actions-primary.browser.raw.log, allsixpalettes/fivewidthaxe/targets/overflow/primary/dataflow. Build/lint/types0 T382-actions-build.raw.log. Inlinevalidation/twocolumnmemberships implemented; finalmodalaxe/partialfixtures andfocusedfileboundaries remain.
 - Real20POST/save and20DELETE/confirm duplicates repaired06330e6/6e28dd6, confirmation7838c2d. Strict25PASS T382-delete-guard.browser.raw.log; markerretired5cfe010, activeprimarytransitions5widthPASS. Browserwrites locallymocked only.
 - Backend main824lines, <=120T331 NOT met; T332unfinished. Genuine modules/core/extracts retained. TypedRuntimeState/providers/lifespan shareandclear identities; requestauth/DatabaseSession. Membership/analytics/pitreads useDI. Actualreturnannotation Decimalstringregression fixedresponse_modelNone19b7991; exactnumericserializationtests1479019 preservewireencoding.
-- Backendfull245PASS0skip/liveacceptancePASS T44472.full.raw.log. Strictmypy134errors/25files T339-current-after-dbms.raw.log,target0T339. Runtime42PASS. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
+- Backendfull245PASS0skip/liveacceptancePASS T-44477.full.raw.log. Strictmypy134errors/25files T339-current-after-dbms.raw.log,target0T339. Runtime48PASS. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
 
 ## Safety / workflow
 - Onlyoverhaul/neo-brutal; commits onlyaccept.sh; independentlyrerunVerify;2packet-onlycustomworkersmax, no model/effortoverrides. Isolatedclones .agent/orchestrate.py;<=3files/150added+deleted; normalizeactualstats. Every5tasks budget.
@@ -35,20 +35,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - Worker T44427wrongworkspacerepairedinpreviouscontext. Reviewcaughtfixture/APIshape errors, serializationregression andhiddenconfirmationprimary; repairedwithouttest/gaterelaxation. Rawlogsabsentclones: inlinefactsinpackets.
 - Latestacceptedpacket/hashes/evidence: Git/.agent/results; queue/stateupdatedaftereachacceptance. No newdependencies, no realDBwrites.
 
-- T382 inlinevalidation/rowkeyboard/cancellation45browserPASS T382-inline-row.browser.raw.log. Native closeeventtest now waits actualdialogteardown/focus, no sleeps/assertionsremoved. Inlinehookactual7VMcases and membershiphook3VMcases, runtime42PASS.
-- T382 two-column selectedcurrentroster+addform0308663, sharedfiveStateview978192d at2callsites, abort/latesthistorye1470ec. Browsermembership/layout/axe/rootbuild pending; parent remainsopen. Currentdatebounds inclusive(futureend active/futurestart excluded), no fakecurrentroster.
-
-- Repeatedkeyboardreopen realnative/Reactrace fixed da4d3ee/bc67c9a; root15/15reopencycles T382-keyboard-after.raw.log, all45editor+30primitivebrowsercasesPASS. Currentmembership10fails:5actuallegacycontrast1.09:1,5testEndmembershiplocatorambiguity; queuedT44478/79. T383liveheader2c7283c, yellowhero/nativeDelete next.
-
-- T382 finalmembership25browserPASS T382-memberships-gate.browser.raw.log incl5states/currentdates/nestedfocus/responsive/axe; all45editor+30primitivecasesPASS. Prior360resourcepagecasesPASS. Latestprodsourcebuild0 T382-memberships-build.raw.log predatesnativeclose/finalCSS, finalbuildstillrequired.
-- T383 header/yellowhero/paperracecards/nativeDelete implemented1d68f7b. Root50route/axe/primary/target/responsivePASS T383-header-cards.browser.raw.log. Newstrictmutationtests T383-demo-before expose20POST/20DELETE instead1; W2persistentguard pendingaccept. Five-state list/sourceflags next.
-
-- T-44484 accepted7ae0ac6: Synchronously guard generated-race create/delete across recreated action factories using one persistent ref, releasing in finally and preserving existing API/reset/retry behavior. Verify0.
-
-- T-44485 accepted60148e6: Scope populated generated-race assertion to its actual card and assert one global primary through creation and confirmation/cancellation transitions. Verify0.
-
-- T-44486 acceptede52386c: Render generated-race list loading, empty, error, partial and populated states; wire retry and reader primary. Verify0.
-
-- T-44487 accepted7e554e7: Test actual live-list settlement observer, current and stale success/failure and legacy callers. Verify0.
-
-- T-44488 accepted262f582: Use scoped light tokens for readable live selectors, success notice and hero/list eyebrows. Verify0.
+## Latest route verification
+- T382 finalmembership25browserPASS T382-memberships-gate.browser.raw.log, all45editor+30primitivePASS; native Escape/Reactclose race da4d3ee/bc67c9a, 15/15keyboardreopens. Readability/currentroster/fiveStates complete; finalproductionbuild stillrequired aftersharedmodalchanges. Earlier360resourcebrowserPASS. Bloat594linesdeferredT400.
+- T383 hero/list/nativeDelete/persistentmutationguard7ae0ac6 implemented. GeneratedlistfiveStates e52386c, observer6tests7e554e7; runtime48PASS. Readable scopedselectors/notices262f582. Root T383-list-final40PASS10FAIL: all20mutationcasespass; outagefixtures count initialStrictMode requests incorrectly, T44492repair. Initialroute50browserPASS T383-header-cards.
+- T384 derivedsector/interval/fastestmetadata underreviewT44490; interactiveNbTableT44491 underreview. NoAPIshapechanges. No newdependencies or realDBwrites. Rootproductedits0.

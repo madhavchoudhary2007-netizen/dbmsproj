@@ -3,15 +3,20 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44492 W3 — OPEN
+- target_files: frontend/e2e/live-list-states.spec.ts
+- contract: T383 make error fixtures model an actual outage until recovery rather than failing one StrictMode request.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/live-list-states.spec.ts --list
+
+### T-44491 W1 — OPEN
+- target_files: frontend/components/pages/live/timing-tower.tsx, frontend/components/pages/live/index.tsx, frontend/components/nb/table.tsx
+- contract: T384 use the existing NbTable timing tower with driver selection and explicit selected-row accessibility, preserving every timing column.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+
 ### T-44490 W2 — OPEN
 - target_files: frontend/lib/live-timing-data.ts
 - contract: T384 derive factual timing-tower interval, sector comparisons and fastest-lap markers from current source records.
 - verify: npm --prefix frontend run test:runtime && npm --prefix frontend run typecheck
-
-### T-44489 W3 — OPEN
-- target_files: frontend/e2e/live-list-states.spec.ts
-- contract: T383 add focused browser coverage for generated-race list five states, retry, filtering and reader primary.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/live-list-states.spec.ts --list
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -23,6 +28,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44489 accepted2281e36; verify0.
 - T-44488 accepted262f582; verify0.
 - T-44487 accepted7e554e7; verify0.
 - T-44486 acceptede52386c; verify0.
@@ -31,24 +37,4 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44482 accepteda13ec92; verify0.
 - T-44483 accepted702e3cc; verify0.
 - T-44481 accepted1d68f7b; verify0.
-- T-44480 acceptedeb229b7; verify0.
-- T-44479 accepteda9e7dde; verify0.
-- T-44478 accepted0443c82; verify0.
-- T-44477 accepted5569250; verify0.
-- T-44476 accepted0fb8de5; verify0.
-- T-44475 acceptedbc67c9a; verify0.
-- T-44474 acceptedda4d3ee; verify0.
-- T-44473 accepteddcbb14e; verify0.
-- T-44472 acceptedb5df2f8; verify0.
-- T-44471 accepted2c7283c; verify0.
-- T-44469 accepteddc0ff28; verify0.
-- T-44470 accepted17b9763; verify0.
-- T-44468 acceptedddbf765; verify0.
-- T-44467 accepted0308663; verify0.
-- T-44466 accepted978192d; verify0.
-- T-44465 acceptede1470ec; verify0.
-- T-44463 acceptede6311f5; verify0.
-- T-44464 accepteded47d9f; verify0.
-- T-44462 accepted4019403; verify0.
-- T-44461 accepteda939d11; verify0.
-- Earlier accepted tasks/hashes/evidence: Git/.agent/results. Parent milestones remain open until full gates.
+- Earlieracceptedtasks/hashes/evidence: Git/.agent/results.
