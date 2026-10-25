@@ -1,0 +1,166 @@
+diff --git a/frontend/components/pages/live/index.tsx b/frontend/components/pages/live/index.tsx
+index 641b49f..f31397e 100644
+--- a/frontend/components/pages/live/index.tsx
++++ b/frontend/components/pages/live/index.tsx
+@@ -161,7 +161,13 @@ export function LiveTiming() {
+             error={snapshotView.error}
+             retry={() => snapshotRetry.current?.()}
+           />
+-          <LatestTelemetry shown={shown} status={status} />
++          <LatestTelemetry
++            shown={shown}
++            status={status}
++            loading={snapshotView.loading}
++            error={snapshotView.error}
++            retry={() => snapshotRetry.current?.()}
++          />
+         </>
+       )}
+       <DeleteDemoModal
+diff --git a/frontend/components/pages/live/latest-telemetry.tsx b/frontend/components/pages/live/latest-telemetry.tsx
+index 0ffb5b7..fb9e9d0 100644
+--- a/frontend/components/pages/live/latest-telemetry.tsx
++++ b/frontend/components/pages/live/latest-telemetry.tsx
+@@ -1,41 +1,94 @@
+-import type { Row } from "@/lib/api";
+-import { DataTable } from "../../ui";
++import { pretty, type Row } from "@/lib/api";
++import type { ViewState } from "@/lib/data-state";
++import { NbCard } from "@/components/nb/card";
++import { NbTable, type NbTableColumn } from "@/components/nb/table";
++
++const keys = [
++  "ts",
++  "driver_id",
++  "lap",
++  "sector",
++  "position",
++  "speed_kph",
++  "throttle_pct",
++  "brake_pct",
++  "tire_compound",
++  "pit_state",
++  "pit_box_number",
++  "pit_reservation_id",
++] as const;
++
++const numericKeys = new Set<string>([
++  "lap",
++  "sector",
++  "position",
++  "speed_kph",
++  "throttle_pct",
++  "brake_pct",
++  "pit_box_number",
++]);
++
++const columns: NbTableColumn<Row>[] = keys.map((key) => ({
++  key,
++  title: key.replaceAll("_", " "),
++  numeric: numericKeys.has(key),
++  className: "whitespace-normal break-words font-mono tabular-nums",
++  render: (row) => pretty(row[key]),
++}));
+ 
+ export function LatestTelemetry({
+   shown,
+   status,
++  loading,
++  error,
++  retry,
+ }: {
+   shown: Row[];
+   status: string;
++  loading: boolean;
++  error: string;
++  retry: () => void;
+ }) {
++  const rows = shown.slice(-30).reverse();
++  const snapshotState: ViewState<readonly Row[]> = loading && rows.length === 0
++    ? { status: "loading" }
++    : error && rows.length === 0
++      ? { status: "error", error: { message: error, retryable: true }, retry }
++      : error
++        ? {
++            status: "partial",
++            data: rows,
++            filter: { label: "Retry snapshot", clear: retry },
++            totalCount: shown.length,
++          }
++        : rows.length > 0
++          ? { status: "populated", data: rows }
++          : { status: "empty", reason: "no-data" };
++
+   return (
+-    <div className="panel">
+-      <div className="panel-heading">
+-        <div>
+-          <div className="eyebrow">LATEST TELEMETRY</div>
+-          <h2>{shown.length} samples in view</h2>
++    <NbCard tone="paper" className="min-w-0">
++      <div className="mb-4 flex min-w-0 flex-wrap items-start justify-between gap-4">
++        <div className="min-w-0">
++          <div className="eyebrow !text-[length:var(--fs-label)]">LATEST TELEMETRY</div>
++          <h2 className="!text-[length:var(--fs-h3)]">{shown.length} samples in view</h2>
+         </div>
+-        <span className="live-badge">
+-          <i /> {status}
++        <span className="live-badge !bg-paper !text-ink">
++          <i /> <span className="!bg-paper !text-[length:var(--fs-label)] !text-ink">{status}</span>
+         </span>
+       </div>
+-      <DataTable
+-        rows={shown.slice(-30).reverse()}
+-        columns={[
+-          "ts",
+-          "driver_id",
+-          "lap",
+-          "sector",
+-          "position",
+-          "speed_kph",
+-          "throttle_pct",
+-          "brake_pct",
+-          "tire_compound",
+-          "pit_state",
+-          "pit_box_number",
+-          "pit_reservation_id",
+-        ]}
++      <NbTable
++        state={snapshotState}
++        columns={columns}
++        rowKey={(_, index) => index}
++        caption="Latest telemetry samples"
++        empty="No records returned by the API."
++        pageSize={8}
++        className="font-mono"
++        sourceMessage={error || undefined}
++        partialSummary={`Showing ${rows.length} retained samples of ${shown.length}.`}
++        partialActionLabel="Retry snapshot"
++        partialActionAriaLabel="Retry snapshot for latest telemetry"
+       />
+-    </div>
++    </NbCard>
+   );
+ }
+diff --git a/frontend/components/pages/live/race-records.tsx b/frontend/components/pages/live/race-records.tsx
+index 7e20c46..8004e2c 100644
+--- a/frontend/components/pages/live/race-records.tsx
++++ b/frontend/components/pages/live/race-records.tsx
+@@ -30,7 +30,7 @@ function recordsState(rows: Row[], loading: boolean, error: string, retry: () =>
+ }
+ 
+ function ControlTimeline({ fields, state, error }: { fields: TimelineField[]; state: ViewState<Row[]>; error: string }) {
+-  return <NbState state={state} empty="No records returned by the API." sourceMessage={state.status === "partial" ? `Records could not be refreshed: ${error}` : undefined} partialActionLabel="Retry records" skeletonRows={3}>
++  return <NbState state={state} empty="No records returned by the API." sourceMessage={state.status === "partial" ? `Records could not be refreshed: ${error}` : undefined} partialActionLabel="Retry records" partialActionAriaLabel="Retry records" skeletonRows={3}>
+     {(items) => <ol className="space-y-3 border-l-4 border-ink pl-4">
+       {items.map((row, index) => <li key={`${String(row.id ?? row.lap ?? index)}-${index}`} className="relative border-4 border-ink bg-paper p-3 shadow-nb-4">
+         <span aria-hidden="true" className="absolute -left-6 top-3 size-3 border-4 border-ink bg-yellow" />
+@@ -81,7 +81,7 @@ export function RaceRecords({ selectedLaps, recordsError, loading, retry, showAl
+       {recordsError && <div className="mb-4 border-4 border-ink bg-red p-3" role="status">Lap and race-control records could not be refreshed: {recordsError}. Retrying automatically in 5 seconds.</div>}
+       {recordsError && selectedLaps.length > 100 && !showAllLaps && <div className="mb-4"><NbButton variant="secondary" onClick={() => setShowAllLaps(true)}>Show all laps</NbButton></div>}
+       {selectedLaps.length > 100 && showAllLaps && <div className="mb-4 flex flex-wrap items-center justify-between gap-3"><span className="text-[length:var(--fs-label)]">Showing all laps</span><NbButton variant="secondary" onClick={() => setShowAllLaps(false)}>Show latest 100</NbButton></div>}
+-      <NbTable state={lapState} columns={lapColumns} rowKey={(_, index) => index} caption="Recorded laps with driver, lap, sector times, lap time, and position" empty="No records returned by the API." pageSize={5} sourceMessage={recordsError || undefined} partialSummary={lapState.status === "partial" && selectedLaps.length > 100 && !showAllLaps ? `Showing latest 100 laps · Showing 100 of ${selectedLaps.length} completed driver laps` : undefined} partialActionLabel={recordsError ? "Retry records" : "Show all laps"} />
++      <NbTable state={lapState} columns={lapColumns} rowKey={(_, index) => index} caption="Recorded laps with driver, lap, sector times, lap time, and position" empty="No records returned by the API." pageSize={5} sourceMessage={recordsError || undefined} partialSummary={lapState.status === "partial" && selectedLaps.length > 100 && !showAllLaps ? `Showing latest 100 laps · Showing 100 of ${selectedLaps.length} completed driver laps` : undefined} partialActionLabel={recordsError ? "Retry records" : "Show all laps"} partialActionAriaLabel={recordsError ? "Retry records" : "Show all laps"} />
+     </NbCard>
+     <NbCard tone="paper" className="min-w-0">
+       <p className="text-[length:var(--fs-label)] font-bold uppercase tracking-widest">RACE CONTROL RECORDS</p><h2 className="mb-4 text-[length:var(--fs-h2)] font-bold">Incidents and pit stops</h2>

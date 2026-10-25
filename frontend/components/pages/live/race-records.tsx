@@ -30,7 +30,7 @@ function recordsState(rows: Row[], loading: boolean, error: string, retry: () =>
 }
 
 function ControlTimeline({ fields, state, error }: { fields: TimelineField[]; state: ViewState<Row[]>; error: string }) {
-  return <NbState state={state} empty="No records returned by the API." sourceMessage={state.status === "partial" ? `Records could not be refreshed: ${error}` : undefined} partialActionLabel="Retry records" skeletonRows={3}>
+  return <NbState state={state} empty="No records returned by the API." sourceMessage={state.status === "partial" ? `Records could not be refreshed: ${error}` : undefined} partialActionLabel="Retry records" partialActionAriaLabel="Retry records" skeletonRows={3}>
     {(items) => <ol className="space-y-3 border-l-4 border-ink pl-4">
       {items.map((row, index) => <li key={`${String(row.id ?? row.lap ?? index)}-${index}`} className="relative border-4 border-ink bg-paper p-3 shadow-nb-4">
         <span aria-hidden="true" className="absolute -left-6 top-3 size-3 border-4 border-ink bg-yellow" />
@@ -81,7 +81,7 @@ export function RaceRecords({ selectedLaps, recordsError, loading, retry, showAl
       {recordsError && <div className="mb-4 border-4 border-ink bg-red p-3" role="status">Lap and race-control records could not be refreshed: {recordsError}. Retrying automatically in 5 seconds.</div>}
       {recordsError && selectedLaps.length > 100 && !showAllLaps && <div className="mb-4"><NbButton variant="secondary" onClick={() => setShowAllLaps(true)}>Show all laps</NbButton></div>}
       {selectedLaps.length > 100 && showAllLaps && <div className="mb-4 flex flex-wrap items-center justify-between gap-3"><span className="text-[length:var(--fs-label)]">Showing all laps</span><NbButton variant="secondary" onClick={() => setShowAllLaps(false)}>Show latest 100</NbButton></div>}
-      <NbTable state={lapState} columns={lapColumns} rowKey={(_, index) => index} caption="Recorded laps with driver, lap, sector times, lap time, and position" empty="No records returned by the API." pageSize={5} sourceMessage={recordsError || undefined} partialSummary={lapState.status === "partial" && selectedLaps.length > 100 && !showAllLaps ? `Showing latest 100 laps · Showing 100 of ${selectedLaps.length} completed driver laps` : undefined} partialActionLabel={recordsError ? "Retry records" : "Show all laps"} />
+      <NbTable state={lapState} columns={lapColumns} rowKey={(_, index) => index} caption="Recorded laps with driver, lap, sector times, lap time, and position" empty="No records returned by the API." pageSize={5} sourceMessage={recordsError || undefined} partialSummary={lapState.status === "partial" && selectedLaps.length > 100 && !showAllLaps ? `Showing latest 100 laps · Showing 100 of ${selectedLaps.length} completed driver laps` : undefined} partialActionLabel={recordsError ? "Retry records" : "Show all laps"} partialActionAriaLabel={recordsError ? "Retry records" : "Show all laps"} />
     </NbCard>
     <NbCard tone="paper" className="min-w-0">
       <p className="text-[length:var(--fs-label)] font-bold uppercase tracking-widest">RACE CONTROL RECORDS</p><h2 className="mb-4 text-[length:var(--fs-h2)] font-bold">Incidents and pit stops</h2>

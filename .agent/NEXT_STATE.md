@@ -3,10 +3,15 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44510 W2 — OPEN
-- target_files: frontend/lib/live-timing-data.ts
-- contract: T384 derive completed pit-stop count per driver from supplied recorded pit history, leaving unavailable counts unknown.
-- verify: npm --prefix frontend run test:runtime && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+### T-44512 W3 — OPEN
+- target_files: frontend/e2e/live-records.spec.ts, frontend/e2e/runtime/live-timing-data.test.mjs
+- contract: T385 verify actual recorded laps, incident/pit timelines, temperature tiles and live recovery.
+- verify: npm --prefix frontend run test:runtime && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/live-records.spec.ts --list
+
+### T-44509 W1 — OPEN
+- target_files: frontend/components/pages/live/latest-telemetry.tsx, frontend/components/pages/live/index.tsx, frontend/components/pages/live/race-records.tsx
+- contract: T385 render latest telemetry in a readable mono table with truthful snapshot five-state retry.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -18,6 +23,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44510 accepted1d3180f; verify0.
 - T-44508 accepted040cb67; verify0.
 - T-44505 accepted38165fc; verify0.
 - T-44507 acceptedab9660e; verify0.
@@ -25,25 +31,4 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44504 acceptedd13765d; verify0.
 - T-44503 accepteda8a1741; verify0.
 - T-44502 accepted1d24522; verify0.
-- T-44501 accepted63a8d91; verify0.
-- T-44500 accepted5f8c134; verify0.
-- T-44499 acceptedb1247fd; verify0.
-- T-44498 acceptedf8b1888; verify0.
-- T-44497 accepted3518121; verify0.
-- T-44496 accepted401fdf1; verify0.
-- T-44495 accepted9641a88; verify0.
-- T-44493 accepted9f604dd; verify0.
-- T-44494 accepted37a230e; verify0.
-- T-44492 accepted0ba1b81; verify0.
-- T-44491 acceptedafe1acd; verify0.
-- T-44490 accepted1f267c0; verify0.
-- T-44489 accepted2281e36; verify0.
-- T-44488 accepted262f582; verify0.
-- T-44487 accepted7e554e7; verify0.
-- T-44486 acceptede52386c; verify0.
-- T-44485 accepted60148e6; verify0.
-- T-44484 accepted7ae0ac6; verify0.
-- T-44482 accepteda13ec92; verify0.
-- T-44483 accepted702e3cc; verify0.
-- T-44481 accepted1d68f7b; verify0.
-- Earlieracceptedtasks/hashes/evidence: Git/.agent/results.
+- Earlier tasks: Git/.agent/results; parent milestones require full gates.

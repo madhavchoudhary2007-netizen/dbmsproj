@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 040cb67
+git_head: 1d3180f
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -18,7 +18,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T382 resources header/toolbar/exactrowhook/classifier/NbTable/nativeModal/NbField/form/rowEditDelete/roleeligibilitybadges implemented; alloriginalcelltext/copy/pageSize50 preserved. Root360browserPASS T382-actions-primary.browser.raw.log, allsixpalettes/fivewidthaxe/targets/overflow/primary/dataflow. Build/lint/types0 T382-actions-build.raw.log. Inlinevalidation/twocolumnmemberships implemented; finalmodalaxe/partialfixtures andfocusedfileboundaries remain.
 - Real20POST/save and20DELETE/confirm duplicates repaired06330e6/6e28dd6, confirmation7838c2d. Strict25PASS T382-delete-guard.browser.raw.log; markerretired5cfe010, activeprimarytransitions5widthPASS. Browserwrites locallymocked only.
 - Backend main824lines, <=120T331 NOT met; T332unfinished. Genuine modules/core/extracts retained. TypedRuntimeState/providers/lifespan shareandclear identities; requestauth/DatabaseSession. Membership/analytics/pitreads useDI. Actualreturnannotation Decimalstringregression fixedresponse_modelNone19b7991; exactnumericserializationtests1479019 preservewireencoding.
-- Backendfull245PASS0skip/liveacceptancePASS T-44477.full.raw.log. Strictmypy134errors/25files T339-current-after-dbms.raw.log,target0T339. Runtime56PASS. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
+- Backendfull245PASS0skip/liveacceptancePASS T-44477.full.raw.log. Strictmypy134errors/25files T339-current-after-dbms.raw.log,target0T339. Runtime63PASS. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
 
 ## Safety / workflow
 - Onlyoverhaul/neo-brutal; commits onlyaccept.sh; independentlyrerunVerify;2packet-onlycustomworkersmax, no model/effortoverrides. Isolatedclones .agent/orchestrate.py;<=3files/150added+deleted; normalizeactualstats. Every5tasks budget.
@@ -37,23 +37,10 @@ last_eval_score: obsolete51.2974; no current score; final T430
 
 ## Latest route verification
 - T382 finalmembership25browserPASS T382-memberships-gate.browser.raw.log, all45editor+30primitivePASS; native Escape/Reactclose race da4d3ee/bc67c9a, 15/15keyboardreopens. Readability/currentroster/fiveStates complete; finalproductionbuild stillrequired aftersharedmodalchanges. Earlier360resourcebrowserPASS. Bloat594linesdeferredT400.
-- T383 hero/list/nativeDelete/persistentmutationguard7ae0ac6 implemented. GeneratedlistfiveStates e52386c, observer6tests7e554e7; runtime56PASS. Readable scopedselectors/notices262f582. Root T383-list-final40PASS10FAIL: all20mutationcasespass; outagefixtures corrected0ba1b81; focused10/10recoveryPASS T383-list-recovery.browser.raw.log (combinedearlier40PASS). Initialroute50browserPASS T383-header-cards.
-- T384 interval/sector/fastest metadata1f267c0 with3VMcases37a230e; NbTabledriverselectionafe1acd/domaincells9f604dd/motionmobile401fdf1/fiveStatesf8b1888. Actualsnapshot5VMcases3518121; runtime56PASS. Focusedbrowsernew25cases pendingT44499/44502. NoAPIshapechanges. No newdependencies or realDBwrites. Rootproductedits0.
+- T383 hero/list/nativeDelete/persistentmutationguard7ae0ac6 implemented. GeneratedlistfiveStates e52386c, observer6tests7e554e7; runtime63PASS. Readable scopedselectors/notices262f582. Root T383-list-final40PASS10FAIL: all20mutationcasespass; outagefixtures corrected0ba1b81; focused10/10recoveryPASS T383-list-recovery.browser.raw.log (combinedearlier40PASS). Initialroute50browserPASS T383-header-cards.
+- T384 interval/sector/fastest metadata1f267c0 with3VMcases37a230e; NbTabledriverselectionafe1acd/domaincells9f604dd/motionmobile401fdf1/fiveStatesf8b1888. Actualsnapshot5VMcases3518121; runtime63PASS. All25focusedbrowsercases havepassing evidence: T384-tower15PASS +T384-tower-repair8PASS +T384-mobile-selection2PASS. Driverclick/Enter/Space/selectedaria/mobileDetails/axe/overflow5widths, actualWSreorder/reducedmotion. NoAPIshapechanges. No newdependencies or realDBwrites. Rootproductedits0.
 
-- T385 sharedcharttheme5f8c134 retainedallseries; frames/cornertilesnextT44503. Recordsourceflags T44501underreview. M13firstdrawpending.
+- T385 theme5f8c134/frames+4actualcornertilesa8a1741/partialretryandlayout040cb67; recorded-lapNbTable/incident+pit5State timelines38165fc/sourceflags63a8d91 +7VMcasesc96573a. LatestTelemetry44509underreview; livehistorybrowser44512pending. M13firstdrawpending.
 
-- T-44501 accepted63a8d91: Expose record loading/retry with latest-request isolation and one polling timer chain, retaining actual data and errors. Verify0.
-
-- T-44502 accepted1d24522: Scope timing assertions to visible responsive sector cells and hold snapshot outages until explicit user retry. Verify0.
-
-- T-44503 accepteda8a1741: Render existing telemetry series in five-state chart frames with four actual temperature corner tiles. Verify0.
-
-- T-44504 acceptedd13765d: Use exact visible sector-best count and actual accessible combobox name in timing browser checks. Verify0.
-
-- T-44506 acceptedc96573a: Test actual record polling loading, retained data, manual retry, timer replacement, stale requests and cleanup. Verify0.
-
-- T-44507 acceptedab9660e: Click the actual driver name for mobile row selection, preserving disclosure, keyboard, ARIA, select-value and accessibility checks. Verify0.
-
-- T-44505 accepted38165fc: Render actual lap and control record states with retries, complete lap expansion and labeled incident/pit timelines, preserving original headers and values. Verify0.
-
-- T-44508 accepted040cb67: Use truthful chart retry labels and scoped live chart, snapshot metadata and safety-car layout. Verify0.
+- Pit count metadata1d3180f deduplicates actual completed IDs; not yet wired into tower. T383 factual selected-race lap counter still pending; no inferred/fake progress.
+- T44503 one transient worker usage error; account tool reported ordinaryUsageAllowed=true; same-role retry succeeded. Its unaccepted236-line rewrite was restored only in clone, replacedwith57-line targeted change. No model substitution.

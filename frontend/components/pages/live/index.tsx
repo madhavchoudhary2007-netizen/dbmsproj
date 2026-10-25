@@ -161,7 +161,13 @@ export function LiveTiming() {
             error={snapshotView.error}
             retry={() => snapshotRetry.current?.()}
           />
-          <LatestTelemetry shown={shown} status={status} />
+          <LatestTelemetry
+            shown={shown}
+            status={status}
+            loading={snapshotView.loading}
+            error={snapshotView.error}
+            retry={() => snapshotRetry.current?.()}
+          />
         </>
       )}
       <DeleteDemoModal
