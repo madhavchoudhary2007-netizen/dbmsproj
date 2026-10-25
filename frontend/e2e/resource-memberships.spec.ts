@@ -162,8 +162,8 @@ test("partial membership refresh retains rows and recovers on retry", async ({ p
   const partial = dialog.getByTestId("state-partial");
   await expect(partial).toBeVisible();
   await expect(partial.getByText("Open Driver")).toBeVisible();
-  await expect(partial.getByText("Roster refresh unavailable", { exact: true })).toBeVisible();
-  await partial.getByRole("button", { name: "Try again", exact: true }).click();
+  await expect(partial.getByText("503 Service Unavailable: Roster refresh unavailable", { exact: true })).toBeVisible();
+  await partial.getByRole("button", { name: "Try again to load membership history", exact: true }).click();
   await expect(dialog.getByTestId("state-populated")).toBeVisible();
   await expect(dialog.getByText("Open Driver")).toBeVisible();
   expect(reads).toBe(3);

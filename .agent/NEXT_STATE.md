@@ -3,9 +3,14 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44479 W3 — OPEN
+### T-44481 W1 — OPEN
+- target_files: frontend/components/pages/live/demo-controls.tsx, frontend/app/styles/live.css, frontend/app/globals.css
+- contract: T383 render generated race sessions as paper cards with state badges and tactile actions.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+
+### T-44480 W3 — OPEN
 - target_files: frontend/e2e/resource-memberships.spec.ts
-- contract: Repair membership partial-state test locators while retaining strict cause and mutation assertions.
+- contract: Match membership partial recovery assertions to actual API error and accessible retry name.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/resource-memberships.spec.ts --list
 
 ## Blocked
@@ -18,6 +23,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44479 accepteda9e7dde; verify0.
 - T-44478 accepted0443c82; verify0.
 - T-44477 accepted5569250; verify0.
 - T-44476 accepted0fb8de5; verify0.
