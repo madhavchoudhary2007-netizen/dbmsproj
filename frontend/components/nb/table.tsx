@@ -51,7 +51,7 @@ export function NbTable<T extends Record<string, unknown>>({
 }: NbTableProps<T>) {
   const isNestedControl = (target: EventTarget | null) => target instanceof HTMLElement && Boolean(target.closest("a,button,input,select,textarea,summary,[role=button],[role=link],[contenteditable=true]"));
   const renderTable = (rows: readonly T[]) => (
-    <div className="min-w-0 max-w-full overflow-x-auto shadow-nb-4">
+    <div tabIndex={0} role="region" aria-label={caption} className="min-w-0 max-w-full overflow-x-auto shadow-nb-4 focus-visible:outline-4 focus-visible:outline-[var(--nb-yellow)] focus-visible:outline-offset-4">
       <table ref={ref} className={cn("min-w-full border-collapse text-left", className)}>
         <caption className="sr-only">{caption}</caption>
         <thead className="sticky top-0 z-10">

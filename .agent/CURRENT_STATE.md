@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: c48443f
+git_head: 51b8121
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -52,3 +52,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44512 acceptedbe6cc11: Add actual live-record and telemetry browser coverage, populated WCAG checks, and completed pit-history runtime cases. Verify0.
 
 - T-44514 acceptedc48443f: Inject request DatabaseSession for generated-race deletion while preserving the exact helper and lazy Mongo/error ordering. Verify0.
+
+- T-44515 accepted51b8121: Scope lap headers exactly, verify selected raw driver IDs in latest telemetry, and control the outage clock. Verify0.

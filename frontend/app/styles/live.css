@@ -236,6 +236,7 @@
   display: block;
   min-width: 0;
   overflow-wrap: anywhere;
+  color: var(--nb-ink);
 }
 .nb-shell .snapshot-strip small {
   font-size: var(--fs-label);
