@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 1d7f717
+git_head: b6494d1
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -35,3 +35,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - Actualstats normalized independently; worker countmisreports caughtpreaccept. Clone dependencyrace44348 and testharnesslint44350 repaired withoutassertchanges. W1localRow boundary44351 correctedpreaccept. Root44349 eagerfactory proposal repairedlazyrefs.
 - T44366 introduced5newdepswarnings, repairedstabledeps/max-warnings0 beforeaccept627d48a; root60livebrowserPASS. T44367 rootpacket mistakenlyselected DBlease tests; active-owner failures, correctedoffline24PASS and rootfull231PASS0skip/livePASS. No assertionschanged.
 - Exact bytes/AST verified for all moves; evidence/results/Githistory retain details. Rootruntime command firstomittedrequired VMflag; correct --experimental-vm-modules gives24PASS0skip. No productdefect.
+
+- T-44370 acceptedb6494d1: Remove only unused legacy imports, keeping LiveTiming function bytes and compatibility exports unchanged. Verify0.

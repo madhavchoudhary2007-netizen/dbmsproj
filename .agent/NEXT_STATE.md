@@ -3,9 +3,9 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44370 W1 — OPEN
+### T-44371 W2 — OPEN
 - target_files: frontend/components/special-pages.tsx
-- contract: T379 remove unused legacy imports from compatibility page before final LiveTiming relocation.
+- contract: T379 activate exact standalone LiveTiming page via compatibility re-export and remove obsolete imports.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Blocked
@@ -15,6 +15,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44370 acceptedb6494d1; verify0.
 - T-44369 accepted1d7f717; verify0.
 - T-44368 accepted1af6714; verify0.
 - T-44367 accepted5ac053e; verify0.
