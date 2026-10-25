@@ -8,6 +8,7 @@ import { NbCard } from "@/components/nb/card";
 import { NbField } from "@/components/nb/field";
 import { NbSelect } from "@/components/nb/input";
 import { NbModal } from "@/components/nb/modal";
+import { PitInfrastructure } from "@/components/pages/pit-infrastructure";
 
 export function PitWall() {
   const {
@@ -45,7 +46,7 @@ export function PitWall() {
 
     <PitStrategy strategy={strategy} strategyLoading={strategyLoading} strategyError={strategyError} loading={loading} sessionState={sessionState} selectedSession={selectedSession} retry={() => void load(event, selectedSession)} value={value} statusText={statusText} />
     {(sessionState === "COMPLETED" || Number(history.total_stops) > 0) && <div className="panel"><div className="panel-heading"><div><div className="eyebrow">RACE HISTORY</div><h2>Completed pit stops</h2></div><span className="muted">{value(history.total_stops, " total stops")}</span></div>{historyDrivers.length ? <DataTable rows={historyDrivers} columns={["driver_name", "team_name", "stop_count", "laps"]} /> : <div className="state" role="status">No completed pit stops were recorded for this race.</div>}</div>}
-    {!loading && !error && <div className="dashboard-grid"><div className="panel"><div className="panel-heading"><div><div className="eyebrow">PIT BOXES</div><h2>Selected event infrastructure</h2></div></div><DataTable rows={boxes} columns={["number", "status", "team_name", "starts_at", "ends_at"]} /></div><div className="panel"><div className="panel-heading"><div><div className="eyebrow">AUTOMATIC ALLOCATIONS</div><h2>Pit stop queue</h2></div></div><DataTable rows={res} columns={["driver_name", "team_name", "box_number", "allocation_source", "starts_at", "ends_at", "status"]} onSelect={(row) => setSelectedReservation(row)} /></div></div>}
+    <PitInfrastructure boxes={boxes} res={res} strategy={strategy} loading={loading} error={error} retry={() => void load(event, selectedSession)} onSelect={setSelectedReservation} />
     {selectedReservation && <NbModal open title="Pit reservation" onClose={() => setSelectedReservation(null)}><div className="grid gap-4"><div className="grid gap-2"><p className="font-bold">{String(selectedReservation.team_name || "Team")} · box {String(selectedReservation.box_number || "—")}</p><p>{String(selectedReservation.starts_at || "")} → {String(selectedReservation.ends_at || "")}</p></div><div className="grid gap-2 border-4 border-ink bg-cream p-4"><p>Status: {String(selectedReservation.status || "—")}</p><p>Allocation: {String(selectedReservation.allocation_source || "—")}</p></div><div className="flex flex-wrap gap-4">{selectedReservation.allocation_source === "MANUAL" && selectedReservation.status === "RESERVED" && canManageReservation(selectedReservation) ? <><NbButton variant="danger" disabled={saving} onClick={() => void updateReservation("CANCELLED")}>Cancel reservation</NbButton><NbButton variant="primary" disabled={saving} data-primary="true" onClick={() => void updateReservation("COMPLETED")}>Mark completed</NbButton></> : <NbButton variant="primary" data-primary="true" onClick={() => setSelectedReservation(null)}>Close reservation</NbButton>}</div></div></NbModal>}
   </>;
 }

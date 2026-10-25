@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: 1cd40f8
+git_head: 9c8841e
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -18,7 +18,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T382 resource CRUD/native modals/memberships/eligibility implemented, copy/hooks/pageSize50 preserved. Browser360PASS T382-actions-primary; final modal/accessibility coverage retained below. Resource page bloat remains T400.
 - Resource20-click save/delete duplicates repaired; strict25PASS T382-delete-guard.browser.raw.log; primary transitions5widthPASS, locally mocked writes only.
 - Backend main825lines, <=120T331 NOT met; T332unfinished. Genuine modules/core/extracts retained. TypedRuntimeState/providers/lifespan shareandclear identities; requestauth/DatabaseSession. Membership/analytics/pitreads useDI. Actualreturnannotation Decimalstringregression fixedresponse_modelNone19b7991; exactnumericserializationtests1479019 preservewireencoding.
-- Backend full262PASS0skip/live acceptance PASS T-44540.full.raw.log. Strictmypy127errors/22files T339-current.raw.log,target0T339. Runtime69PASS T44530 accept log. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
+- Backend full262PASS0skip/live acceptance PASS T-44540.full.raw.log. Strictmypy103errors/14files T339-latest.raw.log,target0T339. Runtime69PASS T44530 accept log. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
 
 ## Safety / workflow
 - Onlyoverhaul/neo-brutal; commits onlyaccept.sh; independentlyrerunVerify;2packet-onlycustomworkersmax, no model/effortoverrides. Isolatedclones .agent/orchestrate.py;<=3files/150added+deleted; normalizeactualstats. Every5tasks budget.
@@ -40,11 +40,11 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T383 real demo creation/deletion guard, list five states, truthful selected lap counter implemented; 40 cases passed plus focused10 outage recovery passed. No fake progress or real database writes.
 - T384 all25 focused cases have passing evidence: T384-tower15 + repair8 + mobile2. Selection keyboard/Details/axe/overflow/WS reorder/reduced motion tested. Metadata, unique completed pit counts wired. Runtime69PASS T44530 accept log.
 - T385 charts/corner tiles, laps/latest telemetry tables, control timelines and retry/source states implemented. Fifteen loading/empty/error/retention browser cases PASS; populated4widths PASS. Mobile tooltip tile scope repaired9a68302; focused mobile1PASS T385-populated-mobile-final, completing five populated widths. M13 first draw remains open.
-- T386 layout/controls/results/native modals implemented7023bc4/d868cac/2e68037. Route gate69PASS1desktop paletteFAIL (red4.10%, minimum5). T44524 fixed desktop palette (all5palette cases PASS); focused lifecycle/simulator/result-read10PASS, dialog fixture corrected885b8ac, focused5/5 browser PASS T386-dialog-final. Desktop/mobile screenshots inspected; legacy field label/border styling remains a Taste defect. Result source7897a78 + five-state view378faa0 + five VM tests8e83f3c; no stale result writes.
-- T332 request database demo DELETE + four dependency override cases accepted c48443f/dede5cd. Root249PASS0skip and live acceptance PASS T-44517.full.raw.log; exact helper ordering preserved.
+- T386 layout/controls/results/native modals implemented7023bc4/d868cac/2e68037. Palettefixed; lifecycle/simulator/resultread10PASS and dialog5PASS. T386-387 root30resiliencePASS; sharedfieldlabel/border styling repaired7c1a7c7. Result source7897a78 + five-state view378faa0 + five VM tests8e83f3c; no stale result writes.
+- T332 request database demo DELETE/override tests c48443f/dede5cd preserve helper ordering.
 - Review corrected worker envelope counts, fixture schema/labels, UUID types and missing source partial state before acceptance. No dependencies added.
 
-- T387 case files/native dialogs/official records UI implemented through95cc69c; ADR013 permits two read-only paged endpoints; lock verified. Root262PASS0skip/livePASS T-44540.full.raw.log. Paged source handles abort/stale/queued refresh; penalties and seasonal 12-cell meters retain real totals. T44542 browser tests accepted1800077, actual browser milestone pending.
+- T387 case files/native dialogs/official records UI implemented through95cc69c; ADR013 permits two read-only paged endpoints; lock verified. Root262PASS0skip/livePASS T-44540.full.raw.log. Paged source handles abort/stale/queued refresh; penalties and seasonal 12-cell meters retain real totals. T44542 browser tests accepted1800077, root35casesnowPASS acrossfivewidths.
 - T386-387 prior route batch99PASS1desktopSteward paletteFAIL; all30 Session resilience cases passed after01e561c spam guard. Shared form readability7c1a7c7 and Steward count sticker8f08922 need current combined browser/build proof.
 
 
@@ -52,8 +52,11 @@ last_eval_score: obsolete51.2974; no current score; final T430
 
 
 
-- T387 source browser24PASS plus focused15PASS T387-records-repair.browser.raw.log completes all35 cases across five widths, including outage/retention and palette. Production build pending. T388 header/native reservation modal a4ef7b6 accepted; remaining strategy/grid/queue/history. Backend helper19c41c6 root262PASS0skip/livePASS T-44543.full.raw.log.
+- T387 source browser24PASS plus focused15PASS T387-records-repair.browser.raw.log completes all35 cases across five widths, including outage/retention and palette. Production build0 T386-387-build.raw.log. T388 header/native reservation modal a4ef7b6 accepted; remaining strategy/grid/queue/history. Backend helper19c41c6 root262PASS0skip/livePASS T-44543.full.raw.log.
 
-- T-44548 acceptedf1a5c17: Render truthful strategy cards with retained refresh data and five-state source boundary. Verify0.
 
-- T-44549 accepted1cd40f8: Type result and lifecycle handlers with bounded returns while preserving wire encoding. Verify0.
+
+
+- T388 strategy five-state cards f1a5c17; grid/queue in review. T44132 helper9c8841e sixofflinePASS; honestproductionbaseline sevenroutes290.49KiB>170, root+page oldgate invalid. WiringT44553 then optimize real route imports; neverraisegate.
+
+- New gate found seven route entries share all special-pages code through a client barrel; direct imports queued to remove unrelated code, no feature change. Orchestrator attempted a third dispatch once; tool rejected it, actual active workers never exceeded2.

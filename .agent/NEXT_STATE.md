@@ -3,6 +3,11 @@ updated_at: 2026-10-26
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44553 W3 — OPEN
+- target_files: scripts/eval/verify-bundle-size.py, scripts/eval/test_bundle_assets.py
+- contract: T44132 wire complete initial asset graph into unchanged 170KiB bundle gate.
+- verify: python3 -m unittest discover -s scripts/eval -p test_bundle_assets.py -v
+
 ### T-44552 W2 — OPEN
 - target_files: backend/app/api/crud.py, backend/app/api/stewards.py
 - contract: T339 type CRUD and stewardship route handlers without changing API or dynamic payload contracts.
@@ -12,11 +17,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - target_files: frontend/components/pages/pit-wall.tsx, frontend/components/pages/pit-infrastructure.tsx
 - contract: T388 numbered physical pit-box grid and selectable horizontal allocation timeline.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
-
-### T-44550 W3 — OPEN
-- target_files: scripts/eval/bundle_assets.py, scripts/eval/test_bundle_assets.py
-- contract: T44132 regression-tested full initial script asset graph helper, before wiring bundle gate.
-- verify: python3 -m unittest discover -s scripts/eval -p test_bundle_assets.py -v
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -28,6 +28,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44550 accepted9c8841e; verify0.
 - T-44549 accepted1cd40f8; verify0.
 - T-44548 acceptedf1a5c17; verify0.
 - T-44547 accepteddbb62d5; verify0.
