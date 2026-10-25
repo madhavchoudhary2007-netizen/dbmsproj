@@ -3,15 +3,25 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44331 W1 — OPEN
+- target_files: frontend/components/special-pages.tsx, frontend/components/pages/live/race-records.tsx
+- contract: T379 extract exact LiveTiming recorded laps and race-control records into live/race-records.tsx, wire same region.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
+
+### T-44330 W2 — OPEN
+- target_files: frontend/components/special-pages.tsx
+- contract: T379 wire useAnalytics hook replacing only Analytics pre-return state/effect/derived logic.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
+
+### T-44329 W1 — OPEN
+- target_files: frontend/components/special-pages.tsx
+- contract: T379 activate standalone PitWall with compatibility reexport; remove duplicate function and hook import.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
+
 ### T-44328 W2 — OPEN
 - target_files: backend/app/main.py, backend/app/simulation_lifecycle.py
 - contract: T331 move exact sync_simulation_lifecycle into typed simulation_lifecycle module, retain legacy wrapper.
 - verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "simulation_stop or simulation_pause or reset" && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/simulation_lifecycle.py
-
-### T-44327 W1 — OPEN
-- target_files: frontend/components/pages/pit-wall.tsx
-- contract: T379 stage exact PitWall presentation page under pages/pit-wall.tsx; keep legacy source until separate wire.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
 ## Blocked
 - None currently. Owner switched workers to gpt-6-luna/high; T44318 interrupted before edits, fresh worker required.
@@ -20,6 +30,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44327 acceptedc0c4f52; verify0.
 - T-44326 accepted33b3818; verify0.
 - T-44325 accepted5c977c3; verify0.
 - T-44324 accepteda54f000; verify0.
@@ -63,5 +74,5 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - Phase6 T370/T371 complete;481 browser checks and build/static0.
 - Login parentT380 accepted0a3e206; root80browserchecks and build/types/lint0.
 - Dashboard exactmove complete; SessionPage split complete, Steward split underway (T379), existingbehavior retained.
-- Backend latest full231pass0skip/livePASS afterb0972ed; main1220lines, T331 remains.
+- Backend latest full231pass0skip/livePASS afterdc23dbc; main1186lines, T331 remains.
 - Detailed accepted IDs/evidence in CURRENT_STATE, git and .agent/results.

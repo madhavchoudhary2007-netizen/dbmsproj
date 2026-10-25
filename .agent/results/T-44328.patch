@@ -1,0 +1,87 @@
+diff --git a/backend/app/main.py b/backend/app/main.py
+index 99f1ebd..1f22cf9 100644
+--- a/backend/app/main.py
++++ b/backend/app/main.py
+@@ -144,6 +144,7 @@ from .simulation_core import Simulation as Simulation
+ from .simulation_core import calculate_sector_performance as calculate_sector_performance
+ from .simulation_finish import finalize_results
+ from .simulation_incidents import record_generated_incidents
++from .simulation_lifecycle import sync_lifecycle
+ from .simulation_pit import (
+     cancel_automatic_reservations,
+     refresh_pit_state,
+@@ -706,30 +707,7 @@ simulations: dict[str, Simulation] = {}
+ 
+ 
+ def sync_simulation_lifecycle(session_id: UUID, action: str):
+-    sim = simulations.get(str(session_id))
+-    if not sim:
+-        return
+-    if action == "pause" and sim.status == "running":
+-        sim.status = "paused"
+-    elif action == "resume" and sim.status == "paused":
+-        sim.status = "running"
+-    elif action in {"finish", "reset"}:
+-        sim.status = "stopped"
+-        if sim.task and not sim.task.done():
+-            sim.task.get_loop().call_soon_threadsafe(sim.task.cancel)
+-        if action == "reset":
+-            sim.lap_by_driver = {str(driver["id"]): 1 for driver in sim.drivers}
+-            sim.sector_by_driver.clear()
+-            sim.race_clock_ms = 0
+-            sim.next_sector_due_by_driver.clear()
+-            sim.last_lap_by_driver.clear()
+-            sim.elapsed_by_driver = {str(driver["id"]): 0 for driver in sim.drivers}
+-            sim.sector_splits_by_driver.clear()
+-            sim.tire_age_by_driver = {str(driver["id"]): 0 for driver in sim.drivers}
+-            sim.tire_wear_by_driver = {str(driver["id"]): 0.0 for driver in sim.drivers}
+-            sim.compound_by_driver.clear()
+-            sim.pit_reservations_by_driver.clear()
+-            sim.pit_due_tire_age_by_driver.clear()
++    sync_lifecycle(session_id, action, simulations)
+ 
+ 
+ def ensure_session_reset_allowed(session_id: UUID | str):
+diff --git a/backend/app/simulation_lifecycle.py b/backend/app/simulation_lifecycle.py
+new file mode 100644
+index 0000000..9c1b321
+--- /dev/null
++++ b/backend/app/simulation_lifecycle.py
+@@ -0,0 +1,37 @@
++from __future__ import annotations
++
++from collections.abc import MutableMapping
++from uuid import UUID
++
++from .simulation_core import Simulation
++
++
++def sync_lifecycle(
++    session_id: UUID,
++    action: str,
++    simulations: MutableMapping[str, Simulation],
++) -> None:
++    sim = simulations.get(str(session_id))
++    if not sim:
++        return
++    if action == "pause" and sim.status == "running":
++        sim.status = "paused"
++    elif action == "resume" and sim.status == "paused":
++        sim.status = "running"
++    elif action in {"finish", "reset"}:
++        sim.status = "stopped"
++        if sim.task and not sim.task.done():
++            sim.task.get_loop().call_soon_threadsafe(sim.task.cancel)
++        if action == "reset":
++            sim.lap_by_driver = {str(driver["id"]): 1 for driver in sim.drivers}
++            sim.sector_by_driver.clear()
++            sim.race_clock_ms = 0
++            sim.next_sector_due_by_driver.clear()
++            sim.last_lap_by_driver.clear()
++            sim.elapsed_by_driver = {str(driver["id"]): 0 for driver in sim.drivers}
++            sim.sector_splits_by_driver.clear()
++            sim.tire_age_by_driver = {str(driver["id"]): 0 for driver in sim.drivers}
++            sim.tire_wear_by_driver = {str(driver["id"]): 0.0 for driver in sim.drivers}
++            sim.compound_by_driver.clear()
++            sim.pit_reservations_by_driver.clear()
++            sim.pit_due_tire_age_by_driver.clear()
