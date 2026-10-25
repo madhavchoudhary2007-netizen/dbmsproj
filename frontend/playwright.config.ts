@@ -4,6 +4,7 @@ const port = process.env.PLAYWRIGHT_PORT ?? "3100";
 
 export default defineConfig({
   testDir: "./e2e",
+  testMatch: "**/*.spec.ts",
   use: { baseURL: `http://localhost:${port}`, trace: "retain-on-failure" },
   webServer: {
     command: `npm run dev -- --hostname 127.0.0.1 --port ${port}`,

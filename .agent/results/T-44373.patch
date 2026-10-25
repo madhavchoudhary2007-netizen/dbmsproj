@@ -1,0 +1,24 @@
+diff --git a/frontend/package.json b/frontend/package.json
+index c887dd1..1b029e7 100644
+--- a/frontend/package.json
++++ b/frontend/package.json
+@@ -6,6 +6,7 @@
+     "dev": "next dev --hostname 0.0.0.0",
+     "build": "next build --webpack",
+     "start": "next start --hostname 0.0.0.0",
++    "test:runtime": "node --experimental-vm-modules --test e2e/runtime/*.test.mjs",
+     "typecheck": "tsc --noEmit",
+     "lint": "eslint ."
+   },
+diff --git a/frontend/playwright.config.ts b/frontend/playwright.config.ts
+index fe235cf..65773fb 100644
+--- a/frontend/playwright.config.ts
++++ b/frontend/playwright.config.ts
+@@ -4,6 +4,7 @@ const port = process.env.PLAYWRIGHT_PORT ?? "3100";
+ 
+ export default defineConfig({
+   testDir: "./e2e",
++  testMatch: "**/*.spec.ts",
+   use: { baseURL: `http://localhost:${port}`, trace: "retain-on-failure" },
+   webServer: {
+     command: `npm run dev -- --hostname 127.0.0.1 --port ${port}`,
