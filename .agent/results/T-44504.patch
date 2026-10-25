@@ -1,0 +1,22 @@
+diff --git a/frontend/e2e/live-timing-tower.spec.ts b/frontend/e2e/live-timing-tower.spec.ts
+index 09fdb66..023a98a 100644
+--- a/frontend/e2e/live-timing-tower.spec.ts
++++ b/frontend/e2e/live-timing-tower.spec.ts
+@@ -55,7 +55,7 @@ test("snapshot loading resolves to named timing rows with tyre, fastest lap, and
+     const firstDriver = rows(page).filter({ hasText: "Driver One" });
+     await firstDriver.locator("details").locator("summary[aria-label='Timing details for Driver One']").click();
+   }
+-  await expect(tower(page).getByText("OB", { exact: true }).filter({ visible: true })).toBeVisible();
++  await expect(tower(page).getByText("OB", { exact: true }).filter({ visible: true })).toHaveCount(2);
+   expect(app.unexpected).toEqual([]);
+ });
+ 
+@@ -99,7 +99,7 @@ test("driver selection supports click, Enter, and Space; mobile details preserve
+   await expect(panel.getByText("Driver One")).toBeVisible();
+   const first = rows(page).filter({ hasText: "Driver One" });
+   const second = rows(page).filter({ hasText: "Driver Two" });
+-  const driverSelect = page.getByLabel("Driver", { exact: true });
++  const driverSelect = page.getByRole("combobox", { name: "Driver", exact: true });
+   await first.click();
+   await expect(first).toHaveAttribute("aria-selected", "true");
+   await expect(driverSelect).toHaveValue("d1");
