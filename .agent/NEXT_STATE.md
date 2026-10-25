@@ -3,10 +3,15 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44320 Orchestrator — OPEN
-- target_files: .codex/agents/w2-state.toml, .codex/agents/w3-eval.toml
-- contract: Owner requested GPT6Luna/high worker bindings only.
-- verify: python3 -c 'import pathlib,tomllib; assert tomllib.loads(pathlib.Path('"'"'.codex/agents/w2-state.toml'"'"').read_text())["model"] == "gpt-6-luna" and tomllib.loads(pathlib.Path('"'"'.codex/agents/w2-state.toml'"'"').read_text())["model_reasoning_effort"] == "high"; assert tomllib.loads(pathlib.Path('"'"'.codex/agents/w3-eval.toml'"'"').read_text())["model"] == "gpt-6-luna" and tomllib.loads(pathlib.Path('"'"'.codex/agents/w3-eval.toml'"'"').read_text())["model_reasoning_effort"] == "high"; print("PASS owner requested gpt-6-luna/high")'
+### T-44322 W2 — OPEN
+- target_files: backend/app/main.py, backend/app/simulation_finish.py
+- contract: T331 move exact _finalize_simulation_results into typed simulation_finish module; retain main legacy async wrapper with current callbacks.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/simulation_finish.py
+
+### T-44321 W1 — OPEN
+- target_files: frontend/components/special-pages.tsx, frontend/components/pages/dbms-center.tsx
+- contract: T379 move exact DbmsCenter page into pages/dbms-center.tsx and retain compatibility reexport.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
 ### T-44318 W2 — OPEN
 - target_files: frontend/lib/use-pit-wall.ts
@@ -20,6 +25,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44320 accepted4645e52; verify0.
 - T-44319 acceptedba3fa7c; verify0.
 - T-44316 acceptedf2ef65e; verify0.
 - T-44317 acceptede0e553d; verify0.
