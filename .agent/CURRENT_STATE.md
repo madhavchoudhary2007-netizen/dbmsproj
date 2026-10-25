@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: e1470ec
+git_head: 978192d
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -48,3 +48,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44463 acceptede6311f5: Assert actual dialog teardown and restored edit focus before keyboard reopen; cover native linked inline errors, clearing, blocked invalid submit and numeric-zero save. Verify0.
 
 - T-44465 acceptede1470ec: Isolate membership reads with cancellation/latest-request protection and pending/error state; derive current roster using inclusive UTC start/end dates. Verify0.
+
+- T-44466 accepted978192d: Create reusable membership history presentation covering five states, retry, retained partial records and original end-membership actions. Verify0.

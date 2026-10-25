@@ -9,10 +9,10 @@ import { NbButton } from "./nb/button";
 import { NbBadge } from "./nb/badge";
 import { NbCard } from "./nb/card";
 import { NbModal } from "./nb/modal";
+import { MembershipHistory } from "./membership-history";
 import {
   Button,
   ResourceEditor,
-  StateMessage,
 } from "./ui";
 import { NbInput } from "./nb/input";
 import { NbTable } from "./nb/table";
@@ -49,6 +49,8 @@ export function ResourcePage({
   const { rows, loading, error, load } = useResourceRows(endpoint);
   const {
     members,
+    currentMembers,
+    loading: membersLoading,
     error: memberError,
     setError: setMemberError,
     clear: clearMembers,
@@ -217,6 +219,9 @@ export function ResourcePage({
         );
       }
     }
+  };
+  const retryMembers = () => {
+    if (edit?.id) void loadMembers(String(edit.id)).catch(() => undefined);
   };
   const memberSave = async (v: Row) => {
     setBusy(true);
@@ -494,37 +499,15 @@ export function ResourcePage({
                   </Button>
                 )}
               </div>
-              {memberError ? (
-                <StateMessage error={memberError} />
-              ) : (
-                <div className="membership-list">
-                  {members.map((m) => (
-                    <div className="membership-line" key={String(m.id)}>
-                      <div>
-                        <b>
-                          {String(m.team_name || m.driver_name || "Membership")}
-                        </b>
-                        <small>
-                          {String(m.start_date || "")} →{" "}
-                          {String(m.end_date || "Current")}
-                        </small>
-                      </div>
-                      {canManage && !m.end_date && (
-                        <Button
-                          kind="secondary"
-                          disabled={busy}
-                          onClick={() => void endMembership(String(m.id))}
-                        >
-                          End membership
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                  {members.length === 0 && (
-                    <div className="state">No membership history returned.</div>
-                  )}
-                </div>
-              )}
+              <MembershipHistory
+                members={members}
+                loading={membersLoading}
+                error={memberError}
+                retry={retryMembers}
+                canManage={canManage}
+                busy={busy}
+                onEnd={(id) => void endMembership(id)}
+              />
             </div>
           )}
         </NbModal>
@@ -567,17 +550,43 @@ export function ResourcePage({
           title="Create team membership"
           onClose={() => setMemberModal(false)}
         >
-          <div className="form-hint">
-            Choose the driver, team, and dates. The membership appears in both
-            history views.
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <section className="min-w-0">
+              <h3 className="mb-4 text-lg font-bold">Current roster</h3>
+              {edit && supportsHistory ? (
+                <>
+                  <p className="mb-4">
+                    {String(edit.full_name || edit.name || "Selected record")}
+                  </p>
+                  <MembershipHistory
+                    members={currentMembers}
+                    loading={membersLoading}
+                    error={memberError}
+                    retry={retryMembers}
+                    canManage={false}
+                    busy={busy}
+                    onEnd={(id) => void endMembership(id)}
+                  />
+                </>
+              ) : (
+                <p>Select a driver or team record to inspect its roster.</p>
+              )}
+            </section>
+            <section className="min-w-0">
+              <h3 className="mb-4 text-lg font-bold">Add membership</h3>
+              <div className="form-hint">
+                Choose the driver, team, and dates. The membership appears in both
+                history views.
+              </div>
+              {memberError && <div className="form-error">{memberError}</div>}
+              <ResourceEditor
+                fields={memberFormFields}
+                save={memberSave}
+                busy={busy}
+                primary={!deleteConfirm}
+              />
+            </section>
           </div>
-          {memberError && <div className="form-error">{memberError}</div>}
-          <ResourceEditor
-            fields={memberFormFields}
-            save={memberSave}
-            busy={busy}
-            primary={!deleteConfirm}
-          />
         </NbModal>
       )}
     </>

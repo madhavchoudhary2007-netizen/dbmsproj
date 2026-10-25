@@ -3,9 +3,14 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44466 W1 — OPEN
-- target_files: frontend/components/membership-history.tsx
-- contract: T382 create reusable five-state membership roster presentation for both existing dialogs.
+### T-44468 W3 — OPEN
+- target_files: frontend/e2e/runtime/resource-memberships.test.mjs
+- contract: T382 prove actual membership hook cancels stale requests and calculates current roster dates.
+- verify: npm --prefix frontend run test:runtime && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
+
+### T-44467 W1 — OPEN
+- target_files: frontend/components/resource-page.tsx
+- contract: T382 finish two-column membership modal using reusable five-state roster view.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Blocked
@@ -18,6 +23,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44466 accepted978192d; verify0.
 - T-44465 acceptede1470ec; verify0.
 - T-44463 acceptede6311f5; verify0.
 - T-44464 accepteded47d9f; verify0.
