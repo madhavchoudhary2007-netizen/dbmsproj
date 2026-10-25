@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: d018de6
+git_head: b87fee6
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -40,20 +40,6 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 
 - T-44398 acceptedda48958: Seven incidents browser scenarios: five states, reload coalescing, cancellation and malformed-response dashboard isolation; collection only. Verify0.
 
-- T-44400 accepted67d0603: Use exact accessible Refresh name to distinguish dashboard reload from the existing race-control feed action. Verify0.
-
-- T331/T332 sequencing finding: legacy tests patch main resource/dependency globals, so closure to120lines requires app.state dependency foundations before removing wrappers. Stage typed providers under T44401; retain main/API contracts and all assertions; neither parent declared complete.
-
-- T-44401 accepted60c4999: Typed application runtime container and HTTP/WebSocket dependency getters staged for T331/T332 integration; unavailable resources fail closed. Verify0.
-
-- T-44402 accepted104bdb8: Compact context and supporting event/incidents cards with legal 12px/8px padding; preserve content and action targets. Verify0.
-
-- T381-layout-final root130PASS incl dashboard/incidents5states/rapidreload/unmount/malformed/legacyoffline, route/axe/targets/palette/6widthresponsive across5projects. Probe fivewidths:0overflow/oneprimary/no pageerrors. Settledscreenshots show2Taste defects despite passingaxe: legacy green!important labelcontrast, missingsecondarylinkface; T44404 fixing +healthstretch.
-
-- T-44403 accepted4521ac9: Offline provider regressions prove independent runtime instances, resource failures and actual FastAPI HTTP/WebSocket dependency injection. Verify0.
-
-- T-44404 accepted5a0ad53: Restore the visible secondary link face and ink health labels; size service-health card to real content. Verify0.
-
-- T-44405 acceptedd756a9f: Publish existing lifespan resources through typed app.state.runtime and clear resource references on shutdown; legacy aliases retained. Verify0.
-
-- T-44406 acceptedd018de6: Browser regressions for readable health labels, visible paper-faced session link and preserved secondary 44px target. Verify0.
+- App runtime/provider foundation60c4999, actual HTTP+WS provider tests4521ac9, appstate wiringd756a9f and lifespan proofb87fee6 accepted. Root full239PASS0skip; liveacceptance finalstatus pending T44407.full.raw.log. Main857lines, T331<=120/T332 still NOT complete. Request auth/DB adapters T44408 stagedawaitreview, strict ownmodules0.
+- Dashboard latest root135PASS T381-visual-verified.browser.raw.log after visualfix5a0ad53 + actualcontrast/link regressiond018de6; fivewidth0overflow/oneprimary/noerrors. Secondaryface readable, greenlabels ink, healthwrapscontent. T381 still requires actualWS/lease source rows; testfixtureprerequisite T44409. No parentcompletion claim.
+- W3 T44406 initially exceeded requestedfile150linecap153, repairedformatting to150 without assertionsremoved. Rootmalformedsource regression repaired1924d64 and coveredda48958. All counts normalized; no threshold changes.
