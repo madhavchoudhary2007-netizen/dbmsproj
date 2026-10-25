@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: 01e561c
+git_head: 823c270
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -54,3 +54,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - Runtime69PASS; T386 dialog five-width browser5PASS. Session spam regression recorded three failures, each20 requests; W2 guard ready for acceptance. ADR-013 focused Phase C/lock verified; official stewarding read implementation pending.
 
 
+
+- T-44536 accepted823c270: Add ADR-013 authenticated read-only penalty and seasonal licence routes with request database providers, typed models and bounded paging. Verify0.

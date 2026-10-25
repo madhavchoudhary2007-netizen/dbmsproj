@@ -23,11 +23,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T387 add isolated HTTP regression coverage for ADR-013 read-only stewarding contracts and provider overrides.
 - verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q --collect-only backend/tests/test_stewarding_reads.py && .venv/bin/ruff check backend/tests/test_stewarding_reads.py && .venv/bin/ruff format --check backend/tests/test_stewarding_reads.py
 
-### T-44536 W2 — OPEN
-- target_files: backend/app/api/stewarding_reads.py, backend/app/main.py
-- contract: T387 implement ADR-013 authenticated read-only official penalty and seasonal licence endpoints through request-scoped providers.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_request_dependencies.py backend/tests/test_runtime_dependencies.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/api/stewarding_reads.py backend/app/main.py
-
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
 
@@ -38,6 +33,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44536 accepted823c270; verify0.
 - T-44534 accepted01e561c; verify0.
 - T-44533 accepted7c1a7c7; verify0.
 - T-44535 accepted09c2730; verify0.
