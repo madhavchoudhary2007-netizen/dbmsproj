@@ -1,0 +1,63 @@
+diff --git a/frontend/components/pages/live/demo-controls.tsx b/frontend/components/pages/live/demo-controls.tsx
+index 8252ad7..8c139d7 100644
+--- a/frontend/components/pages/live/demo-controls.tsx
++++ b/frontend/components/pages/live/demo-controls.tsx
+@@ -14,6 +14,8 @@ interface DemoControlsProps {
+   demoMessage: string;
+   demoRaces: Row[];
+   visibleDemoRaces: Row[];
++  selectedSession: string;
++  leaderLap: unknown;
+   autoFollow: MutableRefObject<boolean>;
+   setSession: (session: string) => void;
+   setDriver: (driver: string) => void;
+@@ -33,6 +35,8 @@ export function DemoControls({
+   demoMessage,
+   demoRaces,
+   visibleDemoRaces,
++  selectedSession,
++  leaderLap,
+   autoFollow,
+   setSession,
+   setDriver,
+@@ -72,6 +76,7 @@ export function DemoControls({
+             <button className="demo-race-select" onClick={() => { autoFollow.current = false; setSession(String(race.session_id)); setDriver(""); }} aria-label={`Show ${race.event_name} ${String(race.session_id).slice(0, 8)} live timing`}>
+               <span className="demo-race-name">{String(race.event_name || "Generated race")}</span>
+               <span className="demo-race-meta">{String(race.circuit_name || "Circuit pending")} · {String(race.car_count)} cars · {String(race.total_laps)} laps · {String(race.created_at || "").slice(0, 10)} · {String(race.session_id).slice(0, 8)}</span>
++              <span className="demo-race-progress font-mono">L {String(race.session_id) === selectedSession && typeof leaderLap === "number" && Number.isFinite(leaderLap) ? leaderLap : "—"}/{String(race.total_laps)}</span>
+             </button>
+             <span className={`demo-state ${race.state === "ACTIVE" ? "is-active" : ""}`}><NbBadge status={String(race.state)} /></span>
+             {canManageDemos && <NbButton variant="ghost" className="icon-button danger-icon" aria-label={`Delete ${race.event_name} ${String(race.session_id).slice(0, 8)}`} disabled={demoBusy} onClick={() => setDeleteRace(race)}><Trash2 size={15} /></NbButton>}
+diff --git a/frontend/components/pages/live/index.tsx b/frontend/components/pages/live/index.tsx
+index f31397e..c8e0417 100644
+--- a/frontend/components/pages/live/index.tsx
++++ b/frontend/components/pages/live/index.tsx
+@@ -92,6 +92,7 @@ export function LiveTiming() {
+     demoRaces,
+     showCompletedDemos,
+     showAllLaps,
++    recordsLoading || (recordsError && livePitStops.length === 0) ? undefined : livePitStops,
+   );
+   return (
+     <>
+@@ -125,6 +126,8 @@ export function LiveTiming() {
+         setDeleteRace={setDeleteRace}
+         setShowCompletedDemos={setShowCompletedDemos}
+         showCompletedDemos={showCompletedDemos}
++        selectedSession={session}
++        leaderLap={orderRows[0]?.lap}
+         listLoading={listLoading}
+         listError={listError}
+         retryLists={() => { refreshLists().catch(() => undefined); }}
+diff --git a/frontend/components/pages/live/timing-tower.tsx b/frontend/components/pages/live/timing-tower.tsx
+index d43f863..4e71a42 100644
+--- a/frontend/components/pages/live/timing-tower.tsx
++++ b/frontend/components/pages/live/timing-tower.tsx
+@@ -73,6 +73,7 @@ const columns: readonly NbTableColumn<Row>[] = [
+   { key: "tire_wear_pct", title: "tire wear pct", numeric: true, className: "timing-secondary", render: (row) => pretty(row.tire_wear_pct) },
+   { key: "pit_state", title: "pit state", className: "timing-secondary", render: (row) => pretty(row.pit_state) },
+   { key: "pit_box_number", title: "pit box number", numeric: true, className: "timing-secondary", render: (row) => pretty(row.pit_box_number) },
++  { key: "pit_count", title: "pit count", numeric: true, className: "timing-secondary", render: (row) => row.pit_count === undefined ? "—" : pretty(row.pit_count) },
+   { key: "interval", title: "interval", className: "timing-secondary", render: (row) => <FlashValue value={(row as Row & { interval?: unknown }).interval}>{pretty((row as Row & { interval?: unknown }).interval)}</FlashValue> },
+   { key: "sector_s1", title: "S1", className: "timing-secondary", render: (row) => sectorCell(row, 0) },
+   { key: "sector_s2", title: "S2", className: "timing-secondary", render: (row) => sectorCell(row, 1) },

@@ -14,6 +14,8 @@ interface DemoControlsProps {
   demoMessage: string;
   demoRaces: Row[];
   visibleDemoRaces: Row[];
+  selectedSession: string;
+  leaderLap: unknown;
   autoFollow: MutableRefObject<boolean>;
   setSession: (session: string) => void;
   setDriver: (driver: string) => void;
@@ -33,6 +35,8 @@ export function DemoControls({
   demoMessage,
   demoRaces,
   visibleDemoRaces,
+  selectedSession,
+  leaderLap,
   autoFollow,
   setSession,
   setDriver,
@@ -72,6 +76,7 @@ export function DemoControls({
             <button className="demo-race-select" onClick={() => { autoFollow.current = false; setSession(String(race.session_id)); setDriver(""); }} aria-label={`Show ${race.event_name} ${String(race.session_id).slice(0, 8)} live timing`}>
               <span className="demo-race-name">{String(race.event_name || "Generated race")}</span>
               <span className="demo-race-meta">{String(race.circuit_name || "Circuit pending")} · {String(race.car_count)} cars · {String(race.total_laps)} laps · {String(race.created_at || "").slice(0, 10)} · {String(race.session_id).slice(0, 8)}</span>
+              <span className="demo-race-progress font-mono">L {String(race.session_id) === selectedSession && typeof leaderLap === "number" && Number.isFinite(leaderLap) ? leaderLap : "—"}/{String(race.total_laps)}</span>
             </button>
             <span className={`demo-state ${race.state === "ACTIVE" ? "is-active" : ""}`}><NbBadge status={String(race.state)} /></span>
             {canManageDemos && <NbButton variant="ghost" className="icon-button danger-icon" aria-label={`Delete ${race.event_name} ${String(race.session_id).slice(0, 8)}`} disabled={demoBusy} onClick={() => setDeleteRace(race)}><Trash2 size={15} /></NbButton>}

@@ -3,15 +3,15 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44511 W1 — OPEN
+- target_files: frontend/components/pages/live/index.tsx, frontend/components/pages/live/timing-tower.tsx, frontend/components/pages/live/demo-controls.tsx
+- contract: T383/T384 display factual selected-race lap progress and completed pit counts from the existing records.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+
 ### T-44512 W3 — OPEN
 - target_files: frontend/e2e/live-records.spec.ts, frontend/e2e/runtime/live-timing-data.test.mjs
 - contract: T385 verify actual recorded laps, incident/pit timelines, temperature tiles and live recovery.
 - verify: npm --prefix frontend run test:runtime && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && ./node_modules/.bin/playwright test e2e/live-records.spec.ts --list
-
-### T-44509 W1 — OPEN
-- target_files: frontend/components/pages/live/latest-telemetry.tsx, frontend/components/pages/live/index.tsx, frontend/components/pages/live/race-records.tsx
-- contract: T385 render latest telemetry in a readable mono table with truthful snapshot five-state retry.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -23,6 +23,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44509 accepted1b65d17; verify0.
 - T-44510 accepted1d3180f; verify0.
 - T-44508 accepted040cb67; verify0.
 - T-44505 accepted38165fc; verify0.

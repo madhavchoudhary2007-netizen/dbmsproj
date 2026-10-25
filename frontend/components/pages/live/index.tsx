@@ -92,6 +92,7 @@ export function LiveTiming() {
     demoRaces,
     showCompletedDemos,
     showAllLaps,
+    recordsLoading || (recordsError && livePitStops.length === 0) ? undefined : livePitStops,
   );
   return (
     <>
@@ -125,6 +126,8 @@ export function LiveTiming() {
         setDeleteRace={setDeleteRace}
         setShowCompletedDemos={setShowCompletedDemos}
         showCompletedDemos={showCompletedDemos}
+        selectedSession={session}
+        leaderLap={orderRows[0]?.lap}
         listLoading={listLoading}
         listError={listError}
         retryLists={() => { refreshLists().catch(() => undefined); }}

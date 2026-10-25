@@ -73,6 +73,7 @@ const columns: readonly NbTableColumn<Row>[] = [
   { key: "tire_wear_pct", title: "tire wear pct", numeric: true, className: "timing-secondary", render: (row) => pretty(row.tire_wear_pct) },
   { key: "pit_state", title: "pit state", className: "timing-secondary", render: (row) => pretty(row.pit_state) },
   { key: "pit_box_number", title: "pit box number", numeric: true, className: "timing-secondary", render: (row) => pretty(row.pit_box_number) },
+  { key: "pit_count", title: "pit count", numeric: true, className: "timing-secondary", render: (row) => row.pit_count === undefined ? "—" : pretty(row.pit_count) },
   { key: "interval", title: "interval", className: "timing-secondary", render: (row) => <FlashValue value={(row as Row & { interval?: unknown }).interval}>{pretty((row as Row & { interval?: unknown }).interval)}</FlashValue> },
   { key: "sector_s1", title: "S1", className: "timing-secondary", render: (row) => sectorCell(row, 0) },
   { key: "sector_s2", title: "S2", className: "timing-secondary", render: (row) => sectorCell(row, 1) },

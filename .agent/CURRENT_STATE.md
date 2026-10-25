@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 1d3180f
+git_head: 1b65d17
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -44,3 +44,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 
 - Pit count metadata1d3180f deduplicates actual completed IDs; not yet wired into tower. T383 factual selected-race lap counter still pending; no inferred/fake progress.
 - T44503 one transient worker usage error; account tool reported ordinaryUsageAllowed=true; same-role retry succeeded. Its unaccepted236-line rewrite was restored only in clone, replacedwith57-line targeted change. No model substitution.
+
+- T-44509 accepted1b65d17: Render readable latest telemetry states and align record and snapshot retry accessible names with visible labels. Verify0.
