@@ -9,6 +9,7 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import { api, asArray, listAll, Row, API_BASE } from "@/lib/api";
+import { createLiveDemoActions } from "@/lib/live-demo-actions";
 import {
   Button,
   Modal,
@@ -145,55 +146,8 @@ export function LiveTiming() {
     void load();
     return () => { alive = false; if (timer) clearTimeout(timer); };
   }, [clearError, session]);
-  const createDemoRace = async () => {
-    setDemoBusy(true);
-    clearError();
-    setDemoMessage("");
-    try {
-      const created = await api<{ session_id?: string | number; event_name?: string; car_count?: number } & Record<string, unknown>>("/demo-races", {
-        method: "POST",
-        body: JSON.stringify({}),
-      });
-      const { sessionRows } = await refreshLists();
-      const newSession = sessionRows.find((r) => String(r.id) === String(created.session_id));
-      if (newSession) setSession(String(newSession.id));
-      setDriver("");
-      setDemoMessage(`${created.event_name || "Generated race"} is live with ${created.car_count} cars.`);
-    } catch (e) {
-      reportError("demo", e instanceof Error ? e.message : "Unable to create live race");
-    } finally {
-      setDemoBusy(false);
-    }
-  };
-  const removeDemoRace = async () => {
-    if (!deleteRace) return;
-    const race = deleteRace;
-    setDemoBusy(true);
-    clearError();
-    try {
-      await api(`/demo-races/${encodeURIComponent(String(race.session_id))}`, { method: "DELETE" });
-      const { sessionRows, raceRows } = await refreshLists();
-      if (session === String(race.session_id)) {
-        const activeDemo = raceRows.find((r: Row) => r.state === "ACTIVE");
-        const next = activeDemo && sessionRows.find((r) => String(r.id) === String(activeDemo.session_id));
-        const nextSession = String(next?.id || sessionRows.find((r: Row) => r.state === "ACTIVE")?.id || "");
-        setSession(nextSession);
-        if (!nextSession) {
-          setPackets([]);
-          setTiming({ cars: [], safety_car: false });
-          setSnapshot(null);
-          setStatus("Choose an active session");
-        }
-        setDriver("");
-      }
-      setDeleteRace(null);
-      setDemoMessage("Generated race deleted.");
-    } catch (e) {
-      reportError("demo", e instanceof Error ? e.message : "Unable to delete generated race");
-    } finally {
-      setDemoBusy(false);
-    }
-  };
+  const createDemoRace = () => createLiveDemoActions({ session, deleteRace, refreshLists, clearError, reportError, setDemoBusy, setDemoMessage, setSession, setDriver, setPackets, setTiming, setSnapshot, setStatus, setDeleteRace }).createDemoRace();
+  const removeDemoRace = () => createLiveDemoActions({ session, deleteRace, refreshLists, clearError, reportError, setDemoBusy, setDemoMessage, setSession, setDriver, setPackets, setTiming, setSnapshot, setStatus, setDeleteRace }).removeDemoRace();
   useEffect(() => {
     if (!session) { setStatus("Choose an active session"); return; }
     setStatus("Connecting · live stream");
