@@ -3,6 +3,7 @@
 import { pretty } from "@/lib/api";
 import { useDashboard } from "@/lib/use-dashboard";
 import { PageHeader, ReloadButton, StateMessage } from "@/components/ui";
+import { NbStat } from "@/components/nb/stat";
 
 export function Dashboard() {
   const { data, health, err, load, fetchData } = useDashboard();
@@ -17,18 +18,22 @@ export function Dashboard() {
       <StateMessage error={err} loading={load} retry={fetchData} />
       {data && (
         <>
-          <div className="stat-grid">
-            {[
-              ["active_sessions", data.active_sessions],
-              ["scheduled_events", data.scheduled_events],
-              ["open_incidents", data.open_incidents],
-              ["drivers", data.drivers],
-            ].map(([k, v]) => (
-              <div className="stat-card" key={String(k)}>
-                <span>{String(k).replaceAll("_", " ")}</span>
-                <b>{pretty(v)}</b>
-                <small>API reported</small>
-              </div>
+          <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {([
+              ["active_sessions", data.active_sessions, "red", -2],
+              ["scheduled_events", data.scheduled_events, "yellow", 2],
+              ["open_incidents", data.open_incidents, "violet", -2],
+              ["drivers", data.drivers, "mint", 2],
+            ] as const).map(([k, v, tone, tilt]) => (
+              <NbStat
+                key={String(k)}
+                label={String(k).replaceAll("_", " ")}
+                value={pretty(v)}
+                delta="API reported"
+                className="[&_dd]:text-5xl"
+                tone={tone}
+                stickerTilt={tilt}
+              />
             ))}
           </div>
           <div className="dashboard-grid">

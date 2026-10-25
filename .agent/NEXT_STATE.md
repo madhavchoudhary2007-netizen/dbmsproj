@@ -3,14 +3,14 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44382 W2 — OPEN
+- target_files: backend/app/main.py, backend/app/core/http_auth.py
+- contract: T331 extract exact HTTP current-user authentication body into core service with legacy wrapper and unchanged security.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_api.py -k "auth_characterization or cookie_auth or jwt_secret" && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/main.py backend/app/core/http_auth.py
+
 ### T-44381 W1 — OPEN
 - target_files: frontend/components/pages/dashboard.tsx, frontend/components/nb/stat.tsx, frontend/app/globals.css
 - contract: T381 dashboard KPI region: replace legacy cards with approved NbStat tiles and remove orphan stat CSS.
-- verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
-### T-44380 W1 — OPEN
-- target_files: frontend/app/styles/shell.css
-- contract: Repair T44379 regression: restore40px feed height required by existing behavior test; route layouts must supply red balance.
 - verify: bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
 
 ## Blocked
@@ -20,6 +20,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44380 accepted09cae83; verify0.
 - T-44378 accepted54689b4; verify0.
 - T-44379 accepted9a764f0; verify0.
 - T-44377 accepted7f62291; verify0.

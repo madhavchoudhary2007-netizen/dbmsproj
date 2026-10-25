@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 54689b4
+git_head: 09cae83
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -14,11 +14,12 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - Login T3800a3e206 COMPLETE: root80browserPASS T380.final.browser.raw.log; settled5widthvisuals reviewed; build/types/lint0 T380.build.raw.log. Authlogic/copy unchanged; mobilegeometry/keyboardfeed and calleraria-busy fixes covered.
 
 ## Active work / evidence
-- T379 exact moves: Dashboard hook/module; Sessions hooks/actions/components/module03ab0d5 plus8real-module operationtestsbd3f9c2, root120browserPASS. Steward f2ef65e root55browserPASS; Pit28eb2e1+DBMS8d44b1f root100browserPASS; Analyticsbd20525. Root105live/analyticsbrowserPASS T379-live-analytics.browser.raw.log. Only Live split remains beforeT379/T381.
-- Live exact extracted charts5c977c3, records1c47bc2, timing409d428, latestcf15b05, snapshot477af90; data7603ad3 and demoactionsad281aa staged. Demoactions7718c89 and data8a33d97 (driverIds included) wired; controls/modal171cb46, records96cabf5 wired. Lazyactioncontext57f81b3 avoids render-time refs, fourruntimecases266e518/harnessrepair20b8d27. Selectorse517c82 wired; currentrunpredicatec3d1e7c wired66bccc6. Five timing/gap/lapcap/demo/predicatetests aeb35ee rootPASS; root55updatedlivebrowserPASS T379-live-controls.browser.raw.log. Streamtypesd181250 and exactbodye66ff78 staged; Stream wired065361e; root10streambrowserPASS plus60list-poll browserPASS T379-live-list.browser.raw.log; allfourCSSlints0.
-- Backend T331 results/sessionaction/pit/DBMS/SQL/Mongo/locks/archive/laps/stewards/runtimehelpers extracted. Preserve legacy main aliases and currentcallbacklookup untilT332; removingDecision once caused7failures, fixed5ee4710. BodyAST parity independently checked for moves. No locals/proxy/class tricks.
-- Latest full backend after simulatorroutea5bb1f7:231PASS,0fail/skip/xfailed + liveacceptancePASS, T44341.full.raw.log. Earlier restore/demo/incident/pit/reset/finalization/lifecycle fulls also231/livegreen. T44341 bbbd12e tickpersistence full231PASS0skip/livePASS T44341.full.raw.log. Main980lines after CRUD/WS/simulatorrouters; root6callASTparity and11offlinePASS, fullT44359 confirms231PASS0skip/livePASS; fullT44364 confirms231PASS0skip/livePASS; fullT44372 confirms231PASS0skip/livePASS after simulaterouter; runtime24PASS using --experimental-vm-modules. Snapshot9/runtimeuniqueness2/input27/seededGET14 retained. T44274 nestedrouter testlookup repair preserved STEWARDassertion.
-- Owner worker switch implementedba3fa7c/4645e52; boot0 and freshcustom-role toolmetadata6luna/high. Prior5.6 quota retry44316 finishedbefore switch; old44318 interruptedbeforeedits. No dependencies added this continuation.
+- Worker switch implementedba3fa7c/4645e52; allcustom-role toolmetadata gpt-6-luna/high, <=2workers; freshroles succeeded repeatedly. No deps added.
+- T379 exactsplit source complete: special-pages9lines re-export7pages; live standalone149lines1af6714 andwireb0d6bcc. Dashboard/Sessions/Stewards/Pit/Analytics/DBMS source moves checked exactbytes/AST. Rootfocusedbrowser totals120sessions/55stewards/100pitDBMS/105analyticslive/60live; evidence T379*.browser.raw.log. Runtime24PASS0skip (--experimental-vm-modules), script added0752dcf; browserdiscovery remains1100cases.
+- ParentT379 remainsUNACCEPTED: build/types/lint0 T379.final-build.raw.log; full1100mocked1020PASS80FAIL. Rootfixedbodydarkboot7a6fde5, actualheadingready445b08c, residualCSSmotionac27b29. Failure-only85cases70PASS15FAIL: all5motionPASS, body/headingchecksPASS;15remainingdesktopA3surface-sharefailures belong Phase7layouts. No gates waived. Use Phase7layouttasks as parentgate repairs, rerunfull beforeaccept.
+- T44379 band64px regressed existing40px feed assertion; repaired09cae83 restoringoriginalCSS. Rootmust rerunfeed suite. No assertionchanged. Packet missed sizeinvariant; recorded honestly.
+- Backend latestT44378 runnerwire54689b4:231PASS0fail/skip/xfailed plus liveacceptancePASS, T44378.full.raw.log. CRUD/WS/simulatorroutes extracted5bba15e/a52fd5b/1d7f717/a5bb1f7; WShelpers5ac053e; runnerbody7f62291 ASTexact. Main927lines, T331<=120stillopen; mainlegacyaliases/currentcallbacklookups retained untilT332.
+- T381 KPI W1T44381 pendingreview/repair: newNbStat tones and dashboardcards plus orphan52CSSlines removed. Do not accept globalfontdefaultchange or unsafe mixedarraycasts; preserve defaults and use typedconstanttuples.
 
 ## Safety / workflow
 - Branchonly overhaul/neo-brutal; commits onlyaccept.sh, root independently reruns Verify; <=2 packet-onlycustomworkers, no model/effortoverride. Isolatedclones .agent/orchestrate.py; <=3files/150changedlines/task; normalize envelopes with actualstats.
@@ -41,23 +42,3 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44371 acceptedb0d6bcc: Activate standalone LiveTiming through compatibility export; remove obsolete local body and imports. Verify0.
 
 - T-44372 accepteda5bb1f7: Move simulator control route into API module preserving response, role dependency and late-bound callbacks. Verify0.
-
-- T379 final build/types/lint0; full mocked browser1100collected:1020PASS/80FAIL, no complete-parentaccept. Failures75body-luminance darkdocument and5reduced-motion animations. T44374 accepted7a6fde5 lightdocument; T44375 445b08c waitsactualh1. Probe traces actualfeed CSS transitions0.01ms, not devtools; T44376 makesfallbackstatic. No thresholds/tests relaxed.
-
-- T-44373 accepted0752dcf: Separate Playwright spec discovery and expose all 24 Node runtime tests through an explicit runnable script. Verify0.
-
-- T-44374 accepted7a6fde5: Use approved cream document background and ink authentication-loading text with light colour scheme. Verify0.
-
-- T-44375 accepted445b08c: Wait for actual route heading before unchanged palette, luminance and contrast measurements. Verify0.
-
-- T-44376 acceptedac27b29: Disable CSS animations and transitions completely in reduced-motion fallback, preserving static states. Verify0.
-
-- T379 failure-onlyrerun85cases:70PASS15FAIL, all5reduced-motionPASS and body/headinggatesPASS. Remaining15desktopA3surface-share failures are Phase7 layouts; parentfullgate remainsunaccepted. T379split source complete, Phase7visualrepairs resolve parentgate without skipping assertions.
-
-- T-44377 accepted7f62291: Stage exact simulation runner body with explicit dependencies, preserving tick and completion behavior. Verify0.
-
-- T-44379 accepted9a764f0: Give desktop race-control feed a readable64px band while preserving mobile layout and existing behavior. Verify0.
-
-- T-44378 accepted54689b4: Activate extracted simulation runner with late-bound helper callbacks and invocation-time clock values. Verify0.
-
-- T44379 desktopband change broke existing fixed40px feed assertion (64received). Rootcaught, repairingT44380withoutassertionchanges; palettebalance belongsPhase7route layouts. Rootpacket missed testedsize invariant.

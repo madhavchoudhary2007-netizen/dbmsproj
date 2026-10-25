@@ -458,45 +458,6 @@ tbody tr:hover {
     transform: rotate(360deg);
   }
 }
-.stat-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-bottom: 16px;
-}
-.stat-card {
-  border: 1px solid var(--line);
-  background: var(--panel);
-  padding: 16px;
-  min-height: 115px;
-  position: relative;
-}
-.stat-card:after {
-  content: "";
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 34px;
-  height: 2px;
-  background: #657529;
-}
-.stat-card span {
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-size: 9px;
-  color: #8a949f;
-  display: block;
-}
-.stat-card b {
-  display: block;
-  font-size: 30px;
-  font-weight: 500;
-  margin: 12px 0 4px;
-}
-.stat-card small {
-  font-size: 9px;
-  color: var(--muted);
-}
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -979,9 +940,6 @@ tbody tr:hover {
   .content {
     padding: 24px 24px 48px;
   }
-  .stat-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
   .sidebar {
     width: var(--sidebar-width);
   }
@@ -1067,16 +1025,6 @@ tbody tr:hover {
   }
   .dashboard-grid {
     grid-template-columns: 1fr;
-  }
-  .stat-grid {
-    gap: 8px;
-  }
-  .stat-card {
-    padding: 12px;
-    min-height: 100px;
-  }
-  .stat-card b {
-    font-size: 25px;
   }
   .snapshot-strip {
     grid-template-columns: repeat(2, 1fr);
