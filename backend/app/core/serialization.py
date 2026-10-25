@@ -1,5 +1,5 @@
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 from bson import ObjectId
@@ -25,4 +25,4 @@ def telemetry_ws_payload(packet: dict[str, Any], inserted_id: ObjectId | str) ->
     """Build a JSON-safe telemetry packet without leaking Mongo's `_id`."""
     payload = {key: value for key, value in packet.items() if key != "_id"}
     payload["id"] = str(inserted_id)
-    return jsonable(payload)
+    return cast(dict[str, Any], jsonable(payload))

@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: a939d11
+git_head: 4019403
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -40,3 +40,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44460 acceptede5c4a2a: Cover row Edit click/keyboard and Delete cancellation boundaries, exact record values, single dialog/primary restoration and zero writes. Verify0.
 
 - T-44461 accepteda939d11: Wire native field errors through NbField with blur/invalid validation and change revalidation; preserve all value conversions and save behavior. Verify0.
+
+- T-44462 accepted4019403: Exercise actual field-validation hook using queued functional state updates, call-time native snapshots, error clearing/preservation and no-op identity. Verify0.
