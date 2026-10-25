@@ -145,6 +145,7 @@ from .simulation_core import calculate_sector_performance as calculate_sector_pe
 from .simulation_finish import finalize_results
 from .simulation_incidents import record_generated_incidents
 from .simulation_lifecycle import sync_lifecycle
+from .simulation_persist import persist_tick
 from .simulation_pit import (
     cancel_automatic_reservations,
     refresh_pit_state,
@@ -781,16 +782,15 @@ def _persist_simulation_tick(
     packets: list[dict[str, Any]],
     timing: dict[str, Any],
 ) -> None:
-    for packet in packets:
-        inserted = col.insert_one(dict(packet))
-        publish(
-            sim.session_id,
-            "telemetry.sample",
-            telemetry_ws_payload(packet, inserted.inserted_id),
-        )
-    publish(sim.session_id, "timing.update", timing)
-    schedule_simulation_pit_stops(sim, packets)
-    record_simulated_incidents(sim, packets)
+    persist_tick(
+        col,
+        sim,
+        packets,
+        timing,
+        publish,
+        schedule_simulation_pit_stops,
+        record_simulated_incidents,
+    )
 
 
 async def simulation_loop(sim: Simulation):
