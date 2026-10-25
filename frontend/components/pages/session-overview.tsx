@@ -57,7 +57,7 @@ export function SessionOverview({
       </NbCard>
       <NbCard tone="paper" className="min-w-0">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <span className="record-count text-[length:var(--fs-label)]">{rows.length} SESSIONS</span>
+          <span className="record-count session-count-sticker">{rows.length} SESSIONS</span>
           <NbButton variant="secondary" onClick={retry} aria-label="Refresh">Refresh</NbButton>
         </div>
         <NbTable

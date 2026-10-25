@@ -13,11 +13,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T386 remove obsolete simulator CSS and correct the session count layout to meet unchanged desktop palette bands.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
-### T-44522 W3 — OPEN
-- target_files: frontend/e2e/session-flow.spec.ts
-- contract: T386 add focused mocked Sessions lifecycle, simulator, native modal and result-flow browser coverage.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && cd frontend && npx playwright test e2e/session-flow.spec.ts --list
-
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
 
@@ -28,6 +23,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44522 accepted0935ce7; verify0.
 - T-44523 accepted9a68302; verify0.
 - T-44520 accepted2e68037; verify0.
 - T-44521 accepted3f2d1fc; verify0.
