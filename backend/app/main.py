@@ -18,6 +18,7 @@ from typing import Any
 from uuid import UUID as UUID
 from uuid import uuid4 as uuid4
 
+import jwt as jwt
 from fastapi import (
     Depends,
     FastAPI,
