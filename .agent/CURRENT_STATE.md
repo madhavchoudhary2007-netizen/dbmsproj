@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: a13ec92
+git_head: 7ae0ac6
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -42,3 +42,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 
 - T382 finalmembership25browserPASS T382-memberships-gate.browser.raw.log incl5states/currentdates/nestedfocus/responsive/axe; all45editor+30primitivecasesPASS. Prior360resourcepagecasesPASS. Latestprodsourcebuild0 T382-memberships-build.raw.log predatesnativeclose/finalCSS, finalbuildstillrequired.
 - T383 header/yellowhero/paperracecards/nativeDelete implemented1d68f7b. Root50route/axe/primary/target/responsivePASS T383-header-cards.browser.raw.log. Newstrictmutationtests T383-demo-before expose20POST/20DELETE instead1; W2persistentguard pendingaccept. Five-state list/sourceflags next.
+
+- T-44484 accepted7ae0ac6: Synchronously guard generated-race create/delete across recreated action factories using one persistent ref, releasing in finally and preserving existing API/reset/retry behavior. Verify0.

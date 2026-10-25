@@ -1,0 +1,54 @@
+diff --git a/frontend/e2e/live-demo-actions.spec.ts b/frontend/e2e/live-demo-actions.spec.ts
+index 4bbb6ee..c54381b 100644
+--- a/frontend/e2e/live-demo-actions.spec.ts
++++ b/frontend/e2e/live-demo-actions.spec.ts
+@@ -73,7 +73,8 @@ test("creates a generated race and shows its timing option and metadata", async
+   await expect(create).toHaveAttribute("data-primary", "true");
+   await create.click();
+ 
+-  await expect(page.getByText("Apex Demo", { exact: true })).toBeVisible();
++  await expect(page.locator(".demo-race-name")).toHaveText("Apex Demo");
++  await expect(page.locator('[data-primary="true"]')).toHaveCount(1);
+   await expect(page.getByText(/Test Circuit · 12 cars · 56 laps/)).toBeVisible();
+   await expect(page.getByRole("option", { name: /Apex Demo/ })).toHaveCount(1);
+   await expect(page.locator('.notice[role="status"]')).toContainText("Apex Demo is live with 12 cars.");
+@@ -90,12 +91,15 @@ test("keeps or confirms deletion through the generated race confirmation", async
+   await openDelete.click();
+   await page.getByRole("button", { name: "Keep race", exact: true }).click();
+   await expect(page.getByRole("dialog", { name: "Delete generated race?" })).toHaveCount(0);
++  await expect(page.locator('[data-primary="true"]')).toHaveCount(1);
+   await openDelete.click();
+   await page.keyboard.press("Escape");
+   await expect(page.getByRole("dialog", { name: "Delete generated race?" })).toHaveCount(0);
++  await expect(page.locator('[data-primary="true"]')).toHaveCount(1);
+   expect(api.counts().deleteCount).toBe(0);
+ 
+   await openDelete.click();
++  await expect(page.locator('[data-primary="true"]')).toHaveCount(1);
+   const confirm = page.getByRole("button", { name: "Delete race", exact: true });
+   await expect(confirm).toHaveCount(1);
+   await expect(confirm).toHaveAttribute("data-primary", "true");
+@@ -104,6 +108,7 @@ test("keeps or confirms deletion through the generated race confirmation", async
+   const create = page.getByRole("button", { name: "Create live race", exact: true });
+   await expect(create).toHaveCount(1);
+   await expect(create).toHaveAttribute("data-primary", "true");
++  await expect(page.locator('[data-primary="true"]')).toHaveCount(1);
+   expect(api.counts().deleteCount).toBe(1);
+   api.assertClean();
+ });
+@@ -114,6 +119,7 @@ test("same-frame Create clicks issue exactly one POST", async ({ page }) => {
+   await expect(create).toHaveCount(1);
+   await clickSameFrame(page, create);
+   await expect(page.locator('.notice[role="status"]')).toContainText("Apex Demo is live with 12 cars.");
++  await expect(page.locator('[data-primary="true"]')).toHaveCount(1);
+   expect(api.counts().postCount).toBe(1);
+   expect(api.posted).toEqual([{}]);
+   api.assertClean();
+@@ -124,6 +130,7 @@ test("same-frame confirmation clicks issue exactly one DELETE", async ({ page })
+   await page.getByRole("button", { name: "Delete Apex Demo s1", exact: true }).click();
+   const confirm = page.getByRole("button", { name: "Delete race", exact: true });
+   await expect(confirm).toHaveCount(1);
++  await expect(page.locator('[data-primary="true"]')).toHaveCount(1);
+   await clickSameFrame(page, confirm);
+   await expect(page.getByRole("dialog", { name: "Delete generated race?" })).toHaveCount(0);
+   expect(api.counts().deleteCount).toBe(1);
