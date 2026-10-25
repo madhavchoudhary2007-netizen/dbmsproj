@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 445b08c
+git_head: ac27b29
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -49,3 +49,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44374 accepted7a6fde5: Use approved cream document background and ink authentication-loading text with light colour scheme. Verify0.
 
 - T-44375 accepted445b08c: Wait for actual route heading before unchanged palette, luminance and contrast measurements. Verify0.
+
+- T-44376 acceptedac27b29: Disable CSS animations and transitions completely in reduced-motion fallback, preserving static states. Verify0.
+
+- T379 failure-onlyrerun85cases:70PASS15FAIL, all5reduced-motionPASS and body/headinggatesPASS. Remaining15desktopA3surface-share failures are Phase7 layouts; parentfullgate remainsunaccepted. T379split source complete, Phase7visualrepairs resolve parentgate without skipping assertions.
