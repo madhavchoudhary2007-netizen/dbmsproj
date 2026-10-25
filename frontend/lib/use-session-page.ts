@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Row } from "@/lib/api";
 import { useAuth } from "@/components/auth";
 import { useSessionData } from "@/lib/use-session-data";
@@ -17,6 +17,8 @@ export function useSessionPage() {
   const [resultModal, setResultModal] = useState(false),
     [editModal, setEditModal] = useState(false),
     [resultsLoaded, setResultsLoaded] = useState(false),
+    [resultsLoading, setResultsLoading] = useState(false),
+    [resultsError, setResultsError] = useState(""),
     [selected, setSelected] = useState(""),
     [actionMsg, setActionMsg] = useState(""),
     [modal, setModal] = useState(false),
@@ -27,6 +29,12 @@ export function useSessionPage() {
     [simMessage, setSimMessage] = useState(""),
     [results, setResults] = useState<Row[]>([]);
   const { rows, events, drivers, err, loading, load } = useSessionData();
+  const resultsRequest = useRef<AbortController | null>(null);
+  const resultsRequestId = useRef(0);
+  const selectedRef = useRef(selected);
+  useLayoutEffect(() => {
+    selectedRef.current = selected;
+  }, [selected]);
   const { user } = useAuth();
   const canManage = user?.role === "ADMIN";
   const canControl = user?.role === "ADMIN" || user?.role === "STEWARD";
@@ -50,8 +58,29 @@ export function useSessionPage() {
     );
   const simulate = async (action: string) =>
     simulateSession(action, selected, setSimMessage, simCars, simRate, load);
-  const getResults = async () =>
-    readSessionResults(selected, setResults, setResultsLoaded, setSimMessage);
+  useEffect(() => {
+    setResultsLoading(false);
+    setResultsError("");
+    return () => {
+      resultsRequest.current?.abort();
+      resultsRequest.current = null;
+      resultsRequestId.current += 1;
+    };
+  }, [selected]);
+  const getResults = async () => {
+    if (!selected) return;
+    resultsRequest.current?.abort();
+    const controller = new AbortController();
+    resultsRequest.current = controller;
+    const requestId = ++resultsRequestId.current;
+    await readSessionResults(selected, setResults, setResultsLoaded, setSimMessage, {
+      signal: controller.signal,
+      isCurrent: () =>
+        resultsRequestId.current === requestId && selectedRef.current === selected,
+      setResultsLoading,
+      setResultsError,
+    });
+  };
   const fields = [
     {
       name: "event_id",
@@ -96,6 +125,8 @@ export function useSessionPage() {
     editModal,
     setEditModal,
     resultsLoaded,
+    resultsLoading,
+    resultsError,
     setResultsLoaded,
     selected,
     setSelected,

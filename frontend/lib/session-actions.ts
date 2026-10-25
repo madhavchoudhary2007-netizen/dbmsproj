@@ -51,12 +51,28 @@ export async function readSessionResults(
   setResults: (value: Row[]) => void,
   setResultsLoaded: (value: boolean) => void,
   setSimMessage: (value: string) => void,
+  options: {
+    signal?: AbortSignal;
+    isCurrent?: () => boolean;
+    setResultsLoading?: (value: boolean) => void;
+    setResultsError?: (value: string) => void;
+  } = {},
 ) {
   if (!selected) return;
+  const { signal, isCurrent = () => true, setResultsLoading, setResultsError } = options;
+  setResultsError?.("");
+  setResultsLoading?.(true);
   try {
-    setResults(asArray(await api(`/sessions/${selected}/results`)));
+    const results = asArray(await api(`/sessions/${selected}/results`, { signal }));
+    if (!isCurrent()) return;
+    setResults(results);
     setResultsLoaded(true);
   } catch (e) {
-    setSimMessage(e instanceof Error ? e.message : "Results request failed");
+    if (!isCurrent() || (e instanceof Error && e.name === "AbortError")) return;
+    const message = e instanceof Error ? e.message : "Results request failed";
+    setResultsError?.(message);
+    setSimMessage(message);
+  } finally {
+    if (isCurrent()) setResultsLoading?.(false);
   }
 }

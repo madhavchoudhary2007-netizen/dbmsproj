@@ -3,6 +3,11 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44529 W1 — OPEN
+- target_files: frontend/components/pages/stewards.tsx, frontend/components/pages/steward-report.tsx, frontend/components/pages/steward-cases.tsx
+- contract: T387 restyle the steward header and native decision/report modal while preserving exact decision semantics.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+
 ### T-44528 W3 — OPEN
 - target_files: frontend/e2e/session-flow.spec.ts
 - contract: T386 correct result dialog fixture labels and expected formatted/typed result values.
@@ -11,11 +16,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 ### T-44526 W2 — OPEN
 - target_files: frontend/lib/use-session-page.ts, frontend/lib/session-actions.ts
 - contract: T386 expose truthful result loading/error and suppress stale result responses after selection changes or unmount.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
-
-### T-44525 W1 — OPEN
-- target_files: frontend/components/pages/stewards.tsx, frontend/components/pages/steward-cases.tsx
-- contract: T387 replace the incident list with accessible paper case files while preserving selection and all original fields.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Blocked
@@ -28,6 +28,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44525 acceptedb301b9c; verify0.
 - T-44524 accepted4666958; verify0.
 - T-44522 accepted0935ce7; verify0.
 - T-44523 accepted9a68302; verify0.
