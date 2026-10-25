@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 409d428
+git_head: eeeb579
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high (latest owner override2026-10-25), cap2
@@ -19,7 +19,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T379 Dashboard exactmodule/hook complete; Sessions exactmodule/hooks/components complete03ab0d5 and8actual-module operation tests bd3f9c2. Root120dashboard/sessionbrowserPASS T379-sessions.browser.raw.log. Steward hook3989f9d,reportf51818a,sanctions0f39a4b,module7bc73c9 wiredf2ef65e; byte-identical page/body verified. Root55stewardbrowserPASS T379-stewards.browser.raw.log. Only Live split remains beforeT379/T381; Analytics move underreview.
 - T331 latest incidentsb0972ed and pit cancellation45cbcad full231PASS0skip/livePASS T44312/T44314.full.raw.log. Reset helper e0e553d and finalizationdc23dbc ASTexact; both full231PASS/0skip/livePASS T44317/T44322.full.raw.log. Main1160lines. Naming parity12seed/countchecks, restore/demo/pit scheduling previousfulls green. Transitional main wrappers/callback injection preserve tests pendingT332.
 - Owner latest switch gpt-6-luna/high: profiles ba3fa7c/4645e52; boot0; fresh custom W1/W2 toolmetadata confirm6luna/high. Prior5.6 usage-limit worker44316 retry returnedvalidbefore switch; 44318 oldworker interrupted before edits. Root44319 firstverify had shellquotingerror; corrected using shlex.quote, rerunaccept0; erroneous premature mark removed beforecommit.
-- DBMS exactmove8d44b1f and pit hook3b7ca06 wired a54f000 root100pit/DBMSbrowserPASS. Chart staged480ae39 wired5c977c3; Analytics hook33b3818 and PitPagec0c4f52 staged. Pit export28eb2e1 and Analytics hookwiree99a00d accepted; lifecyclefa95df4 full231PASS0skip/livePASS. Records1c47bc2 and demoactionsad281aa accepted, exactbody parity. Analyticsbd20525 accepted; resetbc41f81 ASTexact and17offlinePASS, fullinprogress. Active W1T44335timingtower/W2T44336starthelper, disjoint. Rootlive/analytics browserrunning. At most2active workers. Allresults/patches/acceptlogs inGit/.agent/results.
+- DBMS exactmove8d44b1f and pit hook3b7ca06 wired a54f000 root100pit/DBMSbrowserPASS. Chart staged480ae39 wired5c977c3; Analytics hook33b3818 and PitPagec0c4f52 staged. Pit export28eb2e1 and Analytics hookwiree99a00d accepted; lifecyclefa95df4 full231PASS0skip/livePASS. Records1c47bc2 and demoactionsad281aa accepted, exactbody parity. Analyticsbd20525 accepted; resetbc41f81 ASTexact and17offlinePASS, fullinprogress. Active W1T44335timingtower/W2T44336starthelper, disjoint. Root105live/analyticsbrowserPASS T379-live-analytics.browser.raw.log; resetbc41f81 full231PASS0skip/livePASS T44334.full.raw.log. Starthelper eeeb579 stagedASTexact. ActiveW1T44338latestpanel/W2T44337deriveddata, disjoint; extra source418–423 authorized for1line offset. Allresults/patches/acceptlogs inGit/.agent/results.
 
 ## Safety / workflow
 - Branch only overhaul/neo-brutal; commits only accept.sh, independently rerun exact Verify; max2 custom-role packet-only workers, no model/effort overrides. Isolated clones via .agent/orchestrate.py; <=3files/150 changedlines/task. Metadata state/envelopes normalized with realstats and integercounts.
@@ -46,5 +46,3 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 
 - T44334 firstverifyFAILED exit5: root -k reset selected0tests. Corrected to existing lifecycle reset+stop tests; no assertion change. Discarded only isolated taskfiles, re-dispatchonce perprotocol.
 
-
-- T-44335 accepted409d428: Extract exact timing tower panel, preserving fallback values, column order, empty copy and state classes. Verify0.
