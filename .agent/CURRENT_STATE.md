@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 7bc73c9
+git_head: e0e553d
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-5.6-luna/high (owner override2bc94fb), cap2
@@ -42,3 +42,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44314 accepted45cbcad: Move exact automatic pit cancellation persistence into simulation_pit; preserve wrapper, SQL and publications. Verify0.
 
 - T-44315 accepted7bc73c9: Stage standalone StewardDesk with byte-identical function body and required imports. Verify0.
+
+- T-44317 acceptede0e553d: Extract exact reset eligibility and measurement clearing bodies; preserve guards, SQL and postcommit pit publications. Verify0.
