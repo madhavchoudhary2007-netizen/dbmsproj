@@ -1,0 +1,33 @@
+diff --git a/frontend/app/globals.css b/frontend/app/globals.css
+index 633f590..130ce67 100644
+--- a/frontend/app/globals.css
++++ b/frontend/app/globals.css
+@@ -2,8 +2,8 @@
+ @import './styles/textures.css';
+ @import './styles/components.css';
+ :root {
+-  color-scheme: dark;
+-  --bg: #0b0e12;
++  color-scheme: light;
++  --bg: var(--color-cream);
+   --panel: #11161c;
+   --line: #252c34;
+   --text: #eef1f4;
+@@ -564,7 +564,7 @@ tbody tr:hover {
+   display: grid;
+   place-items: center;
+   align-content: center;
+-  color: var(--acid);
++  color: var(--color-ink);
+   font-weight: 800;
+   letter-spacing: 2px;
+ }
+@@ -572,7 +572,7 @@ tbody tr:hover {
+   display: block;
+   font-size: 10px;
+   font-weight: 400;
+-  color: var(--muted);
++  color: var(--color-ink);
+   margin-top: 12px;
+   letter-spacing: 0;
+ }
