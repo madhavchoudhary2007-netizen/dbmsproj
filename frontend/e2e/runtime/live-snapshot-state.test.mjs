@@ -1,0 +1,132 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import * as vm from "node:vm";
+
+const require = createRequire(import.meta.url);
+const ts = require("../../node_modules/typescript");
+const source = readFileSync(new URL("../../lib/live-stream.ts", import.meta.url), "utf8");
+
+async function load(session = "race-1") {
+  const requests = [], sockets = [], timers = [];
+  class FakeWebSocket {
+    constructor(url) { this.url = url; this.closeCount = 0; sockets.push(this); }
+    close() { this.closeCount++; }
+  }
+  const context = vm.createContext({ Error, WebSocket: FakeWebSocket,
+    setTimeout: fn => (timers.push(fn), timers.length), clearTimeout: id => timers.push(["clear", id]) });
+  const output = ts.transpileModule(source, { compilerOptions: {
+    module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022,
+  }}).outputText;
+  const api = new vm.SyntheticModule(["api", "asArray", "API_BASE"], function () {
+    this.setExport("api", path => new Promise((resolve, reject) => requests.push({ path, resolve, reject })));
+    this.setExport("asArray", value => Array.isArray(value) ? value : []);
+    this.setExport("API_BASE", "http://offline.test");
+  }, { context });
+  const timing = new vm.SyntheticModule(["belongsToLiveRun"], function () {
+    this.setExport("belongsToLiveRun", () => true);
+  }, { context });
+  const sourceModule = new vm.SourceTextModule(output, { context });
+  await sourceModule.link(specifier => {
+    if (specifier === "./api") return api;
+    if (specifier === "./live-timing-data") return timing;
+    throw new Error(`Unexpected import: ${specifier}`);
+  });
+  await sourceModule.evaluate();
+  const calls = { views: [], snapshots: [], drivers: [], clears: [], errors: [], statuses: [], writes: [] };
+  const retry = { current: null };
+  let snapshot = null;
+  const setSnapshot = value => {
+    snapshot = typeof value === "function" ? value(snapshot) : value;
+    calls.snapshots.push(snapshot);
+    calls.writes.push("snapshot");
+  };
+  const write = name => () => calls.writes.push(name);
+  const stop = sourceModule.namespace.startLiveStream({ session, retry, snapshotRetry: retry,
+    clearError: value => calls.clears.push(value), reportError: (...v) => calls.errors.push(v),
+    setStatus: value => { calls.statuses.push(value); calls.writes.push("status"); }, setSessionDrivers: value => { calls.drivers.push(value); calls.writes.push("drivers"); },
+    setPackets: write("packets"), setCompletedLaps: write("laps"), setLiveIncidents: write("incidents"), setLivePitStops: write("pits"), setTiming: write("timing"),
+    setSnapshot, setSnapshotView: value => { calls.views.push(value); calls.writes.push("view"); } });
+  return { calls, requests, sockets, timers, retry, stop };
+}
+
+const flush = async () => { await Promise.resolve(); await Promise.resolve(); };
+const assertView = (actual, loading, error) => {
+  assert.equal(actual.loading, loading);
+  assert.equal(actual.error, error);
+};
+
+test("missing session settles empty without network or socket", async () => {
+  const h = await load("");
+  assert.equal(h.stop, undefined);
+  assertView(h.calls.views[0], false, "");
+  assert.equal(h.requests.length, 0);
+  assert.equal(h.sockets.length, 0);
+});
+
+test("selected session loads and commits the actual snapshot", async () => {
+  const h = await load();
+  assertView(h.calls.views[0], true, "");
+  assert.deepEqual(h.calls.writes, ["status", "view", "drivers", "packets", "timing", "snapshot"]);
+  assert.deepEqual(h.requests.map(r => r.path), ["/sessions/race-1/live"]);
+  const rows = [{ id: 7 }];
+  h.requests[0].resolve({ session: { id: "race-1", state: "RUNNING" }, drivers: rows, packets: [] });
+  await flush();
+  assertView(h.calls.views.at(-1), false, "");
+  assert.deepEqual(h.calls.drivers.at(-1), rows);
+  assert.equal(h.calls.snapshots.at(-1).id, "race-1");
+});
+
+test("snapshot error reports its message and retry performs one exact GET then clears it", async () => {
+  const h = await load();
+  h.requests[0].reject(new Error("snapshot offline"));
+  await flush();
+  assert.deepEqual(h.calls.errors, [["snapshot", "snapshot offline"]]);
+  assertView(h.calls.views.at(-1), false, "snapshot offline");
+  h.retry.current();
+  assert.deepEqual(h.requests.map(r => r.path), ["/sessions/race-1/live", "/sessions/race-1/live"]);
+  h.requests[1].resolve({ session: { id: "race-1" }, drivers: [], packets: [] });
+  await flush();
+  assert.deepEqual(h.calls.clears, ["snapshot"]);
+  assertView(h.calls.views.at(-1), false, "");
+});
+
+test("overlapping refresh ignores stale success and failure", async () => {
+  for (const staleFailure of [false, true]) {
+    const h = await load();
+    h.retry.current();
+    const before = h.calls.snapshots.length;
+    if (staleFailure) h.requests[0].reject(new Error("stale"));
+    else h.requests[0].resolve({ session: { id: "stale" }, drivers: [], packets: [] });
+    await flush();
+    assert.equal(h.calls.snapshots.length, before);
+    assert.equal(h.calls.views.length, 1);
+    h.requests[1].resolve({ session: { id: "current" }, drivers: [], packets: [] });
+    await flush();
+    assert.equal(h.calls.snapshots.at(-1).id, "current");
+    assert.equal(h.calls.views.length, 2);
+  }
+});
+
+test("cleanup ignores pending results and an old cleanup preserves newer retry", async () => {
+  const first = await load();
+  const oldRetry = first.retry.current;
+  const writes = first.calls.writes.length;
+  first.stop();
+  assert.equal(first.retry.current, null);
+  first.requests[0].resolve({ session: { id: "late" }, drivers: [], packets: [] });
+  await flush();
+  assert.equal(first.calls.writes.length, writes);
+
+  const older = await load();
+  const newer = await load();
+  const newRetry = newer.retry.current;
+  assert.notEqual(oldRetry, newRetry);
+  older.retry.current = newRetry;
+  older.stop();
+  assert.equal(older.retry.current, newRetry);
+  assert.equal(newer.retry.current, newRetry);
+  newer.stop();
+  assert.equal(newer.retry.current, null);
+});
