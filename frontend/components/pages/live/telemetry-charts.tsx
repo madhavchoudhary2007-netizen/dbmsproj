@@ -48,7 +48,7 @@ export function TelemetryCharts({
             ["lap_time_ms", "Lap time · ms"],
             ["tire_wear_pct", "Tire wear · %"],
           ].map(([key, title]) => (
-            <NbChartFrame key={key} title={title} state={state} empty="Waiting for timing and telemetry packets from this session." description="SELECTED DRIVER TELEMETRY" sourceMessage={error || undefined} className="min-w-0">
+            <NbChartFrame key={key} title={title} state={state} empty="Waiting for timing and telemetry packets from this session." description="SELECTED DRIVER TELEMETRY" sourceMessage={error || undefined} partialActionLabel="Retry snapshot" partialActionAriaLabel="Retry snapshot" className="min-w-0">
               {(data) => <div className="chart min-w-0">
                 <ResponsiveContainer width="100%" height={190}>
                   <LineChart
@@ -90,7 +90,7 @@ export function TelemetryCharts({
             </NbChartFrame>
           ))}
           {hasTireTemperatures && (
-            <NbChartFrame title="Tire temperatures · °C" state={state} empty="Waiting for timing and telemetry packets from this session." description="SELECTED DRIVER TELEMETRY" sourceMessage={error || undefined} className="min-w-0">
+            <NbChartFrame title="Tire temperatures · °C" state={state} empty="Waiting for timing and telemetry packets from this session." description="SELECTED DRIVER TELEMETRY" sourceMessage={error || undefined} partialActionLabel="Retry snapshot" partialActionAriaLabel="Retry snapshot" className="min-w-0">
               {(data) => <div className="chart min-w-0">
                 <dl className="mb-4 grid min-w-0 grid-cols-2 gap-3 sm:grid-cols-4">
                   {(["temp_fl", "temp_fr", "temp_rl", "temp_rr"] as const).map((key, index) => {

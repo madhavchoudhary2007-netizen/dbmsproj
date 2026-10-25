@@ -57,6 +57,8 @@ export type NbChartFrameProps<T> = {
   className?: string;
   sourceMessage?: string;
   description?: string;
+  partialActionLabel?: string;
+  partialActionAriaLabel?: string;
 };
 
 export function NbChartFrame<T>({
@@ -67,6 +69,8 @@ export function NbChartFrame<T>({
   className,
   sourceMessage,
   description,
+  partialActionLabel,
+  partialActionAriaLabel,
 }: NbChartFrameProps<T>) {
   const chartState =
     state.status === "loading" ? (
@@ -74,7 +78,7 @@ export function NbChartFrame<T>({
         <NbSkeleton variant="chart" />
       </div>
     ) : (
-      <NbState state={state} empty={empty} sourceMessage={sourceMessage} className="mt-4">
+      <NbState state={state} empty={empty} sourceMessage={sourceMessage} partialActionLabel={partialActionLabel} partialActionAriaLabel={partialActionAriaLabel} className="mt-4">
         {(data) => (
           <div role="img" aria-label={title}>
             {children(data)}
