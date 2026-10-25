@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: cc18c4b
+git_head: 92a9018
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -37,16 +37,4 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - E5partial legacyselector/aria regression fixed3226b70; invalidincidents{} crash fixed1924d64/testda48958. Rootinterruptedknown-failingbroadrun130exit, cleanedownNext/restorednext-env; later135PASS. Newfixture StrictMode/duplicate-text selectors fixedwithout weakening assertions. W3T44406 153linefile repaired150; T44414 extra type-onlyimport restored toboundary.
 - T381 health ink/plinthface Taste defects fixed5a0ad53 andbrowserprovedd018de6. Remaining fourKPIaccents vsT400max3 TASTE-381-1 mustresolvebeforeA5. Servicehealth source rows notyetcomplete. History/results retain repair details.
 
-- T-44415 accepted2676edf: Import-only platform fixture adoption; byte-exact original feed test bodies and all 40px/polling assertions preserved. Verify0.
-
-- T-44416 accepted3cc777a: Execute actual readiness/WebSocket URL helpers in VM; reject malformed and inconsistent status contracts, preserve observed up/down. Verify0.
-
-- T-44417 accepted93b90e0: Service-health card now shows observed WebSocket and runtime-lease states with truthful pending/idle/error labels and scoped lease retry. Verify0.
-
-- T-44418 accepted304c32b: Prepare injected membership repository sessions and get_database dependency; current callers retain unchanged SQL and temporary fallback. Verify0.
-
-- T-44419 accepted18baed1: Add mocked readiness and WebSocket lifecycle regressions; retain strict health contrast assertions for all four observed healthy sources. Verify0.
-
-- T-44421 accepted3b54092: Move test cookie setup to TestClient cookie jar; preserve every assertion and request order while treating deprecation warnings as errors. Verify0.
-
-- T-44420 acceptedcc18c4b: Adopt request-scoped auth and database dependencies in all four membership handlers; preserve paths, body models, serialization and errors. Verify0.
+- Latest accepted: T44415–21 platformmocks, connectivityhelpers/UI/browser, membershipDI and cookie-warningcleanup; evidence Git/results. Backend243PASS0skip/livePASS T44420.full.raw.log.

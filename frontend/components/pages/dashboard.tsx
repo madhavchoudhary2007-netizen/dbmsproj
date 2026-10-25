@@ -15,6 +15,7 @@ import { useDashboardConnectivity } from "@/lib/use-dashboard-connectivity";
 export function Dashboard() {
   const { state: incidentsState, reload: reloadIncidents } = useDashboardIncidents();
   const { data, health, err, healthError, state, fetchData } = useDashboard();
+  const activeSession = data?.active_session;
   const activeSessionId = typeof data?.active_session?.id === "string" ? data.active_session.id : undefined;
   const connectivity = useDashboardConnectivity(activeSessionId);
   return (
@@ -50,13 +51,38 @@ export function Dashboard() {
                   <i /> LIVE DATA
                 </span>
               </div>
-              {data.active_session ? (
-                Object.entries(data.active_session).map(([k, v]) => (
-                  <div className="detail-row" key={k}>
-                    <span>{k.replaceAll("_", " ")}</span>
-                    <b>{pretty(v)}</b>
+              {activeSession ? (
+                <>
+                  <div className="race-weekend-fields">
+                    {([
+                      ["event_name", "Event"],
+                      ["circuit_name", "Circuit"],
+                      ["session_type", "Session"],
+                    ] as const).map(([key, label]) => (
+                      <div className="race-weekend-field" key={key}>
+                        <span>{label}</span>
+                        <b>{Object.prototype.hasOwnProperty.call(activeSession, key)
+                          ? pretty(activeSession[key])
+                          : "Not returned"}</b>
+                      </div>
+                    ))}
                   </div>
-                ))
+                  <div className="race-weekend-status">
+                    <span>State</span>
+                    <b>{Object.prototype.hasOwnProperty.call(activeSession, "state")
+                      ? pretty(activeSession.state)
+                      : "Not returned"}</b>
+                  </div>
+                  <details className="race-weekend-details">
+                    <summary>Session details</summary>
+                    {Object.entries(activeSession).map(([k, v]) => (
+                      <div className="detail-row" key={k}>
+                        <span>{k.replaceAll("_", " ")}</span>
+                        <b>{pretty(v)}</b>
+                      </div>
+                    ))}
+                  </details>
+                </>
               ) : (
                 <p className="muted">
                   No active or paused session is currently returned by the API.

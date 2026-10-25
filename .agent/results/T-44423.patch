@@ -1,0 +1,77 @@
+diff --git a/frontend/app/styles/dashboard.css b/frontend/app/styles/dashboard.css
+index 4762c51..e9ac67a 100644
+--- a/frontend/app/styles/dashboard.css
++++ b/frontend/app/styles/dashboard.css
+@@ -26,6 +26,15 @@
+ .nb-shell .dashboard-overview-main { display: grid; min-width: 0; align-content: start; gap: 24px; }
+ .nb-shell .dashboard-health-card { min-width: 0; align-self: start; }
+ .nb-shell .dashboard-context-card { padding: 12px; }
++.nb-shell .race-weekend-fields { display: grid; min-width: 0; gap: 12px; }
++.nb-shell .race-weekend-field { min-width: 0; padding: 8px 0; }
++.nb-shell .race-weekend-field span,
++.nb-shell .race-weekend-status span { display: block; font-size: 0.875rem; font-weight: 700; text-transform: uppercase; }
++.nb-shell .race-weekend-field b { display: block; overflow-wrap: anywhere; font-size: 1.25rem; }
++.nb-shell .race-weekend-status { display: flex; min-height: 44px; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; border: 1px solid var(--nb-ink); padding: 8px 12px; background: var(--nb-mint); }
++.nb-shell .race-weekend-status b { overflow-wrap: anywhere; }
++.nb-shell .race-weekend-details { margin-top: 12px; }
++.nb-shell .race-weekend-details summary { display: flex; min-height: 44px; align-items: center; cursor: pointer; font-weight: 700; }
+ .nb-shell .dashboard-next-card, .nb-shell .dashboard-incidents-card { padding: 8px; }
+ .nb-shell .dashboard-health-card .green,
+ .nb-shell .dashboard-health-card .red {
+diff --git a/frontend/components/pages/dashboard.tsx b/frontend/components/pages/dashboard.tsx
+index 69ff33a..0be4899 100644
+--- a/frontend/components/pages/dashboard.tsx
++++ b/frontend/components/pages/dashboard.tsx
+@@ -15,6 +15,7 @@ import { useDashboardConnectivity } from "@/lib/use-dashboard-connectivity";
+ export function Dashboard() {
+   const { state: incidentsState, reload: reloadIncidents } = useDashboardIncidents();
+   const { data, health, err, healthError, state, fetchData } = useDashboard();
++  const activeSession = data?.active_session;
+   const activeSessionId = typeof data?.active_session?.id === "string" ? data.active_session.id : undefined;
+   const connectivity = useDashboardConnectivity(activeSessionId);
+   return (
+@@ -50,13 +51,38 @@ export function Dashboard() {
+                   <i /> LIVE DATA
+                 </span>
+               </div>
+-              {data.active_session ? (
+-                Object.entries(data.active_session).map(([k, v]) => (
+-                  <div className="detail-row" key={k}>
+-                    <span>{k.replaceAll("_", " ")}</span>
+-                    <b>{pretty(v)}</b>
++              {activeSession ? (
++                <>
++                  <div className="race-weekend-fields">
++                    {([
++                      ["event_name", "Event"],
++                      ["circuit_name", "Circuit"],
++                      ["session_type", "Session"],
++                    ] as const).map(([key, label]) => (
++                      <div className="race-weekend-field" key={key}>
++                        <span>{label}</span>
++                        <b>{Object.prototype.hasOwnProperty.call(activeSession, key)
++                          ? pretty(activeSession[key])
++                          : "Not returned"}</b>
++                      </div>
++                    ))}
+                   </div>
+-                ))
++                  <div className="race-weekend-status">
++                    <span>State</span>
++                    <b>{Object.prototype.hasOwnProperty.call(activeSession, "state")
++                      ? pretty(activeSession.state)
++                      : "Not returned"}</b>
++                  </div>
++                  <details className="race-weekend-details">
++                    <summary>Session details</summary>
++                    {Object.entries(activeSession).map(([k, v]) => (
++                      <div className="detail-row" key={k}>
++                        <span>{k.replaceAll("_", " ")}</span>
++                        <b>{pretty(v)}</b>
++                      </div>
++                    ))}
++                  </details>
++                </>
+               ) : (
+                 <p className="muted">
+                   No active or paused session is currently returned by the API.
