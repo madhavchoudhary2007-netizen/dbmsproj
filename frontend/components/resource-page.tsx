@@ -48,6 +48,7 @@ export function ResourcePage({
   const [term, setTerm] = useState(""),
     [page, setPage] = useState(0),
     [modal, setModal] = useState(false),
+    [deleteConfirm, setDeleteConfirm] = useState(false),
     [edit, setEdit] = useState<Row | undefined>(),
     [busy, setBusy] = useState(false),
     [members, setMembers] = useState<Row[]>([]),
@@ -383,7 +384,10 @@ export function ResourcePage({
         <NbModal
           open={modal}
           title={edit ? "Record details" : "Create record"}
-          onClose={() => setModal(false)}
+          onClose={() => {
+            setDeleteConfirm(false);
+            setModal(false);
+          }}
         >
           {canManage ? (
             <>
@@ -427,7 +431,7 @@ export function ResourcePage({
               <Button
                 kind="danger"
                 disabled={busy}
-                onClick={() => void remove()}
+                onClick={() => setDeleteConfirm(true)}
               >
                 Delete record
               </Button>
@@ -481,6 +485,37 @@ export function ResourcePage({
               )}
             </div>
           )}
+        </NbModal>
+      )}
+      {modal && edit && (
+        <NbModal
+          open={deleteConfirm}
+          title="Delete record"
+          onClose={() => setDeleteConfirm(false)}
+        >
+          <p className="min-w-0 [overflow-wrap:anywhere]">
+            Delete {String(edit.full_name || edit.name || edit.id)}? This
+            action cannot be undone.
+          </p>
+          <div className="form-actions">
+            <NbButton
+              variant="secondary"
+              disabled={busy}
+              onClick={() => setDeleteConfirm(false)}
+            >
+              Cancel
+            </NbButton>
+            <NbButton
+              variant="danger"
+              disabled={busy}
+              onClick={() => {
+                setDeleteConfirm(false);
+                void remove();
+              }}
+            >
+              Delete record
+            </NbButton>
+          </div>
         </NbModal>
       )}
       {memberModal && canManage && (

@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 8b7e8d8
+git_head: 06330e6
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -62,3 +62,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T-44446 accepted8b7e8d8: Document remaining factory/global test bindings and six role-separated migration proposals; scoped source audit only, no proposed test commands claimed executed. Verify0.
 
 - RootRUN_XFAIL=1 T382-delete-before.browser.raw.log failed at missingconfirmation beforeUIrepair (realreproducer; allDELETE mocked). T44448 saveguard/T44449 confirmation ready; T44450 adds20confirm-click adversarialcheck.
+
+- T-44448 accepted06330e6: Synchronously guard each resource editor submission and release in finally, preventing overlapping save requests while preserving errors and retry. Verify0.
