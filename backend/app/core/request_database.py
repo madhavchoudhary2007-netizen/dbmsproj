@@ -1,9 +1,12 @@
 from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
-from typing import Any
+from typing import Annotated, Any
 
+from fastapi import Depends
 from psycopg import Connection
 from psycopg_pool import ConnectionPool
+
+from .runtime import get_pool
 
 DatabaseRow = dict[str, Any]
 
@@ -27,3 +30,9 @@ class DatabaseSession:
         with self.connection() as conn, conn.cursor() as cur:
             cur.execute(sql, params)
             return [dict(row) for row in cur.fetchall()]
+
+
+def get_database(
+    pool: Annotated[ConnectionPool[Connection[DatabaseRow]], Depends(get_pool)],
+) -> DatabaseSession:
+    return DatabaseSession(pool)
