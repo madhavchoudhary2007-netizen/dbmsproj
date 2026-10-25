@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 0935ce7
+git_head: 4666958
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -45,3 +45,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T44503 transient worker usage error recovered with same role/model; oversized unaccepted clone diff replaced with targeted change. T44519 count envelope corrected before acceptance; no boundary spill. No dependencies added.
 
 - T-44522 accepted0935ce7: Add mocked lifecycle/simulator exact request, native dialog keyboard/result entry and provisional/empty result tests. Browser execution remains root-owned. Verify0.
+
+- T-44524 accepted4666958: Style the factual session count as a mobile-shrinkable red sticker and remove obsolete simulator input CSS and session-control margin. Verify0.

@@ -1,16 +1,10 @@
 "use client";
 
 import { Check } from "lucide-react";
-import {
-  AddButton,
-  Button,
-  DataTable,
-  Modal,
-  PageHeader,
-  StateMessage,
-} from "../ui";
+import { AddButton, Button, Modal, PageHeader } from "../ui";
 import { StewardReport } from "./steward-report";
 import { StewardSanctions } from "./steward-sanctions";
+import { StewardCases } from "./steward-cases";
 import { useStewardDesk } from "@/lib/use-steward-desk";
 
 export function StewardDesk() {
@@ -52,10 +46,8 @@ export function StewardDesk() {
           ) : null
         }
       />
-      <StateMessage error={error} loading={loading} retry={() => void load()} />
-      {!error && !loading && (
-        <DataTable
-          rows={rows.map((r) => ({
+      <StewardCases
+        rows={rows.map((r) => ({
             ...r,
             driver_name:
               r.driver_name ||
@@ -64,23 +56,17 @@ export function StewardDesk() {
               r.session_name ||
               sessions.find((s) => s.id === r.session_id)?.session_type,
           }))}
-          columns={[
-            "reported_at",
-            "session_label",
-            "driver_name",
-            "lap",
-            "description",
-            "state",
-          ]}
-          onSelect={(r) => {
+        loading={loading}
+        error={error}
+        retry={() => void load()}
+        onSelect={(r) => {
             setActive(r);
             setNotes("");
             setPoints(0);
             setSeconds(0);
             setGrid(0);
-          }}
-        />
-      )}
+        }}
+      />
       {message && <div className="notice">{message}</div>}
       {active && canSteward && (
         <Modal
