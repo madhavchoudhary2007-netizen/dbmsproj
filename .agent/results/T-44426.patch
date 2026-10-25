@@ -1,0 +1,163 @@
+diff --git a/frontend/app/globals.css b/frontend/app/globals.css
+index df343c2..2259958 100644
+--- a/frontend/app/globals.css
++++ b/frontend/app/globals.css
+@@ -2,6 +2,7 @@
+ @import './styles/tokens.css';
+ @import './styles/textures.css';
+ @import './styles/components.css';
++@import './styles/resources.css';
+ :root {
+   color-scheme: light;
+   --bg: var(--color-cream);
+diff --git a/frontend/components/resource-page.tsx b/frontend/components/resource-page.tsx
+index 8b6bc21..5d09633 100644
+--- a/frontend/components/resource-page.tsx
++++ b/frontend/components/resource-page.tsx
+@@ -1,13 +1,14 @@
+ "use client";
+ import { useCallback, useEffect, useMemo, useState } from "react";
+ import { api, asArray, listAll, Row } from "@/lib/api";
++import { Plus } from "lucide-react";
+ import { useAuth } from "./auth";
++import { NbButton } from "./nb/button";
++import { NbCard } from "./nb/card";
+ import {
+-  AddButton,
+   Button,
+   DataTable,
+   Modal,
+-  PageHeader,
+   ReloadButton,
+   ResourceEditor,
+   SearchBox,
+@@ -267,35 +268,45 @@ export function ResourcePage({
+   }));
+   return (
+     <>
+-      <PageHeader
+-        eyebrow={eyebrow}
+-        title={title}
+-        description={description}
+-        action={
+-          <div className="header-actions">
+-            {supportsHistory && canManage && (
+-              <Button
+-                kind="secondary"
+-                onClick={() => {
+-                  setEdit(undefined);
+-                  setMemberModal(true);
+-                }}
+-              >
+-                Add membership
+-              </Button>
+-            )}
+-            {canManage && (
+-              <AddButton
+-                onClick={() => {
+-                  setEdit(undefined);
+-                  setActionError("");
+-                  setModal(true);
+-                }}
+-              />
+-            )}
+-          </div>
+-        }
+-      />
++      <NbCard tone="cream" className="resource-hero">
++        <div className="resource-hero-copy">
++          <div className="eyebrow">{eyebrow}</div>
++          <h1>{title}</h1>
++          <p>{description}</p>
++          <span className="resource-count-sticker">
++            {loading
++              ? "— LOADING"
++              : `${filtered.length} RECORD${filtered.length === 1 ? "" : "S"}`}
++          </span>
++        </div>
++        <div className="header-actions">
++          {supportsHistory && canManage && (
++            <NbButton
++              variant="secondary"
++              onClick={() => {
++                setEdit(undefined);
++                setMemberModal(true);
++              }}
++            >
++              Add membership
++            </NbButton>
++          )}
++          {canManage && (
++            <NbButton
++              variant="primary"
++              data-primary="true"
++              onClick={() => {
++                setEdit(undefined);
++                setActionError("");
++                setModal(true);
++              }}
++            >
++              <Plus size={15} aria-hidden="true" />
++              New record
++            </NbButton>
++          )}
++        </div>
++      </NbCard>
+       <div className="toolbar">
+         <SearchBox value={term} onChange={(value) => { setTerm(value); setPage(0); }} />
+         <span className="record-count">
+diff --git a/frontend/app/styles/resources.css b/frontend/app/styles/resources.css
+new file mode 100644
+index 0000000..1605396
+--- /dev/null
++++ b/frontend/app/styles/resources.css
+@@ -0,0 +1,49 @@
++.nb-shell .resource-hero {
++  display: flex;
++  align-items: center;
++  justify-content: space-between;
++  gap: 24px;
++  margin-bottom: 24px;
++}
++.nb-shell .resource-hero .resource-hero-copy {
++  min-width: 0;
++}
++.nb-shell .resource-hero h1 {
++  margin: 8px 0;
++  font-size: var(--fs-h1);
++  font-weight: 700;
++}
++.nb-shell .resource-hero p {
++  max-width: 68ch;
++  margin: 0;
++  color: var(--color-muted);
++  line-height: 1.5;
++}
++.nb-shell .resource-hero .resource-count-sticker {
++  display: inline-flex;
++  min-height: 44px;
++  align-items: center;
++  margin-top: 16px;
++  border: 2px solid var(--color-ink);
++  background: var(--color-yellow);
++  padding: 8px 12px;
++  color: var(--color-ink);
++  font-weight: 700;
++  letter-spacing: 0.04em;
++}
++.nb-shell .resource-hero .header-actions {
++  display: flex;
++  flex-wrap: wrap;
++  align-items: center;
++  gap: 12px;
++}
++@media (max-width: 619px) {
++  .nb-shell .resource-hero {
++    align-items: stretch;
++    flex-direction: column;
++  }
++  .nb-shell .resource-hero .header-actions {
++    align-items: stretch;
++    flex-direction: column;
++  }
++}

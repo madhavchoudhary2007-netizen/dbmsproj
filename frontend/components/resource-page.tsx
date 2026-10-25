@@ -1,13 +1,14 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { api, asArray, listAll, Row } from "@/lib/api";
+import { Plus } from "lucide-react";
 import { useAuth } from "./auth";
+import { NbButton } from "./nb/button";
+import { NbCard } from "./nb/card";
 import {
-  AddButton,
   Button,
   DataTable,
   Modal,
-  PageHeader,
   ReloadButton,
   ResourceEditor,
   SearchBox,
@@ -267,35 +268,45 @@ export function ResourcePage({
   }));
   return (
     <>
-      <PageHeader
-        eyebrow={eyebrow}
-        title={title}
-        description={description}
-        action={
-          <div className="header-actions">
-            {supportsHistory && canManage && (
-              <Button
-                kind="secondary"
-                onClick={() => {
-                  setEdit(undefined);
-                  setMemberModal(true);
-                }}
-              >
-                Add membership
-              </Button>
-            )}
-            {canManage && (
-              <AddButton
-                onClick={() => {
-                  setEdit(undefined);
-                  setActionError("");
-                  setModal(true);
-                }}
-              />
-            )}
-          </div>
-        }
-      />
+      <NbCard tone="cream" className="resource-hero">
+        <div className="resource-hero-copy">
+          <div className="eyebrow">{eyebrow}</div>
+          <h1>{title}</h1>
+          <p>{description}</p>
+          <span className="resource-count-sticker">
+            {loading
+              ? "— LOADING"
+              : `${filtered.length} RECORD${filtered.length === 1 ? "" : "S"}`}
+          </span>
+        </div>
+        <div className="header-actions">
+          {supportsHistory && canManage && (
+            <NbButton
+              variant="secondary"
+              onClick={() => {
+                setEdit(undefined);
+                setMemberModal(true);
+              }}
+            >
+              Add membership
+            </NbButton>
+          )}
+          {canManage && (
+            <NbButton
+              variant="primary"
+              data-primary="true"
+              onClick={() => {
+                setEdit(undefined);
+                setActionError("");
+                setModal(true);
+              }}
+            >
+              <Plus size={15} aria-hidden="true" />
+              New record
+            </NbButton>
+          )}
+        </div>
+      </NbCard>
       <div className="toolbar">
         <SearchBox value={term} onChange={(value) => { setTerm(value); setPage(0); }} />
         <span className="record-count">

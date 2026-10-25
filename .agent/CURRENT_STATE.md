@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: f311789
+git_head: c18bce7
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -42,3 +42,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44423 accepted1373d88: Show actual event, circuit, session and state in Race weekend; preserve every raw session field in a keyboard-accessible details disclosure. Verify0.
 
 - T-44424 acceptedf311789: Remove unused membership global database fallback; all four functions require the request-injected DatabaseSession and preserve SQL behavior. Verify0.
+
+- T-44425 acceptedc18bce7: Adopt typed request auth/database dependencies for dashboard and analytics, retaining characterization-only repository compatibility and unchanged wire contracts. Verify0.
+
+- Process violation T44427 W3 edited root instead of its packetclone, triggering T44425 boundary rejection. Moved only owned patch into clone, restored rootownedfile via git, reran T44425 accept0. W3 retry must verify explicit clone. No feature/assertion/gate changed.

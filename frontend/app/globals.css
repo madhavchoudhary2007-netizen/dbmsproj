@@ -2,6 +2,7 @@
 @import './styles/tokens.css';
 @import './styles/textures.css';
 @import './styles/components.css';
+@import './styles/resources.css';
 :root {
   color-scheme: light;
   --bg: var(--color-cream);
