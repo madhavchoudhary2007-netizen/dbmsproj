@@ -7,7 +7,8 @@ import { deriveLiveTimingData } from "@/lib/live-timing-data";
 import { startLiveRecordPolling } from "@/lib/live-record-polling";
 import { startInitialLiveSelection, startLiveListPolling } from "@/lib/live-list-polling";
 import { startLiveStream } from "@/lib/live-stream";
-import { PageHeader } from "@/components/ui";
+import { NbBadge } from "@/components/nb/badge";
+import { NbCard } from "@/components/nb/card";
 import { useLiveTimingState } from "@/lib/use-live-timing-state";
 import { TelemetryCharts } from "./telemetry-charts";
 import { RaceRecords } from "./race-records";
@@ -88,11 +89,22 @@ export function LiveTiming() {
   );
   return (
     <>
-      <PageHeader
-        eyebrow="RACE CONTROL / LIVE TIMING"
-        title="Live session"
-        description="A fresh session snapshot and MongoDB telemetry stream, updated over WebSocket."
-      />
+      <NbCard tone="cream" className="min-w-0">
+        <div className="flex min-w-0 flex-wrap items-center justify-between gap-4">
+          <div className="min-w-0">
+            <p className="mb-2 text-[length:var(--fs-label)] font-bold uppercase tracking-widest">RACE CONTROL / LIVE TIMING</p>
+            <div className="flex min-w-0 flex-wrap items-center gap-3">
+              <h1 className="min-w-0 break-words text-[length:var(--fs-h1)] font-bold uppercase">Live session</h1>
+              <NbBadge status="LIVE">LIVE</NbBadge>
+            </div>
+            <p className="mt-2 break-words">A fresh session snapshot and MongoDB telemetry stream, updated over WebSocket.</p>
+          </div>
+          <span className="inline-flex min-w-0 flex-wrap items-center gap-2 border-4 border-ink px-3 py-2 text-[length:var(--fs-label)] font-bold">
+            <i aria-hidden="true" className={`h-3 w-3 shrink-0 rounded-full ${status.startsWith("Connected") ? "bg-mint" : "bg-yellow"}`} />
+            <span className="min-w-0 break-words">{status}</span>
+          </span>
+        </div>
+      </NbCard>
       <DemoControls
         canManageDemos={canManageDemos}
         demoBusy={demoBusy}
