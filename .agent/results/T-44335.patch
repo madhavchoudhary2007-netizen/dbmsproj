@@ -1,0 +1,131 @@
+diff --git a/frontend/components/special-pages.tsx b/frontend/components/special-pages.tsx
+index 70655d7..8c623e2 100644
+--- a/frontend/components/special-pages.tsx
++++ b/frontend/components/special-pages.tsx
+@@ -21,6 +21,7 @@ import {
+ import { useAuth } from "./auth";
+ import { TelemetryCharts } from "./pages/live/telemetry-charts";
+ import { RaceRecords } from "./pages/live/race-records";
++import { TimingTower } from "./pages/live/timing-tower";
+ export { Dashboard } from "@/components/pages/dashboard";
+ export { SessionPage } from "@/components/pages/sessions";
+ export { StewardDesk } from "@/components/pages/stewards";
+@@ -500,52 +501,7 @@ export function LiveTiming() {
+               <TriangleAlert size={16} /> SAFETY CAR DEPLOYED
+             </div>
+           )}
+-          <div className="panel running-order-panel">
+-            <div className="panel-heading">
+-              <div>
+-                <div className="eyebrow">LIVE TIMING / RUNNING ORDER</div>
+-                <h2>{orderRows.length} cars on timing</h2>
+-              </div>
+-              <span className="live-badge">
+-                <i /> {status}
+-              </span>
+-            </div>
+-            {orderRows.length ? (
+-              <DataTable
+-                rows={orderRows.map((car) => ({
+-                  ...car,
+-                  position: car.position ?? "—",
+-                  sector: car.sector ?? "—",
+-                  last_lap_ms: car.last_lap_ms ?? "—",
+-                  best_lap_ms: car.best_lap_ms ?? "—",
+-                  tire_compound: car.tire_compound ?? "—",
+-                  tire_age_laps: car.tire_age_laps ?? "—",
+-                  tire_wear_pct: car.tire_wear_pct ?? "—",
+-                  pit_state: car.pit_state ?? "—",
+-                }))}
+-                columns={[
+-                  "position",
+-                  "number",
+-                  "driver_name",
+-                  "licence_number",
+-                  "team_name",
+-                  "gap",
+-                  "lap",
+-                  "sector",
+-                  "sector_times_ms",
+-                  "last_lap_ms",
+-                  "best_lap_ms",
+-                  "tire_compound",
+-                  "tire_age_laps",
+-                  "tire_wear_pct",
+-                  "pit_state",
+-                  "pit_box_number",
+-                ]}
+-              />
+-            ) : (
+-              <StateMessage empty="Waiting for timing and telemetry packets from this session." />
+-            )}
+-          </div>
++          <TimingTower orderRows={orderRows} status={status} />
+           <RaceRecords selectedLaps={selectedLaps} recordsError={recordsError} showAllLaps={showAllLaps} setShowAllLaps={setShowAllLaps} visibleLaps={visibleLaps} namedDrivers={namedDrivers} liveIncidents={liveIncidents} livePitStops={livePitStops} />
+           <div className="snapshot-strip">
+             {Object.entries(snapshot || {})
+diff --git a/frontend/components/pages/live/timing-tower.tsx b/frontend/components/pages/live/timing-tower.tsx
+new file mode 100644
+index 0000000..0edca0f
+--- /dev/null
++++ b/frontend/components/pages/live/timing-tower.tsx
+@@ -0,0 +1,59 @@
++import { Row } from "@/lib/api";
++import { DataTable, StateMessage } from "../../ui";
++
++export function TimingTower({
++  orderRows,
++  status,
++}: {
++  orderRows: Row[];
++  status: string;
++}) {
++  return (
++    <div className="panel running-order-panel">
++      <div className="panel-heading">
++        <div>
++          <div className="eyebrow">LIVE TIMING / RUNNING ORDER</div>
++          <h2>{orderRows.length} cars on timing</h2>
++        </div>
++        <span className="live-badge">
++          <i /> {status}
++        </span>
++      </div>
++      {orderRows.length ? (
++        <DataTable
++          rows={orderRows.map((car) => ({
++            ...car,
++            position: car.position ?? "—",
++            sector: car.sector ?? "—",
++            last_lap_ms: car.last_lap_ms ?? "—",
++            best_lap_ms: car.best_lap_ms ?? "—",
++            tire_compound: car.tire_compound ?? "—",
++            tire_age_laps: car.tire_age_laps ?? "—",
++            tire_wear_pct: car.tire_wear_pct ?? "—",
++            pit_state: car.pit_state ?? "—",
++          }))}
++          columns={[
++            "position",
++            "number",
++            "driver_name",
++            "licence_number",
++            "team_name",
++            "gap",
++            "lap",
++            "sector",
++            "sector_times_ms",
++            "last_lap_ms",
++            "best_lap_ms",
++            "tire_compound",
++            "tire_age_laps",
++            "tire_wear_pct",
++            "pit_state",
++            "pit_box_number",
++          ]}
++        />
++      ) : (
++        <StateMessage empty="Waiting for timing and telemetry packets from this session." />
++      )}
++    </div>
++  );
++}
