@@ -7,8 +7,7 @@
 }
 
 .nb-shell .page-head p, .nb-shell .eyebrow, .nb-shell .muted, .nb-shell .table-note,
-.nb-shell .record-count, .nb-shell .form-hint, .nb-shell .panel .muted,
-.nb-shell .stat-card span { color: var(--nb-ink); }
+.nb-shell .record-count, .nb-shell .form-hint, .nb-shell .panel .muted { color: var(--nb-ink); }
 .nb-shell .detail-row span, .nb-shell .stream-state, .nb-shell .state.error p { color: var(--nb-ink); }
 .nb-shell .live-badge {
   padding: 4px 8px; color: var(--nb-ink); background: var(--nb-yellow);
@@ -262,4 +261,35 @@
 
 @media (prefers-reduced-motion: reduce) {
   .nb-shell .sidebar { transition: none; }
+}
+
+.nb-shell .dashboard-hero {
+  display: flex; min-width: 0; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 24px; padding: 24px;
+}
+.nb-shell .dashboard-hero-copy { min-width: 0; flex: 1 1 480px; }
+.nb-shell .dashboard-hero-title-wrap { position: relative; min-width: 0; }
+.nb-shell .dashboard-hero-title {
+  position: relative; z-index: 1; width: max-content; max-width: 100%; margin: 8px 0;
+  overflow-wrap: anywhere; color: var(--nb-ink); font-size: var(--fs-h1); font-weight: 700;
+  line-height: 1.1; text-transform: uppercase;
+}
+.nb-shell .dashboard-hero-title-stroke {
+  position: absolute; top: 4px; left: 4px; width: max-content; max-width: 100%;
+  overflow-wrap: anywhere; color: transparent; font-size: var(--fs-h1); font-weight: 700;
+  line-height: 1.1; text-transform: uppercase; -webkit-text-stroke: 1px var(--nb-ink);
+}
+.nb-shell .dashboard-hero-copy > p { margin: 0; color: var(--nb-ink); }
+.nb-shell .dashboard-hero-actions { display: flex; min-width: 0; flex-wrap: wrap; align-items: center; gap: 12px; }
+.nb-shell .dashboard-live-link { color: var(--nb-ink); text-decoration: none; }
+.nb-shell .dashboard-live-link .nb-face {
+  display: inline-flex; min-height: 44px; min-width: 44px; align-items: center; justify-content: center;
+  border: 4px solid var(--nb-ink); padding: 8px 16px; color: var(--nb-ink);
+  background: var(--nb-red); font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  .nb-shell .dashboard-hero-title, .nb-shell .dashboard-hero-title-stroke {
+    font-size: var(--fs-display); line-height: 1;
+  }
 }

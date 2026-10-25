@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: ec4c854
+git_head: bc1c162
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -44,3 +44,7 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44372 accepteda5bb1f7: Move simulator control route into API module preserving response, role dependency and late-bound callbacks. Verify0.
 
 - T-44381 acceptedec4c854: Use approved dashboard KPI tiles with scoped48px values, typed tones and unchanged shared defaults; remove orphan CSS. Verify0.
+
+- T-44382 acceptedbc1c162: Extract HTTP authentication body verbatim while preserving dependency signature and late-bound security callbacks. Verify0.
+
+- Newrootgates caught regressions: T44381 removed .stat-card testedhook (5dashboardretryfailures); fixT44384 preserveshookwithoutoldCSS. T44382 removed main.jwt export (14fullfailures217PASS); repairT44385 restoresexplicit alias, assertions unchanged. Focusedverifies hadpassed; do not claim latestfullgreen.

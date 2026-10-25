@@ -2,19 +2,33 @@
 
 import { pretty } from "@/lib/api";
 import { useDashboard } from "@/lib/use-dashboard";
-import { PageHeader, ReloadButton, StateMessage } from "@/components/ui";
+import Link from "next/link";
+import { ReloadButton, StateMessage } from "@/components/ui";
+import { NbCard } from "@/components/nb/card";
 import { NbStat } from "@/components/nb/stat";
 
 export function Dashboard() {
   const { data, health, err, load, fetchData } = useDashboard();
   return (
     <>
-      <PageHeader
-        eyebrow="CONTROL ROOM / OVERVIEW"
-        title="Race operations"
-        description="Competition status and service health from the ApexGrid API."
-        action={<ReloadButton onClick={fetchData} data-primary="true" />}
-      />
+      <NbCard tone="cream" shadow={8} className="dashboard-hero">
+        <div className="dashboard-hero-copy">
+          <div className="eyebrow">CONTROL ROOM / OVERVIEW</div>
+          <div className="dashboard-hero-title-wrap">
+            <h1 className="dashboard-hero-title">Race operations</h1>
+            <span className="dashboard-hero-title-stroke" aria-hidden="true">
+              RACE OPERATIONS
+            </span>
+          </div>
+          <p>Competition status and service health from the ApexGrid API.</p>
+        </div>
+        <div className="dashboard-hero-actions">
+          <ReloadButton onClick={fetchData} />
+          <Link className="nb-plinth dashboard-live-link" href="/live" data-primary="true">
+            <span className="nb-face">Open live timing</span>
+          </Link>
+        </div>
+      </NbCard>
       <StateMessage error={err} loading={load} retry={fetchData} />
       {data && (
         <>
