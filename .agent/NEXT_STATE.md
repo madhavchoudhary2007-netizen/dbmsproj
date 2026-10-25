@@ -3,6 +3,11 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
+### T-44348 W2 — OPEN
+- target_files: frontend/components/special-pages.tsx
+- contract: T379 activate exact live record polling helper inside original effect; preserve effect dependency array and position.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
+
 ### T-44350 W3 — OPEN
 - target_files: frontend/e2e/runtime/live-demo-actions.test.mjs
 - contract: T379 verification gap: add actual-module regression cases for generated race create/delete actions after extraction.
@@ -13,11 +18,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T379 stage exact lap/race-control record polling effect body into live-record-polling helper; keep main source unchanged.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
-### T-44346 W1 — OPEN
-- target_files: frontend/components/special-pages.tsx
-- contract: T379 activate staged DemoControls and DeleteDemoModal, remove exact duplicated hero/list/message/modal regions only.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
-
 ## Blocked
 - None currently. Owner switch gpt-6-luna/high implemented and freshworkers succeeded.
 
@@ -25,6 +25,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44346 accepted171cb46; verify0.
 - T-44345 accepted96b97d0; verify0.
 - T-44344 accepted8a33d97; verify0.
 - T-44343 accepted6fb844f; verify0.

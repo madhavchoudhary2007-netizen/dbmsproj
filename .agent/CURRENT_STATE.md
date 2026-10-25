@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: 96b97d0
+git_head: 171cb46
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -42,3 +42,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44344 accepted8a33d97: Wire exact derived live timing helper and expose existing driverIds; preserve all effects, actions and JSX. Verify0.
 
 - T-44345 accepted96b97d0: Stage exact generated-race delete modal with original copy, guards and callback bindings. Verify0.
+
+- T-44346 accepted171cb46: Activate exact generated race controls and delete modal; preserve copy, state guards and existing bindings. Verify0.
