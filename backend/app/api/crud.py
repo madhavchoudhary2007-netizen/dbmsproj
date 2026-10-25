@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Query
@@ -40,29 +40,41 @@ def create_crud_router(
     )
     prefix = f"/api/{resource}"
 
-    @router.get(prefix)
+    @router.get(prefix, response_model=None)
     def listing(
         limit: int = Query(50, ge=1, le=200),
         offset: int = Query(0, ge=0),
-        user=authenticated_user_dependency,
-    ):
+        user: dict[str, object] = authenticated_user_dependency,
+    ) -> list[dict[str, object]]:
         page_limit, page_offset = limit_offset(limit, offset)
-        return jsonable(list_crud_rows(base, page_limit, page_offset))
+        rows = jsonable(list_crud_rows(base, page_limit, page_offset))
+        return cast(list[dict[str, object]], rows)
 
-    @router.get(prefix + "/{item_id}")
-    def get_item(item_id: UUID, user=authenticated_user_dependency):
+    @router.get(prefix + "/{item_id}", response_model=None)
+    def get_item(
+        item_id: UUID, user: dict[str, object] = authenticated_user_dependency
+    ) -> dict[str, object]:
         result = get_crud_row(base, table, item_id)
-        return jsonable(_require_crud_record(result, f"{resource[:-1].capitalize()} not found"))
+        return cast(
+            dict[str, object],
+            jsonable(_require_crud_record(result, f"{resource[:-1].capitalize()} not found")),
+        )
 
-    @router.post(prefix, status_code=201)
-    def create_item(payload: dict[str, Any], user=admin_role_dependency):
+    @router.post(prefix, status_code=201, response_model=None)
+    def create_item(
+        payload: dict[str, Any], user: dict[str, object] = admin_role_dependency
+    ) -> dict[str, object]:
         clean = _crud_write_payload(payload, cols)
         validate_session_laps(table, clean)
         row = create_crud_row(table, clean)
-        return jsonable(row)
+        return cast(dict[str, object], jsonable(row))
 
-    @router.patch(prefix + "/{item_id}")
-    def update_item(item_id: UUID, payload: dict[str, Any], user=admin_role_dependency):
+    @router.patch(prefix + "/{item_id}", response_model=None)
+    def update_item(
+        item_id: UUID,
+        payload: dict[str, Any],
+        user: dict[str, object] = admin_role_dependency,
+    ) -> dict[str, object]:
         clean = _crud_write_payload(payload, cols)
         validate_session_laps(table, clean)
         if table == "race_sessions":
@@ -79,10 +91,13 @@ def create_crud_router(
                     409, "Session context and lap count cannot change after a session starts"
                 )
         row = update_crud_row(table, item_id, clean)
-        return jsonable(_require_crud_record(row, f"{resource[:-1].capitalize()} not found"))
+        return cast(
+            dict[str, object],
+            jsonable(_require_crud_record(row, f"{resource[:-1].capitalize()} not found")),
+        )
 
-    @router.delete(prefix + "/{item_id}", status_code=204)
-    def delete_item(item_id: UUID, user=admin_role_dependency):
+    @router.delete(prefix + "/{item_id}", status_code=204, response_model=None)
+    def delete_item(item_id: UUID, user: dict[str, object] = admin_role_dependency) -> None:
         telemetry_collection = get_telemetry_collection()
         try:
             delete_crud_row(table, resource, item_id, telemetry_collection)

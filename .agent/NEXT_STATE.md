@@ -13,11 +13,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: T339 type CRUD and stewardship route handlers without changing API or dynamic payload contracts.
 - verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_request_dependencies.py backend/tests/test_runtime_dependencies.py && .venv/bin/mypy --strict backend/app/api/crud.py backend/app/api/stewards.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/api/crud.py backend/app/api/stewards.py
 
-### T-44551 W1 — OPEN
-- target_files: frontend/components/pages/pit-wall.tsx, frontend/components/pages/pit-infrastructure.tsx
-- contract: T388 numbered physical pit-box grid and selectable horizontal allocation timeline.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
-
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
 
@@ -28,6 +23,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44551 acceptedc42b3f0; verify0.
 - T-44550 accepted9c8841e; verify0.
 - T-44549 accepted1cd40f8; verify0.
 - T-44548 acceptedf1a5c17; verify0.

@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: 9c8841e
+git_head: c42b3f0
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -60,3 +60,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T388 strategy five-state cards f1a5c17; grid/queue in review. T44132 helper9c8841e sixofflinePASS; honestproductionbaseline sevenroutes290.49KiB>170, root+page oldgate invalid. WiringT44553 then optimize real route imports; neverraisegate.
 
 - New gate found seven route entries share all special-pages code through a client barrel; direct imports queued to remove unrelated code, no feature change. Orchestrator attempted a third dispatch once; tool rejected it, actual active workers never exceeded2.
+
+- T-44551 acceptedc42b3f0: Render physical box grid and keyboard allocation timeline with truthful active status and source recovery. Verify0.

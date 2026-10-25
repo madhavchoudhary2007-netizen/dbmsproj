@@ -1,6 +1,6 @@
 from collections.abc import Callable
 from contextlib import AbstractContextManager
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Query
@@ -18,8 +18,12 @@ def _register_decide_incident(
     publish: Callable[[UUID | str, str, Any], Any],
     admin_steward_dependency: Any,
 ) -> Callable[..., Any]:
-    @router.post("/api/incidents/{incident_id}/decision")
-    def decide_incident(incident_id: UUID, body: Decision, user=admin_steward_dependency):
+    @router.post("/api/incidents/{incident_id}/decision", response_model=None)
+    def decide_incident(
+        incident_id: UUID,
+        body: Decision,
+        user: dict[str, object] = admin_steward_dependency,
+    ) -> dict[str, object]:
         with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
             cur.execute("SELECT * FROM incident_reports WHERE id=%s FOR UPDATE", (incident_id,))
             incident = cur.fetchone()
@@ -70,7 +74,7 @@ def _register_decide_incident(
             "driver": jsonable(driver),
         }
         publish(incident["session_id"], "incident.update", out)
-        return out
+        return cast(dict[str, object], out)
 
     return decide_incident
 
@@ -86,13 +90,13 @@ def create_stewards_router(
 ) -> tuple[APIRouter, dict[str, Callable[..., Any]]]:
     router = APIRouter()
 
-    @router.get("/api/incidents")
+    @router.get("/api/incidents", response_model=None)
     def get_incidents(
         state: str | None = None,
         limit: int = Query(50, ge=1, le=200),
         offset: int = Query(0, ge=0),
-        user=authenticated_user_dependency,
-    ):
+        user: dict[str, object] = authenticated_user_dependency,
+    ) -> list[dict[str, object]]:
         sql = (
             "SELECT i.*,u.full_name AS driver_name,d.number,s.session_type,e.name AS event_name"
             " FROM incident_reports i JOIN drivers d ON d.id=i.driver_id JOIN users u ON u.id=d"
@@ -107,10 +111,12 @@ def create_stewards_router(
             params.append(state)
         sql += " ORDER BY i.reported_at DESC LIMIT %s OFFSET %s"
         params.extend(limit_offset(limit, offset))
-        return jsonable(fetch_all(sql, params))
+        return cast(list[dict[str, object]], jsonable(fetch_all(sql, params)))
 
-    @router.post("/api/incidents", status_code=201)
-    def create_incident(body: IncidentIn, user=admin_steward_dependency):
+    @router.post("/api/incidents", status_code=201, response_model=None)
+    def create_incident(
+        body: IncidentIn, user: dict[str, object] = admin_steward_dependency
+    ) -> dict[str, object]:
         with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
             cur.execute("SELECT total_laps FROM race_sessions WHERE id=%s", (body.session_id,))
             session = cur.fetchone()
@@ -135,7 +141,7 @@ def create_stewards_router(
                 (body.session_id, body.driver_id, body.lap, body.description),
             )
             row = cur.fetchone()
-        result = jsonable(row)
+        result = cast(dict[str, object], jsonable(row))
         publish(body.session_id, "incident.update", result)
         return result
 
