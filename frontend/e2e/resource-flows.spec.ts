@@ -26,6 +26,13 @@ async function mockApi(
       await championships(route);
       return;
     }
+    if (path === "/api/dashboard") {
+      await route.fulfill({
+        status: 200,
+        json: { active_sessions: 0, scheduled_events: 0, open_incidents: 0, drivers: 0 },
+      });
+      return;
+    }
     await route.fulfill({ status: 200, json: [] });
   });
   return writes;
@@ -45,10 +52,11 @@ test("resource loading resolves to the API empty state", async ({ page }) => {
   });
 
   await page.goto("/championships");
+  const main = page.getByRole("main");
   await requestStarted;
-  await expect(page.getByRole("status")).toContainText("Loading from API…");
+  await expect(main.getByRole("status")).toContainText("Loading from API…");
   release();
-  await expect(page.getByRole("status")).toContainText("No records returned by the API.");
+  await expect(main.getByRole("status")).toContainText("No records returned by the API.");
   expect(writes).toEqual([]);
 });
 
@@ -63,11 +71,12 @@ test("a failed request shows an error and retry loads the returned row", async (
   });
 
   await page.goto("/championships");
-  await expect(page.getByRole("alert")).toContainText("Temporary service failure");
-  await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
+  const main = page.getByRole("main");
+  await expect(main.getByRole("alert")).toContainText("Temporary service failure");
+  await expect(main.getByRole("button", { name: "Try again", exact: true })).toBeVisible();
   allowRecovery = true;
-  await page.getByRole("button", { name: "Try again" }).click();
-  await expect(page.getByRole("cell", { name: "Recovered championship" })).toBeVisible();
+  await main.getByRole("button", { name: "Try again", exact: true }).click();
+  await expect(main.getByRole("cell", { name: "Recovered championship" })).toBeVisible();
   expect(writes).toEqual([]);
 });
 
@@ -78,19 +87,20 @@ test("filtering and paging keep the 50 row page boundary", async ({ page }) => {
   });
 
   await page.goto("/championships");
-  const table = page.locator("main table");
+  const main = page.getByRole("main");
+  const table = main.locator("table");
   await expect(table.locator("tbody tr")).toHaveCount(50);
-  await expect(page.locator(".resource-range")).toHaveText("Showing 1–50 of 51");
-  await page.getByRole("button", { name: "Next" }).click();
+  await expect(main.locator(".resource-range")).toHaveText("Showing 1–50 of 51");
+  await main.getByRole("button", { name: "Next", exact: true }).click();
   await expect(table.locator("tbody tr")).toHaveCount(1);
-  await expect(page.locator(".resource-range")).toHaveText("Showing 51–51 of 51");
-  await page.getByRole("button", { name: "Previous" }).click();
+  await expect(main.locator(".resource-range")).toHaveText("Showing 51–51 of 51");
+  await main.getByRole("button", { name: "Previous", exact: true }).click();
   await expect(table.locator("tbody tr")).toHaveCount(50);
   await page.getByLabel("Filter records").fill("Championship 51");
   await expect(table.locator("tbody tr")).toHaveCount(1);
-  await expect(page.locator(".resource-range")).toHaveText("Showing 1–1 of 1");
+  await expect(main.locator(".resource-range")).toHaveText("Showing 1–1 of 1");
   await page.getByLabel("Filter records").fill("no matching championship");
-  await expect(page.getByRole("status")).toContainText("No records match this filter.");
+  await expect(main.getByRole("status")).toContainText("No records match this filter.");
   expect(writes).toEqual([]);
 });
 
@@ -100,8 +110,9 @@ test("the create dialog closes on Escape and restores focus without writing", as
   });
 
   await page.goto("/championships");
-  await expect(page.getByRole("status")).toContainText("No records returned by the API.");
-  const create = page.getByRole("button", { name: "New record" });
+  const main = page.getByRole("main");
+  await expect(main.getByRole("status")).toContainText("No records returned by the API.");
+  const create = main.getByRole("button", { name: "New record", exact: true });
   await create.click();
   await expect(page.getByRole("dialog", { name: "Create record" })).toBeVisible();
   await page.keyboard.press("Escape");
