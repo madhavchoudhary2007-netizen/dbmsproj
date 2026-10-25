@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: bbbd12e
+git_head: 7718c89
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -34,3 +34,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - Authoredproductglue: T44250 8add/4remove12lines plus2importintegrationlines=14; allotherimplementation workers. Mechanical reviewedregionpatches for44330/44331 resolved staleimportcontexts, retained rootpagebytes; acceptedrootverifies0.
 - Root44319 verifyquotingfailed, fixedshlex.quote/reaccept0; prematuremark removedbeforecommit. Worker44321/28/33 countmismatches normalizedrealstats. Root44334 -k reset selected0/exit5; isolatedtaskfiles restored/re-dispatchedonce with existinglifecycle/stop tests,17PASS; noassertionchanged.
 - Root44331 dispatch briefly overlapped same relativetarget as44330 in separateclones; interruptedbeforeedits, resumedonlyafter44330accepted. Neverexceeded2workers. Allpackets/results/patches/acceptlogs inGit/.agent/results.
+
+- T-44342 accepted7718c89: Activate exact generated-race actions through typed callback helper; retain all page JSX and render closures. Verify0.
