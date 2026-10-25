@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-25
-git_head: d181250
+git_head: 66bccc6
 branch: overhaul/neo-brutal
 architect_sha256: 3c4ab0a82eb81bc885d5b4a6baf4f64728a6cb87181b515f7cbffcb77c3701ae
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -47,3 +47,5 @@ last_eval_score: obsolete baseline51.2974358974359; no current score; final T430
 - T-44354 acceptede517c82: Activate exact live selectors, preserving option labels, membership, status and manual-selection ordering. Verify0.
 
 - T-44355 acceptedd181250: Stage internal live stream callback types with existing API Row and exact React setter contracts; no runtime changes. Verify0.
+
+- T-44357 accepted66bccc6: Use exact current-run packet predicate with live session/startedAt lookup on each callback, preserving all other stream behavior. Verify0.
