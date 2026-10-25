@@ -3,11 +3,6 @@ updated_at: 2026-10-25
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44483 W2 — OPEN
-- target_files: frontend/lib/live-list-refresh.ts, frontend/lib/use-live-timing-state.ts, frontend/components/pages/live/index.tsx
-- contract: T383 expose actual initial list loading and list-source errors for five-state race list rendering.
-- verify: npm --prefix frontend run test:runtime && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0
-
 ### T-44482 W3 — OPEN
 - target_files: frontend/e2e/live-demo-actions.spec.ts
 - contract: T383 characterize generated-race create/delete flows and same-frame duplicate mutations.
@@ -23,6 +18,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44483 accepted702e3cc; verify0.
 - T-44481 accepted1d68f7b; verify0.
 - T-44480 acceptedeb229b7; verify0.
 - T-44479 accepteda9e7dde; verify0.
