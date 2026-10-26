@@ -13,7 +13,7 @@ phase: 3 backend / 7 routes; no current score
 
 ### T-44591 — DBMS workspace bundle size code-splitting
 - worker: W1 | priority: P1 | origin: P-3 DBMS bundle size defect
-- target_files: frontend/components/dbms-workspace.tsx
+- target_files: frontend/components/dbms-workspace.tsx, frontend/next-env.d.ts
 - contract: Dynamically import RaceDatabase using next/dynamic to avoid bundling recharts in /dbms/page initial JS, satisfying the <= 170 KB gzip limit.
 - verify: npm --prefix frontend run build && python3 scripts/eval/verify-bundle-size.py && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 

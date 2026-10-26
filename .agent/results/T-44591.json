@@ -1,0 +1,27 @@
+{
+  "task_id": "T-44591",
+  "status": "PASSED",
+  "files_modified": [
+    {
+      "path": "frontend/components/dbms-workspace.tsx",
+      "lines_added": 14,
+      "lines_removed": 1
+    },
+    {
+      "path": "frontend/next-env.d.ts",
+      "lines_added": 2,
+      "lines_removed": 2
+    }
+  ],
+  "diff_summary": "Code-split RaceDatabase and EerDiagram with next/dynamic in dbms-workspace.tsx; /dbms/page initial JS drops from 260.10 KB to 154.74 KB (well under the 170 KB limit).",
+  "verification": {
+    "command": "npm --prefix frontend run build && python3 scripts/eval/verify-bundle-size.py && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh",
+    "exit_code": 0,
+    "tests_passed": 19,
+    "tests_failed": 0,
+    "duration_ms": 6500,
+    "typecheck_errors": 0,
+    "lint_warnings": 0
+  },
+  "unresolved_blockers": []
+}

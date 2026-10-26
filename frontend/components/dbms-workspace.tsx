@@ -2,8 +2,21 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { api, asArray, Row } from "@/lib/api";
+import dynamic from "next/dynamic";
 import { Button, DataTable, Modal } from "./ui";
-import { EerDiagram, RaceDatabase } from "./race-database";
+const RaceDatabase = dynamic(
+  () => import("./race-database").then((mod) => mod.RaceDatabase),
+  {
+    loading: () => <div className="p-4 text-muted">Loading race database...</div>,
+  }
+);
+
+const EerDiagram = dynamic(
+  () => import("./race-database").then((mod) => mod.EerDiagram),
+  {
+    loading: () => <div className="p-4 text-muted">Loading EER diagram...</div>,
+  }
+);
 
 type View = "overview" | "race" | "tables" | "eer" | "schema" | "indexes" | "plans" | "locks" | "telemetry" | "mongo-collections" | "mongo-indexes" | "polyglot" | "operations";
 const views: [View, string][] = [
