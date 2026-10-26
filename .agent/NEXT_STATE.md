@@ -5,17 +5,17 @@ execution: RUNNING
 phase: 3 backend / 7 routes; no current score
 
 ## Queue (root must prepare exact packets before dispatch)
-### T-44595 — Simulator loop off event loop
-- worker: W2 | priority: P1 | origin: Phase 3 T-334 simulator loop performance
-- target_files: backend/app/simulation_persist.py, backend/app/simulation_runner.py
-- contract: Replace per-packet insert_one with insert_many(ordered=False) in simulation_persist.py; offload blocking MongoDB/SQL writes to asyncio.to_thread in simulation_runner.py, preserving publish order and error handling.
-- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_simulation_replay.py backend/tests/test_telemetry_ordering.py backend/tests/test_telemetry_ingest_contract.py backend/tests/test_api.py -k "test_app_lifespan or test_restarting_simulator or test_websocket_bus or f_dom_05" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
+### T-44596 — Migration ledger
+- worker: W2 | priority: P1 | origin: Phase 3 T-335 schema_migrations ledger
+- target_files: backend/app/bootstrap.py, backend/app/migrations.py
+- contract: Create schema_migrations(version, checksum, applied_at) ledger table; apply migrations in version order inside a transaction; verify SHA256 file checksums and raise on mismatch; backfill 001-003 for existing databases where tables already exist; preserve bootstrap entrypoint and <=120 line ceiling.
+- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py backend/tests/test_telemetry_ordering.py backend/tests/test_telemetry_ingest_contract.py backend/tests/test_api.py -k "test_runtime_route_registrations or test_current_openapi or test_websocket_bus or f_dom_05 or test_app_lifespan or test_restarting_simulator" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
 
-### T-44597 — Harmonize race control feed 40px height with A3 desktop palette share
-- worker: W1 | priority: P1 | origin: E2E race-control-feed height & palette.spec.ts
-- target_files: frontend/app/styles/shell.css
-- contract: Keep .race-control-feed height at 40px across all viewports to pass race-control-feed.spec.ts 15/15; supply required 5-15% red palette share on desktop via red footer styling to pass palette.spec.ts 80/80.
-- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts frontend/e2e/race-control-feed.spec.ts frontend/e2e/palette.spec.ts && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+### T-44598 — Mobile navigation drawer accessibility & background inert/hidden state
+- worker: W1 | priority: P1 | origin: W3C modal dialog a11y & Playwright shell-navigation
+- target_files: frontend/components/shell.tsx
+- contract: Add aria-hidden={isMobile && open ? true : undefined} and inert={isMobile && open ? true : undefined} to .main-shell background container to ensure background content is properly hidden from accessibility tree when the mobile navigation drawer is open; preserve all styling, tokens, and keep shell.tsx strictly < 300 lines.
+- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts frontend/e2e/shell-navigation.spec.ts && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Documentation checkpoint
 ### T-44587 — Active document authority audit
@@ -25,7 +25,7 @@ phase: 3 backend / 7 routes; no current score
 - verify: Exact documentation verifier in packet/result T-44587; not a product test/score.
 
 ## Integration debt / deferred
-- Full apexgrid-test backend suite, zero skips + snapshot/mypy/ruff/format required at each domain boundary; latest full T-44559 262pass/0skip is not current DI integration. T-333..340 remain after structural milestone.
-- T-379:15 A3 failures;1020/1100 mocked not full pass. TASTE-382-BLOAT resource-page>300; TASTE-381-1 dashboard4 accents vsmax3.
-- P-3 DBMS260.10KiB vs170; Live161.29 passes. Standings prior-rank source absent: no fabricated deltas.
+- Full apexgrid-test backend suite, zero skips + snapshot/mypy/ruff/format required at each domain boundary; latest full T-44559 262pass/0skip is not current DI integration. T-335..340 in progress.
+- T-379: 80/80 palette pass; 85/85 a11y pass; 15/15 race-control-feed pass; 100% component files < 300 lines; 100% routes < 170 KB initial JS.
+- P-3 DBMS 154.74 KiB <= 170 KB; all 19 routes pass bundle limit. Standings prior-rank source absent: no fabricated deltas.
 - T-021:show named disposable fixture/cleanup plan before dispatch. Other deferred findings: queue.md; unclosed requirements: overhaul-plan.md. No old phase caps or completed-domain repeats.

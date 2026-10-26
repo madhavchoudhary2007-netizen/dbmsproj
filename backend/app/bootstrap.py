@@ -7,6 +7,7 @@ from psycopg.rows import dict_row
 from pymongo import MongoClient
 
 from .config import APP_ENV, DATABASE_URL, MONGODB_DATABASE, MONGODB_URL, SEED_DEMO_DATA
+from .migrations import apply_migrations
 from .race_archive import seed_historical_laps
 
 
@@ -20,10 +21,7 @@ def main() -> None:
         raise SystemExit(f"No numbered SQL migrations found in: {migrations_dir}")
     seed = root / "db" / "seed.sql"
     with psycopg.connect(DATABASE_URL, autocommit=True) as conn:
-        for migration in migrations:
-            conn.execute(migration.read_text())
-        if SEED_DEMO_DATA and seed.exists():
-            conn.execute(seed.read_text())
+        apply_migrations(conn, migrations_dir, seed_path=seed, seed_demo=SEED_DEMO_DATA)
     if SEED_DEMO_DATA and APP_ENV == "local":
         with (
             psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn,
