@@ -11,11 +11,11 @@ phase: 3 backend / 7 routes; no current score
 - contract: Extract remaining legacy compatibility helpers into core/legacy_compat.py and group re-exports concisely so main.py is strictly <= 120 lines while preserving all exported aliases and test compatibility.
 - verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py backend/tests/test_api.py -k "test_runtime_route_registrations or test_current_openapi or test_websocket_bus or f_dom_05" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
 
-### T-44590 — Resource-page component modularization
-- worker: W1 | priority: P1 | origin: TASTE-382-BLOAT
-- target_files: frontend/components/resource-page.tsx, frontend/components/resource-table.tsx, frontend/components/resource-modals.tsx
-- contract: Split 594-line resource-page.tsx into modular subcomponents so every component is strictly < 300 lines. Preserve all existing exports, props, accessibility tags, data attributes, and test hooks verbatim.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+### T-44591 — DBMS workspace bundle size code-splitting
+- worker: W1 | priority: P1 | origin: P-3 DBMS bundle size defect
+- target_files: frontend/components/dbms-workspace.tsx
+- contract: Dynamically import RaceDatabase using next/dynamic to avoid bundling recharts in /dbms/page initial JS, satisfying the <= 170 KB gzip limit.
+- verify: npm --prefix frontend run build && python3 scripts/eval/verify-bundle-size.py && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Documentation checkpoint
 ### T-44587 — Active document authority audit
