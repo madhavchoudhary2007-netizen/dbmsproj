@@ -2,8 +2,8 @@
 updated_at: 2026-10-26
 branch: overhaul/neo-brutal
 execution: RUNNING — implementation resumed on owner instruction 2026-10-26
-verified_product_head: 16f72d7
-last_product_task: T-44604
+verified_product_head: 5872a0d
+last_product_task: T-44608
 metadata_task: T-44587 active-document audit; see matching acceptance result/commit
 architect_sha256: 0f2b5366fee89ec70d8340ab2e148ad676f0c64bf324f00af559c242cd4cc46c
 target_harness: Antigravity; requested Gemini 3.8 Flash HIGH orchestrator / LOW workers; cap 2
@@ -18,8 +18,8 @@ Phase requirements are in docs/overhaul-plan.md; the table below is the current 
 | 0 Architecture | COMPLETE | Preserve lock/ADRs; do not repeat owner ADR-007 approval |
 | 1 Baseline | COMPLETE | Final candidate still reruns quality gates |
 | 2 Security | COMPLETE | Retain auth/security regression coverage |
-| 3 Backend | IN_PROGRESS | Combined T-331/T-332 final domains; T-333..340 requirements and full integration |
-| 4 DBMS showcase | NOT_COMPLETE | T-350..358 additions, isolated tests and teacher documentation |
+| 3 Backend | COMPLETE | T-331..T-340 all implemented, tested, and strictly typed |
+| 4 DBMS showcase | IN_PROGRESS | T-351..357 endpoints & migrations 006..008 verified; T-393 UI & T-358 docs next |
 | 5 Frontend foundation | COMPLETE | Preserve approved tokens/fonts/primitives |
 | 6 Shell | COMPLETE | Preserve shared feed/navigation/keyboard behavior |
 | 7 Routes | IN_PROGRESS | T-390..393 dependencies, T-379 failures and remaining route proof |
@@ -43,8 +43,11 @@ Phase requirements are in docs/overhaul-plan.md; the table below is the current 
 - T-44600 (84ae834): handled in-flight navigation abort race in edge-resilience.spec.ts Lens 5 test; full Playwright E2E suite passed 1475/1475 green across all 5 viewports.
 - T-44601 (949adc6): created migration 005_points_systems.sql with points_systems and points_system_positions, default F1 2025 points seed, championships.points_system_id, and dynamic recalculate_standings join; added PointsSystemOut and PointsSystemPositionOut schemas.
 - T-44602 (8751eaa): authored test_points_system.py unit suite asserting migration 005 DDL, standard F1 points distribution (top 10 + 11+ zero), and PointsSystemOut / PointsSystemPositionOut schema validation (18/18 tests green).
-- T-44603 (5239559): implemented structured JSON logging with JSONLogFormatter and request ID correlation middleware in core/observability.py; mounted in create_application; strict mypy clean across 89 files.
-- T-44604 (16f72d7): authored test_observability.py asserting JSON formatting keys, request_id context propagation, middleware header echo/UUID generation, and /health/live status (6/6 tests green).
+- T-44603/4: JSON logging and request ID correlation middleware in core/observability.py; test_observability.py green.
+- T-44605 (74ae818): multi-stage non-root Dockerfiles (app uid 10001, nextjs uid 1001), healthchecks, requirements.lock.
+- T-44606 (12fb9fb): authored test_dbms_showcase.py contract test specifications and parameter validators.
+- T-44607 (93fdba1): Phase 4 migrations 006 (views/MV), 007 (audit log/trigger), 008 (roles/RLS); schemas_showcase.py; dbms_showcase.py with 8 endpoints (isolation, deadlock, views, MV refresh, gaps, explain, audit, security); main.py 116 lines.
+- T-44608 (5872a0d): authored test_migrations.py unit suite asserting SHA-256 checksums, version ordering, mismatch detection, and SQL file integrity (11/11 tests green).
 
 ## Current risks and open work
 - Complete only remaining T-331/T-332 domains and required integration; do not repeat accepted T-44575..80 or create line-count wrappers. T-44573 remains superseded. Historical assembly counts are not the current module map.
