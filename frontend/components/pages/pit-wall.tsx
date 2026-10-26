@@ -37,8 +37,8 @@ export function PitWall() {
           </NbSelect>
         </NbField>
       </div>
-      <div className="flex flex-wrap items-center gap-4 md:col-start-2 md:justify-self-end">
-        <NbCard tone="red" shadow={4} className="font-mono font-bold uppercase">{boxes.length} BOXES · {res.length} PIT {res.length === 1 ? "STOP" : "STOPS"}</NbCard>
+      <div className="flex flex-wrap items-center gap-4 md:col-start-1 md:col-span-2 md:justify-self-stretch">
+        <NbCard tone="red" shadow={4} className="flex-1 justify-center px-8 text-center font-mono font-bold uppercase">{boxes.length} BOXES · {res.length} PIT {res.length === 1 ? "STOP" : "STOPS"}</NbCard>
         <ReloadButton onClick={() => void load(event, selectedSession)} data-primary={selectedReservation ? undefined : "true"} />
       </div>
     </NbCard>

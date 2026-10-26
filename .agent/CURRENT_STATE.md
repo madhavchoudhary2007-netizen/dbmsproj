@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: 640f46a
+git_head: 19cbe5e
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -40,3 +40,5 @@ last_eval_score: obsolete 51.2974; no current score; final T430
 - T-44559 accepted888002c: Added strict parameter and return annotations to the user, simulation, and WebSocket route handlers. Preserved route behavior and dependency defaults. Verify0.
 
 - T-44561 accepted640f46a: Added parameter and return annotations to lap measurement and route handlers; preserved route behavior. Formatted both files. Verify0.
+
+- T-44562 accepted19cbe5e: Kept the LIVE DEMO hero yellow. Applied cream and a named red token to the existing generated-sessions card with a 4px top border. Verify0.
