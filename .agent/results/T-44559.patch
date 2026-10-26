@@ -1,0 +1,72 @@
+diff --git a/backend/app/api/live.py b/backend/app/api/live.py
+index 39f5076..cef5c44 100644
+--- a/backend/app/api/live.py
++++ b/backend/app/api/live.py
+@@ -18,7 +18,7 @@ def create_live_router(  # noqa: C901
+     router = APIRouter()
+ 
+     @router.websocket("/api/ws/sessions/{session_id}")
+-    async def session_ws(ws: WebSocket, session_id: UUID):
++    async def session_ws(ws: WebSocket, session_id: UUID) -> None:
+         if not await _check_ws_runtime_lease(ws):
+             return
+         origin = ws.headers.get("origin")
+diff --git a/backend/app/api/simulation.py b/backend/app/api/simulation.py
+index 90993a9..e97c739 100644
+--- a/backend/app/api/simulation.py
++++ b/backend/app/api/simulation.py
+@@ -22,8 +22,10 @@ def create_simulation_router(
+ 
+     @router.post("/api/sessions/{session_id}/simulate")
+     async def control_simulation(
+-        session_id: UUID, body: SimulationControl, user=admin_steward_dependency
+-    ):
++        session_id: UUID,
++        body: SimulationControl,
++        user: object = admin_steward_dependency,
++    ) -> dict[str, object]:
+         if mongo_ready() is None:
+             raise HTTPException(503, "MongoDB telemetry store is unavailable")
+         sim = get_simulations().get(str(session_id))
+diff --git a/backend/app/user_router.py b/backend/app/user_router.py
+index 662df23..f51b67e 100644
+--- a/backend/app/user_router.py
++++ b/backend/app/user_router.py
+@@ -36,23 +36,23 @@ def create_user_router(
+     def users(
+         limit: int = Query(50, ge=1, le=200),
+         offset: int = Query(0, ge=0),
+-        user=admin_user,
+-    ):
++        user: object = admin_user,
++    ) -> object:
+         return jsonable(list_users(limit, offset))
+ 
+     @router.get("/api/users/{user_id}")
+-    def get_user(user_id: UUID, user=admin_user):
++    def get_user(user_id: UUID, user: object = admin_user) -> object:
+         result = get_user_record(user_id)
+         if not result:
+             raise HTTPException(404, "User not found")
+         return jsonable(result)
+ 
+     @router.post("/api/users", status_code=201)
+-    def create_user(body: UserCreate, user=admin_user):
++    def create_user(body: UserCreate, user: object = admin_user) -> object:
+         return jsonable(create_user_record(body))
+ 
+     @router.patch("/api/users/{user_id}")
+-    def update_user(user_id: UUID, body: UserPatch, user=admin_user):
++    def update_user(user_id: UUID, body: UserPatch, user: object = admin_user) -> object:
+         try:
+             updated = update_user_record(user_id, body)
+         except UserPatchError as exc:
+@@ -62,7 +62,7 @@ def create_user_router(
+         return jsonable(updated)
+ 
+     @router.delete("/api/users/{user_id}", status_code=204)
+-    def delete_user(user_id: UUID, user=admin_user):
++    def delete_user(user_id: UUID, user: object = admin_user) -> None:
+         result = delete_user_record(user_id)
+         errors = {
+             "not_found": (404, "User not found"),

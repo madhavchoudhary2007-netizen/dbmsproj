@@ -18,7 +18,7 @@ def create_live_router(  # noqa: C901
     router = APIRouter()
 
     @router.websocket("/api/ws/sessions/{session_id}")
-    async def session_ws(ws: WebSocket, session_id: UUID):
+    async def session_ws(ws: WebSocket, session_id: UUID) -> None:
         if not await _check_ws_runtime_lease(ws):
             return
         origin = ws.headers.get("origin")

@@ -22,8 +22,10 @@ def create_simulation_router(
 
     @router.post("/api/sessions/{session_id}/simulate")
     async def control_simulation(
-        session_id: UUID, body: SimulationControl, user=admin_steward_dependency
-    ):
+        session_id: UUID,
+        body: SimulationControl,
+        user: object = admin_steward_dependency,
+    ) -> dict[str, object]:
         if mongo_ready() is None:
             raise HTTPException(503, "MongoDB telemetry store is unavailable")
         sim = get_simulations().get(str(session_id))

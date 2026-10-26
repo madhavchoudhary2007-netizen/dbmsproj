@@ -3,11 +3,6 @@ updated_at: 2026-10-26
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44560 W1 — OPEN
-- target_files: frontend/components/pages/live/index.tsx
-- contract: Remove Recharts from the /live route initial client bundle by lazy-loading the selected-driver TelemetryCharts view with next/dynamic and the prescribed NbSkeleton chart fallback. Preserve the current chart contents, five data states, dimensions and route behavior.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
-
 ### T-44559 W2 — OPEN
 - target_files: backend/app/user_router.py, backend/app/api/simulation.py, backend/app/api/live.py
 - contract: Finish the strict annotations in the user router, simulation route and live WebSocket router. Eliminate the existing mypy errors in these three modules with precise parameter and return types; preserve all route contracts, dependency defaults, authentication and runtime behavior.
@@ -23,6 +18,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44560 acceptedb1397e6; verify0.
 - T-44558 acceptede58928e; verify0.
 - T-44557 accepted48d841a; verify0.
 - T-44556 acceptedce4189e; verify0.

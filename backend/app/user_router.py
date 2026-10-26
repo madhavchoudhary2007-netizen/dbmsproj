@@ -36,23 +36,23 @@ def create_user_router(
     def users(
         limit: int = Query(50, ge=1, le=200),
         offset: int = Query(0, ge=0),
-        user=admin_user,
-    ):
+        user: object = admin_user,
+    ) -> object:
         return jsonable(list_users(limit, offset))
 
     @router.get("/api/users/{user_id}")
-    def get_user(user_id: UUID, user=admin_user):
+    def get_user(user_id: UUID, user: object = admin_user) -> object:
         result = get_user_record(user_id)
         if not result:
             raise HTTPException(404, "User not found")
         return jsonable(result)
 
     @router.post("/api/users", status_code=201)
-    def create_user(body: UserCreate, user=admin_user):
+    def create_user(body: UserCreate, user: object = admin_user) -> object:
         return jsonable(create_user_record(body))
 
     @router.patch("/api/users/{user_id}")
-    def update_user(user_id: UUID, body: UserPatch, user=admin_user):
+    def update_user(user_id: UUID, body: UserPatch, user: object = admin_user) -> object:
         try:
             updated = update_user_record(user_id, body)
         except UserPatchError as exc:
@@ -62,7 +62,7 @@ def create_user_router(
         return jsonable(updated)
 
     @router.delete("/api/users/{user_id}", status_code=204)
-    def delete_user(user_id: UUID, user=admin_user):
+    def delete_user(user_id: UUID, user: object = admin_user) -> None:
         result = delete_user_record(user_id)
         errors = {
             "not_found": (404, "User not found"),
