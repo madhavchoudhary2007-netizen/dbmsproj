@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { TriangleAlert } from "lucide-react";
 import { refreshLiveLists } from "@/lib/live-list-refresh";
 import { createLiveDemoActions } from "@/lib/live-demo-actions";
@@ -9,8 +10,12 @@ import { startInitialLiveSelection, startLiveListPolling } from "@/lib/live-list
 import { startLiveStream } from "@/lib/live-stream";
 import { NbBadge } from "@/components/nb/badge";
 import { NbCard } from "@/components/nb/card";
+import { NbSkeleton } from "@/components/nb/skeleton";
 import { useLiveTimingState } from "@/lib/use-live-timing-state";
-import { TelemetryCharts } from "./telemetry-charts";
+const TelemetryCharts = dynamic(
+  () => import("./telemetry-charts").then((module) => module.TelemetryCharts),
+  { ssr: false, loading: () => <NbSkeleton variant="chart" /> },
+);
 import { RaceRecords } from "./race-records";
 import { TimingTower } from "./timing-tower";
 import { LatestTelemetry } from "./latest-telemetry";
