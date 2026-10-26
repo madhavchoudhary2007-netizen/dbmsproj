@@ -1,0 +1,19 @@
+{
+  "task_id": "T-44571",
+  "status": "PASSED",
+  "files_modified": [
+    {"path": "backend/app/main.py", "lines_added": 11, "lines_removed": 25},
+    {"path": "backend/app/api/race_operation_routes.py", "lines_added": 77, "lines_removed": 0}
+  ],
+  "diff_summary": "Moved construction and ordered registration of session-action, results-read, and results-write routers into the new API assembly module. Kept late-bound wrappers and main.py handler aliases.",
+  "verification": {
+    "command": "APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app",
+    "exit_code": 0,
+    "tests_passed": 11,
+    "tests_failed": 0,
+    "duration_ms": 1000,
+    "typecheck_errors": 0,
+    "lint_warnings": 0
+  },
+  "unresolved_blockers": []
+}

@@ -46,9 +46,7 @@ from .api.laps import race_lap_measurements as race_lap_measurements
 from .api.live import create_live_router
 from .api.pit_write import create_pit_write_router
 from .api.race_history_routes import register_race_history_routes
-from .api.results_read import create_results_read_router
-from .api.results_write import create_results_write_router
-from .api.session_action import create_session_action_router
+from .api.race_operation_routes import register_race_operation_routers
 from .api.simulation import create_simulation_router
 from .api.stewarding_reads import router as stewarding_reads_router
 from .api.stewards import create_stewards_router
@@ -276,7 +274,15 @@ app.include_router(
 app.include_router(create_user_router(roles, jsonable))
 
 
-session_action_router, session_action_handlers = create_session_action_router(
+(
+    session_action_router,
+    session_action_handlers,
+    results_read_router,
+    results_read_handlers,
+    results_write_router,
+    results_write_handlers,
+) = register_race_operation_routers(
+    app,
     lambda *a, **kw: _require_crud_record(*a, **kw),
     lambda *a, **kw: fetch_one(*a, **kw),
     lambda *a, **kw: ensure_session_reset_allowed(*a, **kw),
@@ -288,34 +294,14 @@ session_action_router, session_action_handlers = create_session_action_router(
     lambda value: jsonable(value),
     lambda *a, **kw: publish(*a, **kw),
     admin_steward_dependency,
+    lambda *a, **kw: fetch_all(*a, **kw),
+    authenticated_user_dependency,
 )
 session_action = session_action_handlers["session_action"]
-app.include_router(session_action_router)
-
-
-results_read_router, results_read_handlers = create_results_read_router(
-    lambda *a, **kw: fetch_all(*a, **kw),
-    lambda value: jsonable(value),
-    lambda *a, **kw: connection(*a, **kw),
-    authenticated_user_dependency,
-    admin_steward_dependency,
-)
 results = results_read_handlers["results"]
 standings = results_read_handlers["standings"]
 recalculate = results_read_handlers["recalculate"]
-app.include_router(results_read_router)
-
-
-results_write_router, results_write_handlers = create_results_write_router(
-    lambda *a, **kw: fetch_one(*a, **kw),
-    lambda *a, **kw: connection(*a, **kw),
-    lambda: simulations,
-    lambda *a, **kw: publish(*a, **kw),
-    lambda value: jsonable(value),
-    admin_steward_dependency,
-)
 save_results = results_write_handlers["save_results"]
-app.include_router(results_write_router)
 
 
 stewards_router, stewards_handlers = create_stewards_router(

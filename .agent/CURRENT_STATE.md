@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: ed947dd
+git_head: d134e39
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -46,3 +46,6 @@ last_eval_score: obsolete 51.2974; no current score; final T430
 
 - T-44569 accepteded947dd: Extracted race archive and lap route registration into a static API assembly module, retaining late-bound dependencies, route order, and main-module aliases. Verify0.
 - T-44569 packet review caught one missing source range, then a dynamic import and loss of late-bound wrappers; repair packets corrected both. No out-of-scope files changed.
+
+- T-44570 acceptedd134e39: Moved SQL then Mongo router construction and registration into dbms_routes.py. main.py retains router, handler, and individual handler aliases, with the existing late-bound wrappers. Verify0.
+- T-44570 root acceptance reran contract snapshot + route registration (11 passed), strict mypy, Ruff and format; no DB startup/contact.
