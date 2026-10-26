@@ -6,6 +6,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from psycopg import sql
+from pydantic import BaseModel
 from pymongo.collection import Collection
 
 from ..core.request_auth import current_user
@@ -27,7 +28,30 @@ from ..crud_repository import (
     update_crud_row,
 )
 from ..database import fetch_one
+from ..schemas_competition import (
+    ChampionshipIn,
+    ChampionshipOut,
+    CircuitIn,
+    CircuitOut,
+    DriverIn,
+    DriverOut,
+    EventIn,
+    EventOut,
+    SessionIn,
+    SessionOut,
+    TeamIn,
+    TeamOut,
+)
 from .laps import admin, get_race_db, get_race_telemetry
+
+RESOURCE_SCHEMAS: dict[str, tuple[type[BaseModel], type[BaseModel]]] = {
+    "championships": (ChampionshipIn, ChampionshipOut),
+    "circuits": (CircuitIn, CircuitOut),
+    "teams": (TeamIn, TeamOut),
+    "drivers": (DriverIn, DriverOut),
+    "events": (EventIn, EventOut),
+    "sessions": (SessionIn, SessionOut),
+}
 
 _DEFAULT_REQUEST: Any = None
 
@@ -130,6 +154,24 @@ def _get_delete_telemetry(
     return _resolve_telemetry(request, cast(Collection[dict[str, Any]] | None, telemetry))
 
 
+def _resolve_crud_models(
+    resource: str, in_model: type[BaseModel] | None, out_model: type[BaseModel] | None
+) -> tuple[type[BaseModel] | None, type[BaseModel] | None]:
+    schemas = RESOURCE_SCHEMAS.get(resource)
+    resolved_in = in_model or (schemas[0] if schemas else None)
+    resolved_out = out_model or (schemas[1] if schemas else None)
+    return resolved_in, resolved_out
+
+
+def _resolve_crud_dependencies(table: str, auth_dep: Any, admin_dep: Any) -> tuple[Any, Any, Any]:
+    resolved_auth = auth_dep if auth_dep is not None else Depends(current_user)
+    resolved_admin = admin_dep if admin_dep is not None else Depends(admin)
+    telemetry_dep = (
+        Depends(get_race_telemetry) if table == "race_sessions" else Depends(lambda: None)
+    )
+    return resolved_auth, resolved_admin, telemetry_dep
+
+
 def create_crud_router(
     resource: str,
     table: str,
@@ -137,6 +179,8 @@ def create_crud_router(
     joins: str = "",
     select: str | None = None,
     *,
+    in_model: type[BaseModel] | None = None,
+    out_model: type[BaseModel] | None = None,
     authenticated_user_dependency: Any = None,
     admin_role_dependency: Any = None,
     limit_offset: Callable[..., Any] = limit_offset,
@@ -152,15 +196,13 @@ def create_crud_router(
     delete_crud_row: Callable[..., Any] = delete_crud_row,
     get_telemetry_collection: Callable[[], Any] | None = None,
 ) -> APIRouter:
+    in_model, out_model = _resolve_crud_models(resource, in_model, out_model)
+    resp_list: Any = cast(Any, list)[out_model] if out_model is not None else None
+    resp_item: Any = out_model if out_model is not None else None
+
     router = APIRouter()
-    auth_dep = (
-        authenticated_user_dependency
-        if authenticated_user_dependency is not None
-        else Depends(current_user)
-    )
-    admin_dep = admin_role_dependency if admin_role_dependency is not None else Depends(admin)
-    telemetry_dep: Any = (
-        Depends(get_race_telemetry) if table == "race_sessions" else Depends(lambda: None)
+    auth_dep, admin_dep, telemetry_dep = _resolve_crud_dependencies(
+        table, authenticated_user_dependency, admin_role_dependency
     )
     projection = select or f"{table}.*"
     base = (
@@ -170,7 +212,7 @@ def create_crud_router(
     )
     prefix = f"/api/{resource}"
 
-    @router.get(prefix, response_model=None)
+    @router.get(prefix, response_model=resp_list)
     def listing(
         limit: int = Query(50, ge=1, le=200),
         offset: int = Query(0, ge=0),
@@ -182,7 +224,7 @@ def create_crud_router(
         raw_rows = _fetch_listing_rows(base, page_limit, page_offset, db, list_crud_rows)
         return cast(list[dict[str, object]], jsonable(raw_rows))
 
-    @router.get(prefix + "/{item_id}", response_model=None)
+    @router.get(prefix + "/{item_id}", response_model=resp_item)
     def get_item(
         item_id: UUID,
         user: dict[str, object] = auth_dep,
@@ -195,26 +237,30 @@ def create_crud_router(
             jsonable(_require_crud_record(result, f"{resource[:-1].capitalize()} not found")),
         )
 
-    @router.post(prefix, status_code=201, response_model=None)
     def create_item(
-        payload: dict[str, Any],
+        payload: Any,
         user: dict[str, object] = admin_dep,
         database: Annotated[DatabaseSession | None, Depends(get_race_db)] = None,
     ) -> dict[str, object]:
-        clean = _crud_write_payload(payload, cols)
+        raw = payload.model_dump(exclude_unset=True) if isinstance(payload, BaseModel) else payload
+        clean = _crud_write_payload(raw, cols)
         validate_session_laps(table, clean)
         _resolve_db(database)
         row = create_crud_row(table, clean)
         return cast(dict[str, object], jsonable(row))
 
-    @router.patch(prefix + "/{item_id}", response_model=None)
+    if in_model is not None:
+        create_item.__annotations__["payload"] = in_model
+    router.post(prefix, status_code=201, response_model=resp_item)(create_item)
+
     def update_item(
         item_id: UUID,
-        payload: dict[str, Any],
+        payload: Any,
         user: dict[str, object] = admin_dep,
         database: Annotated[DatabaseSession | None, Depends(get_race_db)] = None,
     ) -> dict[str, object]:
-        clean = _crud_write_payload(payload, cols)
+        raw = payload.model_dump(exclude_unset=True) if isinstance(payload, BaseModel) else payload
+        clean = _crud_write_payload(raw, cols)
         validate_session_laps(table, clean)
         if table == "race_sessions":
             db = _resolve_db(database)
@@ -224,6 +270,10 @@ def create_crud_router(
             dict[str, object],
             jsonable(_require_crud_record(row, f"{resource[:-1].capitalize()} not found")),
         )
+
+    if in_model is not None:
+        update_item.__annotations__["payload"] = in_model
+    router.patch(prefix + "/{item_id}", response_model=resp_item)(update_item)
 
     @router.delete(prefix + "/{item_id}", status_code=204, response_model=None)
     def delete_item(

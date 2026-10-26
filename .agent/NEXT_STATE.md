@@ -7,7 +7,7 @@ phase: 3 backend / 7 routes; no current score
 ## Queue (root must prepare exact packets before dispatch)
 ### T-44594 — RootLayout document-title accessibility fix
 - worker: W1 | priority: P1 | origin: E2E-R01 accessibility audit defect
-- target_files: frontend/app/layout.tsx
+- target_files: frontend/app/layout.tsx, frontend/next-env.d.ts
 - contract: Add static <head><title>ApexGrid | Race Operations</title></head> to RootLayout so every route has document-title present at domcontentloaded, passing accessibility.spec.ts 85/85.
 - verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts frontend/e2e/accessibility.spec.ts && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
