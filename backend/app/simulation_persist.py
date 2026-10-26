@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections.abc import Callable
 from typing import Any
 
@@ -16,13 +18,19 @@ def persist_tick(
     schedule_simulation_pit_stops: Callable[..., Any],
     record_simulated_incidents: Callable[..., Any],
 ) -> None:
-    for packet in packets:
-        inserted = col.insert_one(dict(packet))
-        publish(
-            sim.session_id,
-            "telemetry.sample",
-            telemetry_ws_payload(packet, inserted.inserted_id),
-        )
+    if packets:
+        docs = [dict(p) for p in packets]
+        if hasattr(col, "insert_many"):
+            inserted = col.insert_many(docs, ordered=False)
+            inserted_ids = inserted.inserted_ids
+        else:
+            inserted_ids = [col.insert_one(doc).inserted_id for doc in docs]
+        for packet, inserted_id in zip(packets, inserted_ids, strict=False):
+            publish(
+                sim.session_id,
+                "telemetry.sample",
+                telemetry_ws_payload(packet, inserted_id),
+            )
     publish(sim.session_id, "timing.update", timing)
     schedule_simulation_pit_stops(sim, packets)
     record_simulated_incidents(sim, packets)

@@ -1,0 +1,27 @@
+{
+  "task_id": "T-44595",
+  "status": "PASSED",
+  "files_modified": [
+    {
+      "path": "backend/app/simulation_persist.py",
+      "lines_added": 15,
+      "lines_removed": 7
+    },
+    {
+      "path": "backend/app/simulation_runner.py",
+      "lines_added": 219,
+      "lines_removed": 48
+    }
+  ],
+  "diff_summary": "Replaced per-packet insert_one with batched col.insert_many(ordered=False) in simulation_persist.py while preserving sample publish order; offloaded blocking MongoDB aggregate and SQL operations in simulation_runner.py to asyncio.to_thread with legacy lifespan pool and cross-module resolution compatibility.",
+  "verification": {
+    "command": "PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_simulation_replay.py backend/tests/test_telemetry_ordering.py backend/tests/test_telemetry_ingest_contract.py backend/tests/test_api.py -k \"test_app_lifespan or test_restarting_simulator or test_websocket_bus or f_dom_05\" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app",
+    "exit_code": 0,
+    "tests_passed": 7,
+    "tests_failed": 0,
+    "duration_ms": 1200,
+    "typecheck_errors": 0,
+    "lint_warnings": 0
+  },
+  "unresolved_blockers": []
+}
