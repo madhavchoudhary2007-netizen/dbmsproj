@@ -86,7 +86,7 @@ export function DbmsShowcase() {
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
         <span className="font-mono text-xs font-bold uppercase tracking-wider text-ink/70">DATABASE ENGINEERING / DBMS SHOWCASE</span>
-        <h1 className="font-sans text-2xl font-black uppercase text-ink md:text-3xl">PostgreSQL & Database Capabilities</h1>
+        <h1 className="font-sans text-2xl font-bold uppercase text-ink md:text-3xl">PostgreSQL & Database Capabilities</h1>
       </div>
       <NbTabs label="DBMS Showcase Capabilities" items={TABS} value={tab} onChange={(val) => setTab(val as TabKey)} />
       <NbCard tone="paper" shadow={8} className="p-6">
