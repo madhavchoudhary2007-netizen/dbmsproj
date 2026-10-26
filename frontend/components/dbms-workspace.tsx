@@ -4,30 +4,20 @@ import { useEffect, useMemo, useState } from "react";
 import { api, asArray, Row } from "@/lib/api";
 import dynamic from "next/dynamic";
 import { Button, DataTable, Modal } from "./ui";
-const RaceDatabase = dynamic(
-  () => import("./race-database").then((mod) => mod.RaceDatabase),
-  {
-    loading: () => <div className="p-4 text-muted">Loading race database...</div>,
-  }
-);
+const RaceDatabase = dynamic(() => import("./race-database").then((mod) => mod.RaceDatabase), { loading: () => <div className="p-4 text-muted">Loading race database...</div> });
+const EerDiagram = dynamic(() => import("./race-database").then((mod) => mod.EerDiagram), { loading: () => <div className="p-4 text-muted">Loading EER diagram...</div> });
+const DbmsShowcase = dynamic(() => import("./dbms-showcase").then((mod) => mod.DbmsShowcase), { loading: () => <div className="p-4 text-muted">Loading showcase...</div> });
 
-const EerDiagram = dynamic(
-  () => import("./race-database").then((mod) => mod.EerDiagram),
-  {
-    loading: () => <div className="p-4 text-muted">Loading EER diagram...</div>,
-  }
-);
-
-type View = "overview" | "race" | "tables" | "eer" | "schema" | "indexes" | "plans" | "locks" | "telemetry" | "mongo-collections" | "mongo-indexes" | "polyglot" | "operations";
+type View = "overview" | "showcase" | "race" | "tables" | "eer" | "schema" | "indexes" | "plans" | "locks" | "telemetry" | "mongo-collections" | "mongo-indexes" | "polyglot" | "operations";
 const views: [View, string][] = [
-  ["overview", "Overview"], ["race", "Race records"], ["tables", "SQL tables"],
+  ["overview", "Overview"], ["showcase", "Showcase"], ["race", "Race records"], ["tables", "SQL tables"],
   ["eer", "EER model"], ["schema", "Schema"], ["indexes", "Indexes"],
   ["plans", "Query plans"], ["locks", "Locks"], ["telemetry", "Documents"],
   ["mongo-collections", "Collections"], ["mongo-indexes", "Indexes"],
   ["polyglot", "Cross-store"], ["operations", "Operations"],
 ];
 const viewGroups: { label: string; views: View[] }[] = [
-  { label: "Workspace", views: ["overview"] },
+  { label: "Workspace", views: ["overview", "showcase"] },
   { label: "PostgreSQL", views: ["race", "tables", "eer", "schema", "indexes", "plans", "locks", "operations"] },
   { label: "MongoDB", views: ["mongo-collections", "mongo-indexes", "telemetry"] },
   { label: "Cross-store", views: ["polyglot"] },
@@ -270,9 +260,10 @@ export function DbmsWorkspace() {
         })}</div>
       </div>)}
     </nav>
-    <div className="dbms-workspace-toolbar"><div><span className="eyebrow">CURRENT VIEW</span><h2>{views.find(([id]) => id === view)?.[1]}</h2></div><div className="dbms-workspace-tools"><span className="muted">{updatedAt && !["overview","race","eer","operations"].includes(view) ? `Updated ${new Date(updatedAt).toLocaleTimeString()} · auto refresh` : view === "race" ? "Live races refresh automatically" : view === "operations" ? "Actions run on demand" : "Live status refreshes every 5 seconds"}</span><Button kind="secondary" onClick={() => setRevision((value) => value + 1)}>Refresh</Button></div></div>
+    <div className="dbms-workspace-toolbar"><div><span className="eyebrow">CURRENT VIEW</span><h2>{views.find(([id]) => id === view)?.[1]}</h2></div><div className="dbms-workspace-tools"><span className="muted">{updatedAt && !["overview","showcase","race","eer","operations"].includes(view) ? `Updated ${new Date(updatedAt).toLocaleTimeString()} · auto refresh` : view === "race" ? "Live races refresh automatically" : view === "operations" ? "Actions run on demand" : "Live status refreshes every 5 seconds"}</span><Button kind="secondary" onClick={() => setRevision((value) => value + 1)}>Refresh</Button></div></div>
     {readError && <div className="notice error-notice">{readError}</div>}
-    {view === "overview" && <section className="panel"><div className="eyebrow">WORKSPACE</div><h2>Database views and operations</h2><p className="muted">Choose a view above to inspect actual PostgreSQL or MongoDB records. Live status updates every five seconds; race records, table rows and read-only diagnostics refresh while their view is open. Write demonstrations run only when selected.</p><div className="dbms-overview-links"><button type="button" onClick={() => selectView("race")}>Open live race records →</button><button type="button" onClick={() => selectView("tables")}>Browse SQL tables →</button><button type="button" onClick={() => selectView("operations")}>Run DBMS operations →</button></div></section>}
+    {view === "overview" && <section className="panel"><div className="eyebrow">WORKSPACE</div><h2>Database views and operations</h2><p className="muted">Choose a view above to inspect actual PostgreSQL or MongoDB records. Live status updates every five seconds; race records, table rows and read-only diagnostics refresh while their view is open. Write demonstrations run only when selected.</p><div className="dbms-overview-links"><button type="button" onClick={() => selectView("showcase")}>Open DBMS showcase →</button><button type="button" onClick={() => selectView("race")}>Open live race records →</button><button type="button" onClick={() => selectView("tables")}>Browse SQL tables →</button><button type="button" onClick={() => selectView("operations")}>Run DBMS operations →</button></div></section>}
+    {view === "showcase" && <DbmsShowcase />}
     {view === "race" && <RaceDatabase selectedRace={raceSelection} onSelectRace={setRaceSelection} refreshToken={revision} />}
     {view === "eer" && <EerDiagram />}
     {view === "tables" && <section className="panel"><div className="eyebrow">POSTGRESQL / PUBLIC BASE TABLES</div><h2>Relational table browser</h2><p className="muted">Select a table for live row counts and paged records. Password hashes are hidden.</p><div className="dbms-table-picker" role="group" aria-label="Choose a PostgreSQL table">{tables.map((row) => { const name = String(row.table_name); return <button type="button" key={name} aria-pressed={table === name} className={table === name ? "is-active" : ""} onClick={() => {setTable(name); setTableOffset(0);}}>{name}<small>{String(row.row_count)} rows</small></button>; })}</div><div className="inline-form"><label>Table<select aria-label="Database table" value={table} onChange={(event) => {setTable(event.target.value); setTableOffset(0);}}>{tables.map((row) => <option key={String(row.table_name)} value={String(row.table_name)}>{String(row.table_name)} · {String(row.row_count)} rows</option>)}</select></label><span className="muted">{tableData ? `${tableData.total} rows · showing ${tableOffset + 1}–${Math.min(tableOffset + 50, tableData.total)}` : "Loading rows…"}</span></div><DataTable rows={inspectRows} columns={tableData?.columns || []}/><div className="dbms-pagination"><Button kind="secondary" disabled={tableOffset === 0} onClick={() => setTableOffset((value) => Math.max(0, value - 50))}>Previous</Button><Button kind="secondary" disabled={!tableData || tableOffset + 50 >= tableData.total} onClick={() => setTableOffset((value) => value + 50)}>Next</Button></div></section>}
