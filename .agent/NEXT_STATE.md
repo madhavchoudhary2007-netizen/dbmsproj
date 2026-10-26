@@ -3,14 +3,6 @@ updated_at: 2026-10-26
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44566 — Move automatic pit reservation persistence into the repository
-- worker: W2 | priority: P1 | origin: T-331 main.py split tranche; shared database operation currently lives in the app entrypoint
-- target_files: backend/app/main.py, backend/app/pit_repository.py
-- read_only_context: docs/overhaul-plan.md (Phase 3 T-331); backend/app/main.py (110–125, 278–301); backend/app/pit_repository.py (1–25)
-- contract: Move create_automatic_reservation to pit_repository, retain its signature, SQL and row/error behavior, and re-export/import it from main so existing callers remain unchanged.
-- boundaries: structural move only; no behavior, API, schema, tests, or dependency changes; <=150 changed lines
-- verify: .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/mypy --strict backend/app && .venv/bin/ruff check backend/app && .venv/bin/ruff format --check backend/app
-
 ### T-44567 — Reduce standings podium cards to three type sizes
 - worker: W1 | priority: P2 | origin: TASTE-389-1
 - target_files: frontend/app/styles/components.css
@@ -23,13 +15,13 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
 
 ## Deferred
-- TASTE-389-1: frontend/app/styles/components.css:101 — podium cards use display, heading, body, data and smaller point-label type sizes; reduce to at most three sizes per card.
 - TASTE-382-BLOAT: resource-page.tsx >300lines; split genuine reusable presentation/runtime responsibilities after T382 flow coverage, no single-call fake wrappers.
 
 - TASTE-381-1: four KPIface accents followT381 but exceedT400 max3; consolidate supportingcolourbeforeA5, preserve data/features and thresholds.
 - P-3 DBMS: full-route initial-asset measurement is fixed; Live now passes at 161.29 KiB, DBMS remains 260.10 KiB (170 KiB limit). Reduce DBMS initial bundle after Phase 4 and T-393 dependencies; never change the threshold.
 
 ## Done
+- T-44566 accepted01edfca; verify0.
 - T-389 acceptede5ebfeb; verify0.
 - T-44565 accepted669f39e; verify0.
 - T-44564 accepted8b064db; verify0.

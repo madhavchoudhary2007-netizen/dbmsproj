@@ -98,12 +98,12 @@
   .podium-place-2 { animation-delay: 60ms; }
   .podium-place-1 { min-height: 192px; background: var(--nb-yellow); animation-delay: 0ms; }
   .podium-place-3 { animation-delay: 120ms; }
-  .podium-position { display: block; color: transparent; font-family: var(--font-sans); font-size: var(--fs-display); font-weight: 700; line-height: 1; -webkit-text-stroke: 2px var(--nb-ink); }
+  .podium-position { display: block; color: transparent; font-family: var(--font-sans); font-size: var(--fs-heading); font-weight: 700; line-height: 1; -webkit-text-stroke: 2px var(--nb-ink); }
   .podium-card h2, .podium-card p { overflow-wrap: anywhere; }
   .podium-card h2 { margin-block: 8px; font-size: var(--fs-heading); }
   .podium-card p { margin-block: 8px; }
   .podium-card > strong { font-family: var(--font-mono); font-size: var(--fs-data); }
-  .podium-card > strong span { font-family: var(--font-sans); font-size: 0.75em; }
+  .podium-card > strong span { font-family: var(--font-sans); font-size: var(--fs-body); }
   @keyframes podium-rise { from { transform: translateY(16px); } to { transform: translateY(0); } }
   @media (max-width: 619px) {
     .standings-podium { gap: 8px; }

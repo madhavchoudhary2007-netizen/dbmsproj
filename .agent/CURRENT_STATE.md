@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: e5ebfeb
+git_head: 01edfca
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -51,3 +51,5 @@ last_eval_score: obsolete 51.2974; no current score; final T430
 - T-44565 accepted669f39e: Removed added runtime guards and used static local annotations for dynamic results. Preserved the nullable demo builder result and PostgreSQL pool generic annotations. Verify0.
 
 - T-389 acceptede5ebfeb: Added a red accent band to the selected championship's empty state and changed the top-ten marquee to the approved red tone, keeping ink text and existing standings behavior intact. Verify0.
+
+- T-44566 accepted01edfca: Moved create_automatic_reservation into pit_repository.py and imported it in main.py, preserving its signature and behavior. Verify0.
