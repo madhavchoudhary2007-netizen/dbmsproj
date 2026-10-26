@@ -6,12 +6,12 @@ phase: 3 T-331/T-332 consolidated milestone + remaining phase 7; no current over
 
 ## Queue
 
-### T-44575 — Race-history domain dependency injection and router consolidation
+### T-44576 — DBMS showcase domain dependency injection and router consolidation
 - worker: W2 | priority: P1 | origin: T-331/T-332 structural milestone
-- target_files: backend/app/api/race_archive.py, backend/app/api/laps.py, backend/app/api/race_history_routes.py, backend/app/main.py
-- contract: Move race-history reads into domain APIRouters using FastAPI dependency injection (get_database, get_telemetry, require_roles("admin"), current_user). Fold intermediate assembly glue. Preserve exact OpenAPI contract, route uniqueness, and compatibility with test monkeypatches and exported aliases.
-- boundaries: Up to 4 target files, <=350 changed lines. No edits outside target files; no API/OpenAPI breaking changes; no database migrations or new dependencies.
-- verify: APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_api.py -k "test_archive_provisional or test_historical_archive or test_simulation_keeps or test_demo_car_numbers or test_restarting_simulator" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
+- target_files: backend/app/api/dbms_sql.py, backend/app/api/dbms_mongo.py, backend/app/api/dbms_routes.py, backend/app/main.py
+- contract: Move DBMS showcase routes into domain APIRouters using FastAPI dependency injection (get_race_db, get_race_telemetry, get_mongo, admin). Fold intermediate assembly glue in dbms_routes.py and main.py. Preserve exact OpenAPI contracts, unique route registrations (including dbms_mongo_collections and dbms_mongo_collection_documents), and compatibility with exported aliases.
+- boundaries: Up to 4 target files, <=400 changed lines. No edits outside target files; no API/OpenAPI breaking changes; no database migrations or new dependencies.
+- verify: APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_api.py -k "test_runtime_route_registrations or test_current_openapi" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
 
 ## Documentation checkpoint
 A matching T-44574 acceptance commit/result makes this checkpoint complete; never redispatch it as implementation.
@@ -38,4 +38,4 @@ A matching T-44574 acceptance commit/result makes this checkpoint complete; neve
 - Standings delta: no authoritative prior-rank field; no fabricated data. All other remaining tasks are in overhaul-plan.md and existing queue/backlog records; accepted implementation is not repeated.
 
 ## Recent accepted product tasks
-- T-44572 28c196f; T-44571 db57c59; T-44570 d134e39; T-44569 ed947dd; T-44568 b5f7f0e.
+- T-44575 1da3f59; T-44572 28c196f; T-44571 db57c59; T-44570 d134e39; T-44569 ed947dd; T-44568 b5f7f0e.

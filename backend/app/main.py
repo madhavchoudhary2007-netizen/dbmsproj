@@ -35,9 +35,73 @@ from . import token_revocation
 from .analytics_router import router as analytics_router
 from .api.crud import create_crud_router
 from .api.dbms_lock import create_dbms_lock_router
-from .api.dbms_mongo import create_dbms_mongo_router
-from .api.dbms_routes import register_dbms_routes
-from .api.dbms_sql import create_dbms_sql_router
+from .api.dbms_mongo import (
+    create_dbms_mongo_router as create_dbms_mongo_router,
+)
+from .api.dbms_mongo import (
+    dbms_mongo_collection_documents as dbms_mongo_collection_documents,
+)
+from .api.dbms_mongo import (
+    dbms_mongo_collections as dbms_mongo_collections,
+)
+from .api.dbms_mongo import (
+    dbms_mongo_handlers as dbms_mongo_handlers,
+)
+from .api.dbms_mongo import (
+    dbms_overview as dbms_overview,
+)
+from .api.dbms_mongo import (
+    dbms_polyglot as dbms_polyglot,
+)
+from .api.dbms_mongo import (
+    dbms_telemetry as dbms_telemetry,
+)
+from .api.dbms_mongo import (
+    router as dbms_mongo_router,
+)
+from .api.dbms_routes import register_dbms_routes as register_dbms_routes
+from .api.dbms_sql import (
+    constraint_demo as constraint_demo,
+)
+from .api.dbms_sql import (
+    create_dbms_sql_router as create_dbms_sql_router,
+)
+from .api.dbms_sql import (
+    dbms_eer as dbms_eer,
+)
+from .api.dbms_sql import (
+    dbms_explain as dbms_explain,
+)
+from .api.dbms_sql import (
+    dbms_indexes as dbms_indexes,
+)
+from .api.dbms_sql import (
+    dbms_locks as dbms_locks,
+)
+from .api.dbms_sql import (
+    dbms_races as dbms_races,
+)
+from .api.dbms_sql import (
+    dbms_schema as dbms_schema,
+)
+from .api.dbms_sql import (
+    dbms_sql_handlers as dbms_sql_handlers,
+)
+from .api.dbms_sql import (
+    dbms_table_rows as dbms_table_rows,
+)
+from .api.dbms_sql import (
+    dbms_tables as dbms_tables,
+)
+from .api.dbms_sql import (
+    public_dbms_tables as public_dbms_tables,
+)
+from .api.dbms_sql import (
+    router as dbms_sql_router,
+)
+from .api.dbms_sql import (
+    transaction_demo as transaction_demo,
+)
 from .api.health import health_live as health_live
 from .api.health import legacy_router as legacy_health_router
 from .api.health import register_legacy_health, register_readiness
@@ -688,40 +752,8 @@ app.include_router(health_router)
 admin_dependency = Depends(admin)
 
 
-(
-    dbms_sql_router,
-    dbms_sql_handlers,
-    dbms_mongo_router,
-    dbms_mongo_handlers,
-) = register_dbms_routes(
-    app,
-    create_dbms_sql_router,
-    create_dbms_mongo_router,
-    lambda *a, **kw: fetch_all(*a, **kw),
-    lambda value: jsonable(value),
-    admin_dependency,
-    lambda: connection(),
-    lambda *a, **kw: fetch_one(*a, **kw),
-    lambda: mongo_ready(),
-    lambda: mongo_database_ready(),
-    MONGODB_DATABASE,
-)
-public_dbms_tables = dbms_sql_handlers["public_dbms_tables"]
-dbms_tables = dbms_sql_handlers["dbms_tables"]
-dbms_schema = dbms_sql_handlers["dbms_schema"]
-dbms_indexes = dbms_sql_handlers["dbms_indexes"]
-dbms_locks = dbms_sql_handlers["dbms_locks"]
-dbms_eer = dbms_sql_handlers["dbms_eer"]
-dbms_explain = dbms_sql_handlers["dbms_explain"]
-dbms_races = dbms_sql_handlers["dbms_races"]
-constraint_demo = dbms_sql_handlers["constraint_demo"]
-transaction_demo = dbms_sql_handlers["transaction_demo"]
-dbms_table_rows = dbms_sql_handlers["dbms_table_rows"]
-dbms_overview = dbms_mongo_handlers["dbms_overview"]
-dbms_telemetry = dbms_mongo_handlers["dbms_telemetry"]
-dbms_mongo_collections = dbms_mongo_handlers["dbms_mongo_collections"]
-dbms_mongo_collection_documents = dbms_mongo_handlers["dbms_mongo_collection_documents"]
-dbms_polyglot = dbms_mongo_handlers["dbms_polyglot"]
+app.include_router(dbms_sql_router)
+app.include_router(dbms_mongo_router)
 
 
 app.include_router(race_archive_router)
@@ -737,6 +769,9 @@ def mongo_database_ready() -> Database[dict[str, Any]]:
     if mongo_client is None:
         raise HTTPException(503, "MongoDB document store is unavailable")
     return mongo_client[MONGODB_DATABASE]
+
+
+_default_mongo_database_ready = mongo_database_ready
 
 
 lock_demo_guard = threading.Lock()

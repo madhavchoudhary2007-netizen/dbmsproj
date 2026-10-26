@@ -1,0 +1,37 @@
+{
+  "task_id": "T-44576",
+  "status": "PASSED",
+  "files_modified": [
+    {
+      "path": "backend/app/api/dbms_mongo.py",
+      "lines_added": 435,
+      "lines_removed": 119
+    },
+    {
+      "path": "backend/app/api/dbms_routes.py",
+      "lines_added": 81,
+      "lines_removed": 29
+    },
+    {
+      "path": "backend/app/api/dbms_sql.py",
+      "lines_added": 390,
+      "lines_removed": 61
+    },
+    {
+      "path": "backend/app/main.py",
+      "lines_added": 72,
+      "lines_removed": 37
+    }
+  ],
+  "diff_summary": "Refactored dbms_sql and dbms_mongo to APIRouters with FastAPI Depends injection (get_race_db, get_race_telemetry, get_mongo_db, admin). Folded intermediate assembly lambdas in main.py, mounting routers directly. Preserved backwards-compatible factories, handlers, and re-exported aliases with exact OpenAPI compatibility and route registration uniqueness.",
+  "verification": {
+    "command": "APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_api.py -k \"test_runtime_route_registrations or test_current_openapi\" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app",
+    "exit_code": 0,
+    "tests_passed": 2,
+    "tests_failed": 0,
+    "duration_ms": 613,
+    "typecheck_errors": 0,
+    "lint_warnings": 0
+  },
+  "unresolved_blockers": []
+}
