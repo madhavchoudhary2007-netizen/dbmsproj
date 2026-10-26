@@ -168,8 +168,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <div
         ref={backgroundRef}
         className="main-shell"
-        aria-hidden={isMobile && open ? true : undefined}
-        inert={isMobile && open ? true : undefined}
       >
         <header className="topbar">
           <button ref={menuButtonRef} className="mobile-menu" aria-label="Open navigation" aria-expanded={open} aria-controls="primary-navigation" onClick={() => setOpen(true)}>
@@ -188,7 +186,15 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
         <ShellRaceControl items={raceControlItems(feed.data)} status={feed.status} error={feed.error} onRefresh={feed.refresh} />
-        <main className="content" id="main-content" tabIndex={-1}>{children}</main>
+        <main
+          className="content"
+          id="main-content"
+          tabIndex={-1}
+          aria-hidden={isMobile && open ? true : undefined}
+          inert={isMobile && open ? true : undefined}
+        >
+          {children}
+        </main>
         <footer className="footer">
           <span>APEXGRID MOTORSPORT OPERATIONS</span>
           <span>CONTROL SYSTEM · BUILD 1.0</span>
