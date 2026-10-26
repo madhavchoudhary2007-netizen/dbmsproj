@@ -36,6 +36,7 @@ from .analytics_router import router as analytics_router
 from .api.crud import create_crud_router
 from .api.dbms_lock import create_dbms_lock_router
 from .api.dbms_mongo import create_dbms_mongo_router
+from .api.dbms_routes import register_dbms_routes
 from .api.dbms_sql import create_dbms_sql_router
 from .api.health import health_live as health_live
 from .api.health import legacy_router as legacy_health_router
@@ -674,11 +675,23 @@ def admin(user: dict[str, Any] = admin_role_dependency) -> dict[str, Any]:
 admin_dependency = Depends(admin)
 
 
-dbms_sql_router, dbms_sql_handlers = create_dbms_sql_router(
+(
+    dbms_sql_router,
+    dbms_sql_handlers,
+    dbms_mongo_router,
+    dbms_mongo_handlers,
+) = register_dbms_routes(
+    app,
+    create_dbms_sql_router,
+    create_dbms_mongo_router,
     lambda *a, **kw: fetch_all(*a, **kw),
-    lambda v: jsonable(v),
+    lambda value: jsonable(value),
     admin_dependency,
     lambda: connection(),
+    lambda *a, **kw: fetch_one(*a, **kw),
+    lambda: mongo_ready(),
+    lambda: mongo_database_ready(),
+    MONGODB_DATABASE,
 )
 public_dbms_tables = dbms_sql_handlers["public_dbms_tables"]
 dbms_tables = dbms_sql_handlers["dbms_tables"]
@@ -691,24 +704,11 @@ dbms_races = dbms_sql_handlers["dbms_races"]
 constraint_demo = dbms_sql_handlers["constraint_demo"]
 transaction_demo = dbms_sql_handlers["transaction_demo"]
 dbms_table_rows = dbms_sql_handlers["dbms_table_rows"]
-app.include_router(dbms_sql_router)
-
-
-dbms_mongo_router, dbms_mongo_handlers = create_dbms_mongo_router(
-    lambda *a, **kw: fetch_one(*a, **kw),
-    lambda value: jsonable(value),
-    lambda: mongo_ready(),
-    admin_dependency,
-    lambda: mongo_database_ready(),
-    MONGODB_DATABASE,
-    lambda *a, **kw: fetch_all(*a, **kw),
-)
 dbms_overview = dbms_mongo_handlers["dbms_overview"]
 dbms_telemetry = dbms_mongo_handlers["dbms_telemetry"]
 dbms_mongo_collections = dbms_mongo_handlers["dbms_mongo_collections"]
 dbms_mongo_collection_documents = dbms_mongo_handlers["dbms_mongo_collection_documents"]
 dbms_polyglot = dbms_mongo_handlers["dbms_polyglot"]
-app.include_router(dbms_mongo_router)
 
 
 race_history_handlers = register_race_history_routes(

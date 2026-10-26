@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: b5f7f0e
+git_head: ed947dd
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -43,3 +43,6 @@ last_eval_score: obsolete 51.2974; no current score; final T430
 
 - T-44568 acceptedb5f7f0e: Moved the startup and shutdown lifecycle to core/lifespan.py. main.py retains the lifespan export and Mongo globals; startup uses the existing bus, simulations, and deferred demo helper. Verify0.
 - T-44568 root acceptance reran contract snapshot + route registration (11 passed), strict mypy, Ruff and format; no DB startup/contact. Full DB suite remains represented by latest disposable-stack evidence above.
+
+- T-44569 accepteded947dd: Extracted race archive and lap route registration into a static API assembly module, retaining late-bound dependencies, route order, and main-module aliases. Verify0.
+- T-44569 packet review caught one missing source range, then a dynamic import and loss of late-bound wrappers; repair packets corrected both. No out-of-scope files changed.
