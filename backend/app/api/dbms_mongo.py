@@ -23,7 +23,7 @@ def create_dbms_mongo_router(
     router = APIRouter()
 
     @router.get("/api/dbms/overview")
-    def dbms_overview(user=admin_dependency):
+    def dbms_overview(user: Any = admin_dependency) -> Any:
         counts = fetch_one("""SELECT
       (SELECT count(*) FROM race_sessions WHERE state='ACTIVE') AS active_sessions,
       (SELECT count(*) FROM race_sessions WHERE state='COMPLETED') AS completed_sessions,
@@ -48,7 +48,7 @@ def create_dbms_mongo_router(
         )
 
     @router.get("/api/dbms/telemetry")
-    def dbms_telemetry(user=admin_dependency):
+    def dbms_telemetry(user: Any = admin_dependency) -> Any:
         try:
             col = mongo_ready()
             return {
@@ -88,7 +88,7 @@ def _register_polyglot_handler(
     fetch_all: Callable[..., list[DatabaseRow]],
 ) -> dict[str, Callable[..., Any]]:
     @router.get("/api/dbms/polyglot")
-    def dbms_polyglot(user=admin_dependency):
+    def dbms_polyglot(user: Any = admin_dependency) -> Any:
         sql = """SELECT s.id AS session_id,s.state,d.id AS driver_id,u.full_name
       FROM race_sessions s JOIN (
         SELECT session_id,driver_id FROM session_results
@@ -100,7 +100,7 @@ def _register_polyglot_handler(
         col = mongo_ready()
         grouped = {}
         recent_cutoff = datetime.now(UTC) - timedelta(days=30)
-        pipeline = [
+        pipeline: list[dict[str, Any]] = [
             {"$match": {"ts": {"$gte": recent_cutoff}}},
             {"$sort": {"ts": -1}},
             {"$limit": 5000},
@@ -137,7 +137,7 @@ def _register_collection_handlers(
     MONGODB_DATABASE: str,
 ) -> dict[str, Callable[..., Any]]:
     @router.get("/api/dbms/mongo/collections")
-    def dbms_mongo_collections(user=admin_dependency):
+    def dbms_mongo_collections(user: Any = admin_dependency) -> Any:
         """List application collections with their actual document and index metadata."""
         try:
             database = mongo_database_ready()
@@ -185,8 +185,8 @@ def _register_document_handlers(
         driver_id: str | None = Query(None, max_length=64),
         lap: int | None = Query(None, ge=1),
         sector: int | None = Query(None, ge=1, le=3),
-        user=admin_dependency,
-    ):
+        user: Any = admin_dependency,
+    ) -> Any:
         (
             "Browse one real Mongo collection without permitting arbitrary collection "
             # Keep the docstring split within the configured line length.

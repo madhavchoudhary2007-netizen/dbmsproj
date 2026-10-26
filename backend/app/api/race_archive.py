@@ -24,7 +24,7 @@ def create_race_archive_router(
     router = APIRouter()
 
     @router.get("/api/dbms/races/{session_id}")
-    def dbms_race(session_id: UUID, include_laps: bool = True, user=admin_dependency):
+    def dbms_race(session_id: UUID, include_laps: bool = True, user: Any = admin_dependency) -> Any:
         session = fetch_one(
             (
                 "SELECT s.*,e.name AS event_name,c.name AS circuit_"
@@ -75,15 +75,19 @@ def create_race_archive_router(
         # Full lap history is optional for the 1s live poll; it grows with every race lap.
         laps = race_lap_measurements(col, match) if include_laps else []
         driver_ids = col.distinct("driver_id", match)
+        latest_rows: list[dict[str, Any]] = []
         latest = [
             col.find_one({**match, "driver_id": driver_id}, sort=[("ts", DESCENDING)])
             for driver_id in driver_ids
         ]
-        latest = sorted(
-            (row for row in latest if row),
+        for row in latest:
+            if row is not None and row:
+                latest_rows.append(row)
+        latest_rows = sorted(
+            latest_rows,
             key=lambda row: (row.get("position") is None, row.get("position") or 0),
         )
-        ids = {row["driver_id"] for row in latest} | {str(row["driver_id"]) for row in results}
+        ids = {row["driver_id"] for row in latest_rows} | {str(row["driver_id"]) for row in results}
         drivers = (
             fetch_all(
                 (
@@ -131,7 +135,7 @@ def create_race_archive_router(
                 "laps": laps,
                 "laps_included": include_laps,
                 "completed_driver_laps": completed_count[0]["count"] if completed_count else 0,
-                "latest": latest,
+                "latest": latest_rows,
                 "telemetry_count": col.count_documents(match),
                 "updated_at": datetime.now(UTC),
                 "lap_source": lap_source,

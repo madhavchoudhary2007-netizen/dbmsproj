@@ -37,7 +37,7 @@ def _run_lock_demo(
             "IN race_sessions s ON s.event_id=b.event_id CROSS JOIN teams t ORDER BY b.number"
             ",s.scheduled_at LIMIT 1"
         )
-        if not target:
+        if target is None or not target:
             raise HTTPException(503, "Seeded pit box, session, or team is unavailable")
         starts_at = datetime.now(UTC) + timedelta(
             # Non-security randomized demonstration reservation window.
@@ -52,7 +52,7 @@ def _run_lock_demo(
         wait_observed = False
         with connection() as owner, owner.transaction():
             owner.execute("SET LOCAL lock_timeout='8s'")
-            first_reservation_id = owner.execute(
+            reservation = owner.execute(
                 "SELECT reserve_pit_box(%s,%s,%s,%s,%s) AS id",
                 (
                     target["pit_box_id"],
@@ -61,7 +61,10 @@ def _run_lock_demo(
                     starts_at,
                     ends_at,
                 ),
-            ).fetchone()["id"]
+            ).fetchone()
+            if reservation is None:
+                raise TypeError("'NoneType' object is not subscriptable")
+            first_reservation_id = reservation["id"]
             future = worker.submit(
                 _competing_lock_demo_reservation, target, starts_at, ends_at, ready, competitor
             )
@@ -75,7 +78,7 @@ def _run_lock_demo(
                     "SELECT wait_event_type FROM pg_stat_activity WHERE pid=%s",
                     (competitor["pid"],),
                 ).fetchone()
-                if lock_row and lock_row["wait_event_type"] == "Lock":
+                if lock_row and lock_row.get("wait_event_type") == "Lock":
                     wait_observed = True
                     break
                 time.sleep(0.025)
@@ -117,7 +120,7 @@ def create_dbms_lock_router(
     router = APIRouter()
 
     @router.post("/api/dbms/lock-demo")
-    def dbms_lock_demo(user=admin_dependency):
+    def dbms_lock_demo(user: Any = admin_dependency) -> dict[str, Any]:
         return _run_lock_demo(
             fetch_one,
             connection,
@@ -127,7 +130,7 @@ def create_dbms_lock_router(
         )
 
     @router.post("/api/dbms/recalculate")
-    def dbms_recalculate(championship_id: UUID, user=admin_dependency):
+    def dbms_recalculate(championship_id: UUID, user: Any = admin_dependency) -> Any:
         return recalculate(championship_id, user)
 
     handlers: dict[str, Callable[..., Any]] = {

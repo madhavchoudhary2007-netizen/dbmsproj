@@ -1,0 +1,166 @@
+diff --git a/backend/app/api/dbms_lock.py b/backend/app/api/dbms_lock.py
+index c81d643..4b62b4c 100644
+--- a/backend/app/api/dbms_lock.py
++++ b/backend/app/api/dbms_lock.py
+@@ -37,7 +37,7 @@ def _run_lock_demo(
+             "IN race_sessions s ON s.event_id=b.event_id CROSS JOIN teams t ORDER BY b.number"
+             ",s.scheduled_at LIMIT 1"
+         )
+-        if not target:
++        if target is None or not target:
+             raise HTTPException(503, "Seeded pit box, session, or team is unavailable")
+         starts_at = datetime.now(UTC) + timedelta(
+             # Non-security randomized demonstration reservation window.
+@@ -52,7 +52,7 @@ def _run_lock_demo(
+         wait_observed = False
+         with connection() as owner, owner.transaction():
+             owner.execute("SET LOCAL lock_timeout='8s'")
+-            first_reservation_id = owner.execute(
++            reservation = owner.execute(
+                 "SELECT reserve_pit_box(%s,%s,%s,%s,%s) AS id",
+                 (
+                     target["pit_box_id"],
+@@ -61,7 +61,10 @@ def _run_lock_demo(
+                     starts_at,
+                     ends_at,
+                 ),
+-            ).fetchone()["id"]
++            ).fetchone()
++            if reservation is None:
++                raise TypeError("'NoneType' object is not subscriptable")
++            first_reservation_id = reservation["id"]
+             future = worker.submit(
+                 _competing_lock_demo_reservation, target, starts_at, ends_at, ready, competitor
+             )
+@@ -75,7 +78,7 @@ def _run_lock_demo(
+                     "SELECT wait_event_type FROM pg_stat_activity WHERE pid=%s",
+                     (competitor["pid"],),
+                 ).fetchone()
+-                if lock_row and lock_row["wait_event_type"] == "Lock":
++                if lock_row and lock_row.get("wait_event_type") == "Lock":
+                     wait_observed = True
+                     break
+                 time.sleep(0.025)
+@@ -117,7 +120,7 @@ def create_dbms_lock_router(
+     router = APIRouter()
+ 
+     @router.post("/api/dbms/lock-demo")
+-    def dbms_lock_demo(user=admin_dependency):
++    def dbms_lock_demo(user: Any = admin_dependency) -> dict[str, Any]:
+         return _run_lock_demo(
+             fetch_one,
+             connection,
+@@ -127,7 +130,7 @@ def create_dbms_lock_router(
+         )
+ 
+     @router.post("/api/dbms/recalculate")
+-    def dbms_recalculate(championship_id: UUID, user=admin_dependency):
++    def dbms_recalculate(championship_id: UUID, user: Any = admin_dependency) -> Any:
+         return recalculate(championship_id, user)
+ 
+     handlers: dict[str, Callable[..., Any]] = {
+diff --git a/backend/app/api/dbms_mongo.py b/backend/app/api/dbms_mongo.py
+index c731314..0afb9b4 100644
+--- a/backend/app/api/dbms_mongo.py
++++ b/backend/app/api/dbms_mongo.py
+@@ -23,7 +23,7 @@ def create_dbms_mongo_router(
+     router = APIRouter()
+ 
+     @router.get("/api/dbms/overview")
+-    def dbms_overview(user=admin_dependency):
++    def dbms_overview(user: Any = admin_dependency) -> Any:
+         counts = fetch_one("""SELECT
+       (SELECT count(*) FROM race_sessions WHERE state='ACTIVE') AS active_sessions,
+       (SELECT count(*) FROM race_sessions WHERE state='COMPLETED') AS completed_sessions,
+@@ -48,7 +48,7 @@ def create_dbms_mongo_router(
+         )
+ 
+     @router.get("/api/dbms/telemetry")
+-    def dbms_telemetry(user=admin_dependency):
++    def dbms_telemetry(user: Any = admin_dependency) -> Any:
+         try:
+             col = mongo_ready()
+             return {
+@@ -88,7 +88,7 @@ def _register_polyglot_handler(
+     fetch_all: Callable[..., list[DatabaseRow]],
+ ) -> dict[str, Callable[..., Any]]:
+     @router.get("/api/dbms/polyglot")
+-    def dbms_polyglot(user=admin_dependency):
++    def dbms_polyglot(user: Any = admin_dependency) -> Any:
+         sql = """SELECT s.id AS session_id,s.state,d.id AS driver_id,u.full_name
+       FROM race_sessions s JOIN (
+         SELECT session_id,driver_id FROM session_results
+@@ -100,7 +100,7 @@ def _register_polyglot_handler(
+         col = mongo_ready()
+         grouped = {}
+         recent_cutoff = datetime.now(UTC) - timedelta(days=30)
+-        pipeline = [
++        pipeline: list[dict[str, Any]] = [
+             {"$match": {"ts": {"$gte": recent_cutoff}}},
+             {"$sort": {"ts": -1}},
+             {"$limit": 5000},
+@@ -137,7 +137,7 @@ def _register_collection_handlers(
+     MONGODB_DATABASE: str,
+ ) -> dict[str, Callable[..., Any]]:
+     @router.get("/api/dbms/mongo/collections")
+-    def dbms_mongo_collections(user=admin_dependency):
++    def dbms_mongo_collections(user: Any = admin_dependency) -> Any:
+         """List application collections with their actual document and index metadata."""
+         try:
+             database = mongo_database_ready()
+@@ -185,8 +185,8 @@ def _register_document_handlers(
+         driver_id: str | None = Query(None, max_length=64),
+         lap: int | None = Query(None, ge=1),
+         sector: int | None = Query(None, ge=1, le=3),
+-        user=admin_dependency,
+-    ):
++        user: Any = admin_dependency,
++    ) -> Any:
+         (
+             "Browse one real Mongo collection without permitting arbitrary collection "
+             # Keep the docstring split within the configured line length.
+diff --git a/backend/app/api/race_archive.py b/backend/app/api/race_archive.py
+index c9e936c..7daee66 100644
+--- a/backend/app/api/race_archive.py
++++ b/backend/app/api/race_archive.py
+@@ -24,7 +24,7 @@ def create_race_archive_router(
+     router = APIRouter()
+ 
+     @router.get("/api/dbms/races/{session_id}")
+-    def dbms_race(session_id: UUID, include_laps: bool = True, user=admin_dependency):
++    def dbms_race(session_id: UUID, include_laps: bool = True, user: Any = admin_dependency) -> Any:
+         session = fetch_one(
+             (
+                 "SELECT s.*,e.name AS event_name,c.name AS circuit_"
+@@ -75,15 +75,19 @@ def create_race_archive_router(
+         # Full lap history is optional for the 1s live poll; it grows with every race lap.
+         laps = race_lap_measurements(col, match) if include_laps else []
+         driver_ids = col.distinct("driver_id", match)
++        latest_rows: list[dict[str, Any]] = []
+         latest = [
+             col.find_one({**match, "driver_id": driver_id}, sort=[("ts", DESCENDING)])
+             for driver_id in driver_ids
+         ]
+-        latest = sorted(
+-            (row for row in latest if row),
++        for row in latest:
++            if row is not None and row:
++                latest_rows.append(row)
++        latest_rows = sorted(
++            latest_rows,
+             key=lambda row: (row.get("position") is None, row.get("position") or 0),
+         )
+-        ids = {row["driver_id"] for row in latest} | {str(row["driver_id"]) for row in results}
++        ids = {row["driver_id"] for row in latest_rows} | {str(row["driver_id"]) for row in results}
+         drivers = (
+             fetch_all(
+                 (
+@@ -131,7 +135,7 @@ def create_race_archive_router(
+                 "laps": laps,
+                 "laps_included": include_laps,
+                 "completed_driver_laps": completed_count[0]["count"] if completed_count else 0,
+-                "latest": latest,
++                "latest": latest_rows,
+                 "telemetry_count": col.count_documents(match),
+                 "updated_at": datetime.now(UTC),
+                 "lap_source": lap_source,
