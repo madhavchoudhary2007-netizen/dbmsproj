@@ -5,11 +5,11 @@ execution: RUNNING for owner-authorized implementation; current request is docs 
 phase: 3 backend / 7 routes; no current score
 
 ## Queue (root must prepare exact packets before dispatch)
-### T-44581 — Simulation/live/DBMS-lock DI: NEEDS_PACKET_REPAIR
+### T-44581 — Simulation/live/DBMS-lock DI
 - worker: W2 | priority: P1 | origin: T-331/T-332
 - target_files: backend/app/api/simulation.py, backend/app/api/live.py, backend/app/api/dbms_lock.py, backend/app/main.py
 - contract: Final domain routers/providers; preserve factory aliases, routes, OpenAPI and behavior; <=350 changed lines, no migration.
-- verify: NOT_DISPATCHABLE legacy packet. Root must reconcile worker ownership and write approved offline replay+snapshot+registration checks without global deselection, strict mypy/ruff/format; root owns relevant apexgrid-test gate. Existing packet preserved as evidence; ADR-016 lists defects.
+- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py backend/tests/test_api.py -k "test_runtime_route_registrations or test_current_openapi or test_websocket_bus or f_dom_05 or test_simulation_stop_clears_pending_pit_reservations" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app; root owns apexgrid-test integration gate. Packet repaired under packets.md.
 ### T-44582 — CRUD DI
 - worker: W2 | priority: P1 | after: T-44581/domain gate
 - target_files: backend/app/api/crud.py, backend/app/crud_resources.py, backend/app/main.py
@@ -22,8 +22,9 @@ phase: 3 backend / 7 routes; no current score
 - verify: Prepare exact offline replay/snapshot/registration + mypy/ruff/format packet; root disposable integration.
 ### T-44585 — Measured desktop A3 repairs
 - worker: W1 | priority: P1 | origin: T-379
-- contract: Repair 15 documented failures; root first names bounded exact files. Preserve palette bands/hooks/features. Independent second lane only when ready.
-- verify: Approved offline type/lint/design checks in packet; root affected route/state/keyboard/axe/viewports/browser evidence. No directory-wide target placeholder may be dispatched.
+- target_files: frontend/app/styles/shell.css
+- contract: Enlarge desktop race-control marquee to legal 64px for readable primary feed and approved red palette band across shell pages. Preserve mobile 40px, classes/copy/states verbatim.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Documentation checkpoint
 ### T-44587 — Active document authority audit

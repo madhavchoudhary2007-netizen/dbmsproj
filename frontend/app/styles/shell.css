@@ -233,6 +233,7 @@
   .nb-shell .main-shell { margin-left: var(--nb-nav-width); }
   .nb-shell .mobile-menu,
   .nb-shell .close-nav { display: none; }
+  .nb-shell .race-control-feed { height: 64px; min-height: 64px; }
 }
 
 @media (min-width: 1000px) and (max-width: 1199px) {
