@@ -2,6 +2,8 @@ import json
 import gzip
 from pathlib import Path
 import random
+import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -68,6 +70,31 @@ class BundleAssetsTests(unittest.TestCase):
         asset.write_bytes(data)
         self.html("/page", '<script src="/_next/static/chunks/root.js"></script>')
         self.assertGreater(route_gzip_sizes(self.root)["/page"], 170 * 1024)
+
+    def test_bundle_gate_checks_all_routes_and_rejects_missing_assets(self):
+        script = Path(__file__).with_name("verify-bundle-size.py")
+        command = [sys.executable, str(script), "--next-dir", str(self.root)]
+        body = '<script src="/_next/static/chunks/root.js"></script>'
+        self.html("/page", body)
+
+        small = subprocess.run(command, capture_output=True, text=True)
+        self.assertEqual(small.returncode, 0, small.stdout + small.stderr)
+        self.assertIn("Checked 2 routes", small.stdout)
+        self.assertIn("limit: 170 KB (174080 bytes)", small.stdout)
+
+        rng = random.Random(0)
+        (self.root / "static/chunks/root.js").write_bytes(
+            bytes(rng.getrandbits(8) for _ in range(200_000))
+        )
+        large = subprocess.run(command, capture_output=True, text=True)
+        self.assertEqual(large.returncode, 1, large.stdout + large.stderr)
+        self.assertIn("170 KB (174080 bytes)", large.stdout)
+        self.assertIn("Checked 2 routes", large.stdout)
+
+        self.html("/page", '<script src="/_next/static/chunks/missing.js"></script>')
+        missing = subprocess.run(command, capture_output=True, text=True)
+        self.assertEqual(missing.returncode, 1, missing.stdout + missing.stderr)
+        self.assertIn("missing initial asset", missing.stdout)
 
 
 if __name__ == "__main__":

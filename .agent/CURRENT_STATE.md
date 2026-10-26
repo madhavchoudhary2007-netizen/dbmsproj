@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: c42b3f0
+git_head: 41c7c3e
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -62,3 +62,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - New gate found seven route entries share all special-pages code through a client barrel; direct imports queued to remove unrelated code, no feature change. Orchestrator attempted a third dispatch once; tool rejected it, actual active workers never exceeded2.
 
 - T-44551 acceptedc42b3f0: Render physical box grid and keyboard allocation timeline with truthful active status and source recovery. Verify0.
+
+- T-44552 accepted41c7c3e: Type CRUD and steward handlers without changing dynamic payload contracts or serialization. Verify0.
