@@ -2,8 +2,8 @@
 updated_at: 2026-10-26
 branch: overhaul/neo-brutal
 execution: RUNNING — implementation resumed on owner instruction 2026-10-26
-verified_product_head: cc6102b
-last_product_task: T-44578
+verified_product_head: fc3a1fb
+last_product_task: T-44579
 metadata_task: T-44574 documentation reconciliation; commit 639e0ec
 architect_sha256: 36df162b44e313caf9dcf220514dc703f4d490000d8f05ffe667b149807b1c11
 harness: antigravity; configured worker profiles gemini-3.8-flash/low; cap 2; no model/config changes in this task
@@ -30,6 +30,7 @@ Phase requirements are in docs/overhaul-plan.md; the table below is the current 
 - T-44576 passed root acceptance (commit d0336d8): DBMS showcase routes (dbms_sql and dbms_mongo) migrated to domain APIRouters with FastAPI Depends injection (get_race_db, get_race_telemetry, get_mongo_db, admin), assembly lambdas in main.py folded, route registration uniqueness and snapshot contract verified.
 - T-44577 passed root acceptance (commit cf15062): race operations and results routes (session_action, results_read, results_write) migrated to domain APIRouters with FastAPI Depends injection (get_race_db, get_simulations, get_bus, current_user, admin_steward), lambda blocks folded, contracts and registrations verified.
 - T-44578 passed root acceptance (commit cc6102b): stewarding and pit-write operations routes (stewards and pit_write) migrated to domain APIRouters with FastAPI Depends injection (get_race_db, get_bus, get_simulations, require_roles), assembly glue folded, incident/pit tests verified.
+- T-44579 passed root acceptance (commit fc3a1fb): authentication and user management routes (auth_router and user_router) migrated to domain APIRouters with FastAPI Depends injection (get_race_db, current_user, admin_user), mounted directly in main.py, 24 tests passed (login throttle, logout revocation, route registration, OpenAPI contracts).
 - Latest full disposable backend evidence: T-44559, 262 passed/0 failed/0 skipped plus live acceptance. Subsequent extraction-only task checks did not rerun the full stack; milestone integration is not claimed current. Latest shell DB URLs were unset; no DB contacted during recent tasks.
 - Frontend production build passed after T-44560. Live initial JS 161.29 KiB passes; DBMS 260.10 KiB fails unchanged 170 KiB cap. Standings T-389 root gate passed 85/85; latest Live/Pit Wall focused run 100/100. These are scoped results, not a final release score.
 - T-44567 Standings typography: five E2E-R11 viewports passed, frontend lint/four design scripts passed, focused Taste review found no new defect. All accepted task details/hashes are in Git and .agent/results.

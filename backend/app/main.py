@@ -25,7 +25,6 @@ from fastapi import (
     WebSocket,
 )
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from psycopg.rows import dict_row
 from pymongo import DESCENDING as DESCENDING
 from pymongo import MongoClient
 from pymongo.collection import Collection
@@ -259,7 +258,8 @@ from .core.http_auth import authenticate_http_user
 from .core.lifespan import lifespan
 from .core.lock_demo import create_lock_demo_helpers
 from .core.security import websocket_bearer
-from .core.serialization import jsonable, telemetry_ws_payload
+from .core.serialization import jsonable
+from .core.serialization import telemetry_ws_payload as telemetry_ws_payload
 from .core.simulation_tick import advance_simulation_tick as advance_simulation_tick
 from .core.validation import (
     _crud_write_payload,
@@ -287,28 +287,31 @@ from .demo_race_repository import DemoRaceSetupError as DemoRaceSetupError
 from .demo_race_repository import choose_demo_car_numbers as choose_demo_car_numbers
 from .demo_race_repository import (
     create_demo_race_records,
-    delete_demo_race_records,
     get_demo_race_row,
-    list_demo_race_ids,
-    validate_demo_race_delete,
 )
 from .demo_race_router import (
-    create_demo_race_router,
+    create_demo_race_router as create_demo_race_router,
+)
+from .demo_race_router import (
+    router as demo_race_router,
 )
 from .demo_runtime import build_demo_race
 from .membership_router import router as membership_router
 from .pit_repository import (
     create_automatic_reservation as create_automatic_reservation,
 )
-from .pit_repository import (
-    load_pit_strategy_rows,
-    load_pit_telemetry,
-)
 from .pit_router import router as pit_router
-from .pit_strategy_router import create_pit_strategy_router
+from .pit_strategy_router import (
+    create_pit_strategy_router as create_pit_strategy_router,
+)
+from .pit_strategy_router import (
+    pit_strategy as pit_strategy,
+)
+from .pit_strategy_router import (
+    router as pit_strategy_router,
+)
 from .pit_strategy_service import PIT_TIRE_STINT_LAPS as PIT_TIRE_STINT_LAPS
 from .pit_strategy_service import (
-    project_pit_strategy,
     tire_stint_target,
 )
 from .runtime_lease import check_runtime_lease
@@ -344,7 +347,12 @@ from .simulation_restore import (
 )
 from .simulation_runner import run_simulation_loop
 from .simulation_start import start_simulation
-from .telemetry_router import create_telemetry_router
+from .telemetry_router import (
+    create_telemetry_router as create_telemetry_router,
+)
+from .telemetry_router import (
+    router as telemetry_router,
+)
 from .user_router import (
     create_user as create_user,
 )
@@ -549,30 +557,9 @@ def publish(session_id: UUID | str, kind: str, data: Any) -> None:
 _default_publish = publish
 
 
-app.include_router(
-    create_telemetry_router(
-        current_user,
-        jsonable,
-        mongo_ready,
-        roles,
-        telemetry_ws_payload,
-        publish,
-    )
-)
-
-
-pit_strategy_router, pit_strategy = create_pit_strategy_router(
-    current_user,
-    load_pit_strategy_rows,
-    load_pit_telemetry,
-    lambda: mongo_ready(),
-    lambda session_key: simulations.get(session_key),
-    project_pit_strategy,
-    MAX_SESSION_LAPS,
-    tire_stint_target,
-    jsonable,
-)
+app.include_router(telemetry_router)
 app.include_router(pit_strategy_router)
+pit_strategy = pit_strategy
 
 
 def demo_race_row(session_id: UUID | str) -> dict[str, Any] | None:
@@ -583,6 +570,9 @@ def demo_race_row(session_id: UUID | str) -> dict[str, Any] | None:
     sim = simulations.get(str(session_id))
     result["simulation_state"] = sim.status if sim else "stopped"
     return result
+
+
+_default_demo_race_row = demo_race_row
 
 
 def _make_demo_race(cars: int | None = None, auto_repeat: bool = False) -> dict[str, Any] | None:
@@ -603,22 +593,7 @@ def launch_demo_simulation(session_id: UUID | str) -> None:
     sim.task = asyncio.create_task(simulation_loop(sim))
 
 
-app.include_router(
-    create_demo_race_router(
-        current_user,
-        roles("ADMIN", "STEWARD"),
-        demo_race_row,
-        list_demo_race_ids,
-        _make_demo_race,
-        launch_demo_simulation,
-        lambda: simulations,
-        dict_row,
-        mongo_ready,
-        DemoRaceDeleteConflict,
-        validate_demo_race_delete,
-        delete_demo_race_records,
-    )
-)
+app.include_router(demo_race_router)
 
 
 def restore_simulation_from_telemetry(sim: Simulation) -> None:

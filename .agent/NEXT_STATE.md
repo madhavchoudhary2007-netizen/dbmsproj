@@ -6,12 +6,12 @@ phase: 3 T-331/T-332 consolidated milestone + remaining phase 7; no current over
 
 ## Queue
 
-### T-44579 — Authentication and user management domain dependency injection and router consolidation
+### T-44580 — Telemetry, demo race, and pit strategy domain dependency injection and router consolidation
 - worker: W2 | priority: P1 | origin: T-331/T-332 structural milestone
-- target_files: backend/app/auth_router.py, backend/app/user_router.py, backend/app/main.py
-- contract: Move authentication and user management routes into domain APIRouters using FastAPI dependency injection (get_race_db, current_user, admin_user). Mount routers directly in main.py. Preserve factory functions (create_auth_router, create_user_router), exact OpenAPI contracts, and unique route registrations.
-- boundaries: Up to 3 target files, <=300 changed lines. No edits outside target files; no API/OpenAPI breaking changes; no database migrations or new dependencies.
-- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_logout_revocation.py backend/tests/test_login_throttle.py && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
+- target_files: backend/app/telemetry_router.py, backend/app/demo_race_router.py, backend/app/pit_strategy_router.py, backend/app/main.py
+- contract: Move telemetry, demo race, and pit strategy routes into domain APIRouters using FastAPI dependency injection (get_race_db, get_race_telemetry, get_simulations, get_bus, current_user, admin_steward). Mount routers directly in main.py. Preserve factory functions (create_telemetry_router, create_demo_race_router, create_pit_strategy_router), exact OpenAPI contracts, and unique route registrations.
+- boundaries: Up to 4 target files, <=350 changed lines. No edits outside target files; no API/OpenAPI breaking changes; no database migrations or new dependencies.
+- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_demo_route_dependencies.py backend/tests/test_telemetry_ordering.py && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
 
 ## Documentation checkpoint
 A matching T-44574 acceptance commit/result makes this checkpoint complete; never redispatch it as implementation.
@@ -38,4 +38,4 @@ A matching T-44574 acceptance commit/result makes this checkpoint complete; neve
 - Standings delta: no authoritative prior-rank field; no fabricated data. All other remaining tasks are in overhaul-plan.md and existing queue/backlog records; accepted implementation is not repeated.
 
 ## Recent accepted product tasks
-- T-44578 cc6102b; T-44577 cf15062; T-44576 d0336d8; T-44575 1da3f59; T-44572 28c196f; T-44571 db57c59; T-44570 d134e39; T-44569 ed947dd; T-44568 b5f7f0e.
+- T-44579 fc3a1fb; T-44578 cc6102b; T-44577 cf15062; T-44576 d0336d8; T-44575 1da3f59; T-44572 28c196f; T-44571 db57c59; T-44570 d134e39; T-44569 ed947dd; T-44568 b5f7f0e.
