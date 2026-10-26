@@ -18,6 +18,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${spaceGrotesk.variable} ${spaceMono.variable} bg-cream text-ink`}>
+      <head>
+        <title>ApexGrid | Race Operations</title>
+      </head>
       <body className="font-sans">
         <a className="skip-link" href="#main-content">Skip to content</a>
         <AuthProvider>
