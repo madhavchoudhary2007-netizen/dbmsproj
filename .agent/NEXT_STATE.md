@@ -5,17 +5,17 @@ execution: RUNNING
 phase: 3 backend / 7 routes; no current score
 
 ## Queue (root must prepare exact packets before dispatch)
-### T-44609 — Showcase contract tests unmark xfail and edge cases
-- worker: W3 | priority: P1 | origin: Phase 4 T-350 showcase endpoint contract tests hardening
-- target_files: backend/tests/test_dbms_showcase.py
-- contract: Remove xfail from all 8 route tests; add parameter validation edge-case tests (invalid isolation level, invalid UUID, audit limit boundaries, disallowed query names); strict mypy clean.
-- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_dbms_showcase.py && APP_ENV=local .venv/bin/mypy --strict backend/tests/test_dbms_showcase.py && APP_ENV=local .venv/bin/ruff check backend/tests/test_dbms_showcase.py && APP_ENV=local .venv/bin/ruff format --check backend/tests/test_dbms_showcase.py
-
-### T-44610 — Showcase frontend client and state service
-- worker: W2 | priority: P1 | origin: Phase 4 T-393 / T-351..357 frontend client service
-- target_files: frontend/lib/dbms-showcase.ts
-- contract: Create frontend/lib/dbms-showcase.ts with type definitions and API client functions for isolation-demo, deadlock-demo, views, refresh-standings-mv, analytics gaps, explain, audit, and security; strict TypeScript and lint clean.
+### T-44611 — DBMS Showcase UI tab and workspace integration
+- worker: W1 | priority: P1 | origin: Phase 4 T-393 / T-351..T-357 Showcase UI workspace integration
+- target_files: frontend/components/dbms-showcase.tsx, frontend/components/dbms-workspace.tsx
+- contract: Create dbms-showcase.tsx rendering isolation demo, deadlock demo, views/MV refresh, window function analytics gaps, query explain, audit, and security panels using Nb primitives and dbms-showcase client; dynamically import in dbms-workspace.tsx; strictly < 300 lines each.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
+
+### T-44612 — DBMS showcase client runtime unit tests
+- worker: W3 | priority: P1 | origin: Phase 4 T-350 / T-393 client runtime unit tests
+- target_files: frontend/e2e/runtime/dbms-showcase.test.mjs
+- contract: Create dbms-showcase.test.mjs testing all client fetcher functions in frontend/lib/dbms-showcase.ts against mocked API dispatch and query parameter construction.
+- verify: npm --prefix frontend run test:runtime
 
 ## Documentation checkpoint
 ### T-44587 — Active document authority audit
