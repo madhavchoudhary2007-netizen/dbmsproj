@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: 669f39e
+git_head: e5ebfeb
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -10,7 +10,7 @@ last_eval_score: obsolete 51.2974; no current score; final T430
 ## Phase status
 - Phases 0–2, 5–6 complete (5/12). Phases 3–4 and 7–11 remain. `docs/overhaul-plan.md` is authoritative. User authorized autonomous completion.
 - Phase 3: T331 main.py <=120 lines remains; runtime DI/provider/lifespan and module extractions exist. T44565 brought `.venv/bin/mypy --strict backend/app` to exit 0; the three DBMS routers and main application now pass strict mypy.
-- Phase 7: T380–388 route work accepted through Pit Wall; T379 full gate retains 15 desktop A3 layout failures. T389 implementation is under repair: root browser rerun reached tests (84/85 passed); desktop standings palette was 70.18% cream, 26.49% white, 3.33% red, below the fixed 5% minimum accent. Initial route assets: Live passes at 161.29 KiB after T44560; DBMS remains 260.10 KiB against unchanged 170 KiB.
+- Phase 7: T380–389 route work accepted through Standings; T389 root browser gate passed 85/85 across five viewport profiles, including the unchanged desktop palette band. T379 full gate still retains 15 desktop A3 layout failures. Initial route assets: Live passes at 161.29 KiB after T44560; DBMS remains 260.10 KiB against unchanged 170 KiB.
 - Phase 4, 8–11 remain, including DBMS showcase, Taste defects, full E2E/performance, CI/docs, final evaluation/release.
 
 ## Verified evidence
@@ -26,7 +26,7 @@ last_eval_score: obsolete 51.2974; no current score; final T430
 
 ## Open risks and next work
 - T44565 is accepted with behavior-preserving annotations and strict mypy at zero; continue the separate T331 size/split work.
-- T389 worker clone could not resolve Next through the external node_modules symlink; root rerun exposed the palette failure above. Browser checks remain root-owned.
+- T389 worker clone could not resolve Next through its external node_modules symlink; root-owned browser rerun passed after a palette repair. Continue browser checks in the root workspace.
 - DBMS initial bundle remains above 170 KiB; identify and split its heavy lazy views after required Phase 4/route dependencies. Complete Pit Wall automatic-allocation/history coverage and broader Taste review, then proceed in plan order.
 - Main split, strict typing, DBMS showcase, remaining Taste, full browser/performance evidence and final score are not complete. The standings plan requests delta arrows, but driver_standings stores only current rank/points/wins/podiums and the API has no prior-rank field; T389 must not fabricate deltas or change the API. Old 51.2974 is not current; do not present work as done.
 - Host Python 3.14/Node 26 differ from Docker 3.12/22; frontend production image lacks source/lint config; acceptance fixture depends on existing championship round 3 (T021 queued).
@@ -49,3 +49,5 @@ last_eval_score: obsolete 51.2974; no current score; final T430
 - T-44564 accepted8b064db: Added endpoint annotations and typed the Mongo aggregation pipeline. Narrowed optional database and Mongo results while preserving truthiness behavior and response ordering. Verify0.
 
 - T-44565 accepted669f39e: Removed added runtime guards and used static local annotations for dynamic results. Preserved the nullable demo builder result and PostgreSQL pool generic annotations. Verify0.
+
+- T-389 acceptede5ebfeb: Added a red accent band to the selected championship's empty state and changed the top-ten marquee to the approved red tone, keeping ink text and existing standings behavior intact. Verify0.

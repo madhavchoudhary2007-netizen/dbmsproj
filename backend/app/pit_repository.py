@@ -1,18 +1,36 @@
 from __future__ import annotations
 
+from datetime import timedelta
 from typing import Any
 from uuid import UUID
 
+from psycopg.rows import dict_row
 from pymongo.collection import Collection
 
 from .core.request_database import DatabaseSession
-from .database import fetch_all, fetch_one
+from .database import connection, fetch_all, fetch_one
 
 PIT_RESERVATION_SELECT = """SELECT r.*,b.number AS box_number,t.name AS team_name,
     d.full_name AS driver_name,dr.number AS driver_number
     FROM pit_reservations r JOIN pit_boxes b ON b.id=r.pit_box_id
     JOIN teams t ON t.id=r.team_id LEFT JOIN drivers dr ON dr.id=r.driver_id
     LEFT JOIN users d ON d.id=dr.user_id"""
+
+
+def create_automatic_reservation(
+    session_id: UUID | str, team_id: UUID | str, driver_id: UUID | str | None, duration: timedelta
+) -> dict[str, Any] | None:
+    with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            "SELECT reserve_pit_box_auto(%s,%s,%s,%s) AS id",
+            (session_id, team_id, driver_id, duration),
+        )
+        reservation = cur.fetchone()
+        if reservation is None:
+            raise TypeError("'NoneType' object is not subscriptable")
+        reservation_id = reservation["id"]
+        cur.execute(PIT_RESERVATION_SELECT + " WHERE r.id=%s", (reservation_id,))
+        return cur.fetchone()
 
 
 def load_pit_strategy_rows(

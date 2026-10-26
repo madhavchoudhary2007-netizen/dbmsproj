@@ -14,7 +14,6 @@ from concurrent.futures import TimeoutError as _FutureTimeout
 from contextlib import asynccontextmanager, suppress
 from datetime import UTC as UTC
 from datetime import datetime as datetime
-from datetime import timedelta
 from typing import Any
 from uuid import UUID as UUID
 from uuid import uuid4 as uuid4
@@ -115,7 +114,13 @@ from .demo_race_router import (
 )
 from .demo_runtime import build_demo_race
 from .membership_router import router as membership_router
-from .pit_repository import PIT_RESERVATION_SELECT, load_pit_strategy_rows, load_pit_telemetry
+from .pit_repository import (
+    create_automatic_reservation as create_automatic_reservation,
+)
+from .pit_repository import (
+    load_pit_strategy_rows,
+    load_pit_telemetry,
+)
 from .pit_router import router as pit_router
 from .pit_strategy_router import create_pit_strategy_router
 from .pit_strategy_service import PIT_TIRE_STINT_LAPS as PIT_TIRE_STINT_LAPS
@@ -278,22 +283,6 @@ def roles(*allowed: str) -> Callable[..., Any]:
 admin_role_dependency = Depends(roles("ADMIN"))
 admin_steward_dependency = Depends(roles("ADMIN", "STEWARD"))
 admin_steward_principal_dependency = Depends(roles("ADMIN", "STEWARD", "PRINCIPAL"))
-
-
-def create_automatic_reservation(
-    session_id: UUID | str, team_id: UUID | str, driver_id: UUID | str | None, duration: timedelta
-) -> dict[str, Any] | None:
-    with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-        cur.execute(
-            "SELECT reserve_pit_box_auto(%s,%s,%s,%s) AS id",
-            (session_id, team_id, driver_id, duration),
-        )
-        reservation = cur.fetchone()
-        if reservation is None:
-            raise TypeError("'NoneType' object is not subscriptable")
-        reservation_id = reservation["id"]
-        cur.execute(PIT_RESERVATION_SELECT + " WHERE r.id=%s", (reservation_id,))
-        return cur.fetchone()
 
 
 def crud_routes(

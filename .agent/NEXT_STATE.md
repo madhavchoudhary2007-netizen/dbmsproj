@@ -3,21 +3,34 @@ updated_at: 2026-10-26
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-389 W1 — OPEN
-- target_files: frontend/app/standings/page.tsx, frontend/app/styles/components.css
-- contract: Implement the Phase 7 standings presentation from docs/overhaul-plan.md T-389. Keep all existing fetch/API behavior, role checks, championship selection, recalculation, provisional explanation and actual persisted values. Use the stepped P2/P1/P3 podium, championship NbSelect, one data-primary recalculation button with its busy state, a full standings table using fields the current API actually returns, the existing NbMarquee for the static top-ten points ticker, NbTable/ViewState for the data region, and useFlip for row reorder after recalculation. Add the M14 podium-rise treatment in components.css: transform only, 250ms, staggered, instant under reduced motion. Do not add dependencies, endpoints, filters, or fabricate historical rank deltas; the current schema/API has no prior-rank value.
-- verify: npm --prefix frontend run typecheck && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh; root browser gate: python3 .agent/check-frontend-browser.py T-389.route e2e/routes.spec.ts e2e/states-matrix.spec.ts e2e/responsive.spec.ts e2e/touch-targets.spec.ts e2e/accessibility.spec.ts e2e/data-primary.spec.ts e2e/palette.spec.ts e2e/provisional-results.spec.ts --grep 'E2E-R11|E2E-S|F-DOM-02' --workers=2
+### T-44566 — Move automatic pit reservation persistence into the repository
+- worker: W2 | priority: P1 | origin: T-331 main.py split tranche; shared database operation currently lives in the app entrypoint
+- target_files: backend/app/main.py, backend/app/pit_repository.py
+- read_only_context: docs/overhaul-plan.md (Phase 3 T-331); backend/app/main.py (110–125, 278–301); backend/app/pit_repository.py (1–25)
+- contract: Move create_automatic_reservation to pit_repository, retain its signature, SQL and row/error behavior, and re-export/import it from main so existing callers remain unchanged.
+- boundaries: structural move only; no behavior, API, schema, tests, or dependency changes; <=150 changed lines
+- verify: .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/mypy --strict backend/app && .venv/bin/ruff check backend/app && .venv/bin/ruff format --check backend/app
+
+### T-44567 — Reduce standings podium cards to three type sizes
+- worker: W1 | priority: P2 | origin: TASTE-389-1
+- target_files: frontend/app/styles/components.css
+- read_only_context: .agent/protocol/design-visual.md (1–66); .agent/protocol/design-ux.md (1–100); frontend/e2e/routes.spec.ts (24–33); frontend/app/standings/page.tsx (podium markup, locate by rg)
+- contract: Each podium card uses at most three font sizes and two weights, while preserving the route's copy, behavior, and selectors.
+- boundaries: CSS-only; MUST REMAIN VERBATIM: “Standings”, “Recalculate standings”, the single visible `[data-primary="true"]` behavior, and any existing `state-*`/`data-testid` hooks; no changes to markup or tests.
+- verify: npm --prefix frontend run typecheck && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
 
 ## Deferred
+- TASTE-389-1: frontend/app/styles/components.css:101 — podium cards use display, heading, body, data and smaller point-label type sizes; reduce to at most three sizes per card.
 - TASTE-382-BLOAT: resource-page.tsx >300lines; split genuine reusable presentation/runtime responsibilities after T382 flow coverage, no single-call fake wrappers.
 
 - TASTE-381-1: four KPIface accents followT381 but exceedT400 max3; consolidate supportingcolourbeforeA5, preserve data/features and thresholds.
 - P-3 DBMS: full-route initial-asset measurement is fixed; Live now passes at 161.29 KiB, DBMS remains 260.10 KiB (170 KiB limit). Reduce DBMS initial bundle after Phase 4 and T-393 dependencies; never change the threshold.
 
 ## Done
+- T-389 acceptede5ebfeb; verify0.
 - T-44565 accepted669f39e; verify0.
 - T-44564 accepted8b064db; verify0.
 - T-44563 accepted917fe55; verify0.
