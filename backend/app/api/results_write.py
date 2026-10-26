@@ -1,12 +1,129 @@
+from __future__ import annotations
+
 from collections.abc import Callable, Mapping
-from typing import Any, cast
+from contextlib import AbstractContextManager
+from typing import Annotated, Any, cast
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from psycopg.rows import dict_row
 
-from ..database import DatabaseRow
+from ..core.events import EventBus
+from ..core.request_auth import require_roles
+from ..core.request_database import DatabaseRow, DatabaseSession
+from ..core.runtime import get_bus, get_simulations
+from ..core.serialization import jsonable
 from ..schemas_competition import ResultIn
+from ..simulation_core import Simulation
+from .laps import get_race_db
+
+router = APIRouter()
+results_write_router = router
+
+admin_steward_dependency = Depends(require_roles("ADMIN", "STEWARD"))
+
+
+def _resolve_db(database: DatabaseSession | None = None) -> DatabaseSession:
+    if database is not None:
+        return database
+    import sys
+
+    from .. import database as db_module
+
+    main_module = sys.modules.get("backend.app.main")
+    cur_fetch_one = (
+        getattr(main_module, "fetch_one", db_module.fetch_one)
+        if main_module is not None
+        else db_module.fetch_one
+    )
+    cur_fetch_all = (
+        getattr(main_module, "fetch_all", db_module.fetch_all)
+        if main_module is not None
+        else db_module.fetch_all
+    )
+    from .laps import _MonkeypatchedDatabaseSession
+
+    return _MonkeypatchedDatabaseSession(cur_fetch_one, cur_fetch_all)
+
+
+def _get_connection(
+    database: DatabaseSession | None = None,
+) -> AbstractContextManager[Any]:
+    import sys
+
+    from .. import database as db_module
+
+    main_module = sys.modules.get("backend.app.main")
+    conn_fn = (
+        getattr(main_module, "connection", db_module.connection)
+        if main_module is not None
+        else db_module.connection
+    )
+    is_monkeypatched = conn_fn is not db_module.connection
+    if (
+        not is_monkeypatched
+        and database is not None
+        and getattr(database, "pool", None) is not None
+    ):
+        pool = database.pool
+        if not pool.closed:
+            return cast(AbstractContextManager[Any], pool.connection())
+    return cast(AbstractContextManager[Any], conn_fn())
+
+
+def _resolve_simulations(
+    simulations: dict[str, Simulation] | None = None,
+) -> dict[str, Simulation]:
+    if simulations is not None:
+        return simulations
+    import sys
+
+    main_module = sys.modules.get("backend.app.main")
+    if main_module is not None and hasattr(main_module, "simulations"):
+        return cast(dict[str, Simulation], main_module.simulations)
+    return {}
+
+
+def _resolve_bus(bus: EventBus | None = None) -> EventBus:
+    if bus is not None:
+        return bus
+    import sys
+
+    main_module = sys.modules.get("backend.app.main")
+    if main_module is not None and hasattr(main_module, "bus"):
+        return cast(EventBus, main_module.bus)
+
+    return EventBus()
+
+
+def _resolve_publish(
+    bus: EventBus | None = None,
+) -> Callable[[UUID | str, str, Any], None]:
+    import sys
+
+    main_module = sys.modules.get("backend.app.main")
+    main_publish = getattr(main_module, "publish", None) if main_module is not None else None
+    orig_publish = (
+        getattr(main_module, "_default_publish", None) if main_module is not None else None
+    )
+    if main_publish is not None and (orig_publish is None or main_publish is not orig_publish):
+        return cast(Callable[[UUID | str, str, Any], None], main_publish)
+
+    def _publish_event(session_id: UUID | str, kind: str, data: Any) -> None:
+        from datetime import UTC, datetime
+
+        b = _resolve_bus(bus)
+        b.send(
+            session_id,
+            {
+                "type": kind,
+                "ts": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+                "session_id": str(session_id),
+                "data": jsonable(data),
+            },
+        )
+
+    return _publish_event
 
 
 def _save_results(
@@ -16,7 +133,7 @@ def _save_results(
     fetch_one: Callable[..., DatabaseRow | None],
     connection: Callable[..., Any],
     simulations: Mapping[str, Any],
-    publish: Callable[[UUID, str, Any], Any],
+    publish: Callable[..., Any],
     jsonable: Callable[[Any], Any],
 ) -> Any:
     if len(rows) > 100:
@@ -74,6 +191,38 @@ def _save_results(
     return jsonable(result)
 
 
+@router.post("/api/sessions/{session_id}/results", response_model=None)
+def save_results(
+    session_id: UUID,
+    rows: list[ResultIn],
+    user: Annotated[dict[str, Any] | None, admin_steward_dependency] = None,
+    database: Annotated[DatabaseSession | None, Depends(get_race_db)] = None,
+    simulations: Annotated[dict[str, Simulation] | None, Depends(get_simulations)] = None,
+    bus: Annotated[EventBus | None, Depends(get_bus)] = None,
+) -> list[dict[str, object]]:
+    db = _resolve_db(database)
+    sims = _resolve_simulations(simulations)
+    pub = _resolve_publish(bus)
+    return cast(
+        list[dict[str, object]],
+        _save_results(
+            session_id,
+            rows,
+            user,
+            db.fetch_one,
+            lambda: _get_connection(database),
+            sims,
+            pub,
+            jsonable,
+        ),
+    )
+
+
+results_write_handlers: dict[str, Callable[..., Any]] = {
+    "save_results": save_results,
+}
+
+
 def create_results_write_router(
     fetch_one: Callable[..., DatabaseRow | None],
     connection: Callable[..., Any],
@@ -82,10 +231,10 @@ def create_results_write_router(
     jsonable: Callable[[Any], Any],
     admin_steward_dependency: Any,
 ) -> tuple[APIRouter, dict[str, Callable[..., Any]]]:
-    router = APIRouter()
+    rt = APIRouter()
 
-    @router.post("/api/sessions/{session_id}/results", response_model=None)
-    def save_results(
+    @rt.post("/api/sessions/{session_id}/results", response_model=None)
+    def custom_save_results(
         session_id: UUID,
         rows: list[ResultIn],
         user: dict[str, object] = admin_steward_dependency,
@@ -104,4 +253,14 @@ def create_results_write_router(
             ),
         )
 
-    return router, {"save_results": save_results}
+    return rt, {"save_results": custom_save_results}
+
+
+__all__ = [
+    "admin_steward_dependency",
+    "create_results_write_router",
+    "results_write_handlers",
+    "results_write_router",
+    "router",
+    "save_results",
+]

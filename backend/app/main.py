@@ -13,7 +13,7 @@ from concurrent.futures import ThreadPoolExecutor as ThreadPoolExecutor
 from concurrent.futures import TimeoutError as _FutureTimeout
 from datetime import UTC as UTC
 from datetime import datetime as datetime
-from typing import Any
+from typing import Annotated, Any
 from uuid import UUID as UUID
 from uuid import uuid4 as uuid4
 
@@ -144,7 +144,42 @@ from .api.race_history_routes import (
 from .api.race_history_routes import (
     register_race_history_routes as register_race_history_routes,
 )
-from .api.race_operation_routes import register_race_operation_routers
+from .api.race_operation_routes import (
+    recalculate as recalculate,
+)
+from .api.race_operation_routes import (
+    register_race_operation_routers as register_race_operation_routers,
+)
+from .api.race_operation_routes import (
+    results as results,
+)
+from .api.race_operation_routes import (
+    results_read_handlers as results_read_handlers,
+)
+from .api.race_operation_routes import (
+    results_read_router as results_read_router,
+)
+from .api.race_operation_routes import (
+    results_write_handlers as results_write_handlers,
+)
+from .api.race_operation_routes import (
+    results_write_router as results_write_router,
+)
+from .api.race_operation_routes import (
+    save_results as save_results,
+)
+from .api.race_operation_routes import (
+    session_action as session_action,
+)
+from .api.race_operation_routes import (
+    session_action_handlers as session_action_handlers,
+)
+from .api.race_operation_routes import (
+    session_action_router as session_action_router,
+)
+from .api.race_operation_routes import (
+    standings as standings,
+)
 from .api.simulation import create_simulation_router
 from .api.stewarding_reads import router as stewarding_reads_router
 from .auth_cookie import verify_csrf_token
@@ -322,6 +357,12 @@ admin_steward_dependency = Depends(roles("ADMIN", "STEWARD"))
 admin_steward_principal_dependency = Depends(roles("ADMIN", "STEWARD", "PRINCIPAL"))
 
 
+def admin_steward(
+    user: Annotated[dict[str, Any], admin_steward_dependency],
+) -> dict[str, Any]:
+    return user
+
+
 def crud_routes(
     resource: str, table: str, cols: tuple[str, ...], joins: str = "", select: str | None = None
 ) -> None:
@@ -371,34 +412,14 @@ app.include_router(
 app.include_router(create_user_router(roles, jsonable))
 
 
-(
-    session_action_router,
-    session_action_handlers,
-    results_read_router,
-    results_read_handlers,
-    results_write_router,
-    results_write_handlers,
-) = register_race_operation_routers(
-    app,
-    lambda *a, **kw: _require_crud_record(*a, **kw),
-    lambda *a, **kw: fetch_one(*a, **kw),
-    lambda *a, **kw: ensure_session_reset_allowed(*a, **kw),
-    lambda: simulations,
-    lambda *a, **kw: connection(*a, **kw),
-    lambda *a, **kw: clear_session_measurements(*a, **kw),
-    lambda *a, **kw: sync_simulation_lifecycle(*a, **kw),
-    lambda *a, **kw: cancel_automatic_pit_reservations(*a, **kw),
-    lambda value: jsonable(value),
-    lambda *a, **kw: publish(*a, **kw),
-    admin_steward_dependency,
-    lambda *a, **kw: fetch_all(*a, **kw),
-    authenticated_user_dependency,
-)
-session_action = session_action_handlers["session_action"]
-results = results_read_handlers["results"]
-standings = results_read_handlers["standings"]
-recalculate = results_read_handlers["recalculate"]
-save_results = results_write_handlers["save_results"]
+app.include_router(session_action_router)
+app.include_router(results_read_router)
+app.include_router(results_write_router)
+session_action = session_action
+results = results
+standings = standings
+recalculate = recalculate
+save_results = save_results
 
 
 def _require_principal_own_team(team_id: UUID, user: dict[str, Any]) -> None:
@@ -458,6 +479,9 @@ def publish(session_id: UUID | str, kind: str, data: Any) -> None:
             "data": jsonable(data),
         },
     )
+
+
+_default_publish = publish
 
 
 app.include_router(
