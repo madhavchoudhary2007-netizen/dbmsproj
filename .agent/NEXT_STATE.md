@@ -5,17 +5,17 @@ execution: RUNNING
 phase: 3 backend / 7 routes; no current score
 
 ## Queue (root must prepare exact packets before dispatch)
-### T-44603 — Observability: structured JSON logging and X-Request-ID correlation
-- worker: W2 | priority: P1 | origin: Phase 3 T-338 observability and request correlation
-- target_files: backend/app/core/observability.py, backend/app/core/application.py
-- contract: Create observability.py with request_id_ctx, JSONLogFormatter, and RequestCorrelationMiddleware; mount correlation middleware in create_application; strict mypy clean.
-- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py backend/tests/test_api.py -k "test_runtime_route_registrations or test_current_openapi or test_websocket_bus or f_dom_05 or test_app_lifespan or test_restarting_simulator" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
+### T-44605 — Docker hardening
+- worker: W2 | priority: P1 | origin: Phase 3 T-340 Docker hardening
+- target_files: backend/Dockerfile, frontend/Dockerfile, compose.yaml, backend/requirements.lock
+- contract: Multi-stage python:3.12-slim backend Dockerfile with non-root app user (uid 10001), PYTHONDONTWRITEBYTECODE=1, HEALTHCHECK against /health/live; node:22-alpine frontend Dockerfile with non-root nextjs user; compose.yaml backend healthcheck and frontend depends_on condition: service_healthy.
+- verify: docker compose config && PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py backend/tests/test_api.py -k "test_runtime_route_registrations or test_current_openapi or test_websocket_bus or f_dom_05 or test_app_lifespan or test_restarting_simulator" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
 
-### T-44604 — Observability and correlation test suite
-- worker: W3 | priority: P1 | origin: Phase 3 T-338 QA unit tests
-- target_files: backend/tests/test_observability.py
-- contract: Author unit tests in test_observability.py verifying JSONLogFormatter JSON keys, request_id context propagation, middleware header echoing/generation, and /health/live; never touch product source.
-- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_observability.py && APP_ENV=local .venv/bin/mypy --strict backend/tests/test_observability.py
+### T-44606 — Showcase API test specifications
+- worker: W3 | priority: P1 | origin: Phase 4 T-350 showcase endpoint contract tests
+- target_files: backend/tests/test_dbms_showcase.py
+- contract: Create test_dbms_showcase.py with contract test specifications for isolation-demo, deadlock-demo, views, standings-mv, analytics gaps, explain analyze, audit, and security endpoints with xfail fallback pending implementation; strict mypy clean.
+- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_dbms_showcase.py && APP_ENV=local .venv/bin/mypy --strict backend/tests/test_dbms_showcase.py
 
 ## Documentation checkpoint
 ### T-44587 — Active document authority audit
