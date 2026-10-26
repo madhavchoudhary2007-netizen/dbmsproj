@@ -1,0 +1,20 @@
+{
+  "task_id": "T-44604",
+  "status": "PASSED",
+  "files_modified": [
+    {
+      "path": "backend/tests/test_observability.py",
+      "lines_added": 122,
+      "lines_removed": 0
+    }
+  ],
+  "diff_summary": "Created test_observability.py unit tests verifying JSONLogFormatter JSON keys, request_id_ctx propagation, RequestCorrelationMiddleware header echo and UUID generation, and /health/live status and no-store header.",
+  "verification": {
+    "command": "PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_observability.py && APP_ENV=local .venv/bin/mypy --strict backend/tests/test_observability.py",
+    "exit_code": 0,
+    "tests_passed": 6,
+    "tests_failed": 0,
+    "duration_ms": 700
+  },
+  "unresolved_blockers": []
+}

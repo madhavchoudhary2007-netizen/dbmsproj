@@ -18,6 +18,7 @@ from .errors import (
     integrity_handler,
     reference_conflict_handler,
 )
+from .observability import RequestCorrelationMiddleware
 
 
 def create_application(
@@ -57,6 +58,7 @@ def create_application(
                 )
         return await call_next(request)
 
+    app.add_middleware(RequestCorrelationMiddleware)
     app.add_middleware(SecurityHeadersMiddleware, secure=secure)
 
     app.add_exception_handler(UniqueViolation, conflict_handler)
