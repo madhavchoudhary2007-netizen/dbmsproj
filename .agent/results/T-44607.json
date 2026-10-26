@@ -1,0 +1,47 @@
+{
+  "task_id": "T-44607",
+  "status": "PASSED",
+  "files_modified": [
+    {
+      "path": "backend/migrations/006_showcase_views.sql",
+      "lines_added": 35,
+      "lines_removed": 0
+    },
+    {
+      "path": "backend/migrations/007_audit_log.sql",
+      "lines_added": 91,
+      "lines_removed": 0
+    },
+    {
+      "path": "backend/migrations/008_roles_and_rls.sql",
+      "lines_added": 35,
+      "lines_removed": 0
+    },
+    {
+      "path": "backend/app/schemas_showcase.py",
+      "lines_added": 189,
+      "lines_removed": 0
+    },
+    {
+      "path": "backend/app/api/dbms_showcase.py",
+      "lines_added": 476,
+      "lines_removed": 0
+    },
+    {
+      "path": "backend/app/main.py",
+      "lines_added": 12,
+      "lines_removed": 14
+    }
+  ],
+  "diff_summary": "Created database migrations 006 (regular view v_driver_season_summary and unique-indexed mv_championship_standings), 007 (audit_log table and audit_row() trigger function), and 008 (roles apexgrid_app/apexgrid_readonly and RLS policy). Implemented showcase schemas and API endpoints for isolation, deadlocks, views, analytics gaps, query explain, audit, and security; mounted router in main.py.",
+  "verification": {
+    "command": "PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_dbms_showcase.py && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app",
+    "exit_code": 0,
+    "tests_passed": 28,
+    "tests_failed": 0,
+    "duration_ms": 690,
+    "typecheck_errors": 0,
+    "lint_warnings": 0
+  },
+  "unresolved_blockers": []
+}

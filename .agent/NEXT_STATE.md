@@ -5,17 +5,17 @@ execution: RUNNING
 phase: 3 backend / 7 routes; no current score
 
 ## Queue (root must prepare exact packets before dispatch)
-### T-44605 — Docker hardening
-- worker: W2 | priority: P1 | origin: Phase 3 T-340 Docker hardening
-- target_files: backend/Dockerfile, frontend/Dockerfile, compose.yaml, backend/requirements.lock
-- contract: Multi-stage python:3.12-slim backend Dockerfile with non-root app user (uid 10001), PYTHONDONTWRITEBYTECODE=1, HEALTHCHECK against /health/live; node:22-alpine frontend Dockerfile with non-root nextjs user; compose.yaml backend healthcheck and frontend depends_on condition: service_healthy.
-- verify: docker compose config && PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py backend/tests/test_api.py -k "test_runtime_route_registrations or test_current_openapi or test_websocket_bus or f_dom_05 or test_app_lifespan or test_restarting_simulator" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
+### T-44607 — Phase 4 DBMS Showcase and Migrations
+- worker: W2 | priority: P1 | origin: Phase 4 T-351..T-357 DBMS showcase endpoints and migrations
+- target_files: backend/migrations/006_showcase_views.sql, backend/migrations/007_audit_log.sql, backend/migrations/008_roles_and_rls.sql, backend/app/schemas_showcase.py, backend/app/api/dbms_showcase.py, backend/app/main.py
+- contract: Implement database migrations 006 (regular view v_driver_season_summary and unique-indexed mv_championship_standings), 007 (audit_log table and audit_row() trigger function), and 008 (roles apexgrid_app/apexgrid_readonly and RLS policy). Implement showcase schemas and API endpoints for isolation, deadlocks, views, analytics gaps, query explain, audit, and security; mounted router in main.py <= 120 lines.
+- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_dbms_showcase.py && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
 
-### T-44606 — Showcase API test specifications
-- worker: W3 | priority: P1 | origin: Phase 4 T-350 showcase endpoint contract tests
-- target_files: backend/tests/test_dbms_showcase.py
-- contract: Create test_dbms_showcase.py with contract test specifications for isolation-demo, deadlock-demo, views, standings-mv, analytics gaps, explain analyze, audit, and security endpoints with xfail fallback pending implementation; strict mypy clean.
-- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_dbms_showcase.py && APP_ENV=local .venv/bin/mypy --strict backend/tests/test_dbms_showcase.py
+### T-44608 — Migration engine test suite
+- worker: W3 | priority: P1 | origin: Phase 3/4 migration engine and integrity unit tests
+- target_files: backend/tests/test_migrations.py
+- contract: Create test_migrations.py unit tests covering compute_checksum SHA-256 validation, natural version ordering in apply_migrations, checksum mismatch detection, mock ledger operations, and migration file integrity; strict mypy clean.
+- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_migrations.py && APP_ENV=local .venv/bin/mypy --strict backend/tests/test_migrations.py && APP_ENV=local .venv/bin/ruff check backend/tests/test_migrations.py && APP_ENV=local .venv/bin/ruff format --check backend/tests/test_migrations.py
 
 ## Documentation checkpoint
 ### T-44587 — Active document authority audit

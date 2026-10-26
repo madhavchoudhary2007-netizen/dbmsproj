@@ -9,20 +9,12 @@ from pymongo import MongoClient
 from pymongo.collection import Collection
 
 from .analytics_router import router as analytics_router
+from .api import health as health_api
 from .api.crud import crud_router
 from .api.dbms_lock import router as dbms_lock_router
 from .api.dbms_mongo import router as dbms_mongo_router
+from .api.dbms_showcase import router as dbms_showcase_router
 from .api.dbms_sql import router as dbms_sql_router
-from .api.health import (
-    legacy_router as legacy_health_router,
-)
-from .api.health import (
-    register_legacy_health,
-    register_readiness,
-)
-from .api.health import (
-    router as health_router,
-)
 from .api.laps import dbms_race, dbms_race_laps, laps_router, session_laps
 from .api.live import router as live_router
 from .api.pit_write import pit_write_router
@@ -70,8 +62,10 @@ app, require_runtime_lease = create_application(
 bus = EventBus()
 app.state.runtime = RuntimeState(bus=bus, simulations=simulations)
 
-health = register_legacy_health(lambda query: fetch_one(query), lambda: mongo_client)
-health_ready = register_readiness(app, lambda: health(), lambda lease: check_runtime_lease(lease))
+health = health_api.register_legacy_health(lambda query: fetch_one(query), lambda: mongo_client)
+health_ready = health_api.register_readiness(
+    app, lambda: health(), lambda lease: check_runtime_lease(lease)
+)
 lock_demo_guard = threading.Lock()
 _competing_lock_demo_reservation, _cleanup_lock_demo = create_lock_demo_helpers(
     lambda: connection()
@@ -81,6 +75,9 @@ race_history_handlers = {
     "dbms_race_laps": dbms_race_laps,
     "session_laps": session_laps,
 }
+dbms_sql_router.routes = [
+    r for r in dbms_sql_router.routes if getattr(r, "path", None) != "/api/dbms/explain"
+]
 
 for router in (
     crud_router,
@@ -100,8 +97,9 @@ for router in (
     simulation_router,
     live_router,
     analytics_router,
-    legacy_health_router,
-    health_router,
+    health_api.legacy_router,
+    health_api.router,
+    dbms_showcase_router,
     dbms_sql_router,
     dbms_mongo_router,
     race_archive_router,
