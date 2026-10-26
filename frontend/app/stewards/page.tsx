@@ -1,2 +1,2 @@
-import { StewardDesk } from "@/components/special-pages";
+import { StewardDesk } from "@/components/pages/stewards";
 export default StewardDesk;

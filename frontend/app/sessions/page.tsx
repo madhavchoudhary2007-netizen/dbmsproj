@@ -1,2 +1,2 @@
-import { SessionPage } from "@/components/special-pages";
+import { SessionPage } from "@/components/pages/sessions";
 export default SessionPage;

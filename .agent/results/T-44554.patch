@@ -1,0 +1,24 @@
+diff --git a/frontend/app/dashboard/page.tsx b/frontend/app/dashboard/page.tsx
+index ae604d1..8fe2f98 100644
+--- a/frontend/app/dashboard/page.tsx
++++ b/frontend/app/dashboard/page.tsx
+@@ -1,2 +1,2 @@
+-import { Dashboard } from "@/components/special-pages";
++import { Dashboard } from "@/components/pages/dashboard";
+ export default Dashboard;
+diff --git a/frontend/app/sessions/page.tsx b/frontend/app/sessions/page.tsx
+index 1e11d11..bf73e6b 100644
+--- a/frontend/app/sessions/page.tsx
++++ b/frontend/app/sessions/page.tsx
+@@ -1,2 +1,2 @@
+-import { SessionPage } from "@/components/special-pages";
++import { SessionPage } from "@/components/pages/sessions";
+ export default SessionPage;
+diff --git a/frontend/app/stewards/page.tsx b/frontend/app/stewards/page.tsx
+index 512676f..619344d 100644
+--- a/frontend/app/stewards/page.tsx
++++ b/frontend/app/stewards/page.tsx
+@@ -1,2 +1,2 @@
+-import { StewardDesk } from "@/components/special-pages";
++import { StewardDesk } from "@/components/pages/stewards";
+ export default StewardDesk;

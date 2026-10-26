@@ -1,2 +1,2 @@
-import { Dashboard } from "@/components/special-pages";
+import { Dashboard } from "@/components/pages/dashboard";
 export default Dashboard;

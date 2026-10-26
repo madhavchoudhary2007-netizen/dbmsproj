@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: 41c7c3e
+git_head: 800ce8e
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -40,7 +40,7 @@ last_eval_score: obsolete51.2974; no current score; final T430
 - T383 real demo creation/deletion guard, list five states, truthful selected lap counter implemented; 40 cases passed plus focused10 outage recovery passed. No fake progress or real database writes.
 - T384 all25 focused cases have passing evidence: T384-tower15 + repair8 + mobile2. Selection keyboard/Details/axe/overflow/WS reorder/reduced motion tested. Metadata, unique completed pit counts wired. Runtime69PASS T44530 accept log.
 - T385 charts/corner tiles, laps/latest telemetry tables, control timelines and retry/source states implemented. Fifteen loading/empty/error/retention browser cases PASS; populated4widths PASS. Mobile tooltip tile scope repaired9a68302; focused mobile1PASS T385-populated-mobile-final, completing five populated widths. M13 first draw remains open.
-- T386 layout/controls/results/native modals implemented7023bc4/d868cac/2e68037. Palettefixed; lifecycle/simulator/resultread10PASS and dialog5PASS. T386-387 root30resiliencePASS; sharedfieldlabel/border styling repaired7c1a7c7. Result source7897a78 + five-state view378faa0 + five VM tests8e83f3c; no stale result writes.
+- T386 layout/controls/results/native modals implemented7023bc4/d868cac/2e68037. Palettefixed; lifecycle/simulator/resultread10PASS and dialog5PASS. T386-387 root30 resilience cases PASS; shared label/border style restored. Result source7897a78 + five-state view378faa0 + five VM tests8e83f3c; no stale result writes.
 - T332 request database demo DELETE/override tests c48443f/dede5cd preserve helper ordering.
 - Review corrected worker envelope counts, fixture schema/labels, UUID types and missing source partial state before acceptance. No dependencies added.
 
@@ -59,8 +59,9 @@ last_eval_score: obsolete51.2974; no current score; final T430
 
 - T388 strategy five-state cards f1a5c17; grid/queue in review. T44132 helper9c8841e sixofflinePASS; honestproductionbaseline sevenroutes290.49KiB>170, root+page oldgate invalid. WiringT44553 then optimize real route imports; neverraisegate.
 
-- New gate found seven route entries share all special-pages code through a client barrel; direct imports queued to remove unrelated code, no feature change. Orchestrator attempted a third dispatch once; tool rejected it, actual active workers never exceeded2.
+- Bundle evidence exposed shared client barrel across seven route entries; direct imports queued. Actual worker concurrency never exceeded2.
 
-- T-44551 acceptedc42b3f0: Render physical box grid and keyboard allocation timeline with truthful active status and source recovery. Verify0.
 
-- T-44552 accepted41c7c3e: Type CRUD and steward handlers without changing dynamic payload contracts or serialization. Verify0.
+
+
+- Accepted since refresh: T44543-53; commits/evidence in Git and .agent/results.
