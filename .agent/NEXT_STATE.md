@@ -1,26 +1,20 @@
 # NEXT_STATE
 updated_at: 2026-10-26
 branch: overhaul/neo-brutal
-execution: RUNNING for owner-authorized implementation; current request is docs only
+execution: RUNNING
 phase: 3 backend / 7 routes; no current score
 
 ## Queue (root must prepare exact packets before dispatch)
-### T-44582 — CRUD DI
-- worker: W2 | priority: P1 | origin: T-331/T-332
-- target_files: backend/app/api/crud.py, backend/app/crud_resources.py, backend/app/main.py
-- contract: CRUD-only providers/direct mounts, <=250 changed lines, no contract changes.
-- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_request_dependencies.py backend/tests/test_api.py -k "test_runtime_route_registrations or test_current_openapi or test_session_crud_does_not_accept_lifecycle_timestamps or test_authentication_failures_and_pool_access_order or test_signed_bearer_uses_injected_pool_and_stores_claims or test_cookie_post_requires_csrf_and_accepts_matching_token_and_origin or test_role_guard_and_fetch_all_copy_rows_and_balance_resources" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
-
 ### T-44583 — Simulation lifecycle extraction
-- worker: W2 | priority: P1 | after: T-44582
+- worker: W2 | priority: P1 | origin: T-331/T-332 structural entrypoint gate
 - target_files: backend/app/core/simulation_service.py, backend/app/main.py
-- contract: Lifecycle only, <=250 lines; main.py<=120 structural entrypoint gate, not all Phase 3.
-- verify: Prepare exact offline replay/snapshot/registration + mypy/ruff/format packet; root disposable integration.
+- contract: Extract simulation lifecycle helpers from main.py into core/simulation_service.py, <=250 lines; retain main.py entrypoint cleanliness (target <= 120 lines).
+- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py backend/tests/test_api.py -k "test_runtime_route_registrations or test_current_openapi or test_websocket_bus or f_dom_05 or test_simulation_stop_clears_pending_pit_reservations" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
 
-### T-44588 — Resource pages desktop A3 layout repair
-- worker: W1 | priority: P1 | origin: T-379
-- target_files: frontend/components/resource-page.tsx, frontend/app/styles/resources.css
-- contract: Repair desktop A3 red palette deficit (~4% -> 5-15%) across resource routes (championships, events, circuits, teams, drivers, users) using route-local presentation. Preserve classes, copy, states, hooks, and tap targets.
+### T-44589 — Dashboard 4-accent repair
+- worker: W1 | priority: P1 | origin: TASTE-381-1
+- target_files: frontend/components/pages/dashboard.tsx
+- contract: Fix stat card accent tones to stay within the approved <= 3 distinct accent colors (e.g. use red, yellow, mint; avoid violet). Preserve all text, props, structure, data-test attributes, and accessibility attributes verbatim.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Documentation checkpoint

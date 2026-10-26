@@ -146,7 +146,7 @@ export function Dashboard() {
             {([
               ["active_sessions", dashboard.active_sessions, "red", -2],
               ["scheduled_events", dashboard.scheduled_events, "yellow", 2],
-              ["open_incidents", dashboard.open_incidents, "violet", -2],
+              ["open_incidents", dashboard.open_incidents, "yellow", -2],
               ["drivers", dashboard.drivers, "mint", 2],
             ] as const).map(([k, v, tone, tilt]) => (
               <NbStat
