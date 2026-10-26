@@ -3,11 +3,11 @@ updated_at: 2026-10-26
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44571 — Extract session action and result route assembly
+### T-44572 — Extract incident and pit route assembly
 - worker: W2 | priority: P1 | origin: T-331 main.py split
-- target_files: backend/app/main.py, backend/app/api/race_operation_routes.py
-- read_only_context: docs/overhaul-plan.md (Phase 3 T-331, 314–319); backend/app/main.py (270–321); backend/app/api/session_action.py (1–55); backend/app/api/results_read.py (1–28); backend/app/api/results_write.py (70–107)
-- contract: Move-only extraction of session-action, result-read, and result-write router construction/registration. Preserve order, wrappers, router/handler variables, and `session_action`, `results`, `standings`, `recalculate`, `save_results` aliases.
+- target_files: backend/app/main.py, backend/app/api/operations_routes.py
+- read_only_context: docs/overhaul-plan.md (Phase 3 T-331, 314–319); backend/app/main.py (305–356); backend/app/api/stewards.py (82–105, 145–156); backend/app/api/pit_write.py (17–74); backend/app/pit_router.py (1–18)
+- contract: Move-only registration of steward, existing pit-read router, and pit-write router. Preserve order, dependency lambdas, router/handler variables, and main aliases for incident and reservation handlers.
 - boundaries: No endpoint/API/schema/dependency/test/DB changes; max 150 changed lines; target files only.
 - verify: APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
 
@@ -21,6 +21,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - P-3 DBMS: full-route initial-asset measurement is fixed; Live now passes at 161.29 KiB, DBMS remains 260.10 KiB (170 KiB limit). Reduce DBMS initial bundle after Phase 4 and T-393 dependencies; never change the threshold.
 
 ## Done
+- T-44571 accepteddb57c59; verify0.
 - T-44570 acceptedd134e39; verify0.
 - T-44569 accepteded947dd; verify0.
 - T-44568 acceptedb5f7f0e; verify0.

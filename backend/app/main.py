@@ -44,12 +44,11 @@ from .api.health import register_legacy_health, register_readiness
 from .api.health import router as health_router
 from .api.laps import race_lap_measurements as race_lap_measurements
 from .api.live import create_live_router
-from .api.pit_write import create_pit_write_router
+from .api.operations_routes import register_operations_routes
 from .api.race_history_routes import register_race_history_routes
 from .api.race_operation_routes import register_race_operation_routers
 from .api.simulation import create_simulation_router
 from .api.stewarding_reads import router as stewarding_reads_router
-from .api.stewards import create_stewards_router
 from .auth_cookie import verify_csrf_token
 from .auth_router import create_auth_router
 from .config import (
@@ -304,24 +303,6 @@ recalculate = results_read_handlers["recalculate"]
 save_results = results_write_handlers["save_results"]
 
 
-stewards_router, stewards_handlers = create_stewards_router(
-    lambda *a, **kw: fetch_all(*a, **kw),
-    lambda value: jsonable(value),
-    lambda limit, offset: limit_offset(limit, offset),
-    authenticated_user_dependency,
-    lambda: connection(),
-    lambda *a, **kw: publish(*a, **kw),
-    admin_steward_dependency,
-)
-get_incidents = stewards_handlers["get_incidents"]
-create_incident = stewards_handlers["create_incident"]
-decide_incident = stewards_handlers["decide_incident"]
-app.include_router(stewards_router)
-
-
-app.include_router(pit_router)
-
-
 def _require_principal_own_team(team_id: UUID, user: dict[str, Any]) -> None:
     if user["role"] == "PRINCIPAL":
         own_team = fetch_one(
@@ -331,17 +312,30 @@ def _require_principal_own_team(team_id: UUID, user: dict[str, Any]) -> None:
             raise HTTPException(403, "Principals may reserve pit boxes only for their own team")
 
 
-_pit_write_router, _pit_write_handlers = create_pit_write_router(
-    lambda team_id, user: _require_principal_own_team(team_id, user),
-    lambda *args, **kwargs: connection(*args, **kwargs),
-    lambda value: jsonable(value),
-    lambda *args, **kwargs: publish(*args, **kwargs),
-    lambda *args, **kwargs: fetch_one(*args, **kwargs),
-    lambda: simulations,
-    lambda *args, **kwargs: create_automatic_reservation(*args, **kwargs),
-    admin_steward_principal_dependency,
+stewards_router, stewards_handlers, _pit_write_router, _pit_write_handlers = (
+    register_operations_routes(
+        app,
+        pit_router,
+        fetch_all=lambda *a, **kw: fetch_all(*a, **kw),
+        jsonable=lambda value: jsonable(value),
+        limit_offset=lambda limit, offset: limit_offset(limit, offset),
+        authenticated_user_dependency=authenticated_user_dependency,
+        steward_connection=lambda: connection(),
+        pit_write_connection=lambda *args, **kwargs: connection(*args, **kwargs),
+        publish=lambda *a, **kw: publish(*a, **kw),
+        admin_steward_dependency=admin_steward_dependency,
+        require_principal_own_team=lambda team_id, user: _require_principal_own_team(team_id, user),
+        fetch_one=lambda *args, **kwargs: fetch_one(*args, **kwargs),
+        simulations=lambda: simulations,
+        create_automatic_reservation=lambda *args, **kwargs: create_automatic_reservation(
+            *args, **kwargs
+        ),
+        admin_steward_principal_dependency=admin_steward_principal_dependency,
+    )
 )
-app.include_router(_pit_write_router)
+get_incidents = stewards_handlers["get_incidents"]
+create_incident = stewards_handlers["create_incident"]
+decide_incident = stewards_handlers["decide_incident"]
 reserve_pit = _pit_write_handlers["reserve_pit"]
 reserve_pit_auto = _pit_write_handlers["reserve_pit_auto"]
 update_pit_reservation = _pit_write_handlers["update_pit_reservation"]

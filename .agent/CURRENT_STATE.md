@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: d134e39
+git_head: db57c59
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -49,3 +49,6 @@ last_eval_score: obsolete 51.2974; no current score; final T430
 
 - T-44570 acceptedd134e39: Moved SQL then Mongo router construction and registration into dbms_routes.py. main.py retains router, handler, and individual handler aliases, with the existing late-bound wrappers. Verify0.
 - T-44570 root acceptance reran contract snapshot + route registration (11 passed), strict mypy, Ruff and format; no DB startup/contact.
+- T-44571 accepted `db57c59`: extracted ordered session-action/result route assembly; root acceptance passed 11 contract/route tests, strict mypy, Ruff and format. No DB startup/contact.
+
+- T-44571 accepteddb57c59: Moved construction and ordered registration of session-action, results-read, and results-write routers into the new API assembly module. Kept late-bound wrappers and main.py handler aliases. Verify0.
