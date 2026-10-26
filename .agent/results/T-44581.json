@@ -1,0 +1,37 @@
+{
+  "task_id": "T-44581",
+  "status": "PASSED",
+  "files_modified": [
+    {
+      "path": "backend/app/api/dbms_lock.py",
+      "lines_added": 133,
+      "lines_removed": 7
+    },
+    {
+      "path": "backend/app/api/live.py",
+      "lines_added": 113,
+      "lines_removed": 5
+    },
+    {
+      "path": "backend/app/api/simulation.py",
+      "lines_added": 119,
+      "lines_removed": 7
+    },
+    {
+      "path": "backend/app/main.py",
+      "lines_added": 34,
+      "lines_removed": 32
+    }
+  ],
+  "diff_summary": "Refactored simulation, live WebSocket, and DBMS lock modules to domain APIRouters using FastAPI dependency injection (get_simulations, get_bus, admin, require_roles, get_race_db) with runtime state and main export fallbacks. Mounted domain routers directly in main.py, preserved factory functions and handler aliases, verified exact OpenAPI snapshot compatibility and unique route registrations.",
+  "verification": {
+    "command": "PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py backend/tests/test_api.py -k \"test_runtime_route_registrations or test_current_openapi or test_websocket_bus or f_dom_05 or test_simulation_stop_clears_pending_pit_reservations\" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app",
+    "exit_code": 0,
+    "tests_passed": 8,
+    "tests_failed": 0,
+    "duration_ms": 793,
+    "typecheck_errors": 0,
+    "lint_warnings": 0
+  },
+  "unresolved_blockers": []
+}

@@ -2,12 +2,12 @@
 updated_at: 2026-10-26
 branch: overhaul/neo-brutal
 execution: RUNNING — implementation resumed on owner instruction 2026-10-26
-verified_product_head: 6af6b78
-last_product_task: T-44580
+verified_product_head: 16e17a3
+last_product_task: T-44585
 metadata_task: T-44587 active-document audit; see matching acceptance result/commit
 architect_sha256: 0f2b5366fee89ec70d8340ab2e148ad676f0c64bf324f00af559c242cd4cc46c
 target_harness: Antigravity; requested Gemini 3.8 Flash HIGH orchestrator / LOW workers; cap 2
-observed_antigravity_binding: UNVERIFIED — this Codex documentation session cannot attest Antigravity UI settings; no config changes
+observed_antigravity_binding: Antigravity session active; dual-lane dispatch with Flash LOW workers
 archetype: Neo-Brutal Motorsport light, ADR-007
 last_eval_score: no current overhaul score; old 51.2974 is obsolete
 
@@ -31,6 +31,7 @@ Phase requirements are in docs/overhaul-plan.md; the table below is the current 
 - Latest full disposable backend evidence: T-44559, 262 passed/0 failed/0 skipped plus live acceptance. Subsequent extraction-only task checks did not rerun the full stack; milestone integration is not claimed current. Latest shell DB URLs were unset; no DB contacted during recent tasks.
 - Frontend production build passed after T-44560. Live initial JS 161.29 KiB passes; DBMS 260.10 KiB fails unchanged 170 KiB cap. Standings T-389 root gate passed 85/85; latest Live/Pit Wall focused run 100/100. These are scoped results, not a final release score.
 - T-44567 Standings typography: five E2E-R11 viewports passed, frontend lint/four design scripts passed, focused Taste review found no new defect. All accepted task details/hashes are in Git and .agent/results.
+- T-44585 passed root acceptance (commit 16e17a3): desktop race-control marquee enlarged to 64px (.nb-shell .race-control-feed in shell.css) at min-width 1000px, addressing desktop A3 red palette deficit across all shell routes; frontend typecheck, zero-warning lint, and four design linters passed cleanly.
 
 ## Current risks and open work
 - Complete only remaining T-331/T-332 domains and required integration; do not repeat accepted T-44575..80 or create line-count wrappers. T-44573 remains superseded. Historical assembly counts are not the current module map.

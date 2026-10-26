@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import random
 import threading
 import time
@@ -7,13 +9,103 @@ from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeout
 from contextlib import AbstractContextManager
 from datetime import UTC, datetime, timedelta
-from typing import Any
+from typing import Annotated, Any, cast
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from psycopg import Connection
 
-from ..database import DatabaseRow
+from ..core.request_database import DatabaseRow, DatabaseSession
+from .laps import admin, get_race_db
+
+router = APIRouter()
+dbms_lock_router = router
+
+admin_dependency = Depends(admin)
+_default_lock_demo_guard = threading.Lock()
+
+
+def _resolve_db(database: DatabaseSession | None = None) -> DatabaseSession:
+    if database is not None:
+        return database
+    import sys
+
+    from .. import database as db_module
+
+    main_module = sys.modules.get("backend.app.main")
+    cur_fetch_one = (
+        getattr(main_module, "fetch_one", db_module.fetch_one)
+        if main_module is not None
+        else db_module.fetch_one
+    )
+    cur_fetch_all = (
+        getattr(main_module, "fetch_all", db_module.fetch_all)
+        if main_module is not None
+        else db_module.fetch_all
+    )
+    from .laps import _MonkeypatchedDatabaseSession
+
+    return _MonkeypatchedDatabaseSession(cur_fetch_one, cur_fetch_all)
+
+
+def _get_connection(
+    database: DatabaseSession | None = None,
+) -> AbstractContextManager[Connection[DatabaseRow]]:
+    if database is not None and getattr(database, "pool", None) is not None:
+        pool = database.pool
+        if not pool.closed:
+            return cast(AbstractContextManager[Connection[DatabaseRow]], pool.connection())
+    import sys
+
+    from .. import database as db_module
+
+    main_module = sys.modules.get("backend.app.main")
+    conn_fn = (
+        getattr(main_module, "connection", db_module.connection)
+        if main_module is not None
+        else db_module.connection
+    )
+    return cast(AbstractContextManager[Connection[DatabaseRow]], conn_fn())
+
+
+def _resolve_lock_demo_guard() -> LockType:
+    import sys
+
+    main_module = sys.modules.get("backend.app.main")
+    if main_module is not None and hasattr(main_module, "lock_demo_guard"):
+        return cast(LockType, main_module.lock_demo_guard)
+    return _default_lock_demo_guard
+
+
+def _resolve_lock_demo_helpers(
+    database: DatabaseSession | None = None,
+) -> tuple[Callable[..., dict[str, Any]], Callable[..., None]]:
+    import sys
+
+    main_module = sys.modules.get("backend.app.main")
+    competing = (
+        getattr(main_module, "_competing_lock_demo_reservation", None)
+        if main_module is not None
+        else None
+    )
+    cleanup = getattr(main_module, "_cleanup_lock_demo", None) if main_module is not None else None
+    if competing is not None and cleanup is not None:
+        return competing, cleanup
+
+    from ..core.lock_demo import create_lock_demo_helpers
+
+    return create_lock_demo_helpers(lambda: _get_connection(database))
+
+
+def _resolve_recalculate() -> Callable[..., Any]:
+    import sys
+
+    main_module = sys.modules.get("backend.app.main")
+    if main_module is not None and hasattr(main_module, "recalculate"):
+        return cast(Callable[..., Any], main_module.recalculate)
+    from .race_operation_routes import recalculate
+
+    return recalculate
 
 
 def _run_lock_demo(
@@ -108,6 +200,39 @@ def _run_lock_demo(
             lock_demo_guard.release()
 
 
+@router.post("/api/dbms/lock-demo")
+def dbms_lock_demo(
+    user: Annotated[dict[str, Any] | None, admin_dependency] = None,
+    database: Annotated[DatabaseSession | None, Depends(get_race_db)] = None,
+) -> dict[str, Any]:
+    """Demonstrate two real transactions contending on a pit box row."""
+    db = _resolve_db(database)
+    competing, cleanup = _resolve_lock_demo_helpers(database)
+    guard = _resolve_lock_demo_guard()
+    return _run_lock_demo(
+        db.fetch_one,
+        lambda: _get_connection(database),
+        competing,
+        cleanup,
+        guard,
+    )
+
+
+@router.post("/api/dbms/recalculate")
+def dbms_recalculate(
+    championship_id: UUID,
+    user: Annotated[dict[str, Any] | None, admin_dependency] = None,
+) -> Any:
+    recalc = _resolve_recalculate()
+    return recalc(championship_id, user)
+
+
+dbms_lock_handlers: dict[str, Callable[..., Any]] = {
+    "dbms_lock_demo": dbms_lock_demo,
+    "dbms_recalculate": dbms_recalculate,
+}
+
+
 def create_dbms_lock_router(
     fetch_one: Callable[..., DatabaseRow | None],
     connection: Callable[[], AbstractContextManager[Connection[DatabaseRow]]],
@@ -117,10 +242,11 @@ def create_dbms_lock_router(
     recalculate: Callable[..., Any],
     admin_dependency: Any,
 ) -> tuple[APIRouter, dict[str, Callable[..., Any]]]:
-    router = APIRouter()
+    legacy_router = APIRouter()
 
-    @router.post("/api/dbms/lock-demo")
+    @legacy_router.post("/api/dbms/lock-demo")
     def dbms_lock_demo(user: Any = admin_dependency) -> dict[str, Any]:
+        """Demonstrate two real transactions contending on a pit box row."""
         return _run_lock_demo(
             fetch_one,
             connection,
@@ -129,7 +255,7 @@ def create_dbms_lock_router(
             lock_demo_guard,
         )
 
-    @router.post("/api/dbms/recalculate")
+    @legacy_router.post("/api/dbms/recalculate")
     def dbms_recalculate(championship_id: UUID, user: Any = admin_dependency) -> Any:
         return recalculate(championship_id, user)
 
@@ -137,4 +263,4 @@ def create_dbms_lock_router(
         "dbms_lock_demo": dbms_lock_demo,
         "dbms_recalculate": dbms_recalculate,
     }
-    return router, handlers
+    return legacy_router, handlers

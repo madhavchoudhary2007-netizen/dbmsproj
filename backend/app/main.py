@@ -33,7 +33,18 @@ from pymongo.database import Database
 from . import token_revocation
 from .analytics_router import router as analytics_router
 from .api.crud import create_crud_router
-from .api.dbms_lock import create_dbms_lock_router
+from .api.dbms_lock import (
+    create_dbms_lock_router as create_dbms_lock_router,
+)
+from .api.dbms_lock import (
+    dbms_lock_demo as dbms_lock_demo,
+)
+from .api.dbms_lock import (
+    dbms_recalculate as dbms_recalculate,
+)
+from .api.dbms_lock import (
+    router as dbms_lock_router,
+)
 from .api.dbms_mongo import (
     create_dbms_mongo_router as create_dbms_mongo_router,
 )
@@ -129,7 +140,15 @@ from .api.laps import (
 from .api.laps import (
     session_laps as session_laps,
 )
-from .api.live import create_live_router
+from .api.live import (
+    create_live_router as create_live_router,
+)
+from .api.live import (
+    router as live_router,
+)
+from .api.live import (
+    session_ws as session_ws,
+)
 from .api.operations_routes import (
     register_operations_routes as register_operations_routes,
 )
@@ -199,7 +218,15 @@ from .api.race_operation_routes import (
 from .api.race_operation_routes import (
     standings as standings,
 )
-from .api.simulation import create_simulation_router
+from .api.simulation import (
+    control_simulation as control_simulation,
+)
+from .api.simulation import (
+    create_simulation_router as create_simulation_router,
+)
+from .api.simulation import (
+    router as simulation_router,
+)
 from .api.stewarding_reads import router as stewarding_reads_router
 from .api.stewards import (
     create_incident as create_incident,
@@ -257,7 +284,8 @@ from .core.events import EventBus
 from .core.http_auth import authenticate_http_user
 from .core.lifespan import lifespan
 from .core.lock_demo import create_lock_demo_helpers
-from .core.security import websocket_bearer
+from .core.runtime import RuntimeState as RuntimeState
+from .core.security import websocket_bearer as websocket_bearer
 from .core.serialization import jsonable
 from .core.serialization import telemetry_ws_payload as telemetry_ws_payload
 from .core.simulation_tick import advance_simulation_tick as advance_simulation_tick
@@ -621,6 +649,7 @@ bus = EventBus()
 
 
 simulations: dict[str, Simulation] = {}
+app.state.runtime = RuntimeState(bus=bus, simulations=simulations)
 
 
 def sync_simulation_lifecycle(session_id: UUID, action: str) -> None:
@@ -762,14 +791,6 @@ async def _reset_session_simulation(
     )
 
 
-simulation_router, control_simulation = create_simulation_router(
-    lambda: mongo_ready(),
-    lambda: simulations,
-    lambda *args, **kwargs: _start_session_simulation(*args, **kwargs),
-    lambda *args, **kwargs: _reset_session_simulation(*args, **kwargs),
-    lambda *args, **kwargs: cancel_automatic_pit_reservations(*args, **kwargs),
-    admin_steward_dependency,
-)
 app.include_router(simulation_router)
 
 
@@ -787,14 +808,6 @@ def _websocket_authenticated_user(token: str) -> Any:
     )
 
 
-live_router, session_ws = create_live_router(
-    lambda ws: _check_ws_runtime_lease(ws),
-    lambda token: _websocket_authenticated_user(token),
-    lambda ws, queue: _wait_for_ws_event(ws, queue),
-    lambda: bus,
-    lambda: CORS_ORIGINS,
-    websocket_bearer,
-)
 app.include_router(live_router)
 
 
@@ -844,15 +857,4 @@ _competing_lock_demo_reservation, _cleanup_lock_demo = create_lock_demo_helpers(
     lambda: connection()
 )
 
-_dbms_lock_router, _dbms_lock_handlers = create_dbms_lock_router(
-    lambda *args, **kwargs: fetch_one(*args, **kwargs),
-    lambda *args, **kwargs: connection(*args, **kwargs),
-    lambda *args, **kwargs: _competing_lock_demo_reservation(*args, **kwargs),
-    lambda *args, **kwargs: _cleanup_lock_demo(*args, **kwargs),
-    lock_demo_guard,
-    lambda *args, **kwargs: recalculate(*args, **kwargs),
-    admin_dependency,
-)
-app.include_router(_dbms_lock_router)
-dbms_lock_demo = _dbms_lock_handlers["dbms_lock_demo"]
-dbms_recalculate = _dbms_lock_handlers["dbms_recalculate"]
+app.include_router(dbms_lock_router)
