@@ -2,8 +2,8 @@
 updated_at: 2026-10-26
 branch: overhaul/neo-brutal
 execution: RUNNING — implementation resumed on owner instruction 2026-10-26
-verified_product_head: 8751eaa
-last_product_task: T-44602
+verified_product_head: 16f72d7
+last_product_task: T-44604
 metadata_task: T-44587 active-document audit; see matching acceptance result/commit
 architect_sha256: 0f2b5366fee89ec70d8340ab2e148ad676f0c64bf324f00af559c242cd4cc46c
 target_harness: Antigravity; requested Gemini 3.8 Flash HIGH orchestrator / LOW workers; cap 2
@@ -43,6 +43,8 @@ Phase requirements are in docs/overhaul-plan.md; the table below is the current 
 - T-44600 (84ae834): handled in-flight navigation abort race in edge-resilience.spec.ts Lens 5 test; full Playwright E2E suite passed 1475/1475 green across all 5 viewports.
 - T-44601 (949adc6): created migration 005_points_systems.sql with points_systems and points_system_positions, default F1 2025 points seed, championships.points_system_id, and dynamic recalculate_standings join; added PointsSystemOut and PointsSystemPositionOut schemas.
 - T-44602 (8751eaa): authored test_points_system.py unit suite asserting migration 005 DDL, standard F1 points distribution (top 10 + 11+ zero), and PointsSystemOut / PointsSystemPositionOut schema validation (18/18 tests green).
+- T-44603 (5239559): implemented structured JSON logging with JSONLogFormatter and request ID correlation middleware in core/observability.py; mounted in create_application; strict mypy clean across 89 files.
+- T-44604 (16f72d7): authored test_observability.py asserting JSON formatting keys, request_id context propagation, middleware header echo/UUID generation, and /health/live status (6/6 tests green).
 
 ## Current risks and open work
 - Complete only remaining T-331/T-332 domains and required integration; do not repeat accepted T-44575..80 or create line-count wrappers. T-44573 remains superseded. Historical assembly counts are not the current module map.
