@@ -1,18 +1,23 @@
 "use client";
-import { useEffect, useId, useRef, useState } from "react";
+
 import {
   Plus,
   RefreshCw,
   Search,
-  X,
   AlertCircle,
   LoaderCircle,
 } from "lucide-react";
 import { Row, pretty } from "@/lib/api";
-import { NbField } from "@/components/nb/field";
-import { NbButton } from "@/components/nb/button";
-import { NbInput, NbSelect } from "@/components/nb/input";
-import { useFieldValidation } from "@/lib/use-field-validation";
+
+export { Modal } from "./modal";
+export type { ModalProps } from "./modal";
+export { ResourceEditor } from "./resource-editor";
+export type {
+  FieldOption,
+  ResourceEditorField,
+  ResourceEditorProps,
+} from "./resource-editor";
+
 export function PageHeader({
   eyebrow,
   title,
@@ -35,6 +40,7 @@ export function PageHeader({
     </div>
   );
 }
+
 export function Button({
   children,
   onClick,
@@ -62,6 +68,7 @@ export function Button({
     </button>
   );
 }
+
 export function StateMessage({
   error,
   loading,
@@ -97,6 +104,7 @@ export function StateMessage({
   if (empty) return <div className="state" role="status" aria-live="polite">{empty}</div>;
   return null;
 }
+
 export function PartialStateNotice({
   shownCount,
   totalCount,
@@ -122,6 +130,7 @@ export function PartialStateNotice({
     </div>
   );
 }
+
 export function DataTable({
   rows,
   columns,
@@ -167,6 +176,7 @@ export function DataTable({
     </div>
   );
 }
+
 export function SearchBox({
   value,
   onChange,
@@ -188,228 +198,7 @@ export function SearchBox({
     </label>
   );
 }
-type ModalEntry = {
-  element: HTMLElement;
-  close: () => void;
-  previousFocus: HTMLElement | null;
-};
-const modalStack: ModalEntry[] = [];
-let previousBodyOverflow = "";
 
-function focusableElements(container: HTMLElement) {
-  return Array.from(
-    container.querySelectorAll<HTMLElement>(
-      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-    ),
-  ).filter((element) => element.getClientRects().length > 0);
-}
-
-export function Modal({
-  title,
-  close,
-  children,
-}: {
-  title: string;
-  close: () => void;
-  children: React.ReactNode;
-}) {
-  const titleId = useId();
-  const closeRef = useRef<HTMLButtonElement>(null);
-  const modalRef = useRef<HTMLElement>(null);
-  const closeCallbackRef = useRef(close);
-  useEffect(() => {
-    closeCallbackRef.current = close;
-  }, [close]);
-  useEffect(() => {
-    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const element = modalRef.current;
-    if (!element) return;
-    if (modalStack.length === 0) {
-      previousBodyOverflow = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-    }
-    const entry: ModalEntry = {
-      element,
-      close: () => closeCallbackRef.current(),
-      previousFocus,
-    };
-    modalStack.push(entry);
-    closeRef.current?.focus();
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (modalStack.at(-1) !== entry) return;
-      if (event.key === "Escape") {
-        event.preventDefault();
-        entry.close();
-        return;
-      }
-      if (event.key !== "Tab") return;
-      const focusable = focusableElements(element);
-      if (!focusable.length) {
-        event.preventDefault();
-        element.focus();
-        return;
-      }
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && (document.activeElement === first || !element.contains(document.activeElement))) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && (document.activeElement === last || !element.contains(document.activeElement))) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      const wasTopModal = modalStack.at(-1) === entry;
-      const index = modalStack.indexOf(entry);
-      if (index !== -1) modalStack.splice(index, 1);
-      if (modalStack.length === 0) {
-        document.body.style.overflow = previousBodyOverflow;
-      }
-      if (wasTopModal && previousFocus?.isConnected) previousFocus.focus();
-    };
-  }, []);
-  return (
-    <div
-      className="modal-backdrop"
-      onMouseDown={(e) => e.target === e.currentTarget && modalStack.at(-1)?.element === modalRef.current && closeCallbackRef.current()}
-    >
-      <section ref={modalRef} className="modal" role="dialog" tabIndex={-1} aria-modal="true" aria-labelledby={titleId}>
-        <header>
-          <h2 id={titleId}>{title}</h2>
-          <button ref={closeRef} aria-label="Close" onClick={close}>
-            <X size={18} />
-          </button>
-        </header>
-        {children}
-      </section>
-    </div>
-  );
-}
-type FieldOption = string | { value: string; label: string };
-export function ResourceEditor({
-  fields,
-  initial,
-  save,
-  busy,
-  primary = false,
-}: {
-  fields: {
-    name: string;
-    label?: string;
-    type?: string;
-    required?: boolean;
-    min?: number;
-    max?: number;
-    options?: FieldOption[];
-  }[];
-  initial?: Row;
-  save: (row: Row) => Promise<void>;
-  busy: boolean;
-  primary?: boolean;
-}) {
-  const [vals, setVals] = useState<Row>(initial || {}),
-    [err, setErr] = useState("");
-  const { errors, validate, revalidate } = useFieldValidation();
-  const saveInFlight = useRef(false);
-  const formId = useId();
-  return (
-    <form
-      className="form-grid"
-      onSubmit={async (e) => {
-        e.preventDefault();
-        if (saveInFlight.current) return;
-        saveInFlight.current = true;
-        setErr("");
-        try {
-          const payload = { ...vals };
-          fields
-            .filter((f) => f.type === "datetime-local")
-            .forEach((f) => {
-              const v = payload[f.name];
-              if (typeof v === "string" && v)
-                payload[f.name] = new Date(v).toISOString();
-            });
-          await save(payload);
-        } catch (ex) {
-          setErr(ex instanceof Error ? ex.message : "Save failed");
-        } finally {
-          saveInFlight.current = false;
-        }
-      }}
-    >
-      {fields.map((f) => (
-        <NbField key={f.name} id={`${formId}-${f.name}`} label={f.label || f.name.replaceAll("_", " ")} error={errors[f.name]}>
-          {f.options ? (
-            <NbSelect
-              required={f.required}
-              value={
-                f.type === "datetime-local" && vals[f.name]
-                  ? new Date(String(vals[f.name]))
-                      .toLocaleString("sv-SE")
-                      .replace(" ", "T")
-                      .slice(0, 16)
-                  : String(vals[f.name] ?? "")
-              }
-              onBlur={(e) => validate(f.name, e.currentTarget)}
-              onInvalid={(e) => validate(f.name, e.currentTarget)}
-              onChange={(e) => {
-                revalidate(f.name, e.currentTarget);
-                setVals({ ...vals, [f.name]: e.target.value });
-              }}
-            >
-              <option value="">Select…</option>
-              {f.options.map((x) => {
-                const value = typeof x === "string" ? x : x.value;
-                const label = typeof x === "string" ? x : x.label;
-                return (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                );
-              })}
-            </NbSelect>
-          ) : (
-            <NbInput
-              required={f.required}
-              type={f.type || "text"}
-              min={f.min}
-              max={f.max}
-              value={
-                f.type === "datetime-local" && vals[f.name]
-                  ? new Date(String(vals[f.name]))
-                      .toLocaleString("sv-SE")
-                      .replace(" ", "T")
-                      .slice(0, 16)
-                  : String(vals[f.name] ?? "")
-              }
-              onBlur={(e) => validate(f.name, e.currentTarget)}
-              onInvalid={(e) => validate(f.name, e.currentTarget)}
-              onChange={(e) => {
-                revalidate(f.name, e.currentTarget);
-                setVals({
-                  ...vals,
-                  [f.name]:
-                    f.type === "number"
-                      ? e.target.value === "" ? undefined : Number(e.target.value)
-                      : e.target.value,
-                });
-              }}
-            />
-          )}
-        </NbField>
-      ))}
-      {err && <div className="form-error" role="alert">{err}</div>}
-      <div className="form-actions">
-        <NbButton type="submit" variant="primary" data-primary={primary || undefined} disabled={busy}>
-          {busy ? "Saving…" : "Save record"}
-        </NbButton>
-      </div>
-    </form>
-  );
-}
 export function ReloadButton({ onClick, "data-primary": dataPrimary }: { onClick: () => void; "data-primary"?: string | boolean }) {
   return (
     <button className="icon-button" onClick={onClick} aria-label="Refresh" data-primary={dataPrimary}>
@@ -417,6 +206,7 @@ export function ReloadButton({ onClick, "data-primary": dataPrimary }: { onClick
     </button>
   );
 }
+
 export function AddButton({
   onClick,
   children = "New record",

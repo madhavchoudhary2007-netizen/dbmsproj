@@ -1,0 +1,32 @@
+{
+  "task_id": "T-44592",
+  "status": "PASSED",
+  "files_modified": [
+    {
+      "path": "frontend/components/ui.tsx",
+      "lines_added": 17,
+      "lines_removed": 227
+    },
+    {
+      "path": "frontend/components/modal.tsx",
+      "lines_added": 111,
+      "lines_removed": 0
+    },
+    {
+      "path": "frontend/components/resource-editor.tsx",
+      "lines_added": 137,
+      "lines_removed": 0
+    }
+  ],
+  "diff_summary": "Extracted Modal into modal.tsx (111 lines) and ResourceEditor into resource-editor.tsx (137 lines); ui.tsx down to 223 lines; all components < 300 lines.",
+  "verification": {
+    "command": "npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh",
+    "exit_code": 0,
+    "tests_passed": 4,
+    "tests_failed": 0,
+    "duration_ms": 3200,
+    "typecheck_errors": 0,
+    "lint_warnings": 0
+  },
+  "unresolved_blockers": []
+}
