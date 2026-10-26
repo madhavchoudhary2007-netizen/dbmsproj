@@ -131,7 +131,27 @@ from .api.laps import (
     session_laps as session_laps,
 )
 from .api.live import create_live_router
-from .api.operations_routes import register_operations_routes
+from .api.operations_routes import (
+    register_operations_routes as register_operations_routes,
+)
+from .api.pit_write import (
+    create_pit_write_router as create_pit_write_router,
+)
+from .api.pit_write import (
+    pit_write_handlers as _pit_write_handlers,
+)
+from .api.pit_write import (
+    pit_write_router as _pit_write_router,
+)
+from .api.pit_write import (
+    reserve_pit as reserve_pit,
+)
+from .api.pit_write import (
+    reserve_pit_auto as reserve_pit_auto,
+)
+from .api.pit_write import (
+    update_pit_reservation as update_pit_reservation,
+)
 from .api.race_archive import (
     create_race_archive_router as create_race_archive_router,
 )
@@ -182,6 +202,24 @@ from .api.race_operation_routes import (
 )
 from .api.simulation import create_simulation_router
 from .api.stewarding_reads import router as stewarding_reads_router
+from .api.stewards import (
+    create_incident as create_incident,
+)
+from .api.stewards import (
+    create_stewards_router as create_stewards_router,
+)
+from .api.stewards import (
+    decide_incident as decide_incident,
+)
+from .api.stewards import (
+    get_incidents as get_incidents,
+)
+from .api.stewards import (
+    stewards_handlers as stewards_handlers,
+)
+from .api.stewards import (
+    stewards_router as stewards_router,
+)
 from .auth_cookie import verify_csrf_token
 from .auth_router import create_auth_router
 from .config import (
@@ -431,33 +469,22 @@ def _require_principal_own_team(team_id: UUID, user: dict[str, Any]) -> None:
             raise HTTPException(403, "Principals may reserve pit boxes only for their own team")
 
 
-stewards_router, stewards_handlers, _pit_write_router, _pit_write_handlers = (
-    register_operations_routes(
-        app,
-        pit_router,
-        fetch_all=lambda *a, **kw: fetch_all(*a, **kw),
-        jsonable=lambda value: jsonable(value),
-        limit_offset=lambda limit, offset: limit_offset(limit, offset),
-        authenticated_user_dependency=authenticated_user_dependency,
-        steward_connection=lambda: connection(),
-        pit_write_connection=lambda *args, **kwargs: connection(*args, **kwargs),
-        publish=lambda *a, **kw: publish(*a, **kw),
-        admin_steward_dependency=admin_steward_dependency,
-        require_principal_own_team=lambda team_id, user: _require_principal_own_team(team_id, user),
-        fetch_one=lambda *args, **kwargs: fetch_one(*args, **kwargs),
-        simulations=lambda: simulations,
-        create_automatic_reservation=lambda *args, **kwargs: create_automatic_reservation(
-            *args, **kwargs
-        ),
-        admin_steward_principal_dependency=admin_steward_principal_dependency,
-    )
-)
-get_incidents = stewards_handlers["get_incidents"]
-create_incident = stewards_handlers["create_incident"]
-decide_incident = stewards_handlers["decide_incident"]
-reserve_pit = _pit_write_handlers["reserve_pit"]
-reserve_pit_auto = _pit_write_handlers["reserve_pit_auto"]
-update_pit_reservation = _pit_write_handlers["update_pit_reservation"]
+_default_require_principal_own_team = _require_principal_own_team
+
+app.include_router(stewards_router)
+app.include_router(pit_router)
+app.include_router(_pit_write_router)
+pit_write_router = _pit_write_router
+pit_write_handlers = _pit_write_handlers
+
+get_incidents = get_incidents
+create_incident = create_incident
+decide_incident = decide_incident
+reserve_pit = reserve_pit
+reserve_pit_auto = reserve_pit_auto
+update_pit_reservation = update_pit_reservation
+stewards_handlers = stewards_handlers
+_pit_write_handlers = _pit_write_handlers
 
 
 def mongo_ready() -> Collection[dict[str, Any]]:
