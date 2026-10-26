@@ -1,0 +1,71 @@
+diff --git a/backend/app/bootstrap.py b/backend/app/bootstrap.py
+index 657cf06..db548eb 100644
+--- a/backend/app/bootstrap.py
++++ b/backend/app/bootstrap.py
+@@ -10,7 +10,7 @@ from .config import APP_ENV, DATABASE_URL, MONGODB_DATABASE, MONGODB_URL, SEED_D
+ from .race_archive import seed_historical_laps
+ 
+ 
+-def main():
++def main() -> None:
+     root = Path(__file__).resolve().parents[1]
+     migrations_dir = root / "migrations"
+     if not migrations_dir.is_dir():
+@@ -27,7 +27,7 @@ def main():
+     if SEED_DEMO_DATA and APP_ENV == "local":
+         with (
+             psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn,
+-            MongoClient(MONGODB_URL, serverSelectionTimeoutMS=5000) as mongo,
++            MongoClient[dict[str, object]](MONGODB_URL, serverSelectionTimeoutMS=5000) as mongo,
+         ):
+             seed_historical_laps(conn, mongo[MONGODB_DATABASE]["telemetry"])
+     seed_status = " and seed complete" if SEED_DEMO_DATA else "; demo seeding skipped"
+diff --git a/backend/app/core/auth_dependencies.py b/backend/app/core/auth_dependencies.py
+index 8cd61b0..fb02857 100644
+--- a/backend/app/core/auth_dependencies.py
++++ b/backend/app/core/auth_dependencies.py
+@@ -24,7 +24,7 @@ def token_is_revoked(
+     if not isinstance(jti, str) or not jti:
+         raise ValueError()
+     try:
+-        return is_revoked(jti)
++        return bool(is_revoked(jti))
+     except Exception:
+         if not fail_closed:
+             raise
+diff --git a/backend/app/simulation_pit.py b/backend/app/simulation_pit.py
+index 61098ec..2c37084 100644
+--- a/backend/app/simulation_pit.py
++++ b/backend/app/simulation_pit.py
+@@ -12,6 +12,13 @@ from .pit_repository import PIT_RESERVATION_SELECT
+ from .simulation_core import MAX_SESSION_LAPS, Simulation
+ 
+ 
++def _car_number(car: dict[str, object]) -> int:
++    number = car.get("number") or 1
++    if not isinstance(number, (int, str)):
++        return 1
++    return int(number)
++
++
+ def cancel_automatic_reservations(
+     session_id: UUID | str,
+     connection: Callable[..., Any],
+@@ -47,7 +54,7 @@ def schedule_pit_stops(
+     for packet in packets:
+         driver_id = str(packet["driver_id"])
+         driver = next((row for row in sim.drivers if str(row["id"]) == driver_id), None)
+-        number = int((driver or {}).get("number") or 1)
++        number = _car_number(driver or {})
+         compound = sim.compound_by_driver.setdefault(
+             driver_id, ("SOFT", "MEDIUM", "HARD")[number % 3]
+         )
+@@ -118,7 +125,7 @@ def refresh_pit_state(
+             sim.compound_by_driver[key] = compounds[(compounds.index(base) + 1) % len(compounds)]
+             car = next((row for row in sim.drivers if str(row["id"]) == key), {})
+             sim.pit_due_tire_age_by_driver[key] = tire_stint_target(
+-                sim.compound_by_driver[key], int(car.get("number") or 1)
++                sim.compound_by_driver[key], _car_number(car)
+             )
+     sim.pit_reservations_by_driver = {str(row["driver_id"]): row for row in active}
+     return sim.pit_reservations_by_driver

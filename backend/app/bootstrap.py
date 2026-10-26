@@ -10,7 +10,7 @@ from .config import APP_ENV, DATABASE_URL, MONGODB_DATABASE, MONGODB_URL, SEED_D
 from .race_archive import seed_historical_laps
 
 
-def main():
+def main() -> None:
     root = Path(__file__).resolve().parents[1]
     migrations_dir = root / "migrations"
     if not migrations_dir.is_dir():
@@ -27,7 +27,7 @@ def main():
     if SEED_DEMO_DATA and APP_ENV == "local":
         with (
             psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn,
-            MongoClient(MONGODB_URL, serverSelectionTimeoutMS=5000) as mongo,
+            MongoClient[dict[str, object]](MONGODB_URL, serverSelectionTimeoutMS=5000) as mongo,
         ):
             seed_historical_laps(conn, mongo[MONGODB_DATABASE]["telemetry"])
     seed_status = " and seed complete" if SEED_DEMO_DATA else "; demo seeding skipped"

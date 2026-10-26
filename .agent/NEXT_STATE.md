@@ -8,11 +8,6 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - contract: Clear five strict typing errors in bootstrap, auth origin dependencies and simulation pit counters, preserving values/contracts.
 - verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_request_dependencies.py backend/tests/test_runtime_dependencies.py && .venv/bin/mypy --strict backend/app/bootstrap.py backend/app/core/auth_dependencies.py backend/app/simulation_pit.py && .venv/bin/ruff check backend/app backend/tests && .venv/bin/ruff format --check backend/app/bootstrap.py backend/app/core/auth_dependencies.py backend/app/simulation_pit.py
 
-### T-44557 W1 — OPEN
-- target_files: frontend/components/pages/sessions.tsx
-- contract: Restore the client boundary required by Sessions after route stopped importing the client compatibility barrel.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
-
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
 
@@ -23,6 +18,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
 
 ## Done
+- T-44557 accepted48d841a; verify0.
 - T-44556 acceptedce4189e; verify0.
 - T-44555 accepted1f43fcd; verify0.
 - T-44554 accepted55f447f; verify0.

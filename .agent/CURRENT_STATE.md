@@ -1,73 +1,34 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: ce4189e
+git_head: 48d841a
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
 archetype: Neo-Brutal Motorsport light, approved ADR007
-last_eval_score: obsolete51.2974; no current score; final T430
+last_eval_score: obsolete 51.2974; no current score; final T430
 
-## Verified milestones
-- Phases0–2,5–6 COMPLETE (5/12). Phase3 T331/main<=120 unfinished; Phase4,7–11 unfinished. Owner autonomousall12; docs/overhaul-plan.md authoritative.
-- Phase5 tokens/fonts/textures/plinth/primitives complete,60browser/build/static0; productionguidehidden/noindex/zero-write. Phase6 shell/feed/navigation complete481browser/build/static0. Feed30svisiblepoll/cache10s/dedupe/cancellation/40px preserved. ADR012 next_event implemented.
-- Login T3800a3e206 complete80browser/build/static0; fivewidthvisuals reviewed, keyboard/aria-busy covered.
+## Phase status
+- Phases 0–2, 5–6 complete (5/12). Phases 3–4 and 7–11 remain. `docs/overhaul-plan.md` is authoritative. User authorized autonomous completion.
+- Phase 3: T331 main.py <=120 lines and strict typing unfinished. Runtime DI/provider/lifespan and module extractions exist; strict mypy baseline 87 errors/12 files before T44558.
+- Phase 7: route work through Pit Wall; T379 full gate remains 15 desktop A3 layout failures. T380–387 route flows and most browser evidence completed. T388 header/modal/strategy/grid/queue changes accepted; DBMS and Live full initial route bundles exceed unchanged 170 KiB gate (260.01 and 263.84 KiB).
+- Phase 4, 8–11 remain, including DBMS showcase, Taste defects, full E2E/performance, CI/docs, final evaluation/release.
 
-## Active work / evidence
-- T379 exact seven-route split complete(special-pages9exports), parent NOT accepted: initial1100mocked1020PASS80FAIL; aftersharedbody/heading/motionrepairs85targeted70PASS15desktopA3FAIL. RemainingroutePhase7layouts thenfullrerun; no gatewaived.
-- T381 dashboard hero/context/KPIs/services/Nextup/incidents implemented. Actuallease503/notready/recovery +cookieWSopen/error/close/cleanup, no syntheticstatus. Root165browserPASS T381-connectivity-final.browser.raw.log; fivewidthvisuals0overflow/oneprimary/noerrors. Preserve .stat-card/.state.error/Try again. TASTE-381-1 fouraccenttiles vsT400max3 unresolved.
-- T382 resource CRUD/native modals/memberships/eligibility implemented, copy/hooks/pageSize50 preserved. Browser360PASS T382-actions-primary; final modal/accessibility coverage retained below. Resource page bloat remains T400.
-- Resource20-click save/delete duplicates repaired; strict25PASS T382-delete-guard.browser.raw.log; primary transitions5widthPASS, locally mocked writes only.
-- Backend main825lines, <=120T331 NOT met; T332unfinished. Genuine modules/core/extracts retained. TypedRuntimeState/providers/lifespan shareandclear identities; requestauth/DatabaseSession. Membership/analytics/pitreads useDI. Actualreturnannotation Decimalstringregression fixedresponse_modelNone19b7991; exactnumericserializationtests1479019 preservewireencoding.
-- Backend full262PASS0skip/live acceptance PASS T-44540.full.raw.log. Strictmypy103errors/14files T339-latest.raw.log,target0T339. Runtime69PASS T44530 accept log. Demohelpertest246153e +unusedwrappers4514b8e/6391ea2, pitfixtureaf7f9bb preserveallassertions. Remainingfactory/testbindings audited .agent/audit/T44446-di-map.md.
+## Verified evidence
+- Login, Dashboard, Resources, DBMS, Live, Sessions, Stewards and Pit Wall have accepted implementation work; see git commits and `.agent/results/` for task-level records. T44554–57 direct route imports accepted; T44557 restored Sessions client boundary after build failure.
+- Latest corrected production build exits 0. Bundle gate correctly measures initial script/preload assets and fails only DBMS and Live. Recharts is present in each route's shared initial graph; optimize without changing gate or removing features.
+- Backend: full suite 262 passed, 0 skipped, live acceptance passed at T44552. T44558 W2 changes are isolated and await integration: bootstrap/auth dependency/simulation pit typing only. Previous strict baseline 87 errors/12 files.
+- T387 focused browser runs total 35 passing cases across five widths; T386–387 build passed. Pit Wall browser milestone still needs verification.
 
-## Safety / workflow
-- Onlyoverhaul/neo-brutal; commits onlyaccept.sh; independentlyrerunVerify;2packet-onlycustomworkersmax, no model/effortoverrides. Isolatedclones .agent/orchestrate.py;<=3files/150added+deleted; normalizeactualstats. Every5tasks budget.
-- Workerchecks offline/no fixedports; rootowns browser/network/DB. Neverintegrate/accept duringrootNext dev/build orrootbackendchangesduringdb-baseline. Helperscleanupownprocessgroups/restorenext-env. Single db-baseline,18000API, onlylabelguardedapexgrid-test PG15432/Mongo27018. NeverrealDB/schema/data/volumes/.env/secrets/recursive removal. Ownerstatusfilesexcludeduntouched;preserverun-loopedits.
-- Preserveeveryroute/feature/chart/modal/copy/aria/data/stateclass/DBMShash; fiveStates/44targets/tokens/reducedmotion. Thresholds/testsunchanged. Latesttypecheck/strictlint/fourCSS0.
+## Invariants / workflow
+- Locked architecture hash above; verify lock and `source .agent/models.env && bash scripts/agent/boot.sh` before dispatch. Branch only `overhaul/neo-brutal`; accepted changes commit through `accept.sh` integration. Max two packet-only custom workers, gpt-6-luna/high, no overrides. Verify independently; state update after each acceptance; budget every 5 tasks.
+- Preserve every route, feature, chart, modal, copy string, aria/data hook, state class and DBMS hash. Five UI states, >=44px targets, allowed spacing/radius/motion, all gates unchanged. Never touch `.env`, real databases/schema/data/volumes, or run recursive removal. Browser/database/network checks are orchestrator-owned; DB stack only guarded disposable `apexgrid-test`.
+- No dependencies added; no API/schema changes in current work. Owner's authorized ADR-007/ADR-013 changes remain scoped as recorded.
 
-## Open risks / next
-- Backend globals/factorycallbacks/strictmypy/batching/migrationledger, Phase4DBMSshowcase andfinalfullE2E/eval remain. Do not claimcompletion or current95score.
-- T44132 bundlechecker omitslayout/sharedassets; fixbeforeP3 while170KBunchanged. Lighthouseabsent, FPS17untilT41316.7, hostedCIunverified. TASTE-382-BLOAT resourcepage594lines>300; genuineboundarysplitsneeded.
-- HostPython3.14/Node26 vsDocker3.12/22; productionfrontendimage lackssource/lintconfig(hostchecks). Acceptancefixture dependsoldchampionshipround3(T021backlog, ownfixtureplanrequired).
+## Open risks and next work
+- T44558 strict typing fixes need acceptance; rerun strict mypy and focused tests afterward.
+- Measure/optimize DBMS and Live route chunks below 170 KiB while preserving charts and route behavior. Complete Pit Wall browser/Taste coverage, then remaining route tasks in plan dependency order.
+- Main split, strict typing, DBMS showcase, remaining Taste, full browser/performance evidence and final score are not complete. Old 51.2974 is not current; do not present work as done.
+- Host Python 3.14/Node 26 differ from Docker 3.12/22; frontend production image lacks source/lint config; acceptance fixture depends on existing championship round 3 (T021 queued).
 
-## Orchestrator direct edits / process findings
-- Priorlongcontinuation14productgluelines; currentcontinuation0productlines. AllimplementationcustomLunahighworkers, cap2. Independentaccept.sh reruns, actualdiffcounts/unchangedassertionAST checked.
-- Worker T44427wrongworkspacerepairedinpreviouscontext. Reviewcaughtfixture/APIshape errors, serializationregression andhiddenconfirmationprimary; repairedwithouttest/gaterelaxation. Rawlogsabsentclones: inlinefactsinpackets.
-- Latestacceptedpacket/hashes/evidence: Git/.agent/results; queue/stateupdatedaftereachacceptance. No newdependencies, no realDBwrites.
-
-## Latest route verification
-- T382 membership25/editor45/primitive30 and keyboard reopen15 browser PASS; resource-page594lines Taste bloat remains.
-- T383 real demo creation/deletion guard, list five states, truthful selected lap counter implemented; 40 cases passed plus focused10 outage recovery passed. No fake progress or real database writes.
-- T384 all25 focused cases have passing evidence: T384-tower15 + repair8 + mobile2. Selection keyboard/Details/axe/overflow/WS reorder/reduced motion tested. Metadata, unique completed pit counts wired. Runtime69PASS T44530 accept log.
-- T385 charts/corner tiles, laps/latest telemetry tables, control timelines and retry/source states implemented. Fifteen loading/empty/error/retention browser cases PASS; populated4widths PASS. Mobile tooltip tile scope repaired9a68302; focused mobile1PASS T385-populated-mobile-final, completing five populated widths. M13 first draw remains open.
-- T386 layout/controls/results/native modals implemented7023bc4/d868cac/2e68037. Palettefixed; lifecycle/simulator/resultread10PASS and dialog5PASS. T386-387 root30 resilience cases PASS; shared label/border style restored. Result source7897a78 + five-state view378faa0 + five VM tests8e83f3c; no stale result writes.
-- T332 request database demo DELETE/override tests c48443f/dede5cd preserve helper ordering.
-- Review corrected worker envelope counts, fixture schema/labels, UUID types and missing source partial state before acceptance. No dependencies added.
-
-- T387 case files/native dialogs/official records UI implemented through95cc69c; ADR013 permits two read-only paged endpoints; lock verified. Root262PASS0skip/livePASS T-44540.full.raw.log. Paged source handles abort/stale/queued refresh; penalties and seasonal 12-cell meters retain real totals. T44542 browser tests accepted1800077, root35casesnowPASS acrossfivewidths.
-- T386-387 prior route batch99PASS1desktopSteward paletteFAIL; all30 Session resilience cases passed after01e561c spam guard. Shared form readability7c1a7c7 and Steward count sticker8f08922 need current combined browser/build proof.
-
-
-
-
-
-
-- T387 source browser24PASS plus focused15PASS T387-records-repair.browser.raw.log completes all35 cases across five widths, including outage/retention and palette. Production build0 T386-387-build.raw.log. T388 header/native reservation modal a4ef7b6 accepted; remaining strategy/grid/queue/history. Backend helper19c41c6 root262PASS0skip/livePASS T-44543.full.raw.log.
-
-
-
-
-- T388 strategy five-state cards f1a5c17; grid/queue in review. T44132 helper9c8841e sixofflinePASS; honestproductionbaseline sevenroutes290.49KiB>170, root+page oldgate invalid. WiringT44553 then optimize real route imports; neverraisegate.
-
-- Bundle evidence exposed shared client barrel across seven route entries; direct imports queued. Actual worker concurrency never exceeded2.
-
-
-
-
-- Accepted since refresh: T44543-53; commits/evidence in Git and .agent/results.
-
-- T-44554 accepted55f447f: Import each route page component directly while preserving the named binding and default export. Verify0.
-
-- T-44555 accepted1f43fcd: Import each route page component directly while preserving the named binding and default export. Verify0.
-
-- T-44556 acceptedce4189e: Import the live component directly from its route implementation; preserve named and default exports. Verify0.
+## Orchestrator direct edits / process notes
+- Current continuation has 0 product-code lines edited by orchestrator. Accepted results and hashes are in git/.agent/results; workers may not commit. Earlier review caught fixture/API-shape and numeric serialization regressions and corrected them without weakening checks.

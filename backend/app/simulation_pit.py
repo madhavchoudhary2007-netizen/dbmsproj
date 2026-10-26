@@ -12,6 +12,13 @@ from .pit_repository import PIT_RESERVATION_SELECT
 from .simulation_core import MAX_SESSION_LAPS, Simulation
 
 
+def _car_number(car: dict[str, object]) -> int:
+    number = car.get("number") or 1
+    if not isinstance(number, (int, str)):
+        return 1
+    return int(number)
+
+
 def cancel_automatic_reservations(
     session_id: UUID | str,
     connection: Callable[..., Any],
@@ -47,7 +54,7 @@ def schedule_pit_stops(
     for packet in packets:
         driver_id = str(packet["driver_id"])
         driver = next((row for row in sim.drivers if str(row["id"]) == driver_id), None)
-        number = int((driver or {}).get("number") or 1)
+        number = _car_number(driver or {})
         compound = sim.compound_by_driver.setdefault(
             driver_id, ("SOFT", "MEDIUM", "HARD")[number % 3]
         )
@@ -118,7 +125,7 @@ def refresh_pit_state(
             sim.compound_by_driver[key] = compounds[(compounds.index(base) + 1) % len(compounds)]
             car = next((row for row in sim.drivers if str(row["id"]) == key), {})
             sim.pit_due_tire_age_by_driver[key] = tire_stint_target(
-                sim.compound_by_driver[key], int(car.get("number") or 1)
+                sim.compound_by_driver[key], _car_number(car)
             )
     sim.pit_reservations_by_driver = {str(row["driver_id"]): row for row in active}
     return sim.pit_reservations_by_driver

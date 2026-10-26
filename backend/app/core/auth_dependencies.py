@@ -24,7 +24,7 @@ def token_is_revoked(
     if not isinstance(jti, str) or not jti:
         raise ValueError()
     try:
-        return is_revoked(jti)
+        return bool(is_revoked(jti))
     except Exception:
         if not fail_closed:
             raise
