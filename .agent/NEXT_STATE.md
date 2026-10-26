@@ -5,11 +5,11 @@ execution: RUNNING
 phase: 3 backend / 7 routes; no current score
 
 ## Queue (root must prepare exact packets before dispatch)
-### T-44583 — Simulation lifecycle extraction
+### T-44584 — Entrypoint cleanliness gate main.py <= 120 lines
 - worker: W2 | priority: P1 | origin: T-331/T-332 structural entrypoint gate
-- target_files: backend/app/core/simulation_service.py, backend/app/main.py
-- contract: Extract simulation lifecycle helpers from main.py into core/simulation_service.py, <=250 lines; retain main.py entrypoint cleanliness (target <= 120 lines).
-- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py backend/tests/test_api.py -k "test_runtime_route_registrations or test_current_openapi or test_websocket_bus or f_dom_05 or test_simulation_stop_clears_pending_pit_reservations" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
+- target_files: backend/app/core/legacy_compat.py, backend/app/main.py
+- contract: Extract remaining legacy compatibility helpers into core/legacy_compat.py and group re-exports concisely so main.py is strictly <= 120 lines while preserving all exported aliases and test compatibility.
+- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py backend/tests/test_api.py -k "test_runtime_route_registrations or test_current_openapi or test_websocket_bus or f_dom_05" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
 
 ### T-44590 — Resource-page component modularization
 - worker: W1 | priority: P1 | origin: TASTE-382-BLOAT

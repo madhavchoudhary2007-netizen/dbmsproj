@@ -2,8 +2,8 @@
 updated_at: 2026-10-26
 branch: overhaul/neo-brutal
 execution: RUNNING — implementation resumed on owner instruction 2026-10-26
-verified_product_head: 6201515
-last_product_task: T-44589
+verified_product_head: 57d8fa4
+last_product_task: T-44583
 metadata_task: T-44587 active-document audit; see matching acceptance result/commit
 architect_sha256: 0f2b5366fee89ec70d8340ab2e148ad676f0c64bf324f00af559c242cd4cc46c
 target_harness: Antigravity; requested Gemini 3.8 Flash HIGH orchestrator / LOW workers; cap 2
@@ -35,6 +35,7 @@ Phase requirements are in docs/overhaul-plan.md; the table below is the current 
 - T-44581 passed root acceptance (commit 2b04eaf): simulation, live WebSocket, and DBMS lock modules refactored to domain APIRouters using FastAPI dependency injection (get_simulations, get_bus, admin, require_roles, get_race_db), mounted directly in main.py, backwards-compatible factory functions and handler aliases preserved, 8 tests passed (snapshot, route registration uniqueness, simulation replay, simulation control), strict mypy/ruff/format clean.
 - T-44582 passed root acceptance (commit 3d214f9): CRUD resource routing refactored to domain APIRouter using FastAPI dependency injection (current_user, admin, get_race_db, get_race_telemetry), eliminated 15-lambda forwarding block in main.py, directly mounted crud_router, preserved backwards compatibility for create_crud_router and register_resources, 7 tests passed, strict mypy/ruff/format clean.
 - T-44589 passed root acceptance (commit 6201515): replaced violet accent on open_incidents stat card with yellow in dashboard.tsx, resolving TASTE-381-1 four-accent defect and limiting dashboard face accents to approved <= 3 (red, yellow, mint); typecheck, lint, and four design linters passed cleanly.
+- T-44583 passed root acceptance (commit 57d8fa4): extracted simulation lifecycle, demo race orchestration, and simulation loop helpers into backend/app/core/simulation_service.py (409 lines) and trimmed backend/app/main.py by 231 lines, preserving all exported symbols and test monkeypatch compatibility; 8 tests passed, snapshot and route uniqueness clean, strict mypy/ruff/format clean.
 
 ## Current risks and open work
 - Complete only remaining T-331/T-332 domains and required integration; do not repeat accepted T-44575..80 or create line-count wrappers. T-44573 remains superseded. Historical assembly counts are not the current module map.

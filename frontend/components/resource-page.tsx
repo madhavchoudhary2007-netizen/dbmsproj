@@ -1,120 +1,71 @@
 "use client";
+
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Pencil, Plus, RefreshCw, Search, Trash2 } from "lucide-react";
 import { api, asArray, listAll, pretty, Row } from "@/lib/api";
 import { useResourceMemberships } from "@/lib/use-resource-memberships";
 import { useResourceRows } from "@/lib/use-resource-rows";
-import { Pencil, Plus, RefreshCw, Search, Trash2 } from "lucide-react";
+import { resourceViewState } from "@/lib/resource-view";
 import { useAuth } from "./auth";
 import { NbButton } from "./nb/button";
 import { NbBadge } from "./nb/badge";
 import { NbCard } from "./nb/card";
-import { NbModal } from "./nb/modal";
-import { MembershipHistory } from "./membership-history";
-import {
-  Button,
-  ResourceEditor,
-} from "./ui";
 import { NbInput } from "./nb/input";
 import { NbTable } from "./nb/table";
-import { resourceViewState } from "@/lib/resource-view";
+import { Button } from "./ui";
+import {
+  Field,
+  ResourceModals,
+  ResourceRecordModal,
+  ResourceDeleteModal,
+  ResourceMembershipModal,
+} from "./resource-modals";
 
-type FieldOption = string | { value: string; label: string };
-type Field = {
-  name: string;
-  type?: string;
-  required?: boolean;
-  min?: number;
-  max?: number;
-  options?: FieldOption[];
-};
 export function ResourcePage({
-  title,
-  eyebrow,
-  description,
-  endpoint,
-  columns,
-  fields,
-  userField,
-  userRole,
+  title, eyebrow, description, endpoint, columns, fields, userField, userRole,
 }: {
-  title: string;
-  eyebrow: string;
-  description: string;
-  endpoint: string;
-  columns: string[];
-  fields: Field[];
-  userField?: string;
-  userRole?: string;
+  title: string; eyebrow: string; description: string; endpoint: string;
+  columns: string[]; fields: Field[]; userField?: string; userRole?: string;
 }) {
   const { rows, loading, error, load } = useResourceRows(endpoint);
   const {
-    members,
-    currentMembers,
-    loading: membersLoading,
-    error: memberError,
-    setError: setMemberError,
-    clear: clearMembers,
-    load: loadMembers,
+    members, currentMembers, loading: membersLoading, error: memberError,
+    setError: setMemberError, clear: clearMembers, load: loadMembers,
   } = useResourceMemberships(endpoint);
-  const [term, setTerm] = useState(""),
-    [page, setPage] = useState(0),
-    [modal, setModal] = useState(false),
-    [deleteConfirm, setDeleteConfirm] = useState(false),
-    [edit, setEdit] = useState<Row | undefined>(),
-    [busy, setBusy] = useState(false),
-    [memberModal, setMemberModal] = useState(false),
-    [users, setUsers] = useState<Row[]>([]),
+
+  const [term, setTerm] = useState(""), [page, setPage] = useState(0),
+    [modal, setModal] = useState(false), [deleteConfirm, setDeleteConfirm] = useState(false),
+    [edit, setEdit] = useState<Row | undefined>(), [busy, setBusy] = useState(false),
+    [memberModal, setMemberModal] = useState(false), [users, setUsers] = useState<Row[]>([]),
     [relatedRows, setRelatedRows] = useState<Record<string, Row[]>>({}),
     [entityRows, setEntityRows] = useState<Record<string, Row[]>>({}),
-    [userLoadError, setUserLoadError] = useState(""),
-    [actionError, setActionError] = useState("");
+    [userLoadError, setUserLoadError] = useState(""), [actionError, setActionError] = useState("");
   const removeInFlight = useRef(false);
   const supportsHistory = endpoint === "/drivers" || endpoint === "/teams";
   const { user } = useAuth();
   const canManage = user?.role === "ADMIN";
+
   useEffect(() => {
     if (!userField || !canManage) return;
     listAll("/users")
-      .then((rows) => {
-        setUsers(asArray(rows));
-        setUserLoadError("");
-      })
-      .catch((e) =>
-        setUserLoadError(
-          e instanceof Error ? e.message : "Unable to load user accounts",
-        ),
-      );
+      .then((r) => { setUsers(asArray(r)); setUserLoadError(""); })
+      .catch((e) => setUserLoadError(e instanceof Error ? e.message : "Unable to load user accounts"));
   }, [canManage, userField]);
+
   useEffect(() => {
     if (!canManage || endpoint !== "/events") return;
     Promise.all([listAll("/championships"), listAll("/circuits")])
-      .then(([championships, circuits]) =>
-        setRelatedRows({
-          championship_id: asArray(championships),
-          circuit_id: asArray(circuits),
-        }),
-      )
-      .catch((e) =>
-        setActionError(
-          e instanceof Error ? e.message : "Unable to load event choices",
-        ),
-      );
+      .then(([c, cr]) => setRelatedRows({ championship_id: asArray(c), circuit_id: asArray(cr) }))
+      .catch((e) => setActionError(e instanceof Error ? e.message : "Unable to load event choices"));
   }, [canManage, endpoint]);
+
   useEffect(() => {
     if (!supportsHistory || !canManage) return;
     Promise.all([listAll("/drivers"), listAll("/teams")])
-      .then(([drivers, teams]) =>
-        setEntityRows({
-          driver_id: asArray(drivers),
-          team_id: asArray(teams),
-        }),
-      )
-      .catch((e) =>
-        setMemberError(
-          e instanceof Error ? e.message : "Unable to load membership choices",
-        ),
-      );
+      .then(([d, t]) => setEntityRows({ driver_id: asArray(d), team_id: asArray(t) }))
+      .catch((e) => setMemberError(e instanceof Error ? e.message : "Unable to load membership choices"));
   }, [canManage, setMemberError, supportsHistory]);
+
   const userOptions = users
     .filter((row) => !userRole || row.role === userRole)
     .filter((row) => endpoint !== "/drivers" || edit?.user_id === row.id || !rows.some((driver) => driver.user_id === row.id))
@@ -122,157 +73,92 @@ export function ResourcePage({
       value: String(row.id),
       label: `${String(row.full_name || "Unnamed account")} · ${String(row.email || "")}`,
     }));
+
   const formFields = fields.map((field) => {
     if (field.name === userField) return { ...field, options: userOptions };
-    if (relatedRows[field.name])
+    if (relatedRows[field.name]) {
       return {
         ...field,
-        options: relatedRows[field.name].map((row) => ({
-          value: String(row.id),
-          label: String(row.name || row.id),
-        })),
+        options: relatedRows[field.name].map((row) => ({ value: String(row.id), label: String(row.name || row.id) })),
       };
-    if (endpoint === "/users" && field.name === "password")
-      return { ...field, required: !edit?.id };
+    }
+    if (endpoint === "/users" && field.name === "password") return { ...field, required: !edit?.id };
     return field;
   });
+
   const filtered = useMemo(
-    () =>
-      rows.filter((r) =>
-        JSON.stringify(r).toLowerCase().includes(term.toLowerCase()),
-      ),
+    () => rows.filter((r) => JSON.stringify(r).toLowerCase().includes(term.toLowerCase())),
     [rows, term],
   );
+
   const pageSize = 50;
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
   const visiblePage = Math.min(page, pageCount - 1);
   const visibleRows = filtered.slice(visiblePage * pageSize, (visiblePage + 1) * pageSize);
   const tableState = resourceViewState({
-    rows,
-    visibleRows,
-    loading,
-    error,
-    term,
+    rows, visibleRows, loading, error, term,
     retry: () => void load(),
-    clear: () => {
-      setTerm("");
-      setPage(0);
-    },
+    clear: () => { setTerm(""); setPage(0); },
   });
+
   const save = async (v: Row) => {
     setBusy(true);
     try {
       const payload = Object.fromEntries(
-        fields
-          .map(({ name }) => [name, v[name]])
-          .filter(([, value]) => value !== undefined),
+        fields.map(({ name }) => [name, v[name]]).filter(([, value]) => value !== undefined),
       ) as Row;
-      if (endpoint === "/users" && edit?.id && !payload.password)
-        delete payload.password;
-      if (edit?.id)
-        await api(`${endpoint}/${edit.id}`, {
-          method: "PATCH",
-          body: JSON.stringify(payload),
-        });
-      else
-        await api(endpoint, { method: "POST", body: JSON.stringify(payload) });
-      setModal(false);
-      setActionError("");
-      await load();
+      if (endpoint === "/users" && edit?.id && !payload.password) delete payload.password;
+      if (edit?.id) await api(`${endpoint}/${edit.id}`, { method: "PATCH", body: JSON.stringify(payload) });
+      else await api(endpoint, { method: "POST", body: JSON.stringify(payload) });
+      setModal(false); setActionError(""); await load();
     } catch (e) {
       setActionError(e instanceof Error ? e.message : "Unable to save record");
       throw e;
-    } finally {
-      setBusy(false);
-    }
+    } finally { setBusy(false); }
   };
+
   const remove = async () => {
-    if (!edit?.id) return;
-    if (removeInFlight.current) return;
-    removeInFlight.current = true;
-    setBusy(true);
+    if (!edit?.id || removeInFlight.current) return;
+    removeInFlight.current = true; setBusy(true);
     try {
       await api(`${endpoint}/${edit.id}`, { method: "DELETE" });
-      setModal(false);
-      setEdit(undefined);
-      await load();
+      setModal(false); setEdit(undefined); await load();
     } catch (e) {
-      setActionError(
-        e instanceof Error ? e.message : "Unable to delete record",
-      );
-    } finally {
-      removeInFlight.current = false;
-      setBusy(false);
-    }
+      setActionError(e instanceof Error ? e.message : "Unable to delete record");
+    } finally { removeInFlight.current = false; setBusy(false); }
   };
+
   const showRow = async (row: Row) => {
-    setEdit(row);
-    setActionError("");
-    setModal(true);
-    clearMembers();
+    setEdit(row); setActionError(""); setModal(true); clearMembers();
     if (supportsHistory && row.id) {
-      try {
-        await loadMembers(String(row.id));
-      } catch (e) {
-        setMemberError(
-          e instanceof Error ? e.message : "Unable to load membership history",
-        );
-      }
+      try { await loadMembers(String(row.id)); }
+      catch (e) { setMemberError(e instanceof Error ? e.message : "Unable to load membership history"); }
     }
   };
-  const retryMembers = () => {
-    if (edit?.id) void loadMembers(String(edit.id)).catch(() => undefined);
-  };
+
+  const retryMembers = () => { if (edit?.id) void loadMembers(String(edit.id)).catch(() => undefined); };
+
   const memberSave = async (v: Row) => {
     setBusy(true);
     try {
-      await api("/team-memberships", {
-        method: "POST",
-        body: JSON.stringify(v),
-      });
+      await api("/team-memberships", { method: "POST", body: JSON.stringify(v) });
       setMemberModal(false);
-      if (edit?.id && supportsHistory)
-        await loadMembers(String(edit.id));
+      if (edit?.id && supportsHistory) await loadMembers(String(edit.id));
       await load();
-    } finally {
-      setBusy(false);
-    }
+    } finally { setBusy(false); }
   };
+
   const endMembership = async (id: string) => {
     if (!edit?.id) return;
     setBusy(true);
     try {
-      await api(`/team-memberships/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify({
-          end_date: new Date().toISOString().slice(0, 10),
-        }),
-      });
+      await api(`/team-memberships/${id}`, { method: "PATCH", body: JSON.stringify({ end_date: new Date().toISOString().slice(0, 10) }) });
       await loadMembers(String(edit.id));
     } catch (e) {
-      setMemberError(
-        e instanceof Error ? e.message : "Unable to update membership",
-      );
-    } finally {
-      setBusy(false);
-    }
+      setMemberError(e instanceof Error ? e.message : "Unable to update membership");
+    } finally { setBusy(false); }
   };
-  const memberFields: Field[] = [
-    { name: "driver_id", required: true },
-    { name: "team_id", required: true },
-    { name: "start_date", type: "date", required: true },
-    { name: "end_date", type: "date" },
-  ];
-  const memberFormFields = memberFields.map((field) => ({
-    ...field,
-    options: (entityRows[field.name] || []).map((row) => ({
-      value: String(row.id),
-      label:
-        field.name === "driver_id"
-          ? `${String(row.number || "#—")} · ${String(row.full_name || "Driver")}`
-          : `${String(row.name || "Team")} · ${String(row.principal_name || "")}`,
-    })),
-  }));
+
   return (
     <>
       <NbCard tone="cream" className="resource-hero">
@@ -281,20 +167,12 @@ export function ResourcePage({
           <h1>{title}</h1>
           <p>{description}</p>
           <span className="resource-count-sticker">
-            {loading
-              ? "— LOADING"
-              : `${filtered.length} RECORD${filtered.length === 1 ? "" : "S"}`}
+            {loading ? "— LOADING" : `${filtered.length} RECORD${filtered.length === 1 ? "" : "S"}`}
           </span>
         </div>
         <div className="header-actions">
           {supportsHistory && canManage && (
-            <NbButton
-              variant="secondary"
-              onClick={() => {
-                setEdit(undefined);
-                setMemberModal(true);
-              }}
-            >
+            <NbButton variant="secondary" onClick={() => { setEdit(undefined); setMemberModal(true); }}>
               Add membership
             </NbButton>
           )}
@@ -302,11 +180,7 @@ export function ResourcePage({
             <NbButton
               variant="primary"
               data-primary={!modal && !memberModal && !deleteConfirm ? "true" : undefined}
-              onClick={() => {
-                setEdit(undefined);
-                setActionError("");
-                setModal(true);
-              }}
+              onClick={() => { setEdit(undefined); setActionError(""); setModal(true); }}
             >
               <Plus size={15} aria-hidden="true" />
               New record
@@ -321,26 +195,16 @@ export function ResourcePage({
             aria-label="Filter records"
             placeholder="Filter records"
             value={term}
-            onChange={(event) => {
-              setTerm(event.target.value);
-              setPage(0);
-            }}
+            onChange={(event) => { setTerm(event.target.value); setPage(0); }}
           />
         </label>
         <span className="record-count">
-          {loading
-            ? "—"
-            : `${filtered.length} RECORD${filtered.length === 1 ? "" : "S"}`}
+          {loading ? "—" : `${filtered.length} RECORD${filtered.length === 1 ? "" : "S"}`}
         </span>
         <span className="resource-range" aria-live="polite">
-          Showing {filtered.length ? visiblePage * pageSize + 1 : 0}–
-          {filtered.length ? visiblePage * pageSize + visibleRows.length : 0} of {filtered.length}
+          Showing {filtered.length ? visiblePage * pageSize + 1 : 0}–{filtered.length ? visiblePage * pageSize + visibleRows.length : 0} of {filtered.length}
         </span>
-        <NbButton
-          variant="secondary"
-          aria-label="Refresh"
-          onClick={() => void load()}
-        >
+        <NbButton variant="secondary" aria-label="Refresh" onClick={() => void load()}>
           <RefreshCw size={16} aria-hidden="true" />
         </NbButton>
       </div>
@@ -358,59 +222,32 @@ export function ResourcePage({
                 pretty(row[key])
               ),
           })),
-          ...(canManage
-            ? [{
-                key: "actions",
-                title: "Actions",
-                render: (row: Row) => (
-                  <div className="flex items-center gap-2">
-                    <NbButton
-                      variant="ghost"
-                      className="!p-0 [&>span]:!px-0 [&>span]:!py-0"
-                      aria-label="Edit record"
-                      onClick={() => void showRow(row)}
-                    >
-                      <Pencil size={16} aria-hidden="true" />
-                    </NbButton>
-                    <NbButton
-                      variant="ghost"
-                      className="!p-0 [&>span]:!px-0 [&>span]:!py-0"
-                      aria-label="Delete record"
-                      onClick={() => {
-                        void showRow(row);
-                        setDeleteConfirm(true);
-                      }}
-                    >
-                      <Trash2 size={16} aria-hidden="true" />
-                    </NbButton>
-                  </div>
-                ),
-              }]
-            : []),
+          ...(canManage ? [{
+            key: "actions",
+            title: "Actions",
+            render: (row: Row) => (
+              <div className="flex items-center gap-2">
+                <NbButton variant="ghost" className="!p-0 [&>span]:!px-0 [&>span]:!py-0" aria-label="Edit record" onClick={() => void showRow(row)}>
+                  <Pencil size={16} aria-hidden="true" />
+                </NbButton>
+                <NbButton variant="ghost" className="!p-0 [&>span]:!px-0 [&>span]:!py-0" aria-label="Delete record" onClick={() => { void showRow(row); setDeleteConfirm(true); }}>
+                  <Trash2 size={16} aria-hidden="true" />
+                </NbButton>
+              </div>
+            ),
+          }] : []),
         ]}
         rowKey={(row, index) => String(row.id ?? index)}
         caption={title}
         pageSize={pageSize}
-        empty={
-          term
-            ? "No records match this filter."
-            : "No records returned by the API."
-        }
+        empty={term ? "No records match this filter." : "No records returned by the API."}
         sourceMessage={error || undefined}
         partialActionLabel={error ? "Try again" : "Clear filter"}
         partialActionAriaLabel={error ? "Try again" : "Clear filter"}
-        onSelect={(row) => {
-          if (canManage || supportsHistory) void showRow(row);
-        }}
+        onSelect={(row) => { if (canManage || supportsHistory) void showRow(row); }}
       />
       {term && filtered.length === 0 && (
-        <NbButton
-          variant="secondary"
-          onClick={() => {
-            setTerm("");
-            setPage(0);
-          }}
-        >
+        <NbButton variant="secondary" onClick={() => { setTerm(""); setPage(0); }}>
           Clear filter
         </NbButton>
       )}
@@ -423,172 +260,32 @@ export function ResourcePage({
         </div>
       )}
       <p className="table-note">
-        Select a row to inspect or edit. Data is loaded from{" "}
-        <code>/api{endpoint}</code>.
+        Select a row to inspect or edit. Data is loaded from <code>/api{endpoint}</code>.
       </p>
-      {modal && (
-        <NbModal
-          open={modal}
-          title={edit ? "Record details" : "Create record"}
-          onClose={() => {
-            setDeleteConfirm(false);
-            setModal(false);
-          }}
-        >
-          {canManage ? (
-            <>
-              {userField && userLoadError && (
-                <div className="form-error">
-                  Could not load selectable accounts: {userLoadError}
-                </div>
-              )}
-              {userField && !userLoadError && userOptions.length === 0 && (
-                <div className="form-hint">
-                  No matching accounts are available. Create a{" "}
-                  {userRole || "user"} account on the Users page first.
-                </div>
-              )}
-              {endpoint === "/users" && edit?.id && (
-                <div className="form-hint">
-                  Leave password blank to keep the existing password. Passwords
-                  are write-only.
-                </div>
-              )}
-              <ResourceEditor
-                fields={formFields}
-                initial={edit}
-                save={save}
-                busy={busy}
-                primary={!memberModal && !deleteConfirm}
-              />
-            </>
-          ) : (
-            <div className="read-detail">
-              {columns.map((k) => (
-                <div className="detail-row" key={k}>
-                  <span>{k.replaceAll("_", " ")}</span>
-                  <b>{String(edit?.[k] ?? "—")}</b>
-                </div>
-              ))}
-            </div>
-          )}
-          {actionError && <div className="form-error">{actionError}</div>}
-          {canManage && edit && (
-            <div className="form-actions destructive-row">
-              <Button
-                kind="danger"
-                disabled={busy}
-                onClick={() => setDeleteConfirm(true)}
-              >
-                Delete record
-              </Button>
-            </div>
-          )}
-          {supportsHistory && edit && (
-            <div className="membership-history">
-              <div className="panel-heading">
-                <div>
-                  <div className="eyebrow">TEAM MEMBERSHIP HISTORY</div>
-                  <h2>
-                    {String(edit.full_name || edit.name || "Selected record")}
-                  </h2>
-                </div>
-                {canManage && (
-                  <Button kind="secondary" onClick={() => setMemberModal(true)}>
-                    Add membership
-                  </Button>
-                )}
-              </div>
-              <MembershipHistory
-                members={members}
-                loading={membersLoading}
-                error={memberError}
-                retry={retryMembers}
-                canManage={canManage}
-                busy={busy}
-                onEnd={(id) => void endMembership(id)}
-              />
-            </div>
-          )}
-        </NbModal>
-      )}
-      {modal && edit && (
-        <NbModal
-          open={deleteConfirm}
-          title="Delete record"
-          onClose={() => setDeleteConfirm(false)}
-        >
-          <p className="min-w-0 [overflow-wrap:anywhere]">
-            Delete {String(edit.full_name || edit.name || edit.id)}? This
-            action cannot be undone.
-          </p>
-          <div className="form-actions">
-            <NbButton
-              variant="secondary"
-              disabled={busy}
-              onClick={() => setDeleteConfirm(false)}
-            >
-              Cancel
-            </NbButton>
-            <NbButton
-              variant="danger"
-              data-primary={deleteConfirm ? "true" : undefined}
-              disabled={busy}
-              onClick={() => {
-                setDeleteConfirm(false);
-                void remove();
-              }}
-            >
-              Delete record
-            </NbButton>
-          </div>
-        </NbModal>
-      )}
-      {memberModal && canManage && (
-        <NbModal
-          open={memberModal}
-          title="Create team membership"
-          onClose={() => setMemberModal(false)}
-        >
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <section className="min-w-0">
-              <h3 className="mb-4 text-lg font-bold">Current roster</h3>
-              {edit && supportsHistory ? (
-                <>
-                  <p className="mb-4">
-                    {String(edit.full_name || edit.name || "Selected record")}
-                  </p>
-                  <MembershipHistory
-                    members={currentMembers}
-                    loading={membersLoading}
-                    error={memberError}
-                    retry={retryMembers}
-                    canManage={false}
-                    busy={busy}
-                    onEnd={(id) => void endMembership(id)}
-                  />
-                </>
-              ) : (
-                <p>Select a driver or team record to inspect its roster.</p>
-              )}
-            </section>
-            <section className="min-w-0">
-              <h3 className="mb-4 text-lg font-bold">Add membership</h3>
-              <div className="form-hint">
-                Choose the driver, team, and dates. The membership appears in both
-                history views.
-              </div>
-              {memberError && <div className="form-error">{memberError}</div>}
-              <ResourceEditor
-                fields={memberFormFields}
-                save={memberSave}
-                busy={busy}
-                primary={!deleteConfirm}
-              />
-            </section>
-          </div>
-        </NbModal>
-      )}
+      <ResourceModals
+        record={{
+          open: modal, edit, canManage, columns, formFields, userField, userRole,
+          userLoadError, userOptions, endpoint, busy, primary: !memberModal && !deleteConfirm,
+          actionError, supportsHistory, members, membersLoading, memberError,
+          retryMembers, endMembership, onSave: save,
+          onDelete: () => setDeleteConfirm(true),
+          onAddMembership: () => setMemberModal(true),
+          onClose: () => { setDeleteConfirm(false); setModal(false); },
+        }}
+        deleteDialog={{
+          open: modal && Boolean(edit) && deleteConfirm, edit, busy,
+          onCancel: () => setDeleteConfirm(false),
+          onConfirm: () => { setDeleteConfirm(false); void remove(); },
+        }}
+        membership={{
+          open: memberModal && canManage, edit, supportsHistory, currentMembers,
+          membersLoading, memberError, retryMembers, busy, deleteConfirm, entityRows,
+          onSave: memberSave, onEndMembership: endMembership,
+          onClose: () => setMemberModal(false),
+        }}
+      />
     </>
   );
 }
+
+export { ResourceRecordModal, ResourceDeleteModal, ResourceMembershipModal };
