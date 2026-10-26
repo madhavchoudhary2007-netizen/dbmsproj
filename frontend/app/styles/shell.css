@@ -233,7 +233,11 @@
   .nb-shell .main-shell { margin-left: var(--nb-nav-width); }
   .nb-shell .mobile-menu,
   .nb-shell .close-nav { display: none; }
-  .nb-shell .race-control-feed { height: 64px; min-height: 64px; }
+  .nb-shell .footer {
+    background: var(--nb-red); color: var(--nb-ink);
+    border-top: 4px solid var(--nb-ink); font-weight: 700;
+    padding: 12px 16px; line-height: 1.2;
+  }
 }
 
 @media (min-width: 1000px) and (max-width: 1199px) {
