@@ -6,7 +6,7 @@ Read when: building data components, forms, dialogs or navigation, auditing acce
 
 ## Pillar 3: the 5 mandatory UI states
 
-Every data component takes this union and renders every variant; the exhaustive `switch` turns a missing state into a type error.
+The existing frontend/lib/data-state.ts exports this union and assertNever. Reuse that contract; do not create a second type/helper merely to match an example. Every data region renders all five states; use an exhaustive switch where this union is used.
 
 ```ts
 export type ViewState<T> =
@@ -26,7 +26,7 @@ function assertNever(x: never): never { throw new Error(`Unhandled state: ${JSON
 | Loading skeleton | Same dimensions as the final content (CLS ≤ 0.05); appears only after 150ms; `aria-busy="true"` |
 | Populated | Real content; tabular numbers where numeric |
 | Error with retry | Human-readable cause; retry re-issues the same request; `role="alert"`; non-retryable errors give a next step instead |
-| Partial/filtered | "Showing N of M" with a one-click clear; filter state in the URL query |
+| Partial/filtered | Retain useful data with a clear incompleteness/filter explanation and recovery; filtered collections show "Showing N of M" with clear where applicable. Preserve current URL/hash contracts. |
 
 Every data component has a test for all five states (check E-1). Reuse existing mocked routes, fixtures and stable selectors. Add a development-only fixture route only when existing test infrastructure cannot exercise the state; do not add one route or rewrite existing hooks per component merely to match this generic example.
 
@@ -50,7 +50,7 @@ test("touch targets ≥ 44×44 at 375px", async ({ page }) => {
 ## Pillar 5: semantic DOM and WCAG 2.1 AA
 
 - Landmarks: one `<header>`, labelled `<nav>` regions, one `<main id="main">`, `<footer>`. The first focusable element is a "Skip to content" link. One `<h1>` per page, no skipped heading levels.
-- Dialogs use native `<dialog>` opened with `showModal()` (top layer, Escape to close, inert background, focus trap). Return focus to the trigger on close.
+- Preserve accessible existing dialog primitives: labelled dialog semantics, Escape close, inert background/focus trap, and return focus to the trigger. A generic native-dialog example is not a reason to rewrite a working modal.
 - Custom widgets follow WAI-ARIA Authoring Practices keyboard patterns (tabs: arrow keys; menus: arrows plus Escape; listbox: type-ahead).
 - Focus: `:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }`. Never `outline: none` without a replacement.
 - Contrast: body text at least 4.5:1; large text (24px or more, or 18.66px bold) and UI component boundaries at least 3:1.
@@ -113,4 +113,4 @@ test("screenshot baseline", async ({ page }, info) => {
 </div>
 ```
 
-On ultra-wide screens use `max-width: 1440px; margin-inline: auto` for app shells and `68ch` for prose; go full-bleed only for media and data canvases.
+On ultra-wide screens follow the approved route/shell layout in overhaul-plan.md; use bounded readable prose and internal table/canvas scrolling. Do not introduce a generic 1440px shell cap that changes approved palette coverage. Required viewport and overflow gates stay unchanged.

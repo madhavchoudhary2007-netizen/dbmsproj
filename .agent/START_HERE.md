@@ -3,7 +3,7 @@
 This is the entrypoint for a new model. It is a reading/run order, not another product plan. All paths and commands are relative to the project root. No previous chat memory is required to understand the current permission and next action.
 
 ## 1. Decide whether you may implement
-Read AGENTS.md, .agent/CURRENT_STATE.md and .agent/NEXT_STATE.md, in that order.
+Read AGENTS.md, .agent/CURRENT_STATE.md and .agent/NEXT_STATE.md, then .agent/DOC_AUTHORITY.md once.
 - Resolve permission from the latest owner instruction and current state. An explicit start/resume lifts an older pause; a documentation-only request authorizes documentation only. Preserve another session's in-flight task and do not launch a competing orchestrator.
 - Do not restart bootstrap, Phases0–2/5–6, or the historical perfection loop. A fresh context is not a fresh project.
 
@@ -25,14 +25,14 @@ Expected branch: overhaul/neo-brutal; boot must exit0 and print boot OK. Boot in
 | Which architecture is permitted? | Locked .agent/ARCHITECT.md relevant section and its named ADR |
 | How big is a task and which checks run now? | .agent/protocol/delivery-workflow.md |
 | Antigravity setup and compliance? | .agent/protocol/antigravity.md; requested Gemini 3.8 Flash HIGH orchestrator / LOW workers; actual UI settings or UNVERIFIED |
-| Which worker owns it? | .agent/protocol/roles.md; configured w1-ui/w2-state/w3-eval definitions |
+| Which worker owns it? | .agent/protocol/roles.md; roles.md; for Antigravity use UI-selected isolated roles, not Codex/Claude configuration files |
 | How do I write/review/accept the packet? | .agent/protocol/packets.md; .agent/envelope.schema.json |
 | How do I report final quality? | .agent/protocol/evaluation.md; scripts/eval/score.sh |
 
-Read <=100 lines from a file per output. Use rg to locate symbols/headings; old line numbers are hints after code moves. Skip generated/vendor/build/lockfile contents. Historical PROJECT_STATE.md and LOOP.md are not current status sources. Existing configured commands live in .agent/commands.env; do not guess npm/pnpm or test-runner flags.
+Read <=100 lines from a file per output. Use rg to locate symbols/headings; old line numbers are hints after code moves. Skip generated/vendor/build/lockfile contents; an exact required framework guide may be named by root as packet read-only context per packets.md. Historical PROJECT_STATE.md and LOOP.md are not current status sources. Existing configured commands live in .agent/commands.env; do not guess npm/pnpm or test-runner flags.
 
 ## 4. Next implementation action, only when authorized
-Read the live queue, not an old starting task. At this documentation checkpoint T-44575..T-44580 are accepted; T-44581 is pending and its packet must be reconciled before any retry. Check worker status/diff/result and ownership; do not assume it is idle or accepted. Do not repeat race-history or other accepted domains.
+Read the live queue, not an old starting task. At this documentation checkpoint T-44575..T-44580 are accepted; T-44581 is pending; its legacy packet is quarantined for preflight defects and must be reconciled/replaced before any retry. Check worker status/diff/result and ownership; do not assume it is idle or accepted. Do not repeat race-history or other accepted domains.
 1. Inspect only the next task's domain and existing characterization/snapshot tests. Preserve all contracts and assertions. If coverage is missing, queue a focused W3 regression task before the product move.
 2. Use one coherent responsibility per packet, normally small; a justified structural tranche may use <=8 named files/800 changed lines. This is a ceiling, not a target. CRUD and simulation/lifecycle stay separate unless an indivisible dependency is documented. Do not create forwarding wrappers only to shrink main.py.
 3. Record exact offline worker checks, any approved support commands and root-owned disposable integration. No arbitrary three-second cutoff: relevant lifecycle/lease/auth/persistence coverage remains mandatory. Inspect pytest selection so required tests are actually collected.

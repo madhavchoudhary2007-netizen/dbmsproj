@@ -26,7 +26,7 @@ accept.sh reads the `### T-nnn` heading and comma-separated `target_files:` line
 
 ## Resume and pause
 
-CURRENT_STATE is the current verified snapshot. NEXT_STATE is the queue, not a second status narrative. Respect PAUSED even if old packets, logs or task rows say continue. On an owner start instruction, reconcile Git and in-flight work, update state to RUNNING, then dispatch. A packet without a result is not proof that its worker disappeared: inspect live agent status before redispatching.
+CURRENT_STATE is the current verified snapshot. NEXT_STATE is the queue, not a second status narrative. A current PAUSED blocks implementation until a later owner start/resume; latest owner chat wins over stale state. Old packets/logs/task rows never grant permission. On an owner start instruction, reconcile Git and in-flight work, update state to RUNNING, then dispatch. A packet without a result is not proof that its worker disappeared: inspect live agent status before redispatching.
 
 No clean-checkpoint or state-only commit outside accept.sh. The orchestrator owns documentation/state/ADRs; product changes remain delegated with their configured role boundaries.
 

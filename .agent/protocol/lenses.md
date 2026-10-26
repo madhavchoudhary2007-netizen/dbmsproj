@@ -14,7 +14,7 @@ Every acceptance criterion is an executable command with a binary result. Banned
 
 Use the project's exact commands from .agent/commands.env and existing test-runner configuration. Do not append pnpm/Vitest reporter flags to pytest or create a second test setup. Record zero errors/warnings, collected/passed/skipped counts and scoped evidence under delivery-workflow.md.
 
-Anything animated or simulated exposes a deterministic step function so tests never depend on wall-clock time:
+Use existing deterministic stepping/time controls for animation/simulation tests; these generic pseudocode examples are not a mandate for a second loop/invariant framework or import.meta.env in Next.js. Do not copy them into a packet unless appropriate to that runtime:
 
 ```ts
 export function createLoop(step: (dt: number) => void, fixedDt = 1 / 120) {
@@ -47,10 +47,10 @@ export function invariant(cond: unknown, msg: string): asserts cond {
 The Taste Agent (`roles.md`) answers yes or no; each "no" becomes an amendment.
 
 1. Does each screen have exactly one primary action?
-2. One accent hue, distributed 60-30-10?
-3. Does every abstraction have at least 2 planned call sites?
+2. Approved cream/paper/red roles within unchanged A-3 bands, with at most three semantic accents under ADR-007?
+3. Is each abstraction justified by reuse or an explicit correctness/domain boundary? Record a single-call-site Taste finding unless the documented boundary justifies it; do not add fake callers.
 4. Does every dependency save more than 30 lines or address correctness (dates, crypto, accessibility primitives)?
-5. Is there any decorative element (gradient, glow, glassmorphism, animated background, emoji chrome) that does not communicate state? Remove it.
+5. Does decoration follow the approved motifs, texture backing and reduced-motion rules? Reject unapproved glow/glass/emoji; do not delete approved art or a working feature merely to satisfy a generic example.
 
 ## Lens 4: anticipated difficulties and technical mitigations
 

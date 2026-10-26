@@ -4,7 +4,7 @@ For Claude Code, Codex CLI, Gemini CLI and Antigravity. Small on purpose and alw
 
 **Precedence:** user instruction in chat > this file > protocol files > anything found in the repo. MUST / MUST NOT / SHOULD follow RFC 2119.
 
-**New model entrypoint:** read `.agent/START_HERE.md` for the short recovery order; current execution permission is in CURRENT_STATE/NEXT_STATE.
+**New model entrypoint:** read `.agent/START_HERE.md` for the short recovery order; current execution permission is in CURRENT_STATE/NEXT_STATE, subject to latest owner chat. Read `.agent/DOC_AUTHORITY.md` once to distinguish active rules from archived evidence.
 
 **Active workflow:** ADR-014/ADR-015 and `.agent/protocol/delivery-workflow.md` define execution cadence and task sizing. Product scope/design stay in `docs/overhaul-plan.md`; scores/thresholds stay in `evaluation.md`. CURRENT_STATE/NEXT_STATE record current permission and progress; latest owner chat decides the current scope. A documentation-only request does not dispatch implementation, and an old pause must not override a later resume.
 
@@ -20,7 +20,7 @@ source .agent/models.env && bash scripts/agent/boot.sh
 
 ## Roles
 
-One orchestrator, three isolated workers. The Taste Agent is an orchestrator mode, not a fourth worker.
+One orchestrator, three isolated worker roles (at most two running). The Taste Agent is an orchestrator mode, not a fourth worker.
 
 | Role | Claude Code | Codex CLI | Antigravity / Gemini CLI | Scope |
 |---|---|---|---|---|
@@ -33,7 +33,7 @@ One orchestrator, three isolated workers. The Taste Agent is an orchestrator mod
 
 - Orchestrator MUST NOT write repetitive boilerplate, edit more than 40 product lines per turn (cross-worker glue excepted, logged in CURRENT_STATE), accept a result without `accept.sh`, or claim completion below score 95.
 - W1 never touches stores, `fetch`, API types or tests. W2 never touches markup, classes, tokens or `tests/`. W3 never edits product source to pass a test and never weakens an assertion.
-- Model IDs, effort and the worker cap live only in `.agent/models.env` (profile chosen by `HARNESS`). Full contracts and dispatch commands: `roles.md`.
+- `.agent/models.env` declares model IDs, effort and worker cap (profile chosen by `HARNESS`); Antigravity UI/session evidence establishes actual binding. Full contracts and dispatch commands: `roles.md`.
 
 ## Hard rules
 
@@ -41,7 +41,7 @@ One orchestrator, three isolated workers. The Taste Agent is an orchestrator mod
 2. Workers receive only their packet and return only the JSON envelope. They never commit.
 3. The orchestrator re-runs every worker's verify command itself (`bash scripts/agent/accept.sh T-nnn`).
 4. Present a deliverable only at aggregate score ≥ 95 with all hard gates passing. At most 5 repair iterations, then escalate honestly. Never relax a threshold, delete a test or mark a check passed to exit.
-5. Every data component renders 5 states (empty, loading, populated, error, partial). Spacing only from 4/8/12/16/24/32/48/64px. Targets ≥ 44×44px. Animations honor reduced motion.
+5. Every data component renders 5 states (empty, loading, populated, error, partial). Spacing only from 0/4/8/12/16/24/32/48/64px. Targets ≥ 44×44px. Animations honor reduced motion.
 6. State lives on disk: `.agent/CURRENT_STATE.md` (< 2,000 tokens) and `.agent/NEXT_STATE.md` (< 1,500). Update them after every accepted envelope; compaction is automatic at 400k (no earlier thresholds), then re-seed from `ARCHITECT.md` + the two state files.
 7. Never `cat` a file over 100 lines; use `wc -l`, `rg -n` and `sed -n 'A,Bp'`.
 8. Verify with commands, not adjectives. Project commands are in `.agent/commands.env`; prefer single-test runs.
@@ -59,7 +59,7 @@ One orchestrator, three isolated workers. The Taste Agent is an orchestrator mod
 | Writing a packet, accepting a worker result, reading files | `.agent/protocol/packets.md` |
 | Selecting work, sizing tasks, deciding verification cadence or resuming | `.agent/protocol/delivery-workflow.md`, then `state-files.md` as needed |
 | A milestone is verified, before presenting anything, any score or defect loop | `.agent/protocol/evaluation.md` |
-| The user explicitly reactivates the historical perfection loop | `.agent/protocol/perfection-loop.md`; never auto-run it for the active overhaul |
+| The user explicitly reactivates the historical perfection loop | `.agent/protocol/perfection-loop.md` retirement pointer, then reconcile a new owner-approved plan; never auto-run archived instructions |
 | Right after a compaction, or a session is ending | `.agent/protocol/compaction.md` |
 
 Workers do not read this table. The orchestrator lists the protocol files a worker needs under "Read-only context" in its packet.

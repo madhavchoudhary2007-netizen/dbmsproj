@@ -1,5 +1,7 @@
 # ApexGrid shared contracts
 
+Document role: operator/API inventory, with historical wire examples. Current source/OpenAPI snapshot and accepted ADRs govern packet contracts; reconcile before copying. This file is not permission to call mutation/reset/demo endpoints or migrate a real database. ADR-002 defines cookie/CSRF browser transport; the bearer login example below is historical, not a requirement to restore browser token storage.
+
 ## Ownership and wire format
 
 - IDs are UUID strings. All external timestamps are UTC ISO 8601 strings with `Z`; PostgreSQL uses `timestamptz`.

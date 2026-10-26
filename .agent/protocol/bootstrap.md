@@ -9,13 +9,13 @@ Read when: first session in a repo, or when a file from this kit is missing.
 1. Copy this kit into the repo root (keep dotfiles).
 2. `bash scripts/agent/link.sh` creates `CLAUDE.md` as a symlink to `AGENTS.md`, creates `.agent/{packets,results,eval,adr}` and marks the scripts executable.
 3. Edit `.agent/models.env` (default `HARNESS`, exact model IDs, effort, `MAX_WORKERS`) and `.agent/commands.env` (this project's real install, typecheck, lint, test, e2e and build commands; defaults assume pnpm).
-4. Copy `.agent/templates/playwright.config.ts` to the repo root and adjust the preview command and port.
+4. Only if browser setup is actually missing and an authorized task requires it, adapt the template into this project's frontend/ setup. Never create a competing root runner or reinstall existing setup.
 5. Add to `.gitignore`: `.agent/results/*.raw.*` and `.agent/eval/*.json` (keep `score.json` if you want history).
 6. Harness setup:
    - **Gemini CLI:** set its context file name to `AGENTS.md` in its settings (the key is `contextFileName` or `context.fileName` depending on version; check your version's docs). Do not create `GEMINI.md` if Antigravity is also used.
    - **Antigravity:** nothing to link; it reads root `AGENTS.md`. Keep protocol files out of `.agent/rules/` and `.agents/rules/`.
    - **Codex CLI:** merge `.agent/templates/codex-config.toml` into `~/.codex/config.toml` (orchestrator model, `[agents]` cap of 2); worker definitions are already in `.codex/agents/`. Check combined instruction size with `bash scripts/agent/budget.sh`.
-7. Run `source .agent/models.env && bash scripts/agent/boot.sh`. Bootstrap is complete when it prints `boot OK`. Add `--probe` once to confirm both models respond (uses a little quota).
+7. Run `source .agent/models.env && bash scripts/agent/boot.sh`. Bootstrap is complete when it prints `boot OK`. CLI model probing is root-owned only when supported and explicitly needed; it does not verify Antigravity UI binding. For Antigravity record observed model/thinking under antigravity.md.
 
 ## Layout
 
@@ -40,4 +40,4 @@ scripts/eval/                  lint-banned lint-spacing lint-motion palette.ts s
 
 ## Commit prefixes
 
-`arch:` ARCHITECT, ADRs, lock · `T-<nnn>:` an accepted worker task · `eval:` evaluation runs · `checkpoint:` compaction · `fix(orch):` orchestrator direct edits (also logged in CURRENT_STATE).
+For this configured overhaul all commits go through accept.sh with T-nnn prefix, including documentation/architecture metadata. Old kit arch/eval/checkpoint/fix(orch) examples do not authorize a direct git commit. State preparation for its own acceptance is allowed under state-files.md.

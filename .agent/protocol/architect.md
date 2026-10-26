@@ -14,7 +14,7 @@ Read when: starting a project or feature with no locked architecture, or when th
 |---|---|
 | Spinner everywhere | Layout-stable skeletons; CLS ≤ 0.05 |
 | Errors in console | User-facing error with cause and a working retry |
-| Works at 1440px | Verified at 320, 375, 768, 1440, 2560 and 32:9 |
+| Works at 1440px | Verified at 320, 375, 768, 1440 and 5120 (32:9), per the approved project matrix |
 | Mouse only | Full keyboard path, visible focus, screen-reader labels |
 | Fetch on every mount | Cached, deduped, stale-while-revalidate |
 | Optimistic update, no rollback | Snapshot, optimistic write, rollback on error, retry toast |

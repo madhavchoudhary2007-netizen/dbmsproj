@@ -1,6 +1,6 @@
 # Antigravity execution contract — Gemini 3.8 Flash
 
-Read once at Antigravity session start and after a harness/model change. This is the active harness contract under ADR-015. AGENTS.md remains the router; delivery-workflow.md owns cadence; packets.md owns isolation; evaluation.md owns scores. This file does not add a second product plan.
+Read once at Antigravity session start and after a harness/model change. This is the active harness contract under ADR-015/016; DOC_AUTHORITY.md lists active versus historical sources. AGENTS.md remains the router; delivery-workflow.md owns cadence; packets.md owns isolation; evaluation.md owns scores. This file does not add a second product plan.
 
 ## Model binding and evidence
 | Role | Owner-requested model | Thinking | How to verify |
@@ -14,7 +14,7 @@ Markdown and .agent/models.env declare the requested profile; they cannot prove 
 ## Session receipt (record once, no secrets)
 Record in CURRENT_STATE or the active packet: harness; requested/observed orchestrator model+thinking and evidence source; requested/observed worker model+thinking; current branch; execution permission; active worker IDs. Expected branch is overhaul/neo-brutal. A current documentation-only user request authorizes documentation only even if another session's product state says RUNNING. Inspect live status before taking over in-flight work; do not run two competing orchestrators on the same tree.
 
-Read START_HERE.md and run the existing boot once as directed there. Do not bypass boot, read old LOOP history, change branches or reinstall tools merely because the harness changed. Never infer permission from a stale PAUSED/RUNNING sentence in a plan; resolve the latest owner instruction and the current state.
+Read START_HERE.md and run the existing boot once as directed there. In the Antigravity shell explicitly export HARNESS=antigravity before sourcing models.env, so a different harness default does not choose the wrong profile. This selects declarations only, not the UI model. Do not bypass boot, read old LOOP history, change branches or reinstall tools merely because the harness changed. Never infer permission from a stale PAUSED/RUNNING sentence in a plan; resolve the latest owner instruction and the current state.
 
 ## Dispatch gate — do all before launching a worker
 1. Choose one complete domain/user defect and its final boundary. Normal <=3 files/~150 changed lines; justified structural <=8 files/800 lines. These are ceilings, not goals. CRUD and simulator lifecycle are separate domains unless a concrete dependency makes a combined change indivisible; record that dependency. main.py<=120 is a final entrypoint gate, not permission for a giant mixed task.

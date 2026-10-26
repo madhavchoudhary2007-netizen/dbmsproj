@@ -1,6 +1,6 @@
 # ApexGrid
 
-A motorsport league and race operations platform with a PostgreSQL authoritative core, MongoDB telemetry, FastAPI, Next.js and WebSocket live timing. The two ApexGrid presentations in the user's Downloads directory define the product and DBMS demonstration scope.
+A motorsport league and race operations platform with a PostgreSQL authoritative core, MongoDB telemetry, FastAPI, Next.js and WebSocket live timing. The original presentations informed the product; docs/overhaul-plan.md and approved ADRs define active overhaul scope and acceptance.
 
 ## Start
 
@@ -75,3 +75,5 @@ At `/dbms`, grouped one-click navigation opens live PostgreSQL status, running a
 The active overhaul scope is [the twelve-phase plan](docs/overhaul-plan.md). Current verified status and execution permission live in [.agent/CURRENT_STATE.md](.agent/CURRENT_STATE.md) and [.agent/NEXT_STATE.md](.agent/NEXT_STATE.md). Follow [AGENTS.md](AGENTS.md) and the [delivery workflow](.agent/protocol/delivery-workflow.md); historical project snapshots and loop logs are not current completion evidence.
 
 Antigravity execution contract: [.agent/protocol/antigravity.md](.agent/protocol/antigravity.md) — Gemini 3.8 Flash HIGH orchestrator / LOW workers, maximum two workers. Record observed UI settings or UNVERIFIED; declarations do not prove model binding. Current permission and evidence remain in the state files and latest owner instruction.
+
+Document roles and retired instructions: [.agent/DOC_AUTHORITY.md](.agent/DOC_AUTHORITY.md). Operator commands here are not authorization for an agent to write real databases or restart setup.

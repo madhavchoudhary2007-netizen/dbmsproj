@@ -1,3 +1,5 @@
+> HISTORICAL AUDIT EVIDENCE ONLY (2026-10-06). Findings/commands below do not establish current verification, authorize mutations or override AGENTS.md/DOC_AUTHORITY.md. Current work is in CURRENT_STATE/NEXT_STATE.
+
 # ApexGrid flow audit — 2026-10-06
 
 ## Scope

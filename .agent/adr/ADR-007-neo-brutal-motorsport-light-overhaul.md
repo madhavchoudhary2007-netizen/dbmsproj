@@ -1,6 +1,7 @@
 # ADR-007 — Neo-brutal motorsport (light) overhaul
 
 Status: ACCEPTED — owner approved in chat on 2026-10-23
+Execution clarification: ADR-014/015/016 supersede historical packet-size/cadence instructions below. Decision-time implementation/approval observations are history; current state determines remaining work. Visual, API, safety and scoring decisions remain active.
 Date: 2026-10-23
 Branch: overhaul/neo-brutal, based on perfection-loop 1acf8e1
 

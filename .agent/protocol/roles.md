@@ -7,7 +7,7 @@ Read when: configuring models or effort, dispatching a worker, running the Taste
 | Role | Owns | MUST NOT |
 |---|---|---|
 | Orchestrator | ARCHITECT.md, CURRENT/NEXT_STATE.md, ADRs, git history, reviews, scoring | Write repetitive boilerplate (scaffolds, token files, fixtures, CRUD, type re-exports). Edit more than 40 product lines per turn; the only exception is integration glue spanning two workers' boundaries, logged in CURRENT_STATE under "Orchestrator direct edits". Accept a result without re-running its verify command. Claim completion below score 95. |
-| W1 UI/Layout | `*.tsx *.jsx *.css`, design tokens, Tailwind config, assets. Delivers presentational components that render all 5 UI states, use tokens only, meet 44×44 targets and mobile ergonomics | Create stores, call `fetch`, define API types, write tests other than state fixtures the packet names |
+| W1 UI/Layout | `*.tsx *.jsx *.css`, design tokens, Tailwind config, assets. Delivers presentational components that render all 5 UI states, use tokens only, meet 44×44 targets and mobile ergonomics | Create stores, call `fetch`, define API types, write tests (W3 owns tests; W1 may provide presentational fixtures only when named) |
 | W2 State/Runtime | Stores, hooks, mutations, data-fetching layer, API handlers, schemas, workers, simulation loops. Delivers typed contracts, optimistic update with rollback, cancellation, idempotency, error normalization | Change markup, class names or tokens; touch `tests/` |
 | W3 Eval/QA | `tests/ e2e/ scripts/eval/`, Playwright, AST checks, invariant asserts, unit tests, score JSON | Edit product source to make a test pass. A failing test is reported FAILED with the defect; the assertion is never weakened |
 
@@ -15,10 +15,10 @@ Read when: configuring models or effort, dispatching a worker, running the Taste
 
 Runs after architecture Phase B, as a focused diff review after UI acceptance, and with screenshots at route milestones/final A-5/A-6 scoring. The schedule is delivery-workflow.md; do not rerun full screenshots after every cosmetic packet. Checks in order:
 
-1. Focal points: exactly one primary action per viewport (count accent-styled elements in the initial viewport).
+1. Focal points: exactly one data-primary per viewport/route, with its accessible primary action; semantic status accents are not extra primary actions.
 2. Palette tension: approved overhaul-plan.md section 2 roles/bands, contrast and accent limits; generic palette examples do not override ADR-007. No unapproved gradient.
-3. Clutter: at most 3 font sizes and 2 weights per card; never border plus shadow plus background change on one element.
-4. Bloat: no abstraction with a single call site; no dependency replacing under 30 lines; no file over 300 lines.
+3. Clutter: at most 3 font sizes and 2 weights per card; approved border + static hard shadow + solid surface is allowed by ADR-007; flag redundant layers, not the approved plinth.
+4. Bloat: flag an unjustified single-call-site abstraction, a dependency replacing under 30 lines without a correctness/accessibility reason, and files over 300 lines. A documented domain boundary may justify an abstraction; never add fake callers. Record file-size defects without deleting features or pretending the eight-file/800-line change allowance waives them.
 
 Output one line per defect, enqueued in NEXT_STATE: `TASTE-<n>: <file>:<line> — <rule> — <required change>`.
 
@@ -30,7 +30,7 @@ Output one line per defect, enqueued in NEXT_STATE: `TASTE-<n>: <file>:<line> �
 | W1, W2, W3 | Haiku 5.5, high | GPT-6 Luna, high | Gemini 3.8 Flash, low thinking |
 | Max concurrent workers | 2 | 2 | 2 |
 
-IDs, effort/thinking levels, `MAX_WORKERS` and the context window are set once in `.agent/models.env` (one profile per `HARNESS`). The exact ID strings must be the ones your account lists; fix them there if they differ. Nothing else hard-codes a model. If `bash scripts/agent/boot.sh --probe` fails for a model, stop and report the exact error; never substitute silently.
+IDs, effort/thinking levels, `MAX_WORKERS` and the context window are set once in `.agent/models.env` (one profile per `HARNESS`). The exact ID strings must be the ones your account lists; fix them there if they differ. Other docs state requested role labels; actual Antigravity UI settings must be recorded separately under antigravity.md. If `bash scripts/agent/boot.sh --probe` fails for a model, stop and report the exact error; never substitute silently.
 
 ## Dispatch
 
@@ -64,7 +64,7 @@ Prose can be ignored; settings files are read by the harness.
 
 `boot.sh` checks the worker TOMLs and, if `~/.codex/config.toml` exists, the `[agents]` cap. Packets still begin "Ignore AGENTS.md except this packet".
 
-Run Codex with write access to the workspace (workspace-write). Subagents inherit the parent session's sandbox and approvals, and Codex ignores `sandbox_mode`, `approval_policy` and `mcp_servers` in an agent file. Scope is enforced by `accept.sh`'s boundary check, not by the sandbox.
+Run Codex with write access to the workspace (workspace-write). Subagents inherit the parent session's sandbox and approvals, and Codex ignores `sandbox_mode`, `approval_policy` and `mcp_servers` in an agent file. accept.sh checks only its implemented boundary loop and ignores .agent/ paths; the orchestrator manually reviews every changed path, role, and exact packet-command equality under packets.md. The sandbox does not establish task scope.
 
 ## Antigravity and Gemini CLI
 

@@ -5,7 +5,7 @@ Audience: the orchestrator model (GPT-6.1 Sol medium in Codex CLI, Sonnet 5.5 me
 Base branch: `perfection-loop` (HEAD `1acf8e1`). Work branch: `overhaul/neo-brutal`.
 First task ID: `T-300` (T-001..T-213 are taken).
 
-Read `AGENTS.md` first. Owner chat instructions take precedence. ADR-014/ADR-015 and `.agent/protocol/delivery-workflow.md` own task sizing, verification cadence and resume behavior; this plan owns product scope/design and the twelve phase requirements. `.agent/NEXT_STATE.md` is the active queue. Do not restart accepted phases or the historical setup below.
+Read `AGENTS.md` first. Owner chat instructions take precedence. ADR-014/ADR-015/ADR-016 and `.agent/protocol/delivery-workflow.md` own task sizing, verification cadence and resume behavior; this plan owns product scope/design and the twelve phase requirements. `.agent/NEXT_STATE.md` is the active queue. Do not restart accepted phases or the historical setup below.
 
 ---
 
@@ -256,7 +256,7 @@ Keep every existing chart:
 Legend:
 - **Owner:** O = orchestrator; W1 UI; W2 state/runtime/backend; W3 eval/QA.
 - **Par:** tasks with the same letter in one phase can run as 2 workers at once (disjoint files).
-- **Verify:** the task or parent milestone acceptance requirement. A child packet records the exact applicable task command; the complete parent gate runs at its domain/milestone boundary under `delivery-workflow.md`. The orchestrator reruns every candidate packet command through `accept.sh`.
+- **Verify:** the task or parent milestone acceptance requirement, not necessarily a worker command. Browser/DB/network/server checks are root-owned; the packet splits out an exact offline worker Verify without dropping the parent gate. A child packet records the exact applicable task command; the complete parent gate runs at its domain/milestone boundary under `delivery-workflow.md`. The orchestrator reruns every candidate packet command through `accept.sh`.
 
 Scope note: in this repo W2 owns `backend/app/**` and `backend/migrations/**` as well as `frontend/lib/**`. W3 owns `backend/tests/**`, `frontend/e2e/**` and `scripts/eval/**`.
 
@@ -265,7 +265,7 @@ Scope note: in this repo W2 owns `backend/app/**` and `backend/migrations/**` as
 | ID | Owner | Task | Verify |
 |---|---|---|---|
 | T-300 | O | Create branch `overhaul/neo-brutal` from `perfection-loop`. `.agent/models.env` hard-codes `export HARNESS="antigravity"`, which ignores the caller's choice; change that line to `export HARNESS="${HARNESS:-claude}"` (agent-kit file, not product source). Then run `HARNESS=<claude\|codex\|gemini\|antigravity> source .agent/models.env && bash scripts/agent/boot.sh`; fix any failure first. | `bash scripts/agent/boot.sh` exit 0 |
-| T-301 | O | Run `/architect` to draft **ADR-007 "Neo-brutal motorsport (light) overhaul"** (contents below). Unlock ARCHITECT.md, amend A.4/A.5/B.5, re-run Phase C five lenses for the amendment, and re-lock. | `bash scripts/agent/verify-lock.sh` exit 0 |
+| T-301 | O | Follow protocol/architect.md (or /architect where the harness provides it) to draft **ADR-007 "Neo-brutal motorsport (light) overhaul"** (contents below). Unlock ARCHITECT.md, amend A.4/A.5/B.5, re-run Phase C five lenses for the amendment, and re-lock. | `bash scripts/agent/verify-lock.sh` exit 0 |
 | T-302 | O | **STOP.** Post an ADR-007 summary in chat and wait for an explicit owner "approved". Do not dispatch any product task before that. | owner message |
 
 ADR-007 must say:
@@ -305,7 +305,7 @@ ADR-007 must say:
 | T-322 | W2 | — | **Security headers middleware** (pure ASGI, no dependency):<br>• `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Frame-Options: DENY`, `Permissions-Policy` (camera/mic/geo off);<br>• `Strict-Transport-Security` only when `COOKIE_SECURE=1`;<br>• API CSP `default-src 'none'; frame-ancestors 'none'`. | header tests pass |
 | T-323 | W2 | — | **JWT revocation:**<br>• Add a `jti` claim. Additive migration `004_token_revocation.sql`, with table `revoked_tokens(jti uuid primary key, expires_at timestamptz not null)` and an index on `expires_at`.<br>• Logout inserts the jti. The auth dependency and WS handshake check it.<br>• A cleanup runs on login, deleting rows where `expires_at < now()`.<br>• Old tokens without a jti stay valid until expiry (compatibility). Document this in ADR-008. | revocation tests pass; `pytest -q backend/tests` all green |
 | T-324 | W1 | — | Next.js headers in `next.config.*`: CSP with `default-src 'self'`; `connect-src 'self'` plus the API origin and its `ws(s)` origin from env; `font-src 'self'` (next/font self-hosts); `img-src 'self' data:`; `style-src 'self' 'unsafe-inline'` (Next requirement, documented); `frame-ancestors 'none'`. | `npm --prefix frontend run build` + accessibility spec green |
-| T-325 | W2 | — | Rate limiter keeps current behaviour. Add a unit test proving the limiter key cannot be spoofed via `X-Forwarded-For` unless `TRUST_PROXY=1`. | `pytest -q backend/tests/test_login_throttle.py` |
+| T-325 | W3 | — | Rate limiter keeps current behaviour. Add a unit test proving the limiter key cannot be spoofed via `X-Forwarded-For` unless `TRUST_PROXY=1`. | `pytest -q backend/tests/test_login_throttle.py` |
 
 ### Phase 3 — Backend structure and performance (no API change)
 
@@ -323,7 +323,7 @@ Before any refactor, W3 adds the snapshot test T-330. Every later task must keep
 | T-337 | W2 | — | **Points system as data.** Additive migration `005_points_systems.sql`:<br>• tables `points_systems(id, name)` and `points_system_positions(system_id, position, points)`;<br>• nullable `championships.points_system_id` with the default system seeded to exactly the current CASE values.<br>The standings function uses the table when the column is set, else the CASE. Do not delete the CASE in this phase. ADR-009. | `test_database.py -k standings` plus a new equality test: every existing championship's recalculated standings are identical before and after |
 | T-338 | W2 | — | **Observability:**<br>• JSON logs (stdlib `logging` + a 20-line formatter) with request id (`X-Request-ID` in/out), method, path, status, duration_ms and user id.<br>• Never log tokens, passwords, cookies or CSRF.<br>• `/health/live` (process up) and `/health/ready` (pool ping + Mongo ping + lease held). Keep the existing health route unchanged. | T-320 health tests + log redaction test |
 | T-339 | W2 | — | **mypy strict to zero** across `backend/app`. Flip the CI mypy job to required. | `.venv/bin/mypy --strict backend/app` exit 0 |
-| T-340 | W2 | — | **Docker:**<br>• backend image runs as non-root `app` (uid 10001), multi-stage, `HEALTHCHECK` against `/health/live`, `PYTHONDONTWRITEBYTECODE=1`;<br>• hashed lock file `backend/requirements.lock` from `uv pip compile --generate-hashes`, installed with `--require-hashes`;<br>• frontend image uses `next build` standalone output and runs as a non-root user;<br>• compose gets healthchecks and `depends_on: condition: service_healthy`. | `docker compose build && docker compose up -d && curl -fsS localhost:8000/health/ready` (record if Docker unavailable: then `hadolint` + `uv pip compile --dry-run`) |
+| T-340 | W2 | — | **Docker:**<br>• backend image runs as non-root `app` (uid 10001), multi-stage, `HEALTHCHECK` against `/health/live`, `PYTHONDONTWRITEBYTECODE=1`;<br>• hashed lock file `backend/requirements.lock` from `uv pip compile --generate-hashes`, installed with `--require-hashes`;<br>• frontend image uses `next build` standalone output and runs as a non-root user;<br>• compose gets healthchecks and `depends_on: condition: service_healthy`. | root-owned disposable apexgrid-test image build/start/readiness and runtime parity; record unavailable Docker as NOT_RUN. hadolint/lock dry-run evidence does not substitute for a runtime pass |
 
 ### Phase 4 — DBMS showcase (additive; the course's strongest marks)
 
@@ -430,7 +430,7 @@ Concurrency for Phase 7: W1 takes two routes at a time only if they share no fil
 
 | ID | Owner | Task |
 |---|---|---|
-| T-430 | O | Run `/evaluate`. All checks run (no NOT_RUN in the denominator). Hard gates F-1, F-2, F-3, F-4, F-5, P-6 pass. Aggregate ≥ 95. At most 5 repair iterations, then escalate with the honest numbers. Write `.agent/FINAL_REPORT.md` from command output only (paste exit codes and counts, no adjectives). |
+| T-430 | O | Run protocol/evaluation.md with the project commands (the /evaluate shortcut exists only on harnesses that provide it). All checks run (no NOT_RUN in the denominator). Hard gates F-1, F-2, F-3, F-4, F-5, P-6 pass. Aggregate ≥ 95. At most 5 repair iterations, then escalate with the honest numbers. Write `.agent/FINAL_REPORT.md` from command output only (paste exit codes and counts, no adjectives). |
 | T-431 | O | Delete legacy `frontend/app/globals.css` (should be empty by now) or reduce it to ≤ 50 lines of base resets. Confirm `rg -n "#0b0e12\|#11161c\|#d9ff3f\|Arial" frontend` finds nothing. |
 | T-432 | O | Open a PR `overhaul/neo-brutal` → `perfection-loop` with the scorecard. Do not merge without the owner. |
 
@@ -459,7 +459,7 @@ Backend and independent frontend/QA tasks can interleave under the two-worker ca
 
 ## 5. Acceptance and verification schedule
 
-The authoritative schedule is `.agent/protocol/delivery-workflow.md` (ADR-014/ADR-015). Choose checks by risk, not a three-second cutoff; relevant lease/lifecycle coverage remains required. main.py<=120 is only the T-331/T-332 entrypoint gate, not completion of T-333..T-340. Before execution compare the packet and envelope Verify commands exactly. Per task: review the diff/envelope/boundaries, rerun the relevant Verify independently through accept.sh, and update state once. An identical command already covered by accept.sh is not run a third time.
+Active/historical document roles are in `.agent/DOC_AUTHORITY.md`. The authoritative schedule is `.agent/protocol/delivery-workflow.md` (ADR-014/ADR-015). Choose checks by risk, not a three-second cutoff; relevant lease/lifecycle coverage remains required. main.py<=120 is only the T-331/T-332 entrypoint gate, not completion of T-333..T-340. Before execution compare the packet and envelope Verify commands exactly. Per task: review the diff/envelope/boundaries, rerun the relevant Verify independently through accept.sh, and update state once. An identical command already covered by accept.sh is not run a third time.
 
 Full backend disposable tests (zero DB skips), snapshot, strict mypy and Ruff/format run at each completed domain/structural milestone; auth/schema/persistence/provider-sensitive tasks also require their relevant integration proof before verification is complete. Frontend route milestones run typecheck, zero-warning lint, four design lints, production build and affected route/state/keyboard/axe/viewport checks. Focused Taste review follows UI acceptance. Missing evidence stays unverified.
 

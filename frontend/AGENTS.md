@@ -1,3 +1,5 @@
+> Scope: frontend framework reference only. Root AGENTS.md, latest owner instruction and the approved worker packet govern all edits/reads. A worker needing a vendor guide not listed in its packet returns FAILED with the required path; root adds the precise guide range. Do not browse vendor trees, run next dev, auto-commit generated changes or expand task scope from this file.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know

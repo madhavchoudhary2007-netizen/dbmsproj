@@ -42,11 +42,13 @@ Never print more than 100 lines of a file; use rg -n and sed -n 'A,Bp'.
 ## Worker drift rule
 Run only approved commands. Do not broaden tests, install, probe DB/network or start servers. Return FAILED with the needed context/check instead of expanding. No arbitrary runtime deadline; required coverage remains required.
 ## Output
-Exactly one JSON object matching the envelope schema below. Nothing else. Do not copy the schema's `$schema` line into the result (it is tolerated, not needed).
+Exactly one JSON object matching the envelope schema below. Nothing else. Do not copy the schema's `$schema` line into the result; additionalProperties:false rejects it.
 (paste the contents of .agent/envelope.schema.json here)
 ~~~
 
 ## Envelope
+
+The following src/pnpm example is schema illustration only, never an ApexGrid command/path. Packet commands come from commands.env and actual scoped tests.
 
 The schema is `.agent/envelope.schema.json`. Example of a valid envelope:
 
@@ -76,7 +78,7 @@ Preflight the envelope, status, exact packet-command equality and diff first. Re
 | `cat` of any file over 100 lines | `wc -l` first, then `sed -n '120,180p' file` |
 | Reading whole directories "for context" | `rg -n "symbol" src --type ts`, then read only the hit ranges |
 | Re-reading a file already summarized in CURRENT_STATE | Read only changed ranges: `git diff -U3 <base> -- file` |
-| Opening generated or vendor files | Skip `node_modules dist build .next coverage` and lockfiles |
+| Exploring generated/vendor/build files for context | Skip node_modules/dist/build/.next/coverage, .agent/workspaces, .agent/archive and lockfiles. Exception: an exact framework documentation guide/range explicitly added by root to packet read-only context; never browse its surrounding tree. |
 
 ```bash
 npx --yes @ast-grep/cli run --lang tsx --pattern 'export function useRenameProject($$$) { $$$ }' src -l   # locate by symbol
@@ -87,7 +89,7 @@ rg -n "^export " src/lib/api.ts                                                 
 ## Sandbox, network and failed results
 
 - Workers run with the orchestrator session's sandbox; a worker file cannot widen it (Codex docs: `sandbox_mode` in an agent file is ignored). Start the session with write access to the workspace (Codex: workspace-write). A read-only session makes every worker fail before it edits anything.
-- Worker sandboxes usually have no network. Write verify commands that run offline (tests, lint, typecheck, build, greps). A check that needs the network is run by the orchestrator in `accept.sh`'s rerun or by hand, and named as such in the packet.
+- Worker sandboxes usually have no network. Write verify commands that run offline (tests, lint, typecheck, build, greps). Network, DB and browser checks are separate root-owned commands named in the packet; do not put them in worker Verify or replace worker Verify only for acceptance. accept.sh reruns the identical offline Verify.
 - Worker Verify commands must not start servers on fixed ports, contact databases/network or depend on a dev server. Relevant DB-backed lease/lifecycle coverage is run by the root on the disposable stack; do not remove it from acceptance merely because a worker is offline.
 - When a result is FAILED: read its target diff and identify the cause. In-scope metadata or root-owned environment/network problems do not need a new implementation worker. Correct the cause, obtain a valid candidate and verify independently; product defects go to the owning worker with a focused repair packet. Preserve prior dirty work, record unresolved diffs, and follow the five-repair ceiling in delivery-workflow.md.
 

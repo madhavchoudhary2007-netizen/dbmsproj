@@ -61,3 +61,5 @@ Perfection loop authorizations: `.agent/adr/ADR-001-perfection-loop-authorizatio
 - ADR-014 efficient delivery: .agent/adr/ADR-014-efficient-delivery-workflow.md; consolidated task/evidence schedule, bounded domain tranches, unchanged final gates, implementation paused until owner start.
 
 - ADR-015 Antigravity domain delivery: .agent/adr/ADR-015-antigravity-domain-delivery.md; HIGH orchestrator/LOW workers, bounded domains, exact packet verification and root-owned integration; no product/config/gate changes.
+
+- ADR-016 document authority audit: .agent/adr/ADR-016-document-authority-audit.md; retire conflicting historical plans/reports, align active project protocols, amend/relock operational notes only.

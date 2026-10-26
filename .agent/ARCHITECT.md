@@ -1,12 +1,12 @@
 <!-- LOCK:BEGIN -->
 > STATUS: LOCKED
-> SHA256: 36df162b44e313caf9dcf220514dc703f4d490000d8f05ffe667b149807b1c11
-> LOCKED_AT: 2026-10-26T08:41:56Z
+> SHA256: 0f2b5366fee89ec70d8340ab2e148ad676f0c64bf324f00af559c242cd4cc46c
+> LOCKED_AT: 2026-10-26T12:59:36Z
 > LOCKED_BY: orchestrator
 <!-- LOCK:END -->
 # ApexGrid architecture — existing system, improvement in place
 
-Evidence baseline: 2026-10-21 discovery and later ADRs. Historical observations below (including missing E2E/setup and old tool versions) describe that baseline, not current readiness. Current verified facts are in CURRENT_STATE.md; NEXT_STATE.md is the active queue. ADR-014/delivery-workflow.md define the revised execution policy. No product source is authorized by this document alone; implementation is paused until the owner says start work.
+Evidence baseline: 2026-10-21 discovery and later ADRs. Historical observations below (including missing E2E/setup and old tool versions) describe that baseline, not current readiness. Current verified facts are in CURRENT_STATE.md; NEXT_STATE.md is the active queue. ADR-014/015/016 and delivery-workflow.md define execution. No product source is authorized by this document alone; latest owner chat and current state determine permission. DOC_AUTHORITY.md classifies historical observations and active contracts.
 
 ## Phase A — discovery
 
@@ -55,7 +55,7 @@ At discovery API groups lived in `backend/app/main.py`; the active structure now
 | API-12 | DBMS constraint, transaction, lock, recalculate | `.venv/bin/pytest -q backend/tests/test_api.py -k 'constraint_demo or admin_lock_demo'` (transaction/recalculate cases needed) |
 | API-13 | ADR-013 read-only stewarding penalties and seasonal licences (planned) | `.venv/bin/pytest -q backend/tests/test_stewarding_reads.py`; stewarding browser flows |
 
-Core gates: `bash scripts/agent/verify-lock.sh`; `npm --prefix frontend run typecheck`; `npm --prefix frontend run lint`; `.venv/bin/pytest -q backend/tests` with database URLs configured; `npm --prefix frontend run build`; `E2E_CMD=none` until W3 adds browser tests. A check passes only at exit 0 with required tests collected, not when database cases are skipped.
+Core gates: `bash scripts/agent/verify-lock.sh`; `npm --prefix frontend run typecheck`; `npm --prefix frontend run lint`; `.venv/bin/pytest -q backend/tests` with database URLs configured; `npm --prefix frontend run build`; the existing frontend Playwright configuration and scoped packet commands (browser execution is root-owned). A check passes only at exit 0 with required tests collected, not when database cases are skipped.
 
 ### A.3 Expert baseline versus current gaps
 
@@ -80,7 +80,7 @@ No wholesale rewrite of working race flows, SQL rules, public API routes or pers
 
 ### A.6 Assumptions and unknowns
 
-**Required assumption:** keep ApexGrid and improve it in place, preserving its existing PostgreSQL schema and API contracts until an individually justified change is implemented. ADR-001 authorizes the specific font, cookie/CSRF auth, additive schema, and finding-backed API paths in A.5; it does not enact them. Treat historical local-demo records as valuable and do not erase them. Browser E2E is not configured; planned IDs above are a task backlog. Local Compose is the acceptance environment; Docker was unavailable during this baseline. Remaining unknowns: whether shared/public deployment is intended and whether the evaluator requires actual browser automation or only a teacher demonstration. Use the reversible local-demo path until answered.
+**Required assumption:** keep ApexGrid and improve it in place, preserving its existing PostgreSQL schema and API contracts until an individually justified change is implemented. ADR-001 authorizes the specific font, cookie/CSRF auth, additive schema, and finding-backed API paths in A.5; it does not enact them. Treat historical local-demo records as valuable and do not erase them. At discovery browser E2E was not configured and Docker was unavailable; those are historical observations, not setup instructions. Current E2E is configured. Acceptance uses only guarded disposable apexgrid-test, never default application Compose. Remaining unknowns: whether shared/public deployment is intended and whether the evaluator requires actual browser automation or only a teacher demonstration. Use the reversible local-demo path until answered.
 
 ## Phase B — system as built
 
@@ -102,7 +102,9 @@ No wholesale rewrite of working race flows, SQL rules, public API routes or pers
 
 The large mixed files are a risk, not permission for W1 to edit fetch/state or W2 to edit markup. ADR-014/delivery-workflow.md own packet sizing: normal <=3 files/~150 changed lines; justified one-domain mechanical/DI tranche <=8 files/800 changed lines; explicitly scoped Markdown-only reconciliation may span more files. Final entrypoint and all product quality gates remain unchanged. T-331/T-332 are one structural milestone delivered by domain, without temporary forwarding modules solely to meet line counts.
 
-### B.3 Cross-module contracts (existing wire shapes; tighter types are planned)
+### B.3 Cross-module contracts (decision-time inventory; reconcile before copying)
+
+The following inventory records decision-time wire shapes and proposals; it is not a current implementation-status assertion. Before any packet copies a shape, inspect the current source/snapshot and applicable ADR. Auth transport follows ADR-002; existing UI ViewState is in frontend/lib/data-state.ts, not a new DataState type. Record discrepancies; do not alter an API to match a stale sample.
 
 ```ts
 type UUID = string; type UTC = string; // ISO 8601 with Z
@@ -148,7 +150,7 @@ PostgreSQL's 17 existing tables are `users`, `teams`, `drivers`, `team_membershi
 
 | Flow | States and legal transitions | Persistence / guardrail |
 |---|---|---|
-| Login | anonymous -> authenticating -> authenticated or error; authenticated -> refreshing/me -> authenticated or anonymous; authenticated -> signed out | `auth/login`, `auth/me`; JWT role checked server-side; localStorage token is current risk. ADR-002 specifies the planned HttpOnly session cookie, signed CSRF cookie/header, credentialed fetch, explicit logout and cookie-authenticated WebSocket; implementation remains pending. |
+| Login | anonymous -> authenticating -> authenticated or error; authenticated -> refreshing/me -> authenticated or anonymous; authenticated -> signed out | `auth/login`, `auth/me`; JWT role checked server-side; ADR-002 specifies HttpOnly session cookie, signed CSRF cookie/header, credentialed fetch, explicit logout and cookie-authenticated WebSocket; its old localStorage observation is historical. Check current source and accepted evidence before declaring implementation or a remaining migration. |
 | Session | SCHEDULED -> ACTIVE or CANCELLED; ACTIVE <-> PAUSED; ACTIVE/PAUSED -> COMPLETED/CANCELLED/SCHEDULED(reset); COMPLETED/CANCELLED -> SCHEDULED(reset) where API permits | PostgreSQL trigger and timestamp checks; `POST /sessions/{id}/action`; lap 0..72 |
 | Simulation | absent -> running <-> paused -> stopped; stopped/reset -> running after clean start; generated completion -> archived + optionally new auto race | in-memory `simulations`, SQL session and Mongo telemetry; restore from stored packets on restart. ADR-004 requires one active backend process per PostgreSQL database, enforced by a lifespan advisory lock; lock loss fails closed. ADR-006 permits additive nullable `demo_races.simulation_seed`; new generated races persist a seed and derive deterministic sector values from seed, roster and progress, with explicit external inputs for replay. Legacy null-seed races remain valid. |
 | Pit reservation | requested -> locked/allocation -> RESERVED or conflict/no-box error; RESERVED -> COMPLETED/CANCELLED; terminal states cannot reopen | SQL row lock, exclusion/unique constraints; auto chooses earliest free event box/window; Mongo/WS reflect assigned driver |
@@ -314,3 +316,9 @@ A.2 API-09 and B.3 permit only the nullable next_event field specified in ADR-01
 ## ADR-014 focused Phase C: efficient delivery
 
 Owner instruction of 2026-10-26 authorizes documentation optimization and pauses implementation. B.2 adopts the bounded structural/documentation packet exceptions and consolidated T-331/T-332 domain workflow in ADR-014; this does not implement product changes. Pass 1: Lens 1 retains every A.2 deliverable/owner and twelve-phase final outcome; Lens 2 keeps independent accept.sh verification, task-specific proof, sensitive-task integration and full milestone/release gates with zero DB skips; Lens 3 rejects temporary line-count wrappers; Lens 4 bounds domain changes and keys evidence to revision/scope/environment; Lens 5 covers pause/resume, stale shared dependencies, missing tools, malformed envelopes and unrelated dirty work. Pass 2 of all five lenses produced zero further amendments. Risk: partially verified work must remain explicitly unverified until required isolated integration succeeds. All API/data/secret protections, visual thresholds, scoring weights, hard gates and main.py <=120 final criterion remain.
+
+## ADR-016 focused Phase C: document authority reconciliation
+
+Owner requested auditing and removing conflicting follow-directions. A/B operational notes now defer current permission to chat/state, use existing E2E and disposable acceptance, and label B.3 decision-time samples. DOC_AUTHORITY.md retires historical workflow/score/state-exemption entrypoints. No wire shape, scope, runtime, schema, design band, test assertion or evaluation threshold changes.
+
+Pass 1: goal lens retains all A.2 IDs and twelve phases; expert lens distinguishes actual task/domain/release evidence and rejects stale E2E=none; taste lens aligns protocols with approved fonts/palette/hard shadows/motion instead of generic examples; technical lens preserves lock/accept-only commits and root-owned disposable checks; edge lens quarantines historical queues, malformed/offline-incompatible packets and unverifiable model binding. Pass 2 found zero further amendments on affected documentation sections. Risk: a static doc audit cannot guarantee future obedience or turn historical wire samples into verified contracts; current source/snapshot and actual tests remain required.
