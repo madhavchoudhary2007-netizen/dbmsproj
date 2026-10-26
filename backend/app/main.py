@@ -32,7 +32,7 @@ from pymongo.database import Database
 
 from . import token_revocation
 from .analytics_router import router as analytics_router
-from .api.crud import create_crud_router
+from .api.crud import create_crud_router, crud_router
 from .api.dbms_lock import (
     create_dbms_lock_router as create_dbms_lock_router,
 )
@@ -290,24 +290,16 @@ from .core.serialization import jsonable
 from .core.serialization import telemetry_ws_payload as telemetry_ws_payload
 from .core.simulation_tick import advance_simulation_tick as advance_simulation_tick
 from .core.validation import (
-    _crud_write_payload,
     _require_crud_record,
-    limit_offset,
-    validate_session_laps,
+)
+from .core.validation import (
+    validate_session_laps as validate_session_laps,
 )
 from .core.websocket_runtime import check_ws_runtime_lease as _check_ws_runtime_lease_impl
 from .core.websocket_runtime import wait_for_ws_event as _wait_for_ws_event_impl
 from .core.websocket_runtime import (
     websocket_authenticated_user as _websocket_authenticated_user_impl,
 )
-from .crud_repository import (
-    create_crud_row,
-    delete_crud_row,
-    get_crud_row,
-    list_crud_rows,
-    update_crud_row,
-)
-from .crud_resources import register_resources
 from .database import connection, fetch_all, fetch_one, get_pool
 from .demo_names import generate_demo_names as generate_demo_names
 from .demo_race_repository import DemoRaceDeleteConflict as DemoRaceDeleteConflict
@@ -479,32 +471,10 @@ def admin_steward(
 def crud_routes(
     resource: str, table: str, cols: tuple[str, ...], joins: str = "", select: str | None = None
 ) -> None:
-    app.include_router(
-        create_crud_router(
-            resource,
-            table,
-            cols,
-            joins,
-            select,
-            authenticated_user_dependency=authenticated_user_dependency,
-            admin_role_dependency=admin_role_dependency,
-            limit_offset=lambda *args, **kwargs: limit_offset(*args, **kwargs),
-            jsonable=lambda *args, **kwargs: jsonable(*args, **kwargs),
-            list_crud_rows=lambda *args, **kwargs: list_crud_rows(*args, **kwargs),
-            get_crud_row=lambda *args, **kwargs: get_crud_row(*args, **kwargs),
-            _require_crud_record=lambda *args, **kwargs: _require_crud_record(*args, **kwargs),
-            _crud_write_payload=lambda *args, **kwargs: _crud_write_payload(*args, **kwargs),
-            validate_session_laps=lambda *args, **kwargs: validate_session_laps(*args, **kwargs),
-            create_crud_row=lambda *args, **kwargs: create_crud_row(*args, **kwargs),
-            fetch_one=lambda *args, **kwargs: fetch_one(*args, **kwargs),
-            update_crud_row=lambda *args, **kwargs: update_crud_row(*args, **kwargs),
-            delete_crud_row=lambda *args, **kwargs: delete_crud_row(*args, **kwargs),
-            get_telemetry_collection=lambda: telemetry_collection,
-        )
-    )
+    app.include_router(create_crud_router(resource, table, cols, joins, select))
 
 
-register_resources(crud_routes)
+app.include_router(crud_router)
 
 
 app.include_router(membership_router)
