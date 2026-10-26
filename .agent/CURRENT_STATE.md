@@ -2,8 +2,8 @@
 updated_at: 2026-10-26
 branch: overhaul/neo-brutal
 execution: RUNNING — implementation resumed on owner instruction 2026-10-26
-verified_product_head: ac385f0
-last_product_task: T-44598
+verified_product_head: 84ae834
+last_product_task: T-44600
 metadata_task: T-44587 active-document audit; see matching acceptance result/commit
 architect_sha256: 0f2b5366fee89ec70d8340ab2e148ad676f0c64bf324f00af559c242cd4cc46c
 target_harness: Antigravity; requested Gemini 3.8 Flash HIGH orchestrator / LOW workers; cap 2
@@ -42,6 +42,8 @@ Phase requirements are in docs/overhaul-plan.md; the table below is the current 
 - T-44595 (59bbf84): replaced per-packet insert_one with batched col.insert_many(ordered=False) in simulation_persist.py and offloaded blocking writes in simulation_runner.py to asyncio.to_thread with legacy lifespan pool and cross-module resolution compatibility.
 - T-44596 (e99c07d): implemented schema_migrations ledger in migrations.py (152 lines) with transaction-wrapped version-ordered execution, SHA-256 checksum verification, and existing-DB backfill; delegated bootstrap.py (36 lines).
 - T-44598 (ac385f0): added aria-hidden and inert attributes to .main-shell when mobile drawer is open, and calibrated mobile-scrim offset; keeps shell.tsx at 207 lines (< 300); 10/10 Playwright shell-navigation tests passed.
+- T-44599 (fc2d2d4): replaced N+1 driver queries in race_archive.py with MongoDB aggregation pipeline ($match, $sort, $group, $replaceRoot) and fallback; overview count switched to estimated_document_count; added LIMIT 200 to /api/dbms/races SQL; added compound index in lifespan; strict mypy clean.
+- T-44600 (84ae834): handled in-flight navigation abort race in edge-resilience.spec.ts Lens 5 test; full edge-resilience Playwright suite passed 20/20 green across all 5 viewports.
 
 ## Current risks and open work
 - Complete only remaining T-331/T-332 domains and required integration; do not repeat accepted T-44575..80 or create line-count wrappers. T-44573 remains superseded. Historical assembly counts are not the current module map.
