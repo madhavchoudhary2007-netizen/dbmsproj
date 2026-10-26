@@ -1,3 +1,5 @@
+"use client";
+
 import { NbBadge } from "@/components/nb/badge";
 import { NbButton } from "@/components/nb/button";
 import { NbCard } from "@/components/nb/card";
