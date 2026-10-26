@@ -1,0 +1,22 @@
+{
+  "task_id": "T-44610",
+  "status": "PASSED",
+  "files_modified": [
+    {
+      "path": "frontend/lib/dbms-showcase.ts",
+      "lines_added": 276,
+      "lines_removed": 0
+    }
+  ],
+  "diff_summary": "Created typed client service and state hooks for DBMS showcase in frontend/lib/dbms-showcase.ts, including interfaces matching backend schemas and fetchers for isolation, deadlocks, views, materialized views, analytics gaps, query explain, audit logs, and security.",
+  "verification": {
+    "command": "npm --prefix frontend run typecheck && npm --prefix frontend run lint",
+    "exit_code": 0,
+    "tests_passed": 0,
+    "tests_failed": 0,
+    "duration_ms": 3150,
+    "typecheck_errors": 0,
+    "lint_warnings": 0
+  },
+  "unresolved_blockers": []
+}

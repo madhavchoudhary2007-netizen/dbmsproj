@@ -5,17 +5,17 @@ execution: RUNNING
 phase: 3 backend / 7 routes; no current score
 
 ## Queue (root must prepare exact packets before dispatch)
-### T-44607 — Phase 4 DBMS Showcase and Migrations
-- worker: W2 | priority: P1 | origin: Phase 4 T-351..T-357 DBMS showcase endpoints and migrations
-- target_files: backend/migrations/006_showcase_views.sql, backend/migrations/007_audit_log.sql, backend/migrations/008_roles_and_rls.sql, backend/app/schemas_showcase.py, backend/app/api/dbms_showcase.py, backend/app/main.py
-- contract: Implement database migrations 006 (regular view v_driver_season_summary and unique-indexed mv_championship_standings), 007 (audit_log table and audit_row() trigger function), and 008 (roles apexgrid_app/apexgrid_readonly and RLS policy). Implement showcase schemas and API endpoints for isolation, deadlocks, views, analytics gaps, query explain, audit, and security; mounted router in main.py <= 120 lines.
-- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_dbms_showcase.py && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
+### T-44609 — Showcase contract tests unmark xfail and edge cases
+- worker: W3 | priority: P1 | origin: Phase 4 T-350 showcase endpoint contract tests hardening
+- target_files: backend/tests/test_dbms_showcase.py
+- contract: Remove xfail from all 8 route tests; add parameter validation edge-case tests (invalid isolation level, invalid UUID, audit limit boundaries, disallowed query names); strict mypy clean.
+- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_dbms_showcase.py && APP_ENV=local .venv/bin/mypy --strict backend/tests/test_dbms_showcase.py && APP_ENV=local .venv/bin/ruff check backend/tests/test_dbms_showcase.py && APP_ENV=local .venv/bin/ruff format --check backend/tests/test_dbms_showcase.py
 
-### T-44608 — Migration engine test suite
-- worker: W3 | priority: P1 | origin: Phase 3/4 migration engine and integrity unit tests
-- target_files: backend/tests/test_migrations.py
-- contract: Create test_migrations.py unit tests covering compute_checksum SHA-256 validation, natural version ordering in apply_migrations, checksum mismatch detection, mock ledger operations, and migration file integrity; strict mypy clean.
-- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_migrations.py && APP_ENV=local .venv/bin/mypy --strict backend/tests/test_migrations.py && APP_ENV=local .venv/bin/ruff check backend/tests/test_migrations.py && APP_ENV=local .venv/bin/ruff format --check backend/tests/test_migrations.py
+### T-44610 — Showcase frontend client and state service
+- worker: W2 | priority: P1 | origin: Phase 4 T-393 / T-351..357 frontend client service
+- target_files: frontend/lib/dbms-showcase.ts
+- contract: Create frontend/lib/dbms-showcase.ts with type definitions and API client functions for isolation-demo, deadlock-demo, views, refresh-standings-mv, analytics gaps, explain, audit, and security; strict TypeScript and lint clean.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint
 
 ## Documentation checkpoint
 ### T-44587 — Active document authority audit

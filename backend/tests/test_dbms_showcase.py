@@ -1,187 +1,32 @@
 from __future__ import annotations
 
-from datetime import datetime
-from typing import Any
-from uuid import UUID
-
 import pytest
 from fastapi.testclient import TestClient
-from pydantic import BaseModel, ConfigDict, Field
 
 from backend.app.main import app
-
-# ---------------------------------------------------------------------------
-# Phase 4 Showcase Contract Models / Schemas
-# ---------------------------------------------------------------------------
-
-
-class IsolationDemoResponse(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-    level: str
-    observed_reads: list[dict[str, Any]] = Field(default_factory=list)
-    anomaly_detected: bool = False
-    anomaly_type: str | None = None
-    timeline: list[dict[str, Any]] = Field(default_factory=list)
-
-
-class DeadlockDemoResponse(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-    aborted_transaction: str | int
-    sqlstate: str = "40P01"
-    error_message: str | None = None
-    details: dict[str, Any] = Field(default_factory=dict)
+from backend.app.schemas_showcase import (
+    AnalyticsGapsResponse,
+    AuditLogResponse,
+    DBMSSecurityResponse,
+    DeadlockDemoResponse,
+    ExplainPlanResponse,
+    IsolationDemoResponse,
+    RefreshStandingsMVResponse,
+    ViewsResponse,
+    validate_audit_query_params,
+    validate_explain_query_params,
+    validate_gaps_query_params,
+    validate_isolation_level_param,
+)
 
 
-class ViewDefinition(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-    name: str
-    view_type: str  # "view" or "materialized_view"
-    definition: str
-
-
-class ViewsResponse(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-    views: list[ViewDefinition] = Field(default_factory=list)
-
-
-class RefreshStandingsMVResponse(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-    refreshed: bool = True
-    view_name: str = "mv_championship_standings"
-    message: str | None = None
-    duration_ms: float | None = None
-
-
-class LapGapRecord(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-    driver_id: str | None = None
-    driver_name: str | None = None
-    lap: int
-    position: int
-    gap_to_leader_ms: int | float | None = None
-    interval_ms: int | float | None = None
-    rolling_avg_ms: int | float | None = None
-
-
-class AnalyticsGapsResponse(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-    session_id: str
-    gaps: list[LapGapRecord] = Field(default_factory=list)
-    sql: str
-
-
-class ExplainPlanResponse(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-    query_name: str | None = None
-    plan: list[dict[str, Any]] | dict[str, Any] = Field(default_factory=dict)
-    analyze: bool = True
-    buffers: bool | None = None
-    raw_sql: str | None = None
-
-
-class AuditLogRow(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-    id: int
-    table_name: str
-    op: str
-    row_pk: dict[str, Any] | None = None
-    old: dict[str, Any] | None = None
-    new: dict[str, Any] | None = None
-    actor: str | None = None
-    at: datetime | str
-
-
-class AuditLogResponse(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-    audit_logs: list[AuditLogRow] = Field(default_factory=list)
-    total: int | None = None
-
-
-class RoleGrant(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-    grantee: str
-    table_name: str
-    privilege_type: str
-
-
-class SecurityPolicy(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-    policyname: str
-    tablename: str
-    roles: list[str] | str | None = None
-    cmd: str | None = None
-
-
-class DBMSSecurityResponse(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-    roles: list[str] = Field(default_factory=list)
-    grants: list[RoleGrant] = Field(default_factory=list)
-    policies: list[SecurityPolicy] = Field(default_factory=list)
+@pytest.fixture
+def client() -> TestClient:
+    return TestClient(app)
 
 
 # ---------------------------------------------------------------------------
-# Test Helpers: Parameter & Signature Validation
-# ---------------------------------------------------------------------------
-
-VALID_ISOLATION_LEVELS = {"read_committed", "repeatable_read", "serializable"}
-
-
-def validate_isolation_level_param(level: str) -> str:
-    """Validate isolation level query parameter."""
-    normalized = level.lower().strip()
-    if normalized not in VALID_ISOLATION_LEVELS:
-        msg = f"Invalid isolation level '{level}'. Must be one of {sorted(VALID_ISOLATION_LEVELS)}"
-        raise ValueError(msg)
-    return normalized
-
-
-def validate_gaps_query_params(session_id: str | None) -> str:
-    """Validate session_id query parameter for /api/analytics/gaps."""
-    if not session_id or not session_id.strip():
-        msg = "Missing required query parameter: session_id"
-        raise ValueError(msg)
-    try:
-        UUID(session_id.strip())
-    except ValueError as err:
-        msg = f"Invalid UUID for session_id: '{session_id}'"
-        raise ValueError(msg) from err
-    return session_id.strip()
-
-
-def validate_audit_query_params(table: str | None = None, limit: int = 50) -> dict[str, Any]:
-    """Validate query parameters for /api/dbms/audit."""
-    if limit <= 0 or limit > 500:
-        msg = f"Limit must be between 1 and 500, got {limit}"
-        raise ValueError(msg)
-    return {"table": table.strip() if table else None, "limit": limit}
-
-
-def validate_explain_query_params(
-    analyze: bool = True, query_name: str | None = None
-) -> dict[str, Any]:
-    """Validate query parameters for /api/dbms/explain."""
-    allowed_queries = {"standings_rollup", "lap_telemetry_window", "driver_history"}
-    if query_name is not None and query_name not in allowed_queries:
-        msg = f"Query '{query_name}' not in allow-list {sorted(allowed_queries)}"
-        raise ValueError(msg)
-    return {"analyze": analyze, "query_name": query_name}
-
-
-# ---------------------------------------------------------------------------
-# Schema & Helper Unit Tests
+# Schema Unit Tests
 # ---------------------------------------------------------------------------
 
 
@@ -197,6 +42,15 @@ def test_schema_isolation_demo_response() -> None:
     assert model.level == "repeatable_read"
     assert model.anomaly_detected is False
     assert len(model.observed_reads) == 2
+
+
+def test_schema_isolation_demo_default_fields() -> None:
+    model = IsolationDemoResponse(level="serializable")
+    assert model.level == "serializable"
+    assert model.observed_reads == []
+    assert model.anomaly_detected is False
+    assert model.anomaly_type is None
+    assert model.timeline == []
 
 
 def test_schema_deadlock_demo_response() -> None:
@@ -324,91 +178,195 @@ def test_schema_dbms_security_response() -> None:
     assert len(model.policies) == 1
 
 
-def test_helper_parameter_validation() -> None:
-    assert validate_isolation_level_param("READ_COMMITTED") == "read_committed"
-    with pytest.raises(ValueError, match="Invalid isolation level"):
-        validate_isolation_level_param("invalid_level")
+# ---------------------------------------------------------------------------
+# Helper Parameter Validation Unit Tests
+# ---------------------------------------------------------------------------
 
+
+def test_helper_isolation_level_validation_valid() -> None:
+    assert validate_isolation_level_param("READ_COMMITTED") == "read_committed"
+    assert validate_isolation_level_param("repeatable_read") == "repeatable_read"
+    assert validate_isolation_level_param("SERIALIZABLE") == "serializable"
+
+
+@pytest.mark.parametrize("invalid_level", ["phantom_read", "dirty_read", "invalid", "", "123"])
+def test_helper_isolation_level_validation_invalid(invalid_level: str) -> None:
+    with pytest.raises(ValueError, match="Invalid isolation level"):
+        validate_isolation_level_param(invalid_level)
+
+
+def test_helper_gaps_query_params_valid() -> None:
     valid_id = "00000000-0000-0000-0000-000000000001"
     assert validate_gaps_query_params(valid_id) == valid_id
+
+
+def test_helper_gaps_query_params_missing() -> None:
     with pytest.raises(ValueError, match="Missing required query parameter"):
         validate_gaps_query_params("")
+
+
+@pytest.mark.parametrize("malformed_uuid", ["not-a-uuid", "12345", "xyz"])
+def test_helper_gaps_query_params_malformed(malformed_uuid: str) -> None:
     with pytest.raises(ValueError, match="Invalid UUID"):
-        validate_gaps_query_params("not-a-uuid")
+        validate_gaps_query_params(malformed_uuid)
 
-    audit_params = validate_audit_query_params(table="penalties", limit=25)
-    assert audit_params["table"] == "penalties"
-    assert audit_params["limit"] == 25
+
+def test_helper_audit_query_params_valid() -> None:
+    params = validate_audit_query_params(table="penalties", limit=25)
+    assert params["table"] == "penalties"
+    assert params["limit"] == 25
+
+    default_params = validate_audit_query_params()
+    assert default_params["table"] is None
+    assert default_params["limit"] == 50
+
+
+@pytest.mark.parametrize("invalid_limit", [0, -1, -50, 501, 1000])
+def test_helper_audit_query_params_invalid_limit(invalid_limit: int) -> None:
     with pytest.raises(ValueError, match="Limit must be between"):
-        validate_audit_query_params(limit=0)
+        validate_audit_query_params(limit=invalid_limit)
 
-    explain_params = validate_explain_query_params(analyze=True, query_name="standings_rollup")
-    assert explain_params["analyze"] is True
+
+def test_helper_explain_query_params_valid() -> None:
+    params = validate_explain_query_params(analyze=True, query_name="standings_rollup")
+    assert params["analyze"] is True
+    assert params["query_name"] == "standings_rollup"
+
+    params_none = validate_explain_query_params(analyze=False, query_name=None)
+    assert params_none["analyze"] is False
+    assert params_none["query_name"] is None
+
+
+@pytest.mark.parametrize(
+    "disallowed_query",
+    ["drop table users", "select * from audit_log", "random_query"],
+)
+def test_helper_explain_query_params_disallowed(disallowed_query: str) -> None:
     with pytest.raises(ValueError, match="not in allow-list"):
-        validate_explain_query_params(query_name="drop table users")
+        validate_explain_query_params(query_name=disallowed_query)
 
 
 # ---------------------------------------------------------------------------
-# Route Contract Specifications (Marked xfail until Phase 4 routes mounted)
+# Route Contract Tests (Active, Verified Green)
 # ---------------------------------------------------------------------------
 
 
-@pytest.fixture
-def client() -> TestClient:
-    return TestClient(app)
-
-
-@pytest.mark.xfail(reason="Phase 4 showcase route pending implementation", strict=False)
 def test_route_isolation_demo(client: TestClient) -> None:
-    response = client.get("/api/dbms/isolation-demo?level=read_committed")
+    response = client.get("/api/dbms/isolation-demo")
     assert response.status_code == 200
     model = IsolationDemoResponse.model_validate(response.json())
     assert model.level == "read_committed"
+    assert model.anomaly_detected is True
+    assert len(model.observed_reads) >= 2
 
 
-@pytest.mark.xfail(reason="Phase 4 showcase route pending implementation", strict=False)
+def test_route_isolation_demo_repeatable_read(client: TestClient) -> None:
+    response = client.get("/api/dbms/isolation-demo?level=repeatable_read")
+    assert response.status_code == 200
+    model = IsolationDemoResponse.model_validate(response.json())
+    assert model.level == "repeatable_read"
+    assert model.anomaly_detected is False
+
+
+def test_route_isolation_demo_serializable(client: TestClient) -> None:
+    response = client.get("/api/dbms/isolation-demo?level=serializable")
+    assert response.status_code == 200
+    model = IsolationDemoResponse.model_validate(response.json())
+    assert model.level == "serializable"
+    assert model.anomaly_detected is False
+
+
+@pytest.mark.parametrize("invalid_level", ["snapshot", "dirty_read", "unknown"])
+def test_route_isolation_demo_invalid_level(client: TestClient, invalid_level: str) -> None:
+    response = client.get(f"/api/dbms/isolation-demo?level={invalid_level}")
+    assert response.status_code in (400, 422)
+
+
 def test_route_deadlock_demo(client: TestClient) -> None:
     response = client.post("/api/dbms/deadlock-demo")
     assert response.status_code == 200
     model = DeadlockDemoResponse.model_validate(response.json())
     assert model.sqlstate == "40P01"
+    assert model.aborted_transaction == "T2"
+    assert "transaction_1" in model.details
 
 
-@pytest.mark.xfail(reason="Phase 4 showcase route pending implementation", strict=False)
+def test_route_deadlock_demo_method_not_allowed(client: TestClient) -> None:
+    response = client.get("/api/dbms/deadlock-demo")
+    assert response.status_code == 405
+
+
 def test_route_views(client: TestClient) -> None:
     response = client.get("/api/dbms/views")
     assert response.status_code == 200
     model = ViewsResponse.model_validate(response.json())
     assert any(v.name == "v_driver_season_summary" for v in model.views)
+    assert any(v.name == "mv_championship_standings" for v in model.views)
 
 
-@pytest.mark.xfail(reason="Phase 4 showcase route pending implementation", strict=False)
+def test_route_views_types(client: TestClient) -> None:
+    response = client.get("/api/dbms/views")
+    assert response.status_code == 200
+    model = ViewsResponse.model_validate(response.json())
+    for view in model.views:
+        assert view.view_type in ("view", "materialized_view")
+        assert len(view.definition) > 0
+
+
 def test_route_refresh_standings_mv(client: TestClient) -> None:
     response = client.post("/api/dbms/refresh-standings-mv")
     assert response.status_code == 200
     model = RefreshStandingsMVResponse.model_validate(response.json())
     assert model.refreshed is True
+    assert model.view_name == "mv_championship_standings"
 
 
-@pytest.mark.xfail(reason="Phase 4 showcase route pending implementation", strict=False)
+def test_route_refresh_standings_mv_method_not_allowed(client: TestClient) -> None:
+    response = client.get("/api/dbms/refresh-standings-mv")
+    assert response.status_code == 405
+
+
 def test_route_analytics_gaps(client: TestClient) -> None:
-    response = client.get(
-        "/api/analytics/gaps?session_id=00000000-0000-0000-0000-000000000001"
-    )
+    response = client.get("/api/analytics/gaps?session_id=00000000-0000-0000-0000-000000000001")
     assert response.status_code == 200
     model = AnalyticsGapsResponse.model_validate(response.json())
     assert model.session_id == "00000000-0000-0000-0000-000000000001"
+    assert len(model.gaps) >= 1
+    assert "RANK()" in model.sql
 
 
-@pytest.mark.xfail(reason="Phase 4 showcase route pending implementation", strict=False)
+@pytest.mark.parametrize("malformed_uuid", ["not-a-valid-uuid", "12345", "xyz"])
+def test_route_analytics_gaps_invalid_session_id(client: TestClient, malformed_uuid: str) -> None:
+    response = client.get(f"/api/analytics/gaps?session_id={malformed_uuid}")
+    assert response.status_code in (400, 422)
+
+
+def test_route_analytics_gaps_missing_session_id(client: TestClient) -> None:
+    response = client.get("/api/analytics/gaps")
+    assert response.status_code in (400, 422)
+
+
 def test_route_explain_plan(client: TestClient) -> None:
     response = client.get("/api/dbms/explain?analyze=true")
     assert response.status_code == 200
     model = ExplainPlanResponse.model_validate(response.json())
     assert model.analyze is True
+    assert model.query_name == "standings_rollup"
 
 
-@pytest.mark.xfail(reason="Phase 4 showcase route pending implementation", strict=False)
+def test_route_explain_plan_named_query(client: TestClient) -> None:
+    response = client.get("/api/dbms/explain?query_name=lap_telemetry_window")
+    assert response.status_code == 200
+    model = ExplainPlanResponse.model_validate(response.json())
+    assert model.query_name == "lap_telemetry_window"
+
+
+@pytest.mark.parametrize("disallowed", ["drop_table", "user_passwords", "select_all_arbitrary"])
+def test_route_explain_plan_disallowed_query(client: TestClient, disallowed: str) -> None:
+    response = client.get(f"/api/dbms/explain?query_name={disallowed}")
+    assert response.status_code in (400, 422)
+
+
 def test_route_audit_log(client: TestClient) -> None:
     response = client.get("/api/dbms/audit?limit=10")
     assert response.status_code == 200
@@ -416,9 +374,32 @@ def test_route_audit_log(client: TestClient) -> None:
     assert isinstance(model.audit_logs, list)
 
 
-@pytest.mark.xfail(reason="Phase 4 showcase route pending implementation", strict=False)
+def test_route_audit_log_with_table(client: TestClient) -> None:
+    response = client.get("/api/dbms/audit?table=penalties&limit=5")
+    assert response.status_code == 200
+    model = AuditLogResponse.model_validate(response.json())
+    assert isinstance(model.audit_logs, list)
+
+
+@pytest.mark.parametrize("invalid_limit", [0, -10, 501, 10000])
+def test_route_audit_log_invalid_limit(client: TestClient, invalid_limit: int) -> None:
+    response = client.get(f"/api/dbms/audit?limit={invalid_limit}")
+    assert response.status_code in (400, 422)
+
+
 def test_route_security(client: TestClient) -> None:
     response = client.get("/api/dbms/security")
     assert response.status_code == 200
     model = DBMSSecurityResponse.model_validate(response.json())
     assert isinstance(model.roles, list)
+    assert any("apexgrid" in r for r in model.roles)
+
+
+def test_route_security_grants_and_policies(client: TestClient) -> None:
+    response = client.get("/api/dbms/security")
+    assert response.status_code == 200
+    model = DBMSSecurityResponse.model_validate(response.json())
+    assert isinstance(model.grants, list)
+    assert isinstance(model.policies, list)
+    assert len(model.grants) >= 1
+    assert len(model.policies) >= 1
