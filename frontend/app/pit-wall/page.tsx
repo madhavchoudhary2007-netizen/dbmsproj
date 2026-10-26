@@ -1,2 +1,2 @@
-import { PitWall } from "@/components/special-pages";
+import { PitWall } from "@/components/pages/pit-wall";
 export default PitWall;

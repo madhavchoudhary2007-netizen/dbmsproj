@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: 800ce8e
+git_head: 55f447f
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -65,3 +65,5 @@ last_eval_score: obsolete51.2974; no current score; final T430
 
 
 - Accepted since refresh: T44543-53; commits/evidence in Git and .agent/results.
+
+- T-44554 accepted55f447f: Import each route page component directly while preserving the named binding and default export. Verify0.

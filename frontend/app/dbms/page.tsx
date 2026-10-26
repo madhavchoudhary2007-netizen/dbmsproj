@@ -1,2 +1,2 @@
-import { DbmsCenter } from "@/components/special-pages";
+import { DbmsCenter } from "@/components/pages/dbms-center";
 export default DbmsCenter;

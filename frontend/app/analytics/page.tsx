@@ -1,2 +1,2 @@
-import { Analytics } from "@/components/special-pages";
+import { Analytics } from "@/components/pages/analytics";
 export default Analytics;
