@@ -3,13 +3,13 @@ updated_at: 2026-10-26
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44567 — Reduce standings podium cards to three type sizes
-- worker: W1 | priority: P2 | origin: TASTE-389-1
-- target_files: frontend/app/styles/components.css
-- read_only_context: .agent/protocol/design-visual.md (1–66); .agent/protocol/design-ux.md (1–100); frontend/e2e/routes.spec.ts (24–33); frontend/app/standings/page.tsx (podium markup, locate by rg)
-- contract: Each podium card uses at most three font sizes and two weights, while preserving the route's copy, behavior, and selectors.
-- boundaries: CSS-only; MUST REMAIN VERBATIM: “Standings”, “Recalculate standings”, the single visible `[data-primary="true"]` behavior, and any existing `state-*`/`data-testid` hooks; no changes to markup or tests.
-- verify: npm --prefix frontend run typecheck && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+### T-44568 — Move application lifespan into core
+- worker: W2 | priority: P1 | origin: T-331 explicitly places lifespan under backend/app/core
+- target_files: backend/app/main.py, backend/app/core/lifespan.py
+- read_only_context: docs/overhaul-plan.md (Phase 3 T-331); backend/app/main.py (1–20, 160–230, 510–540); backend/app/core/runtime.py (1–35); backend/app/runtime_lease.py (1–31); backend/app/core/application.py (1–70)
+- contract: Move startup/shutdown lifecycle orchestration out of main.py into core/lifespan.py; preserve app.state fields, Mongo globals as observed by existing routes/tests, resource cleanup order, local demo resume behavior, and error handling.
+- boundaries: T-331 move only; no API/schema/database changes; at most 150 changed lines; target files only. Use deferred providers where necessary to preserve module initialization order.
+- verify: APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -21,6 +21,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - P-3 DBMS: full-route initial-asset measurement is fixed; Live now passes at 161.29 KiB, DBMS remains 260.10 KiB (170 KiB limit). Reduce DBMS initial bundle after Phase 4 and T-393 dependencies; never change the threshold.
 
 ## Done
+- T-44567 acceptedb0b12af; verify0.
 - T-44566 accepted01edfca; verify0.
 - T-389 acceptede5ebfeb; verify0.
 - T-44565 accepted669f39e; verify0.

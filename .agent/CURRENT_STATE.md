@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: 01edfca
+git_head: b0b12af
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -34,22 +34,9 @@ last_eval_score: obsolete 51.2974; no current score; final T430
 ## Orchestrator direct edits / process notes
 - Current continuation has 0 product-code lines edited by orchestrator. Accepted results and hashes are in git/.agent/results; workers may not commit. Earlier review caught fixture/API-shape and numeric serialization regressions and corrected them without weakening checks.
 
-- T-44558 acceptede58928e: Annotated bootstrap.main, typed MongoClient with dict[str, object], converted revocation results to bool, and narrowed car numbers before int conversion while retaining the default and string-number support. Verify0.
-
-- T-44560 acceptedb1397e6: Lazy-loaded TelemetryCharts with next/dynamic, ssr:false, and NbSkeleton chart fallback; chart props and call site are unchanged. Verify0.
-
-- T-44559 accepted888002c: Added strict parameter and return annotations to the user, simulation, and WebSocket route handlers. Preserved route behavior and dependency defaults. Verify0.
-
-- T-44561 accepted640f46a: Added parameter and return annotations to lap measurement and route handlers; preserved route behavior. Formatted both files. Verify0.
-
-- T-44562 accepted19cbe5e: Kept the LIVE DEMO hero yellow. Applied cream and a named red token to the existing generated-sessions card with a 4px top border. Verify0.
-
-- T-44563 accepted917fe55: Stretched the existing red count panel across the available grid row while keeping its normal height, live counts, Reload control, and approved spacing tokens. Verify0.
-
-- T-44564 accepted8b064db: Added endpoint annotations and typed the Mongo aggregation pipeline. Narrowed optional database and Mongo results while preserving truthiness behavior and response ordering. Verify0.
-
-- T-44565 accepted669f39e: Removed added runtime guards and used static local annotations for dynamic results. Preserved the nullable demo builder result and PostgreSQL pool generic annotations. Verify0.
-
-- T-389 acceptede5ebfeb: Added a red accent band to the selected championship's empty state and changed the top-ten marquee to the approved red tone, keeping ink text and existing standings behavior intact. Verify0.
-
 - T-44566 accepted01edfca: Moved create_automatic_reservation into pit_repository.py and imported it in main.py, preserving its signature and behavior. Verify0.
+
+- T-44566 root acceptance: OpenAPI snapshot/route registration 11 passed, strict mypy and Ruff passed. Full backend pytest NOT_RUN because DB URL environment variables are unset; no database was contacted.
+
+- T-44567 acceptedb0b12af: Reduced podium typography to three sizes by matching rank to heading size and the points label to body size; retained the winner card styling and existing weights. Verify0.
+- T-44567 root checks: Standings E2E-R11 passed at all five configured viewports; frontend lint and four design lint scripts passed. Taste review confirms three type sizes, two weights, unchanged focal action/palette, and no new bloat.

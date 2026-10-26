@@ -7,11 +7,10 @@ import random as random
 import secrets as secrets
 import threading
 import time as time
-from collections.abc import AsyncIterator, Callable
+from collections.abc import Callable
 from concurrent.futures import Future as Future
 from concurrent.futures import ThreadPoolExecutor as ThreadPoolExecutor
 from concurrent.futures import TimeoutError as _FutureTimeout
-from contextlib import asynccontextmanager, suppress
 from datetime import UTC as UTC
 from datetime import datetime as datetime
 from typing import Any
@@ -21,7 +20,6 @@ from uuid import uuid4 as uuid4
 import jwt as jwt
 from fastapi import (
     Depends,
-    FastAPI,
     HTTPException,
     Request,
     WebSocket,
@@ -58,12 +56,10 @@ from .auth_cookie import verify_csrf_token
 from .auth_router import create_auth_router
 from .config import (
     APP_ENV,
-    AUTO_DEMO_RACE,
     CORS_ORIGINS,
     JWT_ALGORITHM,
     JWT_SECRET,
     MONGODB_DATABASE,
-    MONGODB_URL,
 )
 from .core.application import create_application
 from .core.auth_dependencies import (
@@ -73,8 +69,8 @@ from .core.auth_dependencies import (
 )
 from .core.events import EventBus
 from .core.http_auth import authenticate_http_user
+from .core.lifespan import lifespan
 from .core.lock_demo import create_lock_demo_helpers
-from .core.runtime import RuntimeState
 from .core.security import websocket_bearer
 from .core.serialization import jsonable, telemetry_ws_payload
 from .core.simulation_tick import advance_simulation_tick as advance_simulation_tick
@@ -97,7 +93,7 @@ from .crud_repository import (
     update_crud_row,
 )
 from .crud_resources import register_resources
-from .database import close_pool, connection, fetch_all, fetch_one, get_pool, open_pool
+from .database import connection, fetch_all, fetch_one, get_pool
 from .demo_names import generate_demo_names as generate_demo_names
 from .demo_race_repository import DemoRaceDeleteConflict as DemoRaceDeleteConflict
 from .demo_race_repository import DemoRaceSetupError as DemoRaceSetupError
@@ -128,7 +124,7 @@ from .pit_strategy_service import (
     project_pit_strategy,
     tire_stint_target,
 )
-from .runtime_lease import acquire_runtime_lease, check_runtime_lease
+from .runtime_lease import check_runtime_lease
 from .schemas_competition import ResultIn as ResultIn
 from .schemas_health import HealthReport as HealthReport
 from .schemas_health import LivenessReport as LivenessReport
@@ -171,60 +167,6 @@ log = logging.getLogger("apexgrid")
 bearer = HTTPBearer(auto_error=False)
 mongo_client: MongoClient[dict[str, Any]] | None = None
 telemetry_collection: Collection[dict[str, Any]] | None = None
-
-
-@asynccontextmanager
-async def lifespan(application: FastAPI) -> AsyncIterator[None]:
-    global mongo_client, telemetry_collection
-    runtime_lease = acquire_runtime_lease()
-    application.state.runtime_lease = runtime_lease
-    runtime = RuntimeState(bus=bus, simulations=simulations, runtime_lease=runtime_lease)
-    application.state.runtime = runtime
-    try:
-        open_pool()
-    except Exception:
-        log.exception("PostgreSQL pool could not open")
-    runtime.pool = get_pool()
-    try:
-        mongo_client = MongoClient(MONGODB_URL, serverSelectionTimeoutMS=1800)
-        mongo_client.admin.command("ping")
-        telemetry_collection = mongo_client[MONGODB_DATABASE]["telemetry"]
-        telemetry_collection.create_index([("session_id", 1), ("ts", -1)])
-        telemetry_collection.create_index([("driver_id", 1), ("ts", -1)])
-        telemetry_collection.create_index([("session_id", 1), ("driver_id", 1), ("ts", -1)])
-    except Exception:
-        log.warning("MongoDB is not available at startup", exc_info=True)
-    runtime.mongo_client = mongo_client
-    runtime.telemetry_collection = telemetry_collection
-    if APP_ENV == "local" and not get_pool().closed and telemetry_collection is not None:
-        try:
-            await resume_or_create_auto_demo_race(create_if_missing=AUTO_DEMO_RACE)
-        except Exception:
-            log.exception("Automatic local demo race could not be started")
-
-    try:
-        yield
-    finally:
-        try:
-            tasks = [sim.task for sim in simulations.values() if sim.task and not sim.task.done()]
-            for task in tasks:
-                task.cancel()
-            if tasks:
-                await asyncio.gather(*tasks, return_exceptions=True)
-            if mongo_client:
-                mongo_client.close()
-            mongo_client = None
-            telemetry_collection = None
-            with suppress(Exception):
-                close_pool()
-        finally:
-            runtime.pool = None
-            runtime.mongo_client = None
-            runtime.telemetry_collection = None
-            runtime.runtime_lease = None
-            application.state.runtime = None
-            application.state.runtime_lease = None
-            runtime_lease.close()
 
 
 app, require_runtime_lease = create_application(
