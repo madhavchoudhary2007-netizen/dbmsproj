@@ -1,5 +1,7 @@
 # Bootstrap, layout and conventions
 
+Existing-project routing (ADR-014): setup is already configured. Do not repeat installs, copy templates, relink files or probe models on ordinary resume. Read CURRENT_STATE/NEXT_STATE and delivery-workflow.md; use bootstrap steps only for an actually missing setup component.
+
 Read when: first session in a repo, or when a file from this kit is missing.
 
 ## Setup (once per repo)

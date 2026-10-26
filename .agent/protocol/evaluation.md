@@ -1,10 +1,10 @@
 # Evaluation and the autonomous quality loop
 
-Read when: a milestone's tasks are all VERIFIED, before presenting anything to the user, and whenever a score or defect loop is involved.
+Read when: a major milestone is ready for scoring, before claiming product completion, or when an actual scored defect loop is required. Routine status updates, documentation delivery and small task acceptance do not start a full evaluation. Verification cadence is delivery-workflow.md (ADR-014).
 
 ## Dispatch
 
-Send one W3 packet per dimension (four), at most 2 running at once; start the next when one returns. Each writes `.agent/eval/<dimension>.json` (`functional`, `aesthetic`, `performance`, `edge`):
+Use a shared evidence set: run each needed command once on the relevant candidate/environment, then map it to rubric IDs. At most two W3 workers may partition dimensions or collect independent missing evidence; do not launch four duplicate suite runs. The orchestrator may populate evidence dimensions from commands it actually ran. Each dimension writes `.agent/eval/<dimension>.json` (`functional`, `aesthetic`, `performance`, `edge`):
 
 ```json
 { "checks": [{ "id": "F-1", "weight": 3, "passed": true, "detail": "tsc exit 0" }] }
@@ -38,6 +38,8 @@ bash scripts/eval/score.sh        # writes .agent/eval/score.json; exit 0 only w
 ```
 
 ## Defect loop
+
+Between scored milestones, rerun only checks affected by a repair and reuse matching evidence under delivery-workflow.md. Before final completion run the full candidate gate set. Do not restart a full evaluation per atomic child task. The rubric, weights, thresholds and NOT_RUN behavior below are unchanged.
 
 ```
 iteration = 0

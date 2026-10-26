@@ -1,3 +1,5 @@
+> HISTORICAL PRODUCT SNAPSHOT (through 2026-10-07). The counts, service health and completion claims below are archived observations, not the current overhaul baseline. Read .agent/CURRENT_STATE.md for verified status and .agent/NEXT_STATE.md for the active pause/queue. Do not rerun historical checks merely to refresh this file.
+
 ```yaml
 project: ApexGrid
 state_version: 12

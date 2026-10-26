@@ -1,54 +1,45 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: db57c59
 branch: overhaul/neo-brutal
-architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
-harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
-archetype: Neo-Brutal Motorsport light, approved ADR007
-last_eval_score: obsolete 51.2974; no current score; final T430
+execution: PAUSED — documentation optimization only; wait for owner start work
+verified_product_head: 28c196f
+last_product_task: T-44572
+metadata_task: T-44574 documentation reconciliation; resolve its acceptance hash from Git on resume
+architect_sha256: 36df162b44e313caf9dcf220514dc703f4d490000d8f05ffe667b149807b1c11
+harness: codex; configured worker profiles gpt-6-luna/high; cap 2; no model/config changes in this task
+archetype: Neo-Brutal Motorsport light, ADR-007
+last_eval_score: no current overhaul score; old 51.2974 is obsolete
 
-## Phase status
-- Phases 0–2, 5–6 complete (5/12). Phases 3–4 and 7–11 remain. `docs/overhaul-plan.md` is authoritative. User authorized autonomous completion.
-- Phase 3: T331 main.py <=120 lines remains; runtime DI/provider/lifespan and module extractions exist. T44565 brought `.venv/bin/mypy --strict backend/app` to exit 0; the three DBMS routers and main application now pass strict mypy.
-- Phase 7: T380–389 route work accepted through Standings; T389 root browser gate passed 85/85 across five viewport profiles, including the unchanged desktop palette band. T379 full gate still retains 15 desktop A3 layout failures. Initial route assets: Live passes at 161.29 KiB after T44560; DBMS remains 260.10 KiB against unchanged 170 KiB.
-- Phase 4, 8–11 remain, including DBMS showcase, Taste defects, full E2E/performance, CI/docs, final evaluation/release.
+## Phase and evidence snapshot
+Phase requirements are in docs/overhaul-plan.md; the table below is the current status, not a new task list.
+| Phase | Status | Remaining completion proof |
+|---|---|---|
+| 0 Architecture | COMPLETE | Preserve lock/ADRs; do not repeat owner ADR-007 approval |
+| 1 Baseline | COMPLETE | Final candidate still reruns quality gates |
+| 2 Security | COMPLETE | Retain auth/security regression coverage |
+| 3 Backend | IN_PROGRESS | Combined T-331/T-332 final domains; T-333..340 requirements and full integration |
+| 4 DBMS showcase | NOT_COMPLETE | T-350..358 additions, isolated tests and teacher documentation |
+| 5 Frontend foundation | COMPLETE | Preserve approved tokens/fonts/primitives |
+| 6 Shell | COMPLETE | Preserve shared feed/navigation/keyboard behavior |
+| 7 Routes | IN_PROGRESS | T-390..393 dependencies, T-379 failures and remaining route proof |
+| 8 Taste/motion | NOT_COMPLETE | T-400 audit and resulting fixes; keep known Taste backlog |
+| 9 Tests | NOT_COMPLETE | Production/real-stack E2E, visual/motion/resilience, coverage |
+| 10 DevOps/docs | NOT_COMPLETE | CI release gates and accurate runtime/demo docs |
+| 11 Release | NOT_COMPLETE | Current full score>=95, all hard gates, cleanup and owner PR step |
+- Backend strict mypy reached zero in T-44565. T-44568 through T-44572 each passed root acceptance: 11 contract/route-registration tests, strict mypy, Ruff and format. Latest source is main.py 732 lines; T-331 <=120 final milestone is still open.
+- Latest full disposable backend evidence: T-44559, 262 passed/0 failed/0 skipped plus live acceptance. Subsequent extraction-only task checks did not rerun the full stack; milestone integration is not claimed current. Latest shell DB URLs were unset; no DB contacted during recent tasks.
+- Frontend production build passed after T-44560. Live initial JS 161.29 KiB passes; DBMS 260.10 KiB fails unchanged 170 KiB cap. Standings T-389 root gate passed 85/85; latest Live/Pit Wall focused run 100/100. These are scoped results, not a final release score.
+- T-44567 Standings typography: five E2E-R11 viewports passed, frontend lint/four design scripts passed, focused Taste review found no new defect. All accepted task details/hashes are in Git and .agent/results.
 
-## Verified evidence
-- Login, Dashboard, Resources, DBMS, Live, Sessions, Stewards and Pit Wall have accepted implementation work; see git commits and `.agent/results/` for task-level records. T44554–57 direct route imports accepted; T44557 restored Sessions client boundary after build failure.
-- Production build after T44560 exits 0. Full initial-script bundle gate passes Live at 161.29 KiB and fails DBMS at 260.10 KiB; limit remains 170 KiB. T44560 uses the plan-prescribed dynamic chart import and skeleton fallback.
-- Backend: the disposable apexgrid-test full suite and live acceptance passed after T44558 (262 passed, 0 skipped); the full suite and live acceptance passed after T44559 (262 passed, 0 failed, 0 skipped). T44565 acceptance passed strict mypy, contract snapshot and route-registration checks (11 tests).
-- T387 focused browser runs total 35 passing cases across five widths; T386–387 build passed. The latest post-fix Live/Pit Wall run passed 100/100 route, state, responsive, touch, accessibility, primary and palette checks across five projects.
+## Current risks and open work
+- Complete the T-331/T-332 structural/DI milestone by real domain boundaries; recent four assembly-only modules added 215 lines while main fell only 764 ->732. Reconcile/fold such glue toward final ownership rather than creating more wrappers. T-44573 is superseded before dispatch.
+- T-379 retains 15 desktop A3 layout failures; never label its full suite passed. Resource-page bloat and dashboard four-accent Taste findings remain. DBMS showcase/route work, motion, full E2E/performance, CI/docs and final evaluation remain.
+- Standings delta arrows require an actual prior-rank source absent from the current API; never fabricate deltas or alter API without its ADR.
+- T-021 acceptance fixture still depends on existing championship round 3; it needs a self-contained named test championship/cleanup plan shown before dispatch. Only disposable apexgrid-test may receive test writes/migrations; never real DB/data/volumes.
+- Host Python3.14/Node26 differ from Docker3.12/22; production frontend image has no source/lint config, so host evidence is not container parity proof. Worker clone Next resolution failed previously; root-owned browser runs passed.
 
-## Invariants / workflow
-- Locked architecture hash above; verify lock and `source .agent/models.env && bash scripts/agent/boot.sh` before dispatch. Branch only `overhaul/neo-brutal`; accepted changes commit through `accept.sh` integration. Max two packet-only custom workers, gpt-6-luna/high, no overrides. Verify independently; state update after each acceptance; budget every 5 tasks.
-- Preserve every route, feature, chart, modal, copy string, aria/data hook, state class and DBMS hash. Five UI states, >=44px targets, allowed spacing/radius/motion, all gates unchanged. Never touch `.env`, real databases/schema/data/volumes, or run recursive removal. Browser/database/network checks are orchestrator-owned; DB stack only guarded disposable `apexgrid-test`.
-- No dependencies added; no API/schema changes in current work. Owner's authorized ADR-007/ADR-013 changes remain scoped as recorded.
-
-## Open risks and next work
-- T44565 is accepted with behavior-preserving annotations and strict mypy at zero; continue the separate T331 size/split work.
-- T389 worker clone could not resolve Next through its external node_modules symlink; root-owned browser rerun passed after a palette repair. Continue browser checks in the root workspace.
-- DBMS initial bundle remains above 170 KiB; identify and split its heavy lazy views after required Phase 4/route dependencies. Complete Pit Wall automatic-allocation/history coverage and broader Taste review, then proceed in plan order.
-- Main split, strict typing, DBMS showcase, remaining Taste, full browser/performance evidence and final score are not complete. The standings plan requests delta arrows, but driver_standings stores only current rank/points/wins/podiums and the API has no prior-rank field; T389 must not fabricate deltas or change the API. Old 51.2974 is not current; do not present work as done.
-- Host Python 3.14/Node 26 differ from Docker 3.12/22; frontend production image lacks source/lint config; acceptance fixture depends on existing championship round 3 (T021 queued).
-
-## Orchestrator direct edits / process notes
-- Current continuation has 0 product-code lines edited by orchestrator. Accepted results and hashes are in git/.agent/results; workers may not commit. Earlier review caught fixture/API-shape and numeric serialization regressions and corrected them without weakening checks.
-
-- T-44566 accepted01edfca: Moved create_automatic_reservation into pit_repository.py and imported it in main.py, preserving its signature and behavior. Verify0.
-
-- T-44566 root acceptance: OpenAPI snapshot/route registration 11 passed, strict mypy and Ruff passed. Full backend pytest NOT_RUN because DB URL environment variables are unset; no database was contacted.
-
-- T-44567 acceptedb0b12af: Reduced podium typography to three sizes by matching rank to heading size and the points label to body size; retained the winner card styling and existing weights. Verify0.
-- T-44567 root checks: Standings E2E-R11 passed at all five configured viewports; frontend lint and four design lint scripts passed. Taste review confirms three type sizes, two weights, unchanged focal action/palette, and no new bloat.
-
-- T-44568 acceptedb5f7f0e: Moved the startup and shutdown lifecycle to core/lifespan.py. main.py retains the lifespan export and Mongo globals; startup uses the existing bus, simulations, and deferred demo helper. Verify0.
-- T-44568 root acceptance reran contract snapshot + route registration (11 passed), strict mypy, Ruff and format; no DB startup/contact. Full DB suite remains represented by latest disposable-stack evidence above.
-
-- T-44569 accepteded947dd: Extracted race archive and lap route registration into a static API assembly module, retaining late-bound dependencies, route order, and main-module aliases. Verify0.
-- T-44569 packet review caught one missing source range, then a dynamic import and loss of late-bound wrappers; repair packets corrected both. No out-of-scope files changed.
-
-- T-44570 acceptedd134e39: Moved SQL then Mongo router construction and registration into dbms_routes.py. main.py retains router, handler, and individual handler aliases, with the existing late-bound wrappers. Verify0.
-- T-44570 root acceptance reran contract snapshot + route registration (11 passed), strict mypy, Ruff and format; no DB startup/contact.
-- T-44571 accepted `db57c59`: extracted ordered session-action/result route assembly; root acceptance passed 11 contract/route tests, strict mypy, Ruff and format. No DB startup/contact.
-
-- T-44571 accepteddb57c59: Moved construction and ordered registration of session-action, results-read, and results-write routers into the new API assembly module. Kept late-bound wrappers and main.py handler aliases. Verify0.
+## Current process decision
+- New models start at START_HERE.md; current permission is explicit, next domain inputs are named, and the twelve-phase status above needs no chat history.
+- ADR-014/delivery-workflow.md consolidate sizing, verification cadence and resume rules. Normal <=3 files/~150 lines; justified domain structural/DI <=8 files/800 lines; docs-only explicit sweep allowed. Roles, two workers, accept.sh, score>=95 and every existing final gate remain.
+- This task changes Markdown only. No product, test, script, schema/API, dependency/config, secret or database changes; no implementation worker active. Architecture B.2 and focused Phase C amended/relocked for ADR-014.
+- T-44569 packet/context and wiring reviews required corrections; no out-of-scope product edits. Preserve user-owned status.sh files/run-loop.sh and unrelated changes; commit only through accept.sh.

@@ -2,11 +2,13 @@
 
 Read when: writing a packet, accepting a worker result, or reading source files.
 
+Execution cadence and normal/structural/documentation packet sizes are owned by `delivery-workflow.md` (ADR-014). This file owns isolation, envelope handling and boundaries.
+
 ## Isolation
 
 Workers get no conversation history, no ARCHITECT.md and no state files. The packet is their entire context and authority. It contains: role contract, task ID, target files, read-only context (paths with line ranges), the interface types inlined, acceptance criteria, boundaries, the verify command and the envelope schema. For UI packets list the relevant design files (`design-visual.md`, `design-ux.md`) under read-only context, because workers do not see the routing table.
 
-A worker reads only the files listed. Anything else: report `FAILED` with the needed path in `unresolved_blockers` and let the orchestrator decide whether to widen the packet. Workers never commit.
+A worker reads only listed files. Target files may be read as needed in <=100-line chunks; validate read-only context windows include imports/factory wiring before dispatch. Do not hand-copy an incomplete interface or schema: copy the canonical envelope schema into the packet and include the actual task ID. Anything else: report `FAILED` with the needed path in `unresolved_blockers` and let the orchestrator decide whether to widen the packet. Workers never commit.
 
 ## Packet template
 
@@ -55,11 +57,11 @@ The schema is `.agent/envelope.schema.json`. Example of a valid envelope:
 
 ## Acceptance
 
-Save the worker's JSON to `.agent/results/T-021.json`, then run `bash scripts/agent/accept.sh T-021`. It validates the schema, re-runs the verify command itself (never trusting the reported result), checks that every changed or new file is listed in the task's `target_files` (files under `.agent/` are ignored), and commits on PASSED.
+Preflight the envelope, status, command and exact diff first. Save the worker's JSON to `.agent/results/T-021.json`, then for a valid candidate run `bash scripts/agent/accept.sh T-021`. It validates the schema, re-runs the verify command itself (never trusting the reported result), checks that every changed or new file is listed in the task's `target_files` (files under `.agent/` are ignored), and commits on PASSED.
 
-- Malformed envelope: treat as FAILED.
+- Malformed/FAILED envelope: classify and review its diff before calling accept.sh; its current implementation executes Verify even for FAILED status. Do not rerun a known unchanged failure just to record it. Record metadata corrections transparently; never fabricate a worker pass.
 - PASSED envelope whose verify command fails on re-run: treat as FAILED and log the discrepancy under Open risks.
-- Boundary violation: `git checkout -- <file>` (delete new files), then re-dispatch once with the violation quoted in the packet.
+- Boundary violation: isolate only the worker-owned change, preserve owner/other-worker work, and repair/revert that exact change. Do not blindly restore a whole pre-existing dirty file. Re-dispatch with the violation quoted when product repair is necessary.
 
 ## File reading hygiene (everyone)
 
@@ -81,4 +83,4 @@ rg -n "^export " src/lib/api.ts                                                 
 - Workers run with the orchestrator session's sandbox; a worker file cannot widen it (Codex docs: `sandbox_mode` in an agent file is ignored). Start the session with write access to the workspace (Codex: workspace-write). A read-only session makes every worker fail before it edits anything.
 - Worker sandboxes usually have no network. Write verify commands that run offline (tests, lint, typecheck, build, greps). A check that needs the network is run by the orchestrator in `accept.sh`'s rerun or by hand, and named as such in the packet.
 - Verify commands must not start servers on fixed ports or depend on a dev server; workers run side by side and ports collide.
-- When a result is FAILED: read `git diff` for its target files. If the diff is in scope and the failure was only the envelope format or a network-only check, fix the cause, re-run `accept.sh` and do not re-dispatch. Otherwise `git checkout -- <target files>` and re-dispatch once. Never leave a failed task's diff uncommitted and unreferenced: record it in CURRENT_STATE.
+- When a result is FAILED: read its target diff and identify the cause. In-scope metadata or root-owned environment/network problems do not need a new implementation worker. Correct the cause, obtain a valid candidate and verify independently; product defects go to the owning worker with a focused repair packet. Preserve prior dirty work, record unresolved diffs, and follow the five-repair ceiling in delivery-workflow.md.

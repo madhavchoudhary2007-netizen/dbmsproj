@@ -61,6 +61,6 @@ When Phase C yields zero amendments (or reaches its 3-pass cap), run `bash scrip
 <!-- LOCK:END -->
 ```
 
-`bash scripts/agent/verify-lock.sh` runs at every session boot (via `boot.sh`) and before every dispatch. It fails if the body changed after locking.
+`bash scripts/agent/verify-lock.sh` runs at session boot (via `boot.sh`) and before dispatch. Do not repeat full boot per task or call budget again immediately after boot. It fails if the body changed after locking.
 
-**Changing a locked architecture:** write `.agent/adr/ADR-<NNN>-<slug>.md` (Context, Decision, Consequences, sections affected), edit ARCHITECT.md, rerun Phase C on the affected sections only, then rerun `lock.sh`. A user instruction that contradicts the lock triggers this automatically and wins.
+**Changing a locked architecture:** write `.agent/adr/ADR-<NNN>-<slug>.md` (Context, Decision, Consequences, sections affected), edit ARCHITECT.md, rerun Phase C on the affected sections only, then regenerate the lock banner and verify it. In this repo lock.sh includes a direct Git commit; reproduce only its canonical banner/hash operation and use accept.sh for the commit, as already recorded by ADR-007. Do not execute its Git tail. A user instruction that contradicts the lock triggers this automatically and wins.

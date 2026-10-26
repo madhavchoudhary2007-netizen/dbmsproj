@@ -1,5 +1,7 @@
 # UX, accessibility and viewports (Pillars 3, 5, 6)
 
+Project routing (ADR-014): use the approved overhaul-plan.md section 2 and locked ADR-007 for project-specific visual/layout rules; examples here are generic. Preserve all existing numeric quality gates. Read only the relevant sections for the current packet. Verification cadence is delivery-workflow.md.
+
 Read when: building data components, forms, dialogs or navigation, auditing accessibility, or checking responsive behavior. Visual rules are in `design-visual.md`.
 
 ## Pillar 3: the 5 mandatory UI states
@@ -26,7 +28,7 @@ function assertNever(x: never): never { throw new Error(`Unhandled state: ${JSON
 | Error with retry | Human-readable cause; retry re-issues the same request; `role="alert"`; non-retryable errors give a next step instead |
 | Partial/filtered | "Showing N of M" with a one-click clear; filter state in the URL query |
 
-Each component gets a fixture route `/__fixtures/<name>?state=<status>` and a test per state asserting `data-testid="state-<status>"` is visible (check E-1).
+Every data component has a test for all five states (check E-1). Reuse existing mocked routes, fixtures and stable selectors. Add a development-only fixture route only when existing test infrastructure cannot exercise the state; do not add one route or rewrite existing hooks per component merely to match this generic example.
 
 **Forms:** label above the field, never placeholder-as-label; correct `type`, `inputmode` and `autocomplete`; validate on blur, then on change after the first error; link errors with `aria-describedby`; disable submit only while submitting, never for invalid input; preserve input on error.
 
@@ -88,7 +90,7 @@ Automated checks find only part of the accessibility defects, so the orchestrato
 
 ## Pillar 6: cross-viewport inspection
 
-Copy `.agent/templates/playwright.config.ts` to the repo root. It defines five projects: 320×568, 375×812, 768×1024, 1440×900 and 5120×1440 (32:9). Per route per project:
+Reuse the configured `frontend/` Playwright setup; only a new, unconfigured project copies/adapts the template. It defines five projects: 320×568, 375×812, 768×1024, 1440×900 and 5120×1440 (32:9). Per route per project:
 
 ```ts
 test("no horizontal overflow", async ({ page }) => {

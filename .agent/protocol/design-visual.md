@@ -1,5 +1,7 @@
 # Visual design: art direction, tokens, motion (Pillars 1, 2, 4)
 
+Project routing (ADR-014): use the approved overhaul-plan.md section 2 and locked ADR-007 for project-specific visual/layout rules; examples here are generic. Preserve all existing numeric quality gates. Read only the relevant sections for the current packet. Verification cadence is delivery-workflow.md.
+
 Read when: writing or reviewing `.tsx`, `.jsx`, `.css`, tokens or animation. UX states, accessibility and viewport checks are in `design-ux.md`.
 
 ## Pillar 1: art direction and anti-AI-slop

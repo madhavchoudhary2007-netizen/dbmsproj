@@ -1,12 +1,12 @@
 <!-- LOCK:BEGIN -->
 > STATUS: LOCKED
-> SHA256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
-> LOCKED_AT: 2026-10-25T18:27:01Z
+> SHA256: 36df162b44e313caf9dcf220514dc703f4d490000d8f05ffe667b149807b1c11
+> LOCKED_AT: 2026-10-26T08:41:56Z
 > LOCKED_BY: orchestrator
 <!-- LOCK:END -->
 # ApexGrid architecture — existing system, improvement in place
 
-Evidence: `README.md`, `PROJECT_CONTEXT.md`, `PROJECT_STATE.md`, `DECISIONS.md`, `NEXT_STEPS.md`, `docs/contracts.md`, `docs/demo-guide.md`, source, and the 2026-10-21 baseline. Acceptance IDs below name existing or planned binary checks; `E2E-*` checks do not exist yet. No product source is authorized by this document alone.
+Evidence baseline: 2026-10-21 discovery and later ADRs. Historical observations below (including missing E2E/setup and old tool versions) describe that baseline, not current readiness. Current verified facts are in CURRENT_STATE.md; NEXT_STATE.md is the active queue. ADR-014/delivery-workflow.md define the revised execution policy. No product source is authorized by this document alone; implementation is paused until the owner says start work.
 
 ## Phase A — discovery
 
@@ -16,7 +16,7 @@ ApexGrid is a motorsport league and race-operations demo. Admins manage competit
 
 ### A.2 Deliverables and acceptance IDs
 
-Each route is an existing `frontend/app/**/page.tsx` file. A route's planned binary acceptance command is `npm --prefix frontend exec -- playwright test e2e/routes.spec.ts --grep 'E2E-Rnn'`; W3 must first add Playwright and the named case. Until then these IDs are UNVERIFIED, not passing checks.
+Each route is an existing `frontend/app/**/page.tsx` file. The configured browser specs now live in `frontend/e2e/`; use the existing `frontend/` Playwright runner/configuration and the named E2E-Rnn case. Do not reinstall or recreate it. A case is verified only by an actual passing run, not test listing or a planned ID; current scoped evidence is in CURRENT_STATE.md.
 
 | ID | Route / deliverable | Primary job | API prerequisite |
 |---|---|---|---|
@@ -37,7 +37,7 @@ Each route is an existing `frontend/app/**/page.tsx` file. A route's planned bin
 | E2E-R15 | `/analytics` | paged/filterable driver statistics | analytics/drivers |
 | E2E-R16 | `/dbms` | SQL/Mongo views, archive, EER and write demonstrations | dbms/* |
 
-API groups live in `backend/app/main.py`. Existing test commands shown here are binary, but database cases skip without a reachable seeded PostgreSQL/MongoDB; W3 owns closing that verification gap. `API-*` is the acceptance inventory, not a claim of current coverage.
+At discovery API groups lived in `backend/app/main.py`; the active structure now includes `backend/app/api/` and providers in `core/`. Preserve the group contracts below while following CURRENT_STATE for implementation status. Existing test commands shown here are binary, but database cases skip without a reachable seeded PostgreSQL/MongoDB; W3 owns closing that verification gap. `API-*` is the acceptance inventory, not a claim of current coverage.
 
 | ID | API group | Binary command / intended test |
 |---|---|---|
@@ -86,7 +86,7 @@ No wholesale rewrite of working race flows, SQL rules, public API routes or pers
 
 ### B.1 Stack and reasons
 
-`frontend/`: Next.js 16/React 19/TypeScript, npm lockfile, Tailwind/CSS variables; existing routed operational UI. `backend/`: FastAPI/Pydantic on Python 3.12 container; one service owns validation, auth, simulation and DBMS endpoints. PostgreSQL 16 stores official state and enforces constraints, triggers, explicit-cursor standings and pit overlap. MongoDB 7 stores high-volume telemetry keyed by PostgreSQL UUIDs. Auth uses bcrypt/JWT; WebSocket transports live events. Docker Compose is the local deployment. Host Node 26 and venv Python 3.14 differ from Node 22/Python 3.12 images; verify in container before claiming parity. Test stack is pytest plus `scripts/acceptance.py`; no configured browser E2E.
+`frontend/`: Next.js 16/React 19/TypeScript, npm lockfile, Tailwind/CSS variables; existing routed operational UI. `backend/`: FastAPI/Pydantic on Python 3.12 container; one service owns validation, auth, simulation and DBMS endpoints. PostgreSQL 16 stores official state and enforces constraints, triggers, explicit-cursor standings and pit overlap. MongoDB 7 stores high-volume telemetry keyed by PostgreSQL UUIDs. Auth uses bcrypt/JWT; WebSocket transports live events. Docker Compose is the local deployment. Host Node 26 and venv Python 3.14 differ from Node 22/Python 3.12 images; verify in container before claiming parity. Tests use pytest plus `scripts/acceptance.py` and the existing `frontend/e2e/` Playwright setup; reuse configured commands and record actual environment/fixture evidence.
 
 ### B.2 Module map and ownership
 
@@ -100,7 +100,7 @@ No wholesale rewrite of working race flows, SQL rules, public API routes or pers
 | `backend/tests/`, future `e2e/`, `scripts/eval/` | API/database/browser checks and scoring | W3 |
 | `docs/`, `.agent/`, `DECISIONS.md`, Git | contracts, architecture/state, decisions and integration | orchestrator |
 
-The large mixed files are a risk, not permission for W1 to edit fetch/state or W2 to edit markup. Each packet has <=3 target files and <=150 changed lines.
+The large mixed files are a risk, not permission for W1 to edit fetch/state or W2 to edit markup. ADR-014/delivery-workflow.md own packet sizing: normal <=3 files/~150 changed lines; justified one-domain mechanical/DI tranche <=8 files/800 changed lines; explicitly scoped Markdown-only reconciliation may span more files. Final entrypoint and all product quality gates remain unchanged. T-331/T-332 are one structural milestone delivered by domain, without temporary forwarding modules solely to meet line counts.
 
 ### B.3 Cross-module contracts (existing wire shapes; tighter types are planned)
 
@@ -196,6 +196,8 @@ ADR-013 focused Phase C: goal traced T-387 to existing official tables with W2/W
 
 ## Gap list against protocol
 
+This is the discovery gap inventory. CURRENT_STATE/NEXT_STATE and accepted results determine which gaps remain; do not queue or reimplement an already closed gap from this historical table.
+
 Severity P0 blocks reproducible verification/security; P1 blocks a protocol gate or important user path; P2 is improvement. Evidence-based gaps are tasks, not assertions that all current UI behavior is broken.
 
 | Gap | Severity | Evidence / required acceptance |
@@ -258,6 +260,8 @@ Lens 5 boundary matrix: 0/1/72/73 laps and sector three boundary (API-04); dupli
 
 ## Risks
 
+The numbered entries below record discovery/ADR-time risks. CURRENT_STATE is authoritative for current environment, closed findings and remaining verification.
+
 - R01: Install and full DB acceptance are red/unverified until G01 and Docker availability are resolved; no completed product claim or score >=95 is possible now.
 - R02: `E2E_CMD=none` and planned route IDs cannot pass until W3 adds Playwright; historical “E2E passing” means prior manual/API checks, not current automated browser coverage.
 - R03: ADR-002 specifies cookie/CSRF auth transport, credentialed CORS, local HTTP exception, and legacy bearer compatibility. Implementation and proof remain open; the current API and local demo must keep working until the migration is accepted.
@@ -306,3 +310,7 @@ ADR-011 adds only GET /health/live (200/status alive, no external probes) and GE
 ## ADR-012 focused Phase C: next-event ticker
 
 A.2 API-09 and B.3 permit only the nullable next_event field specified in ADR-012. Existing fields and scheduled_events count semantics remain unchanged. Earliest future scheduled RACE session is selected by database UTC time and stable scheduled_at/session-id ordering. W3 owns failing-first selection/null/exclusion/compatibility tests, W2 the read-only repository query, root the full disposable suite. Shell and dashboard are the two planned consumers; no dependency, schema, auth or unrelated API change. All five focused lenses and the zero-amendment second pass are recorded in ADR-012; no passing implementation is implied.
+
+## ADR-014 focused Phase C: efficient delivery
+
+Owner instruction of 2026-10-26 authorizes documentation optimization and pauses implementation. B.2 adopts the bounded structural/documentation packet exceptions and consolidated T-331/T-332 domain workflow in ADR-014; this does not implement product changes. Pass 1: Lens 1 retains every A.2 deliverable/owner and twelve-phase final outcome; Lens 2 keeps independent accept.sh verification, task-specific proof, sensitive-task integration and full milestone/release gates with zero DB skips; Lens 3 rejects temporary line-count wrappers; Lens 4 bounds domain changes and keys evidence to revision/scope/environment; Lens 5 covers pause/resume, stale shared dependencies, missing tools, malformed envelopes and unrelated dirty work. Pass 2 of all five lenses produced zero further amendments. Risk: partially verified work must remain explicitly unverified until required isolated integration succeeds. All API/data/secret protections, visual thresholds, scoring weights, hard gates and main.py <=120 final criterion remain.

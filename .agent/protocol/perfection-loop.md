@@ -1,3 +1,5 @@
+> HISTORICAL / INACTIVE for the current overhaul. ADR-007 replaced this execution plan; ADR-014 makes delivery-workflow.md the active schedule on overhaul/neo-brutal. Do not run a runner, switch to perfection-loop, apply old phase caps or reread this file on every active-overhaul resume. Preserve this text as history; reactivate only on an explicit owner instruction. The current implementation pause is in CURRENT_STATE/NEXT_STATE.
+
 # Perfection loop
 
 Read when: the user starts or resumes the perfection loop. Re-read this whole file after every compaction and at the start of every session. It overrides any summary of it.

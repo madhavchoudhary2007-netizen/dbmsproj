@@ -1,5 +1,7 @@
 # Phase C: five-lens stress test
 
+Project routing (ADR-014): use the approved overhaul-plan.md section 2 and locked ADR-007 for project-specific visual/layout rules; examples here are generic. Preserve all existing numeric quality gates. Read only the relevant sections for the current packet. Verification cadence is delivery-workflow.md.
+
 Read when: running Phase C of the architect protocol. Run each lens against Phase A+B. Every finding amends the document or is rejected with a written reason. Repeat all five lenses until a full pass produces zero amendments; maximum 3 passes, then list what remains under a "Risks" heading at the end of ARCHITECT.md and proceed to the lock.
 
 ## Lens 1: goal achievement
@@ -10,13 +12,7 @@ For each A.2 deliverable trace cold start to success and list every prerequisite
 
 Every acceptance criterion is an executable command with a binary result. Banned wording in criteria: "works", "looks good", "handles errors", "is fast". Use the commands in `.agent/commands.env`:
 
-```bash
-$TYPECHECK_CMD                       # zero errors
-$LINT_CMD                            # zero warnings
-$TEST_CMD --reporter=json --outputFile=.agent/eval/unit.json
-$E2E_CMD --reporter=json > .agent/eval/e2e.json
-npx --yes @ast-grep/cli scan --rule scripts/eval/rules/no-fetch-in-components.yml src/components
-```
+Use the project's exact commands from .agent/commands.env and existing test-runner configuration. Do not append pnpm/Vitest reporter flags to pytest or create a second test setup. Record zero errors/warnings, collected/passed/skipped counts and scoped evidence under delivery-workflow.md.
 
 Anything animated or simulated exposes a deterministic step function so tests never depend on wall-clock time:
 

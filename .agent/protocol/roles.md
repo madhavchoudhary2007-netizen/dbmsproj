@@ -6,17 +6,17 @@ Read when: configuring models or effort, dispatching a worker, running the Taste
 
 | Role | Owns | MUST NOT |
 |---|---|---|
-| Orchestrator | ARCHITECT.md, CURRENT/NEXT_STATE.md, ADRs, git history, reviews, scoring | Write repetitive boilerplate (scaffolds, token files, fixtures, CRUD, type re-exports). Edit more than 40 product lines per turn; the only exception is integration glue spanning two workers' boundaries, logged in CURRENT_STATE under "Orchestrator direct edits". Accept a result without re-running its verify command. Present a score below 95. |
+| Orchestrator | ARCHITECT.md, CURRENT/NEXT_STATE.md, ADRs, git history, reviews, scoring | Write repetitive boilerplate (scaffolds, token files, fixtures, CRUD, type re-exports). Edit more than 40 product lines per turn; the only exception is integration glue spanning two workers' boundaries, logged in CURRENT_STATE under "Orchestrator direct edits". Accept a result without re-running its verify command. Claim completion below score 95. |
 | W1 UI/Layout | `*.tsx *.jsx *.css`, design tokens, Tailwind config, assets. Delivers presentational components that render all 5 UI states, use tokens only, meet 44×44 targets and mobile ergonomics | Create stores, call `fetch`, define API types, write tests other than state fixtures the packet names |
 | W2 State/Runtime | Stores, hooks, mutations, data-fetching layer, API handlers, schemas, workers, simulation loops. Delivers typed contracts, optimistic update with rollback, cancellation, idempotency, error normalization | Change markup, class names or tokens; touch `tests/` |
 | W3 Eval/QA | `tests/ e2e/ scripts/eval/`, Playwright, AST checks, invariant asserts, unit tests, score JSON | Edit product source to make a test pass. A failing test is reported FAILED with the defect; the assertion is never weakened |
 
 ## Taste Agent (orchestrator mode)
 
-Runs after architecture Phase B, after every UI packet merges, and when scoring A-5/A-6 in `evaluation.md`. Checks in order:
+Runs after architecture Phase B, as a focused diff review after UI acceptance, and with screenshots at route milestones/final A-5/A-6 scoring. The schedule is delivery-workflow.md; do not rerun full screenshots after every cosmetic packet. Checks in order:
 
 1. Focal points: exactly one primary action per viewport (count accent-styled elements in the initial viewport).
-2. Palette tension: 60-30-10, one accent hue, no gradient spanning more than 60° of hue.
+2. Palette tension: approved overhaul-plan.md section 2 roles/bands, contrast and accent limits; generic palette examples do not override ADR-007. No unapproved gradient.
 3. Clutter: at most 3 font sizes and 2 weights per card; never border plus shadow plus background change on one element.
 4. Bloat: no abstraction with a single call site; no dependency replacing under 30 lines; no file over 300 lines.
 
@@ -34,18 +34,9 @@ IDs, effort/thinking levels, `MAX_WORKERS` and the context window are set once i
 
 ## Dispatch
 
-Workers always start fresh with the packet file as the entire prompt (packet format: `packets.md`).
+Use the configured native w1-ui, w2-state and w3-eval agents with only the packet as context; no per-call model/effort override. Packets own exact scope/interfaces/Verify; delivery-workflow.md owns task sizing and scheduling. Use existing harness profile definitions, not a shell runner or a new conversation per wrapper-sized change.
 
-```bash
-claude -p "$(cat .agent/packets/T-014.md)" --model "$WORKER_MODEL" --effort "$WORKER_EFFORT" --output-format json > .agent/results/T-014.raw.json
-codex exec --model "$WORKER_MODEL" "$(cat .agent/packets/T-014.md)" > .agent/results/T-014.raw.txt
-gemini -m "$WORKER_MODEL" -p "$(cat .agent/packets/T-014.md)" > .agent/results/T-014.raw.txt
-# Antigravity: new agent conversation, packet as the only message, save the JSON envelope to .agent/results/T-014.json
-```
-
-Inside Claude Code, prefer the Agent tool with `subagent_type` set to `w1-ui`, `w2-state` or `w3-eval` and the packet text as the prompt. Do not pass `model` or `effort` in that call: a per-call value overrides the frontmatter.
-
-Parallelism: at most `MAX_WORKERS` (2) workers at once; queue the rest. W1 and W2 packets with disjoint `target_files` may run together. W3 runs after the packets it verifies have merged. Two packets touching the same file are serialized. For stronger isolation add `isolation: worktree` to a worker's frontmatter.
+At most two workers run at once, with disjoint target files and satisfied prerequisites. W3 test work may precede the W1/W2 fix it protects; verification of merged behavior follows its dependency. Repairs use the same role and focused packet. Before redispatch after interruption, inspect live status. Preserve owner scripts and unrelated changes.
 
 ## Claude Code binding (configuration, not prose)
 

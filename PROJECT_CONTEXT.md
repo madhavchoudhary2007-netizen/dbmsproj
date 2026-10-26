@@ -7,3 +7,5 @@ Architecture: Next.js/React frontend, FastAPI modular monolith, PostgreSQL autho
 Critical rules: PostgreSQL trigger accumulates approved penalty points and bans drivers at 12; PostgreSQL standings routine uses an explicit cursor; pit reservation locks the box row, checks overlap and commits transactionally; PostgreSQL enforces session transitions, unique classified positions, and nonoverlapping team memberships; DBMS Operations Center reports real database behavior. Simulation and external telemetry ingest share one packet contract. External ingest requires an admin/steward token and an active session. WebSocket auth uses the `apexgrid.jwt` subprotocol.
 
 Local URLs: frontend `http://localhost:3000`, API `http://localhost:8000/api`, API docs `http://localhost:8000/docs`. Demo credentials, run commands, and verification steps are in `README.md`.
+
+Engineering execution: AGENTS.md -> .agent/protocol/delivery-workflow.md. Current verified state and pause/queue: .agent/CURRENT_STATE.md and .agent/NEXT_STATE.md. Product scope/design: docs/overhaul-plan.md; this product overview does not restart setup or establish current quality results.

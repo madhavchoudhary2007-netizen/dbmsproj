@@ -68,3 +68,8 @@ See `PROJECT_STATE.md` for verified feature and test status.
 ### Race database explorer
 
 At `/dbms`, grouped one-click navigation opens live PostgreSQL status, running and completed race archives, all 17 actual public base tables, the EER diagram, schema, indexes, query plans, locks, database operations, MongoDB collections, and cross-store results. PostgreSQL table counts and rows come from the database; there are no public SQL `VIEW` objects. MongoDB shows the actual telemetry collection, document counts and index definitions, with filtered, paged documents and a raw JSON inspector. The selected view is encoded in the URL hash, so links open a view directly and browser Back/Forward restores navigation. Status and read-only views refresh automatically; the global Refresh control also refreshes the selected race database view. The SQL table browser hides password hashes. Race records refresh every second while active; completed races retain final classifications, telemetry, incidents, pit stops, a two-driver comparison and every-driver lap/sector history. The two original completed fixtures have explicitly labeled historical demo lap archives; generated completed races retain their actual simulator data across restarts.
+
+
+## Engineering workflow
+
+The active overhaul scope is [the twelve-phase plan](docs/overhaul-plan.md). Current verified status and execution permission live in [.agent/CURRENT_STATE.md](.agent/CURRENT_STATE.md) and [.agent/NEXT_STATE.md](.agent/NEXT_STATE.md). Follow [AGENTS.md](AGENTS.md) and the [delivery workflow](.agent/protocol/delivery-workflow.md); historical project snapshots and loop logs are not current completion evidence.

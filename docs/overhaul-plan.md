@@ -1,11 +1,11 @@
 # ApexGrid Neo-Brutal Overhaul — Implementation Plan
 
-Status: PLAN ONLY. Nothing in this file has been implemented.
+Status: IN PROGRESS; implementation PAUSED by owner on 2026-10-26 until start work. The baseline below is historical; current evidence is in .agent/CURRENT_STATE.md.
 Audience: the orchestrator model (GPT-6.1 Sol medium in Codex CLI, Sonnet 5.5 medium in Claude Code, or Gemini 3.8 Flash high thinking in Gemini CLI / Antigravity) and the W1/W2/W3 workers it dispatches.
 Base branch: `perfection-loop` (HEAD `1acf8e1`). Work branch: `overhaul/neo-brutal`.
 First task ID: `T-300` (T-001..T-213 are taken).
 
-Read `AGENTS.md` first. This plan never overrides it. Where this plan and `AGENTS.md` disagree, `AGENTS.md` wins and the orchestrator records the conflict in `CURRENT_STATE.md`.
+Read `AGENTS.md` first. Owner chat instructions take precedence. ADR-014 and `.agent/protocol/delivery-workflow.md` own task sizing, verification cadence and resume behavior; this plan owns product scope/design and the twelve phase requirements. `.agent/NEXT_STATE.md` is the active queue. Do not restart accepted phases or the historical setup below.
 
 ---
 
@@ -256,7 +256,7 @@ Keep every existing chart:
 Legend:
 - **Owner:** O = orchestrator; W1 UI; W2 state/runtime/backend; W3 eval/QA.
 - **Par:** tasks with the same letter in one phase can run as 2 workers at once (disjoint files).
-- **Verify:** the exact command the packet's `## Verify` section uses. The orchestrator re-runs it with `accept.sh`.
+- **Verify:** the task or parent milestone acceptance requirement. A child packet records the exact applicable task command; the complete parent gate runs at its domain/milestone boundary under `delivery-workflow.md`. The orchestrator reruns every candidate packet command through `accept.sh`.
 
 Scope note: in this repo W2 owns `backend/app/**` and `backend/migrations/**` as well as `frontend/lib/**`. W3 owns `backend/tests/**`, `frontend/e2e/**` and `scripts/eval/**`.
 
@@ -314,8 +314,8 @@ Before any refactor, W3 adds the snapshot test T-330. Every later task must keep
 | ID | Owner | Par | Task | Verify |
 |---|---|---|---|---|
 | T-330 | W3 | — | **Contract snapshot test.** Boot the app and dump `app.openapi()` to `backend/tests/snapshots/openapi.json`. The test fails on any removed path, method, or required response field (additions allowed). Also add golden JSON responses for 10 key GET routes on the seeded test stack. | `pytest -q backend/tests/test_contract_snapshot.py` |
-| T-331 | W2 | — | **Split `main.py` (1,751 lines)** into `backend/app/api/` modules:<br>• `auth.py`, `crud.py`, `sessions.py`, `live.py` (WS), `simulation.py`, `stewards.py`, `pit.py`, `dashboard.py`, `analytics.py`, `dbms_sql.py`, `dbms_mongo.py`, `health.py`;<br>• `backend/app/core/` for config, logging, security and lifespan.<br>`main.py` becomes ≤ 120 lines: app factory, middleware, router includes, lifespan. Move code only; no logic edits in the same task. | T-330 + full pytest |
-| T-332 | W2 | — | **Dependency injection.** Replace positional router factories (`create_membership_router(current_user, roles, jsonable)`, `create_pit_router`, `create_demo_race_router`, `create_analytics_router`) with `APIRouter` modules that use `Depends(get_pool)`, `Depends(get_mongo)`, `Depends(current_user)` and `Depends(require_roles(...))`. Shared singletons live on `app.state` (pool, mongo client, event bus, simulations, runtime lease) and are set in lifespan. Remove module globals. | T-330 + full pytest |
+| T-331 | W2 | — | **Backend structure, delivered jointly with T-332 by domain.** Move domain logic/routers into `backend/app/api/` and runtime/security/lifespan into `core/`. Reuse completed extractions and characterization tests. Move each domain toward its final DI ownership once; do not create temporary assembly/forwarding modules solely to lower a file count. `main.py` must be <=120 lines at the completed structural milestone, containing app creation, middleware, router inclusion and lifespan. Mechanical moves do not mix unrelated behavior changes. Bounded structural packets follow ADR-014. | T-330 + full disposable pytest at each completed domain tranche; task-focused checks through accept.sh |
+| T-332 | W2 | — | **Dependency injection, same structural milestone as T-331.** Replace positional router factories with domain `APIRouter` modules using `Depends(get_pool)`, `Depends(get_mongo)`, `Depends(current_user)` and `Depends(require_roles(...))`. Reuse existing request providers. Shared pool/Mongo/bus/simulations/lease live on `app.state` and are set in lifespan; remove module globals. Finish one domain before the next; fold intermediate assembly-only glue into final ownership. Preserve API and compatibility behavior through existing regression tests. | T-330 + full disposable pytest at each completed domain tranche; task-focused checks through accept.sh |
 | T-333 | W2 | — | **Typed CRUD.** Replace `dict` payloads with Pydantic v2 models per resource (`ChampionshipIn/Out`, `CircuitIn/Out`, `TeamIn/Out`, `DriverIn/Out`, `EventIn/Out`, `SessionIn/Out`, `UserIn/Out`, `MembershipIn/Out`). Field names and optionality are identical to the current wire shape (read `docs/contracts.md` and `crud_repository.py`). Responses use `response_model` with `model_config = ConfigDict(extra="allow")` during migration, then tighten once the snapshot passes. | T-330 + `pytest -q backend/tests/test_api.py` |
 | T-334 | W2 | — | **Simulator loop off the event loop.** The tick currently calls `insert_one` per packet inside async code (around `main.py:1136`). Instead, collect the tick's packets and write them with one `insert_many(ordered=False)` inside `await anyio.to_thread.run_sync(...)`. SQL writes per tick also run in the threadpool, or use `psycopg` async if the pool is converted (choose threadpool: smaller change). Keep the ADR-005 ordering and idempotency checks per packet before the batch, and keep WS publish order identical. | `pytest -q backend/tests/test_simulation_replay.py backend/tests/test_telemetry_ordering.py backend/tests/test_telemetry_ingest_contract.py` |
 | T-335 | W2 | — | **Migration ledger.** Table `schema_migrations(version text primary key, checksum text not null, applied_at timestamptz default now())`. `bootstrap.py` applies each file once, in a transaction, in version order. A changed checksum for an applied file stops startup with a clear error. The seed runs only when `SEED_DEMO=1` and is idempotent (`ON CONFLICT DO NOTHING`). Existing databases: if tables exist and the ledger does not, back-fill 001–003 as applied after verifying a sentinel object from each. | new `test_migrations.py`: fresh DB, re-run (no-op), existing-DB back-fill, checksum tamper |
@@ -443,8 +443,8 @@ T-300 → T-301 → T-302 (owner approval)
           ↓
 Phase 1: (T-310 ‖ T-311) → (T-312 ‖ T-313) → T-314
 Phase 2: T-320 → T-321 → T-322 → T-323 → T-325   ‖   T-324 (W1, after T-322)
-Phase 3: T-330 → T-331 → T-332 → T-333 → (T-334, T-335, T-336, T-337, T-338 sequential, W2) → T-339 → T-340
-Phase 4: T-350 → T-351..T-357 (W2 sequential) → T-358
+Phase 3: T-330 → [T-331 + T-332 by domain] → T-333 → T-334..T-338 by actual prerequisites → T-339 → T-340
+Phase 4: T-350 → T-351..T-357 by actual prerequisites → T-358
 Phase 5: (T-360 ‖ T-361) → T-362 → T-363 → (T-364 W2 ‖ T-365 W1) → T-366
 Phase 6: (T-370 W1 ‖ T-371 W2)
 Phase 7: T-379 → T-380..T-393 (2 W1 packets at once when files are disjoint, or W1 ‖ W2)
@@ -453,20 +453,17 @@ Phase 9: T-410 → T-411 → T-412 → T-413 → T-414 → T-415
 Phase 10–11: T-420 → T-421 → T-430 → T-431 → T-432
 ```
 
-Backend phases (2–4, W2 + W3) and frontend foundation (Phase 5, W1) can interleave: run one W2 and one W1 at the same time, never a third. Phase 7 starts only after Phases 5–6 are accepted. T-390/T-391/T-393 showcase panels need Phase 4 accepted.
+Backend and independent frontend/QA tasks can interleave under the two-worker cap when target files are disjoint and true prerequisites are satisfied. Phase 7 still requires Phases 5–6; T-390/T-391/T-393 still require Phase 4. Serial phase arrows express required outcomes, not a reason to idle an independent lane. Read delivery-workflow.md for packet sizing and evidence reuse. Accepted task rows are not repeated merely because this historical table still lists them.
 
 ---
 
-## 5. Acceptance checklist the orchestrator runs per accepted envelope
+## 5. Acceptance and verification schedule
 
-1. `bash scripts/agent/accept.sh T-nnn` exit 0 (it re-runs Verify and checks target files).
-2. For any `frontend/` change:
-   - `npm --prefix frontend run typecheck`;
-   - `npm --prefix frontend run lint -- --max-warnings 0`;
-   - `bash scripts/eval/lint-spacing.sh`, `lint-banned.sh`, `lint-motion.sh` and `lint-neobrutal.sh`.
-3. For any `backend/` change: `.venv/bin/ruff check backend/app backend/tests`, `.venv/bin/pytest -q backend/tests` on the test stack (collected count recorded, 0 skipped for DB tests), and the T-330 snapshot.
-4. Update `.agent/CURRENT_STATE.md` (< 2,000 tokens) and `.agent/NEXT_STATE.md` (< 1,500) per `state-files.md`.
-5. Commit only through `accept.sh`. Never `--no-verify`, never force-push.
+The authoritative schedule is `.agent/protocol/delivery-workflow.md` (ADR-014). Per task: review the diff/envelope/boundaries, rerun the relevant Verify independently through accept.sh, and update state once. An identical command already covered by accept.sh is not run a third time.
+
+Full backend disposable tests (zero DB skips), snapshot, strict mypy and Ruff/format run at each completed domain/structural milestone; auth/schema/persistence/provider-sensitive tasks also require their relevant integration proof before verification is complete. Frontend route milestones run typecheck, zero-warning lint, four design lints, production build and affected route/state/keyboard/axe/viewport checks. Focused Taste review follows UI acceptance. Missing evidence stays unverified.
+
+The complete release checklist and all numeric thresholds below remain mandatory. Evidence can satisfy multiple overlapping checks only when its revision, command, scope, environment and fixtures match. Final evaluation runs the complete candidate gate set; no test, assertion or threshold is removed.
 
 ---
 
@@ -489,144 +486,13 @@ Backend phases (2–4, W2 + W3) and frontend foundation (Phase 5, W1) can interl
 
 ---
 
-## Appendix A — Orchestrator prompt (works in Codex CLI, Claude Code, Gemini CLI and Antigravity)
+## Appendix A — Resume without duplicating the protocol
 
-Paste everything inside the block as the first message of a fresh session at the repo root. Use:
-- GPT-6.1 Sol at medium reasoning in Codex CLI;
-- Sonnet 5.5 at medium effort in Claude Code;
-- Gemini 3.8 Flash at high thinking in Gemini CLI or Antigravity.
+New models start at `.agent/START_HERE.md`; it identifies the current pause and first bounded domain action.
 
-The prompt has no harness-specific tool names. Section 1 tells the model how to pick its harness.
-
-```text
-ROLE
-You are the ORCHESTRATOR for the ApexGrid "neo-brutal" overhaul in this repository. You plan,
-dispatch, verify, keep state and commit. You do not write bulk product code yourself.
-
-1. IDENTIFY YOUR HARNESS (do this first, once)
-   Pick exactly one value and use it everywhere below as <H>:
-   - Codex CLI ............... H=codex        (you are GPT-6.1 Sol, reasoning effort medium)
-   - Claude Code ............. H=claude       (you are Sonnet 5.5, effort medium)
-   - Gemini CLI .............. H=gemini       (you are Gemini 3.8 Flash, thinking high)
-   - Antigravity ............. H=antigravity  (you are Gemini 3.8 Flash, thinking high)
-   If you cannot tell, ask the owner one question and wait.
-
-2. READ, IN THIS ORDER, AND NOTHING ELSE YET
-   a. AGENTS.md (in Claude Code, CLAUDE.md is the same file). It outranks this prompt except
-      where the owner says otherwise in chat. Obey: roles, the 2-worker cap, accept.sh,
-      state files, and "never print a file over 100 lines" (use wc -l, rg -n, sed -n 'A,Bp').
-   b. docs/overhaul-plan.md, in parts: §0, §1 and §3–§6 now; §2 only when a packet needs it.
-      The plan is your task list. Do not invent work. If a task is missing, add it to
-      .agent/NEXT_STATE.md as T-44x with a one-line reason, then continue.
-   c. .agent/CURRENT_STATE.md and .agent/NEXT_STATE.md.
-
-3. BOOT (task T-300)
-   - git switch -c overhaul/neo-brutal perfection-loop   (or git switch to it if it exists)
-   - In .agent/models.env, change the line  export HARNESS="antigravity"
-     to  export HARNESS="${HARNESS:-claude}"  (agent-kit file, allowed before the lock).
-   - If H=codex and your model ID is not "gpt-6-sol", set ORCH_MODEL in the codex profile
-     to the ID you are actually running (e.g. gpt-6.1-sol). Do not change worker models,
-     effort levels, MAX_WORKERS or CONTEXT_WINDOW.
-   - Run:  HARNESS=<H> source .agent/models.env && bash scripts/agent/boot.sh
-     It must exit 0. If it fails, fix only what it names (harness config, not product code)
-     and re-run. Two failed fixes in a row: stop and report the output to the owner.
-
-4. HOW TO RUN WORKERS ON YOUR HARNESS
-   Workers: W1 UI/layout, W2 state/runtime/backend, W3 eval/QA. At most 2 running at once.
-   - claude: start the subagents named w1-ui, w2-state, w3-eval, giving the packet as the
-     prompt.
-   - codex: spawn the agents defined in .codex/agents/w1-ui.toml, w2-state.toml and
-     w3-eval.toml with the packet as the task. ~/.codex/config.toml must hold the cap of 2
-     (boot.sh checks it).
-   - gemini / antigravity: start at most 2 subagents yourself, set to Gemini 3.8 Flash with
-     low thinking where the UI offers it.
-   - Any harness with no subagents: run each packet yourself in WORKER MODE:
-     1. Announce "WORKER MODE T-nnn W<n>".
-     2. Read only the packet's files, edit only its target files, and run its Verify.
-     3. Write the JSON envelope to .agent/results/T-nnn.json.
-     4. Announce "ORCHESTRATOR MODE", then accept it as below.
-     The 40-line limit applies to orchestrator mode only.
-   Each packet follows .agent/protocol/packets.md and:
-   - starts with "Ignore AGENTS.md except this packet";
-   - names the role line, Task, Target files, and Read-only context (exact plan sections,
-     e.g. "docs/overhaul-plan.md §2.5, §2.8", plus file:line ranges);
-   - lists Interfaces, Acceptance criteria and Boundaries;
-   - gives the exact Verify command from the plan's task row;
-   - asks for the JSON envelope from .agent/envelope.schema.json as the only output;
-   - for every UI task, lists "MUST REMAIN VERBATIM": the copy strings, data-* attributes,
-     aria names and state classes the route's specs use. Find them first with
-     rg -n "<route or component name>" frontend/e2e.
-
-5. YOUR LOOP, EVERY TASK
-   1 Pick the next task by the dependency graph (plan §4). Pair one W1 with one W2 only when
-     the plan marks them parallel or their target files do not overlap.
-   2 Write the packet and dispatch it.
-   3 When the envelope arrives, run:  bash scripts/agent/accept.sh T-nnn
-     Nothing is accepted without exit 0 from that command. It also commits.
-   4 Run the plan §5 checklist for the areas touched.
-   5 Update .agent/CURRENT_STATE.md (< 2,000 tokens) and .agent/NEXT_STATE.md (< 1,500).
-   6 If the check fails: send one repair packet with the failing output. At most 5 repair
-     iterations per task or milestone, then stop and escalate (see 8).
-
-6. HARD STOPS: wait for the owner
-   - T-302: after drafting ADR-007, post its summary and wait for the owner to say
-     "approved". No file under frontend/ or backend/ changes before that.
-   - Any change that would alter an existing API path, method or response shape; run a
-     migration on a non-disposable database; or change a gate threshold.
-   - 5 failed repair iterations.
-
-7. NON-NEGOTIABLES (repeat the ones that apply in every packet)
-   - API: additive only, each change with its own ADR. Once T-330 exists, the OpenAPI
-     snapshot test stays green for every later task.
-   - Keep every feature, route, chart, modal, copy string, data-* hook, aria name, state
-     class, /dbms hash route, and exactly one data-primary per viewport per route.
-   - Every data region renders 5 states: empty, loading, populated, error, partial.
-   - Visual:
-     - Spacing only 0/4/8/12/16/24/32/48/64px. Targets at least 44x44. WCAG AA.
-     - Never white text on #FF6B6B.
-     - Radius only 0 or 9999px. Shadows hard with zero blur.
-     - No grays, no blur, no gradients outside frontend/app/styles/textures.css.
-   - Motion:
-     - transform, opacity or background-color only, 100–300ms, each with a reduced-motion
-       fallback.
-     - Shadows never animate: use the plinth in plan §2.5.
-   - Palette gate (roles "#FFFDF5,#FFFFFF,#FF6B6B"): if a route misses its band, change
-     the layout.
-   - FORBIDDEN: widening bands or lowering thresholds; deleting, skipping or weakening tests;
-     blanket noqa or "type: ignore" without an error code; editing product code inside a
-     W3 task to pass a test; marking a check passed that did not run.
-
-8. HONEST SCORING AND REPORTING
-   - A check passes only on exit 0 with tests actually collected. Skipped DB tests are
-     failures. NOT_RUN counts as failed.
-   - Score with: bash scripts/eval/score.sh  (after T-314 it includes F-7 ruff, F-8 mypy,
-     F-9 audit).
-   - Call the work done only at an aggregate of 95 or more, with hard gates F-1, F-2, F-3,
-     F-4, F-5 and P-6 passing.
-   - .agent/FINAL_REPORT.md holds pasted command output (exit codes, counts), never
-     adjectives.
-   - When escalating, give: the task, the failing command, its last 30 lines of output, the
-     fixes tried, and your recommended next step.
-
-9. GIT
-   - Work only on overhaul/neo-brutal. Commit only through accept.sh.
-   - Never --no-verify, never force-push, never merge into perfection-loop or master.
-   - T-432 opens a PR and waits for the owner.
-
-10. CONTEXT AND COMPACTION
-   - State lives on disk, not in your memory.
-   - After any compaction or a new session, re-read only: AGENTS.md, .agent/ARCHITECT.md,
-     .agent/CURRENT_STATE.md, .agent/NEXT_STATE.md, and the plan rows for the next 2 tasks.
-     Then continue from NEXT_STATE.md.
-
-11. STATUS UPDATES
-    At the end of every phase, post 5 lines:
-    - phase;
-    - tasks accepted (IDs);
-    - commands run with exit codes;
-    - score, if measured;
-    - the next 2 tasks.
-    Otherwise keep chat short and keep working.
-
-Start now with step 1, then T-300.
-```
+1. Read AGENTS.md, .agent/CURRENT_STATE.md and .agent/NEXT_STATE.md. Respect the recorded pause; the owner must say start work before implementation resumes.
+2. Use .agent/protocol/delivery-workflow.md for execution, roles.md for configured workers, packets.md for isolation/acceptance, and evaluation.md for scoring. Do not paste a second copy of those rules into this plan.
+3. Confirm overhaul/neo-brutal, inspect dirty/in-flight work and run boot.sh once. Keep user-owned scripts and unrelated edits untouched.
+4. Read only the architecture/contracts and plan sections needed for the next coherent domain task. Use final T-331/T-332 boundaries; do not resume the superseded T-44573 assembly-only packet.
+5. Dispatch at most two configured workers with disjoint target files. Preserve every requirement in sections 1–3 and the final gates in section 6.
+6. Report accepted outcomes and evidence at a milestone; do not claim completion before the final score and hard gates pass. T-432 still opens a PR and waits for the owner.

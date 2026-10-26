@@ -57,3 +57,5 @@ Perfection loop authorizations: `.agent/adr/ADR-001-perfection-loop-authorizatio
 - ADR-012 dashboard next event: .agent/adr/ADR-012-dashboard-next-event.md; additive read-only nullable field for plan T-370, existing fields retained.
 
 - ADR-013 stewarding read models: .agent/adr/ADR-013-stewarding-read-models.md; planned read-only official penalty history and explicit seasonal licence points for T-387.
+
+- ADR-014 efficient delivery: .agent/adr/ADR-014-efficient-delivery-workflow.md; consolidated task/evidence schedule, bounded domain tranches, unchanged final gates, implementation paused until owner start.

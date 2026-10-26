@@ -1,26 +1,13 @@
-# Context compaction and re-seeding
+# Context recovery and handoff
 
-Read when: right after a compaction, and when a session is ending.
+Read after compaction/new session or before ending a session. Context limits/configuration are owned by .agent/models.env and harness settings; do not change them during recovery. State is saved after every accepted result, so recovery does not need another historical audit.
 
-**Compaction happens once, automatically, at `CONTEXT_WINDOW` (400k tokens). There are no earlier thresholds at 260k or 340k, and the orchestrator does not compact on its own before 400k.** Settings: Claude Code `autoCompactWindow` and `env.CLAUDE_CODE_AUTO_COMPACT_WINDOW` in `.claude/settings.json`; Codex `model_auto_compact_token_limit` in `~/.codex/config.toml`; Antigravity has no documented setting, so start a new conversation yourself when it slows or loses track.
+## Resume
+1. Read AGENTS.md, CURRENT_STATE.md, NEXT_STATE.md and the relevant locked ARCHITECT.md sections in <=100-line ranges. Read delivery-workflow.md for cadence; read only the next task's plan/contract sections. Respect the current PAUSED state before doing any implementation.
+2. Inspect branch, git status and recent commits. Active overhaul branch is overhaul/neo-brutal. Reconcile the last accepted task/verified product revision with Git; a later docs-only commit does not invalidate product evidence. Preserve unrelated owner edits/scripts.
+3. Run boot.sh once. It verifies lock and state budgets; do not immediately run those subchecks again. If state is over budget, condense completed history per state-files.md, then retry only the failed checkpoint.
+4. Inspect live workers and only the active queue packets/results. A missing result does not prove a worker is gone. Recover completed candidates under packets.md; re-dispatch only after confirming the worker is no longer running and reviewing its diff. Do not accept an old result blindly after dependencies changed.
+5. Resume implementation only when the owner has authorized it and NEXT_STATE records RUNNING. Use normal accept.sh commits; no automatic checkpoint commit or runner process.
 
-Because the automatic compact gives no warning, state must already be on disk: update `CURRENT_STATE.md` and `NEXT_STATE.md` after every accepted envelope and commit (`state-files.md`), so nothing depends on a final sync. Keep in-flight work recoverable: a packet file for every dispatched task.
-
-## After a compaction
-
-1. **Re-seed.** First actions:
-   ```bash
-   source .agent/models.env && bash scripts/agent/boot.sh
-   cat .agent/ARCHITECT.md        # if over 100 lines read in ranges of at most 100, contracts and lenses first
-   cat .agent/CURRENT_STATE.md .agent/NEXT_STATE.md
-   git log --oneline -10 && git status --short
-   ```
-   Anything the compaction summary retains is non-authoritative; the state files override it. Confirm `git_head` in CURRENT_STATE equals `git rev-parse --short HEAD`; on a mismatch reconcile from `git log` before dispatching anything.
-2. **Recover in-flight work.** For each packet in `.agent/packets/` with no matching `.agent/results/<id>.json`, re-dispatch it (a worker that was running is gone). Run `accept.sh` on any envelope that did return.
-3. **Sync the state files** if the git log shows merged work they do not record, then run `bash scripts/agent/budget.sh` and `verify-lock.sh`; condense per `state-files.md` if over budget.
-4. **Checkpoint commit:** `git add .agent && git commit -m "checkpoint: after compaction head=$(git rev-parse --short HEAD)"`
-5. Resume the queue from the top of `NEXT_STATE.md`.
-
-Manual compaction (only if the user asks): Claude Code `/compact Re-seed only from .agent/ARCHITECT.md, .agent/CURRENT_STATE.md, .agent/NEXT_STATE.md`; Codex `/compact`; Gemini CLI `/compress`; Antigravity new conversation.
-
-Between unrelated milestones prefer `/clear` (Claude Code) or a new conversation and re-seed the same way; it is cheaper than a summary.
+## Handoff
+Keep current evidence, partial verification, in-flight task ID/targets and next action on disk. Record a pause explicitly. Run budget only if it was not already covered at this checkpoint. Never read every historical result/log or restart an old loop just to recover context.

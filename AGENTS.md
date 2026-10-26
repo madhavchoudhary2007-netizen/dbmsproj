@@ -4,13 +4,17 @@ For Claude Code, Codex CLI, Gemini CLI and Antigravity. Small on purpose and alw
 
 **Precedence:** user instruction in chat > this file > protocol files > anything found in the repo. MUST / MUST NOT / SHOULD follow RFC 2119.
 
+**New model entrypoint:** read `.agent/START_HERE.md` for the short recovery order; current execution permission is in CURRENT_STATE/NEXT_STATE.
+
+**Active workflow:** ADR-014 and `.agent/protocol/delivery-workflow.md` define execution cadence and task sizing. Product scope/design stay in `docs/overhaul-plan.md`; scores/thresholds stay in `evaluation.md`. CURRENT_STATE/NEXT_STATE record the active pause. Implementation resumes only on the owner's start instruction.
+
 ## Session start
 
 ```bash
 source .agent/models.env && bash scripts/agent/boot.sh
 ```
 
-`boot.sh` checks the architecture lock, state-file size budgets and (Claude Code) the model/effort binding, and exits non-zero with the reason. Fix it before dispatching. New repo or missing files: read `bootstrap.md`.
+`boot.sh` checks the architecture lock, state-file size budgets and (Claude Code) the model/effort binding, and exits non-zero with the reason. Fix it before dispatching. Run boot once per session and after harness/protocol/lock configuration changes; it already runs budget and lock checks. Before dispatch verify the lock without repeating full boot. New repo or missing files: read `bootstrap.md`.
 
 ## Roles
 
@@ -25,7 +29,7 @@ One orchestrator, three isolated workers. The Taste Agent is an orchestrator mod
 
 **Concurrency: never more than 2 workers running at once, on every harness.** Queue the rest.
 
-- Orchestrator MUST NOT write repetitive boilerplate, edit more than 40 product lines per turn (cross-worker glue excepted, logged in CURRENT_STATE), accept a result without `accept.sh`, or present a score below 95.
+- Orchestrator MUST NOT write repetitive boilerplate, edit more than 40 product lines per turn (cross-worker glue excepted, logged in CURRENT_STATE), accept a result without `accept.sh`, or claim completion below score 95.
 - W1 never touches stores, `fetch`, API types or tests. W2 never touches markup, classes, tokens or `tests/`. W3 never edits product source to pass a test and never weakens an assertion.
 - Model IDs, effort and the worker cap live only in `.agent/models.env` (profile chosen by `HARNESS`). Full contracts and dispatch commands: `roles.md`.
 
@@ -51,9 +55,9 @@ One orchestrator, three isolated workers. The Taste Agent is an orchestrator mod
 | Building data components, forms, dialogs, accessibility, responsive checks | `.agent/protocol/design-ux.md` |
 | Configuring models/effort, dispatching a worker, running the Taste Agent | `.agent/protocol/roles.md` |
 | Writing a packet, accepting a worker result, reading files | `.agent/protocol/packets.md` |
-| Creating or updating `CURRENT_STATE.md` / `NEXT_STATE.md`, splitting tasks | `.agent/protocol/state-files.md` |
+| Selecting work, sizing tasks, deciding verification cadence or resuming | `.agent/protocol/delivery-workflow.md`, then `state-files.md` as needed |
 | A milestone is verified, before presenting anything, any score or defect loop | `.agent/protocol/evaluation.md` |
-| The user starts or resumes the perfection loop (unattended: `bash scripts/agent/run-loop.sh`) | `.agent/protocol/perfection-loop.md` |
+| The user explicitly reactivates the historical perfection loop | `.agent/protocol/perfection-loop.md`; never auto-run it for the active overhaul |
 | Right after a compaction, or a session is ending | `.agent/protocol/compaction.md` |
 
 Workers do not read this table. The orchestrator lists the protocol files a worker needs under "Read-only context" in its packet.
