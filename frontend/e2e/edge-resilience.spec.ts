@@ -124,7 +124,7 @@ test("E-2 Lens 5 navigation mid-request aborts cleanly without errors", async ({
     await route.fulfill({ status: 200, json: {} });
   });
 
-  void page.goto("/dashboard");
+  await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(50);
   await page.goto("/sessions", { waitUntil: "domcontentloaded" });
   await expect(page.getByRole("heading", { name: "Sessions" })).toBeVisible();
