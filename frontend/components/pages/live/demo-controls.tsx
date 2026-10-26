@@ -102,7 +102,7 @@ export function DemoControls({
       )}
       {demoMessage && <div className="notice live-demo-notice" role="status">{demoMessage}</div>}
       <section className="demo-races-panel" aria-labelledby="demo-races-title">
-          <NbCard shadow={4} className="demo-races-container">
+          <NbCard shadow={4} className="demo-races-container !border-t-4 !border-t-red !bg-cream">
           <div className="panel-heading">
             <div><div className="eyebrow">GENERATED SESSIONS</div><h2 id="demo-races-title">Live race demos</h2></div>
             <span className="muted">{demoRaces.length} race{demoRaces.length === 1 ? "" : "s"}</span>

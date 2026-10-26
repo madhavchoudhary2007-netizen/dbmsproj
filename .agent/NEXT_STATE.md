@@ -3,10 +3,15 @@ updated_at: 2026-10-26
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44561 W2 — OPEN
-- target_files: backend/app/api/laps.py, backend/app/api/pit_write.py
-- contract: Close the strict typing errors in the lap-records and pit-reservation write routers. Add precise annotations to existing helpers and route handlers only; preserve all endpoint, status, dependency, query, serialization and simulation behavior.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py && .venv/bin/mypy --strict backend/app/api/laps.py backend/app/api/pit_write.py && .venv/bin/ruff check backend/app/api/laps.py backend/app/api/pit_write.py && .venv/bin/ruff format --check backend/app/api/laps.py backend/app/api/pit_write.py
+### T-44563 W1 — OPEN
+- target_files: frontend/components/pages/pit-wall.tsx
+- contract: Correct the measured /pit-wall A3 palette miss using route-local presentational styling only. At 1440px, make the existing palette check pass (cream 50–70%, paper 20–40%, red 5–15%) while aiming for the narrower design targets in docs/overhaul-plan.md §2.2. Use an existing meaningful race-status surface; preserve semantics, data flow and every state.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+
+### T-44562 W1 — OPEN
+- target_files: frontend/components/pages/live/demo-controls.tsx
+- contract: Correct the measured /live A3 palette miss using route-local presentational styling only. At 1440px, make the existing palette check pass (cream 50–70%, paper 20–40%, red 5–15%) while aiming for the narrower design targets in docs/overhaul-plan.md §2.2. Preserve semantics, data flow and every state.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -18,6 +23,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - P-3 DBMS: full-route initial-asset measurement is fixed; Live now passes at 161.29 KiB, DBMS remains 260.10 KiB (170 KiB limit). Reduce DBMS initial bundle after Phase 4 and T-393 dependencies; never change the threshold.
 
 ## Done
+- T-44561 accepted640f46a; verify0.
 - T-44559 accepted888002c; verify0.
 - T-44560 acceptedb1397e6; verify0.
 - T-44558 acceptede58928e; verify0.
