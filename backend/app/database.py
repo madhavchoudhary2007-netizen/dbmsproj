@@ -1,6 +1,6 @@
 from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
-from typing import Any, cast
+from typing import Any
 
 from psycopg import Connection
 from psycopg.rows import dict_row
@@ -11,7 +11,7 @@ from .config import DATABASE_URL
 DatabaseRow = dict[str, Any]
 
 
-def _new_pool() -> ConnectionPool:
+def _new_pool() -> ConnectionPool[Connection[DatabaseRow]]:
     return ConnectionPool(
         DATABASE_URL,
         min_size=1,
@@ -21,10 +21,10 @@ def _new_pool() -> ConnectionPool:
     )
 
 
-pool = _new_pool()
+pool: ConnectionPool[Connection[DatabaseRow]] = _new_pool()
 
 
-def get_pool() -> ConnectionPool:
+def get_pool() -> ConnectionPool[Connection[DatabaseRow]]:
     return pool
 
 
@@ -42,7 +42,7 @@ def close_pool() -> None:
 @contextmanager
 def connection() -> Iterator[Connection[DatabaseRow]]:
     with pool.connection() as conn:
-        yield cast(Connection[DatabaseRow], conn)
+        yield conn
 
 
 def fetch_one(sql: str, params: Sequence[Any] = ()) -> Any:

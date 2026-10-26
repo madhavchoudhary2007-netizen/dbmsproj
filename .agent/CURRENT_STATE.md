@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: 917fe55
+git_head: 8b064db
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -9,7 +9,7 @@ last_eval_score: obsolete 51.2974; no current score; final T430
 
 ## Phase status
 - Phases 0–2, 5–6 complete (5/12). Phases 3–4 and 7–11 remain. `docs/overhaul-plan.md` is authoritative. User authorized autonomous completion.
-- Phase 3: T331 main.py <=120 lines and strict typing unfinished. Runtime DI/provider/lifespan and module extractions exist; strict mypy is 56 errors/4 files after T44561 (latest full run; remaining files: `main.py`, `api/dbms_mongo.py`, `api/dbms_lock.py`, `api/race_archive.py`).
+- Phase 3: T331 main.py <=120 lines remains; runtime DI/provider/lifespan and module extractions exist. Full strict mypy after T44564 reports 41 errors, all in main.py; the three DBMS routers now pass strict mypy.
 - Phase 7: T380–388 route work accepted through Pit Wall; T379 full gate retains 15 desktop A3 layout failures. After T44562 and T44563, the focused route gate passed 100/100 checks, including Live/Pit Wall palette, accessibility, responsive checks (320–5120), route flows and data-primary across five browser projects. Initial route assets: Live passes at 161.29 KiB after T44560; DBMS remains 260.10 KiB against unchanged 170 KiB.
 - Phase 4, 8–11 remain, including DBMS showcase, Taste defects, full E2E/performance, CI/docs, final evaluation/release.
 
@@ -25,9 +25,9 @@ last_eval_score: obsolete 51.2974; no current score; final T430
 - No dependencies added; no API/schema changes in current work. Owner's authorized ADR-007/ADR-013 changes remain scoped as recorded.
 
 ## Open risks and next work
-- T44561 onward: continue reducing the remaining strict mypy errors in small module groups.
+- T44565: address the remaining 41 strict mypy errors in main.py with annotations/narrowing only; then continue the separate T331 size/split work.
 - DBMS initial bundle remains above 170 KiB; identify and split its heavy lazy views after required Phase 4/route dependencies. Complete Pit Wall automatic-allocation/history coverage and broader Taste review, then proceed in plan order.
-- Main split, strict typing, DBMS showcase, remaining Taste, full browser/performance evidence and final score are not complete. Old 51.2974 is not current; do not present work as done.
+- Main split, strict typing, DBMS showcase, remaining Taste, full browser/performance evidence and final score are not complete. The standings plan requests delta arrows, but driver_standings stores only current rank/points/wins/podiums and the API has no prior-rank field; T389 must not fabricate deltas or change the API. Old 51.2974 is not current; do not present work as done.
 - Host Python 3.14/Node 26 differ from Docker 3.12/22; frontend production image lacks source/lint config; acceptance fixture depends on existing championship round 3 (T021 queued).
 
 ## Orchestrator direct edits / process notes
@@ -44,3 +44,5 @@ last_eval_score: obsolete 51.2974; no current score; final T430
 - T-44562 accepted19cbe5e: Kept the LIVE DEMO hero yellow. Applied cream and a named red token to the existing generated-sessions card with a 4px top border. Verify0.
 
 - T-44563 accepted917fe55: Stretched the existing red count panel across the available grid row while keeping its normal height, live counts, Reload control, and approved spacing tokens. Verify0.
+
+- T-44564 accepted8b064db: Added endpoint annotations and typed the Mongo aggregation pipeline. Narrowed optional database and Mongo results while preserving truthiness behavior and response ordering. Verify0.
