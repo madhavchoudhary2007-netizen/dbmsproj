@@ -4,6 +4,8 @@ Read when: a major milestone is ready for scoring, before claiming product compl
 
 ## Dispatch
 
+ADR-015: a task's focused pass is not a domain integration pass, and a domain pass is not the final release score. Domain integration is not deferred until a whole phase. Use actual risk/coverage, not a three-second runtime goal; retain relevant lease/auth/persistence tests. main.py length alone does not close Phase3. No numeric rubric or threshold changes.
+
 Use a shared evidence set: run each needed command once on the relevant candidate/environment, then map it to rubric IDs. At most two W3 workers may partition dimensions or collect independent missing evidence; do not launch four duplicate suite runs. The orchestrator may populate evidence dimensions from commands it actually ran. Each dimension writes `.agent/eval/<dimension>.json` (`functional`, `aesthetic`, `performance`, `edge`):
 
 ```json

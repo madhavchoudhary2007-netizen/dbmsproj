@@ -9,3 +9,5 @@ Critical rules: PostgreSQL trigger accumulates approved penalty points and bans 
 Local URLs: frontend `http://localhost:3000`, API `http://localhost:8000/api`, API docs `http://localhost:8000/docs`. Demo credentials, run commands, and verification steps are in `README.md`.
 
 Engineering execution: AGENTS.md -> .agent/protocol/delivery-workflow.md. Current verified state and pause/queue: .agent/CURRENT_STATE.md and .agent/NEXT_STATE.md. Product scope/design: docs/overhaul-plan.md; this product overview does not restart setup or establish current quality results.
+
+Antigravity execution contract: [.agent/protocol/antigravity.md](.agent/protocol/antigravity.md) — Gemini 3.8 Flash HIGH orchestrator / LOW workers, maximum two workers. Record observed UI settings or UNVERIFIED; declarations do not prove model binding. Current permission and evidence remain in the state files and latest owner instruction.

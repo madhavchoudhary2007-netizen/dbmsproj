@@ -2,11 +2,12 @@
 updated_at: 2026-10-26
 branch: overhaul/neo-brutal
 execution: RUNNING — implementation resumed on owner instruction 2026-10-26
-verified_product_head: fc3a1fb
-last_product_task: T-44579
-metadata_task: T-44574 documentation reconciliation; commit 639e0ec
+verified_product_head: 6af6b78
+last_product_task: T-44580
+metadata_task: T-44586 Antigravity docs; see matching acceptance result/commit (not product completion)
 architect_sha256: 36df162b44e313caf9dcf220514dc703f4d490000d8f05ffe667b149807b1c11
-harness: antigravity; configured worker profiles gemini-3.8-flash/low; cap 2; no model/config changes in this task
+target_harness: Antigravity; requested Gemini 3.8 Flash HIGH orchestrator / LOW workers; cap 2
+observed_antigravity_binding: UNVERIFIED — this Codex documentation session cannot attest Antigravity UI settings; no config changes
 archetype: Neo-Brutal Motorsport light, ADR-007
 last_eval_score: no current overhaul score; old 51.2974 is obsolete
 
@@ -31,6 +32,7 @@ Phase requirements are in docs/overhaul-plan.md; the table below is the current 
 - T-44577 passed root acceptance (commit cf15062): race operations and results routes (session_action, results_read, results_write) migrated to domain APIRouters with FastAPI Depends injection (get_race_db, get_simulations, get_bus, current_user, admin_steward), lambda blocks folded, contracts and registrations verified.
 - T-44578 passed root acceptance (commit cc6102b): stewarding and pit-write operations routes (stewards and pit_write) migrated to domain APIRouters with FastAPI Depends injection (get_race_db, get_bus, get_simulations, require_roles), assembly glue folded, incident/pit tests verified.
 - T-44579 passed root acceptance (commit fc3a1fb): authentication and user management routes (auth_router and user_router) migrated to domain APIRouters with FastAPI Depends injection (get_race_db, current_user, admin_user), mounted directly in main.py, 24 tests passed (login throttle, logout revocation, route registration, OpenAPI contracts).
+- T-44580 passed root acceptance (commit 6af6b78): telemetry, demo race, and pit strategy routes migrated to domain APIRouters with FastAPI Depends injection (get_race_telemetry, get_race_db, get_simulations, get_bus, current_user, admin_steward), mounted directly in main.py, 20 tests passed.
 - Latest full disposable backend evidence: T-44559, 262 passed/0 failed/0 skipped plus live acceptance. Subsequent extraction-only task checks did not rerun the full stack; milestone integration is not claimed current. Latest shell DB URLs were unset; no DB contacted during recent tasks.
 - Frontend production build passed after T-44560. Live initial JS 161.29 KiB passes; DBMS 260.10 KiB fails unchanged 170 KiB cap. Standings T-389 root gate passed 85/85; latest Live/Pit Wall focused run 100/100. These are scoped results, not a final release score.
 - T-44567 Standings typography: five E2E-R11 viewports passed, frontend lint/four design scripts passed, focused Taste review found no new defect. All accepted task details/hashes are in Git and .agent/results.
@@ -43,7 +45,13 @@ Phase requirements are in docs/overhaul-plan.md; the table below is the current 
 - Host Python3.14/Node26 differ from Docker3.12/22; production frontend image has no source/lint config, so host evidence is not container parity proof. Worker clone Next resolution failed previously; root-owned browser runs passed.
 
 ## Current process decision
-- New models start at START_HERE.md; current permission is explicit, next domain inputs are named, and the twelve-phase status above needs no chat history.
-- ADR-014/delivery-workflow.md consolidate sizing, verification cadence and resume rules. Normal <=3 files/~150 lines; justified domain structural/DI <=8 files/800 lines; docs-only explicit sweep allowed. Roles, two workers, accept.sh, score>=95 and every existing final gate remain.
-- This task changes Markdown only. No product, test, script, schema/API, dependency/config, secret or database changes; no implementation worker active. Architecture B.2 and focused Phase C amended/relocked for ADR-014.
-- T-44569 packet/context and wiring reviews required corrections; no out-of-scope product edits. Preserve user-owned status.sh files/run-loop.sh and unrelated changes; commit only through accept.sh.
+- Documentation-only T-44586 under ADR-015: no implementation workers dispatched. Preserve pending T-44581 packet unchanged; its live worker status is unknown to this session. Accepted T-44575..80 remain accepted; task-only checks do not close integration debt.
+- Orchestrator direct product edits: 0. Docs/manual preflight enforce command equality and scope; current scripts do not guarantee model obedience.
+- Dual-lane execution active: Lane 1 (W2) drives Phase 3 backend domain tranches; Lane 2 (W1) addresses measured Phase 7 frontend layout defects (e.g. desktop A3 failures) concurrently on disjoint files.
+- Checks chosen by risk, not arbitrary time limits. Lifecycle/lease/auth/persistence changes genuinely require those tests; run DB checks on disposable stack through orchestrator.
+- Integration gates run at domain milestones (not just whole phases) to prevent failure accumulation.
+- Separate bounded CRUD tranche and simulation/runtime tranche; never combine unrelated concerns merely to hit line counts.
+- `main.py <= 120 lines` is the entrypoint gate for the T-331/T-332 structural milestone, NOT Phase 3 completion. Phase 3 still requires T-333..T-340 with their own evidence.
+- Reuse exact evidence; avoid duplicate runs, exploratory audits, and throwaway wrappers. Progress measured by requirements and defects closed.
+
+- T-44586 acceptance initially rejected its own result JSON as outside Markdown scope; explicitly named that metadata artifact and reran. No product gate changed.

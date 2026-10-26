@@ -1,11 +1,11 @@
 # ApexGrid Neo-Brutal Overhaul — Implementation Plan
 
-Status: IN PROGRESS; implementation PAUSED by owner on 2026-10-26 until start work. The baseline below is historical; current evidence is in .agent/CURRENT_STATE.md.
+Status: IN PROGRESS. Current evidence and permission are in .agent/CURRENT_STATE.md and the latest owner instruction; this historical baseline does not reset them.
 Audience: the orchestrator model (GPT-6.1 Sol medium in Codex CLI, Sonnet 5.5 medium in Claude Code, or Gemini 3.8 Flash high thinking in Gemini CLI / Antigravity) and the W1/W2/W3 workers it dispatches.
 Base branch: `perfection-loop` (HEAD `1acf8e1`). Work branch: `overhaul/neo-brutal`.
 First task ID: `T-300` (T-001..T-213 are taken).
 
-Read `AGENTS.md` first. Owner chat instructions take precedence. ADR-014 and `.agent/protocol/delivery-workflow.md` own task sizing, verification cadence and resume behavior; this plan owns product scope/design and the twelve phase requirements. `.agent/NEXT_STATE.md` is the active queue. Do not restart accepted phases or the historical setup below.
+Read `AGENTS.md` first. Owner chat instructions take precedence. ADR-014/ADR-015 and `.agent/protocol/delivery-workflow.md` own task sizing, verification cadence and resume behavior; this plan owns product scope/design and the twelve phase requirements. `.agent/NEXT_STATE.md` is the active queue. Do not restart accepted phases or the historical setup below.
 
 ---
 
@@ -453,13 +453,13 @@ Phase 9: T-410 → T-411 → T-412 → T-413 → T-414 → T-415
 Phase 10–11: T-420 → T-421 → T-430 → T-431 → T-432
 ```
 
-Backend and independent frontend/QA tasks can interleave under the two-worker cap when target files are disjoint and true prerequisites are satisfied. Phase 7 still requires Phases 5–6; T-390/T-391/T-393 still require Phase 4. Serial phase arrows express required outcomes, not a reason to idle an independent lane. Read delivery-workflow.md for packet sizing and evidence reuse. Accepted task rows are not repeated merely because this historical table still lists them.
+Backend and independent frontend/QA tasks can interleave under the two-worker cap when target files are disjoint and true prerequisites are satisfied. Phase 7 still requires Phases 5–6; T-390/T-391/T-393 still require Phase 4. Serial phase arrows express required outcomes, not a reason to idle an independent lane. Read delivery-workflow.md for packet sizing and evidence reuse; Antigravity uses antigravity.md (Gemini 3.8 Flash HIGH orchestrator, LOW workers, actual settings observed or UNVERIFIED). Prefer ready W2 backend and independent W1 measured frontend repairs; do not create filler tasks. Accepted task rows are not repeated merely because this historical table still lists them.
 
 ---
 
 ## 5. Acceptance and verification schedule
 
-The authoritative schedule is `.agent/protocol/delivery-workflow.md` (ADR-014). Per task: review the diff/envelope/boundaries, rerun the relevant Verify independently through accept.sh, and update state once. An identical command already covered by accept.sh is not run a third time.
+The authoritative schedule is `.agent/protocol/delivery-workflow.md` (ADR-014/ADR-015). Choose checks by risk, not a three-second cutoff; relevant lease/lifecycle coverage remains required. main.py<=120 is only the T-331/T-332 entrypoint gate, not completion of T-333..T-340. Before execution compare the packet and envelope Verify commands exactly. Per task: review the diff/envelope/boundaries, rerun the relevant Verify independently through accept.sh, and update state once. An identical command already covered by accept.sh is not run a third time.
 
 Full backend disposable tests (zero DB skips), snapshot, strict mypy and Ruff/format run at each completed domain/structural milestone; auth/schema/persistence/provider-sensitive tasks also require their relevant integration proof before verification is complete. Frontend route milestones run typecheck, zero-warning lint, four design lints, production build and affected route/state/keyboard/axe/viewport checks. Focused Taste review follows UI acceptance. Missing evidence stays unverified.
 
@@ -488,11 +488,11 @@ The complete release checklist and all numeric thresholds below remain mandatory
 
 ## Appendix A — Resume without duplicating the protocol
 
-New models start at `.agent/START_HERE.md`; it identifies the current pause and first bounded domain action.
+New models start at `.agent/START_HERE.md`; it identifies current permission, in-flight ownership and the next bounded domain action.
 
-1. Read AGENTS.md, .agent/CURRENT_STATE.md and .agent/NEXT_STATE.md. Respect the recorded pause; the owner must say start work before implementation resumes.
+1. Read AGENTS.md, .agent/CURRENT_STATE.md and .agent/NEXT_STATE.md. Resolve current permission from the latest owner instruction and state; do not infer authorization from old pause/resume prose. A docs-only request does not launch implementation.
 2. Use .agent/protocol/delivery-workflow.md for execution, roles.md for configured workers, packets.md for isolation/acceptance, and evaluation.md for scoring. Do not paste a second copy of those rules into this plan.
 3. Confirm overhaul/neo-brutal, inspect dirty/in-flight work and run boot.sh once. Keep user-owned scripts and unrelated edits untouched.
-4. Read only the architecture/contracts and plan sections needed for the next coherent domain task. Use final T-331/T-332 boundaries; do not resume the superseded T-44573 assembly-only packet.
+4. Read only the architecture/contracts and plan sections needed for the next coherent domain task. Use final T-331/T-332 boundaries; reconcile the currently pending packet before any retry and never repeat accepted domains. Do not resume the superseded T-44573 assembly-only packet.
 5. Dispatch at most two configured workers with disjoint target files. Preserve every requirement in sections 1–3 and the final gates in section 6.
 6. Report accepted outcomes and evidence at a milestone; do not claim completion before the final score and hard gates pass. T-432 still opens a PR and waits for the owner.

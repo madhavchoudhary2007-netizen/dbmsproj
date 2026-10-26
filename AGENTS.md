@@ -6,7 +6,9 @@ For Claude Code, Codex CLI, Gemini CLI and Antigravity. Small on purpose and alw
 
 **New model entrypoint:** read `.agent/START_HERE.md` for the short recovery order; current execution permission is in CURRENT_STATE/NEXT_STATE.
 
-**Active workflow:** ADR-014 and `.agent/protocol/delivery-workflow.md` define execution cadence and task sizing. Product scope/design stay in `docs/overhaul-plan.md`; scores/thresholds stay in `evaluation.md`. CURRENT_STATE/NEXT_STATE record the active pause. Implementation resumes only on the owner's start instruction.
+**Active workflow:** ADR-014/ADR-015 and `.agent/protocol/delivery-workflow.md` define execution cadence and task sizing. Product scope/design stay in `docs/overhaul-plan.md`; scores/thresholds stay in `evaluation.md`. CURRENT_STATE/NEXT_STATE record current permission and progress; latest owner chat decides the current scope. A documentation-only request does not dispatch implementation, and an old pause must not override a later resume.
+
+**Antigravity:** requested orchestrator Gemini 3.8 Flash HIGH; workers Gemini 3.8 Flash LOW; max2. Read `.agent/protocol/antigravity.md` once. Record observed UI/session settings or UNVERIFIED; Markdown/boot do not force actual model settings. Match envelope Verify to the approved packet before acceptance.
 
 ## Session start
 
@@ -53,7 +55,7 @@ One orchestrator, three isolated workers. The Taste Agent is an orchestrator mod
 | Picking a visual direction, tokens or project archetype | `.agent/protocol/archetypes.md` |
 | Writing or reviewing `.tsx .jsx .css`, tokens, motion, art direction | `.agent/protocol/design-visual.md` |
 | Building data components, forms, dialogs, accessibility, responsive checks | `.agent/protocol/design-ux.md` |
-| Configuring models/effort, dispatching a worker, running the Taste Agent | `.agent/protocol/roles.md` |
+| Configuring models/effort, dispatching a worker, running the Taste Agent | `.agent/protocol/roles.md`; Antigravity also `antigravity.md` |
 | Writing a packet, accepting a worker result, reading files | `.agent/protocol/packets.md` |
 | Selecting work, sizing tasks, deciding verification cadence or resuming | `.agent/protocol/delivery-workflow.md`, then `state-files.md` as needed |
 | A milestone is verified, before presenting anything, any score or defect loop | `.agent/protocol/evaluation.md` |

@@ -59,3 +59,5 @@ Perfection loop authorizations: `.agent/adr/ADR-001-perfection-loop-authorizatio
 - ADR-013 stewarding read models: .agent/adr/ADR-013-stewarding-read-models.md; planned read-only official penalty history and explicit seasonal licence points for T-387.
 
 - ADR-014 efficient delivery: .agent/adr/ADR-014-efficient-delivery-workflow.md; consolidated task/evidence schedule, bounded domain tranches, unchanged final gates, implementation paused until owner start.
+
+- ADR-015 Antigravity domain delivery: .agent/adr/ADR-015-antigravity-domain-delivery.md; HIGH orchestrator/LOW workers, bounded domains, exact packet verification and root-owned integration; no product/config/gate changes.

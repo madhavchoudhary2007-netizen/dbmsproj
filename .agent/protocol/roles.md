@@ -34,7 +34,7 @@ IDs, effort/thinking levels, `MAX_WORKERS` and the context window are set once i
 
 ## Dispatch
 
-Use the configured native w1-ui, w2-state and w3-eval agents with only the packet as context; no per-call model/effort override. Packets own exact scope/interfaces/Verify; delivery-workflow.md owns task sizing and scheduling. Use existing harness profile definitions, not a shell runner or a new conversation per wrapper-sized change.
+Codex/Claude use the configured native w1-ui, w2-state and w3-eval agents with packet-only context and no per-call model/effort override. Antigravity assigns W1/W2/W3 roles to its available isolated workers and selects the requested model/thinking in the UI under antigravity.md; do not assume Codex TOML files bind Antigravity. Packets own exact scope/interfaces/Verify; delivery-workflow.md owns task sizing and scheduling. Use existing harness profile definitions, not a shell runner or a new conversation per wrapper-sized change.
 
 At most two workers run at once, with disjoint target files and satisfied prerequisites. W3 test work may precede the W1/W2 fix it protects; verification of merged behavior follows its dependency. Repairs use the same role and focused packet. Before redispatch after interruption, inspect live status. Preserve owner scripts and unrelated changes.
 
@@ -66,6 +66,10 @@ Prose can be ignored; settings files are read by the harness.
 
 Run Codex with write access to the workspace (workspace-write). Subagents inherit the parent session's sandbox and approvals, and Codex ignores `sandbox_mode`, `approval_policy` and `mcp_servers` in an agent file. Scope is enforced by `accept.sh`'s boundary check, not by the sandbox.
 
-## Antigravity and Gemini CLI (instructions only)
+## Antigravity and Gemini CLI
 
-Antigravity documents no file setting for subagent count, subagent model or thinking level, and no custom subagents. So this is a rule, not a binding: the orchestrator runs on Gemini 3.8 Flash with high thinking; run at most 2 subagents at once, each Gemini 3.8 Flash with low thinking, picking those in the UI where offered. Verify in the UI at session start and report any mismatch. Gemini CLI: pass `-m "$WORKER_MODEL"`; its thinking level has no flag in this kit, set it in its config if your version supports it.
+The requested Antigravity profile is Gemini3.8Flash HIGH orchestration and Gemini3.8Flash LOW workers, cap2. Follow antigravity.md for observed-setting evidence, dispatch/acceptance gates and capability limitations. .agent/models.env is the requested profile, not proof of actual UI selection. No invented setting, silent substitution or boot-based model attestation.
+
+The owner-approved no-subagent fallback is WORKER MODE: one packet/role at a time, exact targets/Verify/envelope, then ORCHESTRATOR MODE for independent acceptance. Record it as serial fallback, never as two real workers. Select LOW for worker work and HIGH for orchestration where the harness supports it; if it cannot supply the requested role settings, report that limitation rather than pretending compliance. Product-line limits apply to orchestrator integration, not an explicitly authorized worker-mode packet.
+
+Gemini CLI uses its actual supported model/config options; Antigravity UI instructions are not claims that CLI flags or custom subagent binding exist. Do not change harness configuration during a documentation-only task.

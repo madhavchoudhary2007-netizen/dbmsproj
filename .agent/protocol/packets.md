@@ -2,7 +2,7 @@
 
 Read when: writing a packet, accepting a worker result, or reading source files.
 
-Execution cadence and normal/structural/documentation packet sizes are owned by `delivery-workflow.md` (ADR-014). This file owns isolation, envelope handling and boundaries.
+Execution cadence and normal/structural/documentation packet sizes are owned by `delivery-workflow.md` (ADR-014/ADR-015); Antigravity dispatch gates are in `antigravity.md`. This file owns isolation, envelope handling and boundaries.
 
 ## Isolation
 
@@ -13,8 +13,8 @@ A worker reads only listed files. Target files may be read as needed in <=100-li
 ## Packet template
 
 ~~~markdown
-# PACKET T-021
 Ignore AGENTS.md except this packet; the packet is your only authority.
+# PACKET T-021
 role: Worker 2 — State/Runtime. State/runtime code only; never components or tests.
 ## Task
 Fix optimistic rename rollback in useRenameProject.
@@ -33,8 +33,14 @@ export function apiPatch<T>(path: string, body: unknown, opts: { idempotencyKey:
 No new dependencies; no edits outside target files; no signature changes.
 ## File hygiene
 Never print more than 100 lines of a file; use rg -n and sed -n 'A,Bp'.
-## Verify (exit 0 required for PASSED)
-pnpm exec vitest run tests/state/use-rename-project.spec.ts
+## Approved Verify (exit 0 and actual intended tests collected)
+<copy the exact project command; replace this placeholder before dispatch>
+## Approved support commands
+<explicit scoped format/read commands; none if not needed>
+## Root-owned integration
+<exact sensitive-task/domain milestone check and fixture/environment; NOT_RUN remains unverified>
+## Worker drift rule
+Run only approved commands. Do not broaden tests, install, probe DB/network or start servers. Return FAILED with the needed context/check instead of expanding. No arbitrary runtime deadline; required coverage remains required.
 ## Output
 Exactly one JSON object matching the envelope schema below. Nothing else. Do not copy the schema's `$schema` line into the result (it is tolerated, not needed).
 (paste the contents of .agent/envelope.schema.json here)
@@ -57,7 +63,7 @@ The schema is `.agent/envelope.schema.json`. Example of a valid envelope:
 
 ## Acceptance
 
-Preflight the envelope, status, command and exact diff first. Save the worker's JSON to `.agent/results/T-021.json`, then for a valid candidate run `bash scripts/agent/accept.sh T-021`. It validates the schema, re-runs the verify command itself (never trusting the reported result), checks that every changed or new file is listed in the task's `target_files` (files under `.agent/` are ignored), and commits on PASSED.
+Preflight the envelope, status, exact packet-command equality and diff first. Reject an unapproved Verify before execution; accept.sh currently does not perform that equality check. Verify actual collected/passed/skipped counts and preserve pre-existing dirty work. A zero-test run or filtered-out required case is not a pass. Save the worker's JSON to `.agent/results/T-021.json`, then for a valid candidate run `bash scripts/agent/accept.sh T-021`. It validates the schema, re-runs the verify command itself (never trusting the reported result), checks that every changed or new file is listed in the task's `target_files` (files under `.agent/` are ignored), and commits on PASSED.
 
 - Malformed/FAILED envelope: classify and review its diff before calling accept.sh; its current implementation executes Verify even for FAILED status. Do not rerun a known unchanged failure just to record it. Record metadata corrections transparently; never fabricate a worker pass.
 - PASSED envelope whose verify command fails on re-run: treat as FAILED and log the discrepancy under Open risks.
@@ -82,5 +88,8 @@ rg -n "^export " src/lib/api.ts                                                 
 
 - Workers run with the orchestrator session's sandbox; a worker file cannot widen it (Codex docs: `sandbox_mode` in an agent file is ignored). Start the session with write access to the workspace (Codex: workspace-write). A read-only session makes every worker fail before it edits anything.
 - Worker sandboxes usually have no network. Write verify commands that run offline (tests, lint, typecheck, build, greps). A check that needs the network is run by the orchestrator in `accept.sh`'s rerun or by hand, and named as such in the packet.
-- Verify commands must not start servers on fixed ports or depend on a dev server; workers run side by side and ports collide.
+- Worker Verify commands must not start servers on fixed ports, contact databases/network or depend on a dev server. Relevant DB-backed lease/lifecycle coverage is run by the root on the disposable stack; do not remove it from acceptance merely because a worker is offline.
 - When a result is FAILED: read its target diff and identify the cause. In-scope metadata or root-owned environment/network problems do not need a new implementation worker. Correct the cause, obtain a valid candidate and verify independently; product defects go to the owning worker with a focused repair packet. Preserve prior dirty work, record unresolved diffs, and follow the five-repair ceiling in delivery-workflow.md.
+
+## Packet preflight for lower-thinking workers
+Inline the short worker instruction block from antigravity.md, exact task ID, one complete domain, target/read paths, interfaces, required unchanged UI copy/hooks, approved Verify/support commands, root integration owner and canonical JSON schema. Validate that the command selects every intended case (a global pytest -k filter can accidentally deselect snapshot tests). Use separate explicit commands/node IDs when needed. Never send unresolved placeholders or assume the worker will infer missing prerequisites. The worker returns the existing schema only; do not invent extra envelope fields.
