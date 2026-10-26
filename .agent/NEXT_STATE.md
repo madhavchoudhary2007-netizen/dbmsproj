@@ -1,11 +1,17 @@
 # NEXT_STATE
 updated_at: 2026-10-26
 branch: overhaul/neo-brutal
-execution: PAUSED — owner must say start work before implementation
+execution: RUNNING
 phase: 3 T-331/T-332 consolidated milestone + remaining phase 7; no current overhaul score
 
 ## Queue
-No implementation dispatch while paused.
+
+### T-44575 — Race-history domain dependency injection and router consolidation
+- worker: W2 | priority: P1 | origin: T-331/T-332 structural milestone
+- target_files: backend/app/api/race_archive.py, backend/app/api/laps.py, backend/app/api/race_history_routes.py, backend/app/main.py
+- contract: Move race-history reads into domain APIRouters using FastAPI dependency injection (get_database, get_telemetry, require_roles("admin"), current_user). Fold intermediate assembly glue. Preserve exact OpenAPI contract, route uniqueness, and compatibility with test monkeypatches and exported aliases.
+- boundaries: Up to 4 target files, <=350 changed lines. No edits outside target files; no API/OpenAPI breaking changes; no database migrations or new dependencies.
+- verify: APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_api.py -k "test_archive_provisional or test_historical_archive or test_simulation_keeps or test_demo_car_numbers or test_restarting_simulator" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
 
 ## Documentation checkpoint
 A matching T-44574 acceptance commit/result makes this checkpoint complete; never redispatch it as implementation.

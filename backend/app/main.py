@@ -42,10 +42,44 @@ from .api.health import health_live as health_live
 from .api.health import legacy_router as legacy_health_router
 from .api.health import register_legacy_health, register_readiness
 from .api.health import router as health_router
-from .api.laps import race_lap_measurements as race_lap_measurements
+from .api.laps import (
+    admin as admin,
+)
+from .api.laps import (
+    dbms_race as dbms_race,
+)
+from .api.laps import (
+    dbms_race_laps as dbms_race_laps,
+)
+from .api.laps import (
+    get_race_db as get_race_db,
+)
+from .api.laps import (
+    get_race_telemetry as get_race_telemetry,
+)
+from .api.laps import (
+    laps_router as laps_router,
+)
+from .api.laps import (
+    race_lap_measurements as race_lap_measurements,
+)
+from .api.laps import (
+    session_laps as session_laps,
+)
 from .api.live import create_live_router
 from .api.operations_routes import register_operations_routes
-from .api.race_history_routes import register_race_history_routes
+from .api.race_archive import (
+    create_race_archive_router as create_race_archive_router,
+)
+from .api.race_archive import (
+    race_archive_router as race_archive_router,
+)
+from .api.race_history_routes import (
+    race_history_router as race_history_router,
+)
+from .api.race_history_routes import (
+    register_race_history_routes as register_race_history_routes,
+)
 from .api.race_operation_routes import register_race_operation_routers
 from .api.simulation import create_simulation_router
 from .api.stewarding_reads import router as stewarding_reads_router
@@ -345,6 +379,9 @@ def mongo_ready() -> Collection[dict[str, Any]]:
     if telemetry_collection is None:
         raise HTTPException(503, "MongoDB telemetry store is unavailable")
     return telemetry_collection
+
+
+_default_mongo_ready = mongo_ready
 
 
 def publish(session_id: UUID | str, kind: str, data: Any) -> None:
@@ -648,10 +685,6 @@ health_ready = register_readiness(
 app.include_router(health_router)
 
 
-def admin(user: dict[str, Any] = admin_role_dependency) -> dict[str, Any]:
-    return user
-
-
 admin_dependency = Depends(admin)
 
 
@@ -691,19 +724,13 @@ dbms_mongo_collection_documents = dbms_mongo_handlers["dbms_mongo_collection_doc
 dbms_polyglot = dbms_mongo_handlers["dbms_polyglot"]
 
 
-race_history_handlers = register_race_history_routes(
-    app,
-    lambda *a, **kw: fetch_one(*a, **kw),
-    lambda *a, **kw: fetch_all(*a, **kw),
-    lambda value: jsonable(value),
-    lambda: mongo_ready(),
-    lambda col, match: race_lap_measurements(col, match),
-    admin_dependency,
-    authenticated_user_dependency,
-)
-dbms_race = race_history_handlers["dbms_race"]
-dbms_race_laps = race_history_handlers["dbms_race_laps"]
-session_laps = race_history_handlers["session_laps"]
+app.include_router(race_archive_router)
+app.include_router(laps_router)
+race_history_handlers = {
+    "dbms_race": dbms_race,
+    "dbms_race_laps": dbms_race_laps,
+    "session_laps": session_laps,
+}
 
 
 def mongo_database_ready() -> Database[dict[str, Any]]:
