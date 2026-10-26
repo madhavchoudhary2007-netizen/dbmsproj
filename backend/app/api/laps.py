@@ -9,7 +9,9 @@ from ..database import DatabaseRow
 from ..pit_repository import PIT_RESERVATION_SELECT
 
 
-def race_lap_measurements(col, match: dict[str, Any]):
+def race_lap_measurements(
+    col: Collection[dict[str, Any]], match: dict[str, Any]
+) -> list[dict[str, Any]]:
     # Collapse retries to one complete lap per driver, retaining the latest stored measurement.
     return list(
         col.aggregate(
@@ -43,7 +45,7 @@ def create_laps_router(
     race_lap_measurements = lap_measurements
 
     @router.get("/api/dbms/races/{session_id}/laps")
-    def dbms_race_laps(session_id: UUID, user=admin_dependency):
+    def dbms_race_laps(session_id: UUID, user: Any = admin_dependency) -> Any:
         session = fetch_one(
             "SELECT id FROM race_sessions WHERE id=%s AND session_type='RACE'", (session_id,)
         )
@@ -60,7 +62,7 @@ def create_laps_router(
         return jsonable({"session_id": session_id, "laps": laps, "lap_source": source})
 
     @router.get("/api/sessions/{session_id}/laps")
-    def session_laps(session_id: UUID, user=authenticated_user_dependency):
+    def session_laps(session_id: UUID, user: Any = authenticated_user_dependency) -> Any:
         session = fetch_one("SELECT id FROM race_sessions WHERE id=%s", (session_id,))
         if not session:
             raise HTTPException(404, "Session not found")

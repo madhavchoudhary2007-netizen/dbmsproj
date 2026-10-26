@@ -27,7 +27,7 @@ def create_pit_write_router(
     router = APIRouter()
 
     @router.post("/api/pit-reservations", status_code=201)
-    def reserve_pit(body: ReservationIn, user=admin_steward_principal_dependency):
+    def reserve_pit(body: ReservationIn, user: Any = admin_steward_principal_dependency) -> Any:
         return run_reserve_pit(
             body,
             user,
@@ -38,7 +38,9 @@ def create_pit_write_router(
         )
 
     @router.post("/api/pit-reservations/auto", status_code=201)
-    def reserve_pit_auto(body: AutoReservationIn, user=admin_steward_principal_dependency):
+    def reserve_pit_auto(
+        body: AutoReservationIn, user: Any = admin_steward_principal_dependency
+    ) -> Any:
         return run_reserve_pit_auto(
             body,
             user,
@@ -54,8 +56,8 @@ def create_pit_write_router(
     def update_pit_reservation(
         reservation_id: UUID,
         body: ReservationStatus,
-        user=admin_steward_principal_dependency,
-    ):
+        user: Any = admin_steward_principal_dependency,
+    ) -> Any:
         return run_update_pit_reservation(
             reservation_id,
             body,

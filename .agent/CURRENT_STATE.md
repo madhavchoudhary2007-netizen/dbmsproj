@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: b1397e6
+git_head: 888002c
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -9,14 +9,14 @@ last_eval_score: obsolete 51.2974; no current score; final T430
 
 ## Phase status
 - Phases 0–2, 5–6 complete (5/12). Phases 3–4 and 7–11 remain. `docs/overhaul-plan.md` is authoritative. User authorized autonomous completion.
-- Phase 3: T331 main.py <=120 lines and strict typing unfinished. Runtime DI/provider/lifespan and module extractions exist; strict mypy baseline 87 errors/12 files before T44558.
-- Phase 7: route work through Pit Wall; T379 full gate remains 15 desktop A3 layout failures. T380–387 route flows and most browser evidence completed. T388 header/modal/strategy/grid/queue changes accepted; DBMS and Live full initial route bundles exceed unchanged 170 KiB gate (260.01 and 263.84 KiB).
+- Phase 3: T331 main.py <=120 lines and strict typing unfinished. Runtime DI/provider/lifespan and module extractions exist; strict mypy is 68 errors/6 files after T44559 (root `.agent/results/T44559.mypy.raw.log`).
+- Phase 7: T380–388 route work accepted through Pit Wall; T379 full gate retains 15 desktop A3 layout failures. Pit Wall route browser milestone is pending. Initial route assets: Live now passes at 161.29 KiB after T44560; DBMS still fails at 260.10 KiB against unchanged 170 KiB.
 - Phase 4, 8–11 remain, including DBMS showcase, Taste defects, full E2E/performance, CI/docs, final evaluation/release.
 
 ## Verified evidence
 - Login, Dashboard, Resources, DBMS, Live, Sessions, Stewards and Pit Wall have accepted implementation work; see git commits and `.agent/results/` for task-level records. T44554–57 direct route imports accepted; T44557 restored Sessions client boundary after build failure.
-- Latest corrected production build exits 0. Bundle gate correctly measures initial script/preload assets and fails only DBMS and Live. Recharts is present in each route's shared initial graph; optimize without changing gate or removing features.
-- Backend: full suite 262 passed, 0 skipped, live acceptance passed at T44552. T44558 W2 changes are isolated and await integration: bootstrap/auth dependency/simulation pit typing only. Previous strict baseline 87 errors/12 files.
+- Production build after T44560 exits 0. Full initial-script bundle gate passes Live at 161.29 KiB and fails DBMS at 260.10 KiB; limit remains 170 KiB. T44560 uses the plan-prescribed dynamic chart import and skeleton fallback.
+- Backend: the disposable apexgrid-test full suite and live acceptance passed after T44558 (262 passed, 0 skipped); a second full run is in progress after T44559. T44558 and T44559 accepted; strict count is now 68 errors/6 files.
 - T387 focused browser runs total 35 passing cases across five widths; T386–387 build passed. Pit Wall browser milestone still needs verification.
 
 ## Invariants / workflow
@@ -25,8 +25,8 @@ last_eval_score: obsolete 51.2974; no current score; final T430
 - No dependencies added; no API/schema changes in current work. Owner's authorized ADR-007/ADR-013 changes remain scoped as recorded.
 
 ## Open risks and next work
-- T44558 strict typing fixes need acceptance; rerun strict mypy and focused tests afterward.
-- Measure/optimize DBMS and Live route chunks below 170 KiB while preserving charts and route behavior. Complete Pit Wall browser/Taste coverage, then remaining route tasks in plan dependency order.
+- T44561 onward: continue reducing the remaining strict mypy errors in small module groups.
+- DBMS initial bundle remains above 170 KiB; identify and split its heavy lazy views after required Phase 4/route dependencies. Complete Pit Wall browser/Taste coverage, then proceed in plan order.
 - Main split, strict typing, DBMS showcase, remaining Taste, full browser/performance evidence and final score are not complete. Old 51.2974 is not current; do not present work as done.
 - Host Python 3.14/Node 26 differ from Docker 3.12/22; frontend production image lacks source/lint config; acceptance fixture depends on existing championship round 3 (T021 queued).
 
@@ -36,3 +36,5 @@ last_eval_score: obsolete 51.2974; no current score; final T430
 - T-44558 acceptede58928e: Annotated bootstrap.main, typed MongoClient with dict[str, object], converted revocation results to bool, and narrowed car numbers before int conversion while retaining the default and string-number support. Verify0.
 
 - T-44560 acceptedb1397e6: Lazy-loaded TelemetryCharts with next/dynamic, ssr:false, and NbSkeleton chart fallback; chart props and call site are unchanged. Verify0.
+
+- T-44559 accepted888002c: Added strict parameter and return annotations to the user, simulation, and WebSocket route handlers. Preserved route behavior and dependency defaults. Verify0.

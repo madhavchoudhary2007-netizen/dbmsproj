@@ -3,10 +3,10 @@ updated_at: 2026-10-26
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44559 W2 — OPEN
-- target_files: backend/app/user_router.py, backend/app/api/simulation.py, backend/app/api/live.py
-- contract: Finish the strict annotations in the user router, simulation route and live WebSocket router. Eliminate the existing mypy errors in these three modules with precise parameter and return types; preserve all route contracts, dependency defaults, authentication and runtime behavior.
-- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py && .venv/bin/mypy --strict backend/app/user_router.py backend/app/api/simulation.py backend/app/api/live.py && .venv/bin/ruff check backend/app/user_router.py backend/app/api/simulation.py backend/app/api/live.py && .venv/bin/ruff format --check backend/app/user_router.py backend/app/api/simulation.py backend/app/api/live.py
+### T-44561 W2 — OPEN
+- target_files: backend/app/api/laps.py, backend/app/api/pit_write.py
+- contract: Close the strict typing errors in the lap-records and pit-reservation write routers. Add precise annotations to existing helpers and route handlers only; preserve all endpoint, status, dependency, query, serialization and simulation behavior.
+- verify: env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py && .venv/bin/mypy --strict backend/app/api/laps.py backend/app/api/pit_write.py && .venv/bin/ruff check backend/app/api/laps.py backend/app/api/pit_write.py && .venv/bin/ruff format --check backend/app/api/laps.py backend/app/api/pit_write.py
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -15,9 +15,10 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - TASTE-382-BLOAT: resource-page.tsx >300lines; split genuine reusable presentation/runtime responsibilities after T382 flow coverage, no single-call fake wrappers.
 
 - TASTE-381-1: four KPIface accents followT381 but exceedT400 max3; consolidate supportingcolourbeforeA5, preserve data/features and thresholds.
-- T-44132 (W3, before claiming P-3): bundle checker counts only rootMainFiles+page chunk, omitting layout/shared dependency assets; add fixture regression and measure fullinitial asset graph with unchanged170KB threshold.
+- P-3 DBMS: full-route initial-asset measurement is fixed; Live now passes at 161.29 KiB, DBMS remains 260.10 KiB (170 KiB limit). Reduce DBMS initial bundle after Phase 4 and T-393 dependencies; never change the threshold.
 
 ## Done
+- T-44559 accepted888002c; verify0.
 - T-44560 acceptedb1397e6; verify0.
 - T-44558 acceptede58928e; verify0.
 - T-44557 accepted48d841a; verify0.
@@ -78,5 +79,5 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - Earlier tasks: Git/.agent/results; parent milestones require full gates.
 
 ## Plan dependencies still required
-- T387 official records API/source/UI implemented under ADR013; focused browser milestone/build pending. Then T388 Pit Wall.
-- T385/M13 first chart draw animation remains for T400; actual stream updates remain animation-free.
+- T387 official records API/source/UI and focused browser/build milestone complete. T388 Pit Wall implementation is accepted; root route/browser/Taste verification pending before T389.
+- T385/M13 first chart draw animation remains for T400; actual stream updates remain animation-free. T44560 dynamic chart split verified by production build; Live passes P-3.
