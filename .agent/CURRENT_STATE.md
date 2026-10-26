@@ -2,8 +2,8 @@
 updated_at: 2026-10-26
 branch: overhaul/neo-brutal
 execution: RUNNING — implementation resumed on owner instruction 2026-10-26
-verified_product_head: 1bfe3fa
-last_product_task: T-44610
+verified_product_head: b7afc1b
+last_product_task: T-44611
 metadata_task: T-44587 active-document audit; see matching acceptance result/commit
 architect_sha256: 0f2b5366fee89ec70d8340ab2e148ad676f0c64bf324f00af559c242cd4cc46c
 target_harness: Antigravity; requested Gemini 3.8 Flash HIGH orchestrator / LOW workers; cap 2
@@ -19,7 +19,7 @@ Phase requirements are in docs/overhaul-plan.md; the table below is the current 
 | 1 Baseline | COMPLETE | Final candidate still reruns quality gates |
 | 2 Security | COMPLETE | Retain auth/security regression coverage |
 | 3 Backend | COMPLETE | T-331..T-340 all implemented, tested, and strictly typed |
-| 4 DBMS showcase | IN_PROGRESS | T-351..357 endpoints & migrations 006..008 verified; T-393 UI & T-358 docs next |
+| 4 DBMS showcase | COMPLETE | T-350..358 endpoints, migrations 006..008, tests, UI panels & docs complete |
 | 5 Frontend foundation | COMPLETE | Preserve approved tokens/fonts/primitives |
 | 6 Shell | COMPLETE | Preserve shared feed/navigation/keyboard behavior |
 | 7 Routes | IN_PROGRESS | T-390..393 dependencies, T-379 failures and remaining route proof |
@@ -45,6 +45,9 @@ Phase requirements are in docs/overhaul-plan.md; the table below is the current 
 - T-44608 (5872a0d): authored test_migrations.py unit suite asserting SHA-256 checksums, version ordering, mismatch detection, and SQL file integrity (11/11 tests green).
 - T-44609 (efe56d0): removed xfail decorators and expanded test coverage with edge-case/parameter validation in test_dbms_showcase.py (60/60 tests green).
 - T-44610 (1bfe3fa): implemented typed client service and state hooks for DBMS showcase in frontend/lib/dbms-showcase.ts.
+- T-44611 (d866b4d): created DbmsShowcase component (286 lines, <300) and integrated dynamically into dbms-workspace.tsx (280 lines, <300); route initial JS 154.74 KB (<= 170 KB limit).
+- T-44612 (6a15c0c): authored dbms-showcase.test.mjs unit tests verifying all 8 client fetchers (77/77 runtime tests green).
+- T-358 (b7afc1b): authored normalisation analysis, BCNF justifications, index rationale table, and backup/restore runbook in docs/database.md.
 
 ## Current risks and open work
 - Complete only remaining T-331/T-332 domains and required integration; do not repeat accepted T-44575..80 or create line-count wrappers. T-44573 remains superseded. Historical assembly counts are not the current module map.
