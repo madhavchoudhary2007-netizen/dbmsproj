@@ -5,17 +5,17 @@ execution: RUNNING
 phase: 3 backend / 7 routes; no current score
 
 ## Queue (root must prepare exact packets before dispatch)
-### T-44584 — Entrypoint cleanliness gate main.py <= 120 lines
-- worker: W2 | priority: P1 | origin: T-331/T-332 structural entrypoint gate
-- target_files: backend/app/core/legacy_compat.py, backend/app/main.py
-- contract: Extract remaining legacy compatibility helpers into core/legacy_compat.py and group re-exports concisely so main.py is strictly <= 120 lines while preserving all exported aliases and test compatibility.
-- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py backend/tests/test_api.py -k "test_runtime_route_registrations or test_current_openapi or test_websocket_bus or f_dom_05" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
+### T-44592 — Modularize frontend/components/ui.tsx under 300 lines
+- worker: W1 | priority: P1 | origin: ARCHITECT.md hard rule (< 300 lines per component)
+- target_files: frontend/components/ui.tsx, frontend/components/modal.tsx, frontend/components/resource-editor.tsx
+- contract: Extract Modal into frontend/components/modal.tsx and ResourceEditor into frontend/components/resource-editor.tsx, re-exporting both from ui.tsx so all three files are strictly < 300 lines and backwards compatible.
+- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
-### T-44591 — DBMS workspace bundle size code-splitting
-- worker: W1 | priority: P1 | origin: P-3 DBMS bundle size defect
-- target_files: frontend/components/dbms-workspace.tsx, frontend/next-env.d.ts
-- contract: Dynamically import RaceDatabase using next/dynamic to avoid bundling recharts in /dbms/page initial JS, satisfying the <= 170 KB gzip limit.
-- verify: npm --prefix frontend run build && python3 scripts/eval/verify-bundle-size.py && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+### T-44593 — Typed Pydantic v2 schemas for CRUD endpoints
+- worker: W2 | priority: P1 | origin: Phase 3 T-333 typed CRUD
+- target_files: backend/app/schemas_competition.py, backend/app/api/crud.py
+- contract: Add Pydantic v2 models for Championship, Circuit, Team, Driver, Event, Session in schemas_competition.py and use response_model with ConfigDict(extra="allow") and typed payloads in crud.py, keeping openapi snapshot assert_compatible green.
+- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_api.py -k "test_runtime_route_registrations or test_current_openapi or test_websocket_bus or f_dom_05" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
 
 ## Documentation checkpoint
 ### T-44587 — Active document authority audit

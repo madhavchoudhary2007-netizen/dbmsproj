@@ -2,8 +2,8 @@
 updated_at: 2026-10-26
 branch: overhaul/neo-brutal
 execution: RUNNING — implementation resumed on owner instruction 2026-10-26
-verified_product_head: cb134fc
-last_product_task: T-44590
+verified_product_head: 248b06c
+last_product_task: T-44591
 metadata_task: T-44587 active-document audit; see matching acceptance result/commit
 architect_sha256: 0f2b5366fee89ec70d8340ab2e148ad676f0c64bf324f00af559c242cd4cc46c
 target_harness: Antigravity; requested Gemini 3.8 Flash HIGH orchestrator / LOW workers; cap 2
@@ -27,16 +27,14 @@ Phase requirements are in docs/overhaul-plan.md; the table below is the current 
 | 9 Tests | NOT_COMPLETE | Production/real-stack E2E, visual/motion/resilience, coverage |
 | 10 DevOps/docs | NOT_COMPLETE | CI release gates and accurate runtime/demo docs |
 | 11 Release | NOT_COMPLETE | Current full score>=95, all hard gates, cleanup and owner PR step |
-- Accepted domains T-44575..80: race history, SQL/Mongo showcase, session/results, steward/pit writes, auth/users, telemetry/demo/pit strategy. Evidence in results/Git; latest product6af6b78.
-- Latest full disposable backend evidence: T-44559, 262 passed/0 failed/0 skipped plus live acceptance. Subsequent extraction-only task checks did not rerun the full stack; milestone integration is not claimed current. Latest shell DB URLs were unset; no DB contacted during recent tasks.
-- Frontend production build passed after T-44560. Live initial JS 161.29 KiB passes; DBMS 260.10 KiB fails unchanged 170 KiB cap. Standings T-389 root gate passed 85/85; latest Live/Pit Wall focused run 100/100. These are scoped results, not a final release score.
-- T-44567 Standings typography: five E2E-R11 viewports passed, frontend lint/four design scripts passed, focused Taste review found no new defect. All accepted task details/hashes are in Git and .agent/results.
-- T-44585 passed root acceptance (commit 16e17a3): desktop race-control marquee enlarged to 64px (.nb-shell .race-control-feed in shell.css) at min-width 1000px, addressing desktop A3 red palette deficit across all shell routes; frontend typecheck, zero-warning lint, and four design linters passed cleanly. Root E2E palette gate (e2e/palette.spec.ts) re-measured at 1440px: 80 passed / 0 failed in 11.9s across all 16 routes, resolving all 15 desktop A3 failures.
-- T-44581 passed root acceptance (commit 2b04eaf): simulation, live WebSocket, and DBMS lock modules refactored to domain APIRouters using FastAPI dependency injection (get_simulations, get_bus, admin, require_roles, get_race_db), mounted directly in main.py, backwards-compatible factory functions and handler aliases preserved, 8 tests passed (snapshot, route registration uniqueness, simulation replay, simulation control), strict mypy/ruff/format clean.
-- T-44582 passed root acceptance (commit 3d214f9): CRUD resource routing refactored to domain APIRouter using FastAPI dependency injection (current_user, admin, get_race_db, get_race_telemetry), eliminated 15-lambda forwarding block in main.py, directly mounted crud_router, preserved backwards compatibility for create_crud_router and register_resources, 7 tests passed, strict mypy/ruff/format clean.
-- T-44589 passed root acceptance (commit 6201515): replaced violet accent on open_incidents stat card with yellow in dashboard.tsx, resolving TASTE-381-1 four-accent defect and limiting dashboard face accents to approved <= 3 (red, yellow, mint); typecheck, lint, and four design linters passed cleanly.
-- T-44583 passed root acceptance (commit 57d8fa4): extracted simulation lifecycle, demo race orchestration, and simulation loop helpers into backend/app/core/simulation_service.py (409 lines) and trimmed backend/app/main.py by 231 lines, preserving all exported symbols and test monkeypatch compatibility; 8 tests passed, snapshot and route uniqueness clean, strict mypy/ruff/format clean.
-- T-44590 passed root acceptance (commit cb134fc): modularized bloated frontend/components/resource-page.tsx (from 594 down to 291 lines) by extracting modal dialogs into frontend/components/resource-modals.tsx (245 lines); both files strictly < 300 lines resolving TASTE-382-BLOAT; typecheck, lint, four design linters, and all 70 Playwright resource tests passed cleanly.
+- Accepted domains T-44575..80: race history, SQL/Mongo showcase, session/results, steward/pit writes, auth/users, telemetry/demo/pit strategy. Evidence in results/Git.
+- Full disposable backend: T-44559 262 passed/0 failed/0 skipped. Recent extraction checks verified domain suites; milestone integration pending full DB rerun.
+- Frontend bundle size: all 19 routes <= 170 KB initial JS gzip (max 161.53 KB, DBMS 154.74 KB). Standings T-389 passed 85/85; Live/Pit Wall 100/100.
+- T-44585 (16e17a3): enlarged marquee to 64px, resolving all 15 desktop A3 red palette deficit failures (80/80 green).
+- T-44581..83: DI APIRouters mounted in main.py, simulation service extracted, preserving all 24 routers and monkeypatch targets.
+- T-44584 (d5e9fd0): legacy compat extracted (248 lines); main.py compacted to 118 lines (<= 120 structural entrypoint gate); 7 tests, strict mypy/ruff clean.
+- T-44589 (6201515) & T-44590 (cb134fc): resolved TASTE-381-1 accent defect and TASTE-382-BLOAT (resource-page down to 291 lines, resource-modals 245 lines; 70/70 Playwright resource tests green).
+- T-44591 (248b06c): code-split RaceDatabase/EerDiagram in dbms-workspace.tsx; /dbms initial JS dropped to 154.74 KB; all 19 routes pass bundle limit.
 
 ## Current risks and open work
 - Complete only remaining T-331/T-332 domains and required integration; do not repeat accepted T-44575..80 or create line-count wrappers. T-44573 remains superseded. Historical assembly counts are not the current module map.
