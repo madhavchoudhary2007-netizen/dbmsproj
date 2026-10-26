@@ -2,8 +2,8 @@
 updated_at: 2026-10-26
 branch: overhaul/neo-brutal
 execution: RUNNING — implementation resumed on owner instruction 2026-10-26
-verified_product_head: 84ae834
-last_product_task: T-44600
+verified_product_head: 8751eaa
+last_product_task: T-44602
 metadata_task: T-44587 active-document audit; see matching acceptance result/commit
 architect_sha256: 0f2b5366fee89ec70d8340ab2e148ad676f0c64bf324f00af559c242cd4cc46c
 target_harness: Antigravity; requested Gemini 3.8 Flash HIGH orchestrator / LOW workers; cap 2
@@ -32,18 +32,17 @@ Phase requirements are in docs/overhaul-plan.md; the table below is the current 
 - Frontend bundle size: all 19 routes <= 170 KB initial JS gzip (max 161.53 KB, DBMS 154.74 KB). Standings T-389 passed 85/85; Live/Pit Wall 100/100.
 - T-44585 (16e17a3): enlarged marquee to 64px, resolving all 15 desktop A3 red palette deficit failures (80/80 green).
 - T-44581..83: DI APIRouters mounted in main.py, simulation service extracted, preserving all 24 routers and monkeypatch targets.
-- T-44584 (d5e9fd0): legacy compat extracted (248 lines); main.py compacted to 118 lines (<= 120 structural entrypoint gate); 7 tests, strict mypy/ruff clean.
-- T-44589 (6201515) & T-44590 (cb134fc): resolved TASTE-381-1 accent defect and TASTE-382-BLOAT (resource-page down to 291 lines, resource-modals 245 lines; 70/70 Playwright resource tests green).
-- T-44591 (248b06c): code-split RaceDatabase/EerDiagram in dbms-workspace.tsx; /dbms initial JS dropped to 154.74 KB; all 19 routes pass bundle limit.
-- T-44592 (7e3ce2d): modularized ui.tsx (223 lines) into modal.tsx (111 lines) and resource-editor.tsx (137 lines); 100% of frontend component files strictly < 300 lines (ARCHITECT.md hard rule).
-- T-44593 (3c6c08b): typed CRUD models (ChampionshipIn/Out, CircuitIn/Out, TeamIn/Out, DriverIn/Out, EventIn/Out, SessionIn/Out, MembershipOut) in schemas_competition.py and api/crud.py, preserving openapi snapshot assert_compatible.
-- T-44594 (128693b): added static head title to RootLayout in layout.tsx; accessibility.spec.ts passed 85/85 green across all viewports. Core E2E suites (states-matrix, data-primary, responsive, touch-targets) verified 660/660 passed.
-- T-44597 (ba7f19d): harmonized race control feed to 40px everywhere (15/15 passed in race-control-feed.spec.ts) and added desktop red footer styling to maintain 5-15% red palette share (80/80 passed in palette.spec.ts).
-- T-44595 (59bbf84): replaced per-packet insert_one with batched col.insert_many(ordered=False) in simulation_persist.py and offloaded blocking writes in simulation_runner.py to asyncio.to_thread with legacy lifespan pool and cross-module resolution compatibility.
-- T-44596 (e99c07d): implemented schema_migrations ledger in migrations.py (152 lines) with transaction-wrapped version-ordered execution, SHA-256 checksum verification, and existing-DB backfill; delegated bootstrap.py (36 lines).
-- T-44598 (ac385f0): added aria-hidden and inert attributes to .main-shell when mobile drawer is open, and calibrated mobile-scrim offset; keeps shell.tsx at 207 lines (< 300); 10/10 Playwright shell-navigation tests passed.
-- T-44599 (fc2d2d4): replaced N+1 driver queries in race_archive.py with MongoDB aggregation pipeline ($match, $sort, $group, $replaceRoot) and fallback; overview count switched to estimated_document_count; added LIMIT 200 to /api/dbms/races SQL; added compound index in lifespan; strict mypy clean.
-- T-44600 (84ae834): handled in-flight navigation abort race in edge-resilience.spec.ts Lens 5 test; full edge-resilience Playwright suite passed 20/20 green across all 5 viewports.
+- T-44584 (d5e9fd0): legacy compat extracted (248 lines); main.py compacted to 118 lines (<= 120 entrypoint gate).
+- T-44589..92: modularized resource pages (291 lines) and modals (111/137 lines); code-split /dbms (154.74 KB); 100% components < 300 lines (ARCHITECT hard rule).
+- T-44593 (3c6c08b): typed CRUD models (ChampionshipIn/Out, CircuitIn/Out, TeamIn/Out, DriverIn/Out, EventIn/Out, SessionIn/Out, MembershipOut) in schemas_competition.py, preserving openapi snapshot.
+- T-44594/98: RootLayout static title (85/85 a11y green) and accessible mobile drawer (10/10 green). Full Playwright suite 1475/1475 green across all viewports.
+- T-44585/97: Race control feed 40px everywhere (15/15 green), marquee & desktop red footer maintain 5-15% red palette share (80/80 green).
+- T-44595 (59bbf84): replaced per-packet insert_one with batched col.insert_many(ordered=False) in simulation_persist.py and offloaded blocking writes in simulation_runner.py to asyncio.to_thread.
+- T-44596 (e99c07d): implemented schema_migrations ledger in migrations.py with SHA-256 checksum verification and existing-DB backfill; delegated bootstrap.py (36 lines).
+- T-44599 (fc2d2d4): replaced N+1 driver queries in race_archive.py with MongoDB aggregation pipeline ($match, $sort, $group, $replaceRoot) and fallback; overview count switched to estimated_document_count; added LIMIT 200 to /api/dbms/races SQL; added compound index in lifespan.
+- T-44600 (84ae834): handled in-flight navigation abort race in edge-resilience.spec.ts Lens 5 test; full Playwright E2E suite passed 1475/1475 green across all 5 viewports.
+- T-44601 (949adc6): created migration 005_points_systems.sql with points_systems and points_system_positions, default F1 2025 points seed, championships.points_system_id, and dynamic recalculate_standings join; added PointsSystemOut and PointsSystemPositionOut schemas.
+- T-44602 (8751eaa): authored test_points_system.py unit suite asserting migration 005 DDL, standard F1 points distribution (top 10 + 11+ zero), and PointsSystemOut / PointsSystemPositionOut schema validation (18/18 tests green).
 
 ## Current risks and open work
 - Complete only remaining T-331/T-332 domains and required integration; do not repeat accepted T-44575..80 or create line-count wrappers. T-44573 remains superseded. Historical assembly counts are not the current module map.
