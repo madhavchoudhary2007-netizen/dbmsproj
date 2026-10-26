@@ -1,6 +1,6 @@
 # CURRENT_STATE
 updated_at: 2026-10-26
-git_head: b0b12af
+git_head: b5f7f0e
 branch: overhaul/neo-brutal
 architect_sha256: 8e8897b1a90568d13f119a810c986c42201a6603dc6eeeb53ea4953b851f49ca
 harness: codex; orchestrator gpt-6.1-sol/medium; workers gpt-6-luna/high, cap2
@@ -40,3 +40,6 @@ last_eval_score: obsolete 51.2974; no current score; final T430
 
 - T-44567 acceptedb0b12af: Reduced podium typography to three sizes by matching rank to heading size and the points label to body size; retained the winner card styling and existing weights. Verify0.
 - T-44567 root checks: Standings E2E-R11 passed at all five configured viewports; frontend lint and four design lint scripts passed. Taste review confirms three type sizes, two weights, unchanged focal action/palette, and no new bloat.
+
+- T-44568 acceptedb5f7f0e: Moved the startup and shutdown lifecycle to core/lifespan.py. main.py retains the lifespan export and Mongo globals; startup uses the existing bus, simulations, and deferred demo helper. Verify0.
+- T-44568 root acceptance reran contract snapshot + route registration (11 passed), strict mypy, Ruff and format; no DB startup/contact. Full DB suite remains represented by latest disposable-stack evidence above.

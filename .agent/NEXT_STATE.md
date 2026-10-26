@@ -3,12 +3,12 @@ updated_at: 2026-10-26
 phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 
 ## Queue
-### T-44568 — Move application lifespan into core
-- worker: W2 | priority: P1 | origin: T-331 explicitly places lifespan under backend/app/core
-- target_files: backend/app/main.py, backend/app/core/lifespan.py
-- read_only_context: docs/overhaul-plan.md (Phase 3 T-331); backend/app/main.py (1–20, 160–230, 510–540); backend/app/core/runtime.py (1–35); backend/app/runtime_lease.py (1–31); backend/app/core/application.py (1–70)
-- contract: Move startup/shutdown lifecycle orchestration out of main.py into core/lifespan.py; preserve app.state fields, Mongo globals as observed by existing routes/tests, resource cleanup order, local demo resume behavior, and error handling.
-- boundaries: T-331 move only; no API/schema/database changes; at most 150 changed lines; target files only. Use deferred providers where necessary to preserve module initialization order.
+### T-44569 — Extract race history route assembly from main
+- worker: W2 | priority: P1 | origin: T-331 main.py split
+- target_files: backend/app/main.py, backend/app/api/race_history_routes.py
+- read_only_context: docs/overhaul-plan.md (Phase 3 T-331, 314–319); backend/app/main.py (724–740); backend/app/api/race_archive.py (1–100, 101–145); backend/app/api/laps.py (1–88)
+- contract: Move-only extraction of race archive and lap router construction/registration into one API assembly helper. Keep paths, order, dependencies, handler aliases exported from main, and OpenAPI unchanged.
+- boundaries: No endpoint logic/API/schema/dependency/test/DB changes; max 150 changed lines; edit target files only.
 - verify: APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
 
 ## Blocked
@@ -21,6 +21,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - P-3 DBMS: full-route initial-asset measurement is fixed; Live now passes at 161.29 KiB, DBMS remains 260.10 KiB (170 KiB limit). Reduce DBMS initial bundle after Phase 4 and T-393 dependencies; never change the threshold.
 
 ## Done
+- T-44568 acceptedb5f7f0e; verify0.
 - T-44567 acceptedb0b12af; verify0.
 - T-44566 accepted01edfca; verify0.
 - T-389 acceptede5ebfeb; verify0.
