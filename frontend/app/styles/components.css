@@ -81,6 +81,36 @@
     min-height: 12px;
   }
 
+  .standings-controls { align-items: end; flex-wrap: wrap; }
+  .standings-controls > label { display: grid; gap: 8px; min-width: min(100%, 288px); }
+  .standings-ticker,
+  .standings-podium,
+  .standings-data { min-width: 0; margin-block: 24px; }
+  .standings-ticker h2 { margin-bottom: 12px; font-size: var(--fs-heading); }
+  .standings-empty-accent { height: 32px; margin-top: 24px; background: var(--nb-red); }
+  .standings-podium {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: end;
+    gap: 16px;
+  }
+  .podium-card { min-width: 0; min-height: 144px; padding: 16px; border: 4px solid var(--nb-ink); background: var(--nb-paper); animation: podium-rise 250ms ease-out both; }
+  .podium-place-2 { animation-delay: 60ms; }
+  .podium-place-1 { min-height: 192px; background: var(--nb-yellow); animation-delay: 0ms; }
+  .podium-place-3 { animation-delay: 120ms; }
+  .podium-position { display: block; color: transparent; font-family: var(--font-sans); font-size: var(--fs-display); font-weight: 700; line-height: 1; -webkit-text-stroke: 2px var(--nb-ink); }
+  .podium-card h2, .podium-card p { overflow-wrap: anywhere; }
+  .podium-card h2 { margin-block: 8px; font-size: var(--fs-heading); }
+  .podium-card p { margin-block: 8px; }
+  .podium-card > strong { font-family: var(--font-mono); font-size: var(--fs-data); }
+  .podium-card > strong span { font-family: var(--font-sans); font-size: 0.75em; }
+  @keyframes podium-rise { from { transform: translateY(16px); } to { transform: translateY(0); } }
+  @media (max-width: 619px) {
+    .standings-podium { gap: 8px; }
+    .podium-card { min-height: 128px; padding: 8px; }
+    .podium-place-1 { min-height: 160px; }
+  }
+
   .nb-focus:focus-visible {
     min-width: 44px;
     min-height: 44px;
@@ -102,8 +132,11 @@
   @media (prefers-reduced-motion: reduce) {
     .nb-plinth > .nb-face,
     .nb-marquee > *,
-    .nb-skeleton {
+    .nb-skeleton,
+    .podium-card {
       transition: none;
+      animation: none;
+      transform: none;
     }
   }
 }

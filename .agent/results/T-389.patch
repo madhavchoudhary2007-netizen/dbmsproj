@@ -1,0 +1,208 @@
+diff --git a/frontend/app/standings/page.tsx b/frontend/app/standings/page.tsx
+index d92c17c..d32b890 100644
+--- a/frontend/app/standings/page.tsx
++++ b/frontend/app/standings/page.tsx
+@@ -1,8 +1,15 @@
+ "use client";
+-import { useCallback, useEffect, useState } from "react";
++import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+ import { api, asArray, list, Row } from "@/lib/api";
+-import { Button, DataTable, PageHeader, StateMessage } from "@/components/ui";
++import { Button, PageHeader } from "@/components/ui";
++import { NbMarquee } from "@/components/nb/marquee";
++import { NbSelect } from "@/components/nb/input";
++import { NbTable } from "@/components/nb/table";
++import type { NbTableColumn } from "@/components/nb/table";
++import type { ViewState } from "@/lib/data-state";
++import { useFlip } from "@/lib/use-flip";
+ import { useAuth } from "@/components/auth";
++
+ export default function Page() {
+   const [chs, setChs] = useState<Row[]>([]),
+     [champ, setChamp] = useState(""),
+@@ -13,6 +20,10 @@ export default function Page() {
+     [message, setMessage] = useState("");
+   const { user } = useAuth();
+   const canRecalculate = user?.role === "ADMIN" || user?.role === "STEWARD";
++  const bodyRef = useRef<HTMLTableSectionElement | null>(null);
++  const rowKeys = useMemo(() => rows.map((row, index) => String(row.driver_id ?? row.id ?? row.rank ?? index)), [rows]);
++  useFlip(bodyRef, rowKeys);
++
+   useEffect(() => {
+     list("/championships")
+       .then((x) => {
+@@ -34,16 +45,12 @@ export default function Page() {
+       setLoading(false);
+     }
+   }, [champ]);
+-  useEffect(() => {
+-    void load();
+-  }, [load]);
++  useEffect(() => { void load(); }, [load]);
+   const recalc = async () => {
+     setBusy(true);
+     setMessage("");
+     try {
+-      const result = await api(`/championships/${champ}/recalculate`, {
+-        method: "POST",
+-      });
++      const result = await api(`/championships/${champ}/recalculate`, { method: "POST" });
+       setMessage(`Standings recalculated. ${JSON.stringify(result)}`);
+       await load();
+     } catch (e) {
+@@ -52,57 +59,61 @@ export default function Page() {
+       setBusy(false);
+     }
+   };
++  const columns: NbTableColumn<Row>[] = [
++    { key: "rank", title: "Pos", numeric: true },
++    { key: "driver_name", title: "Driver", render: (row) => <strong>{String(row.driver_name ?? "—")}</strong> },
++    { key: "number", title: "Car", numeric: true },
++    { key: "team_name", title: "Team" },
++    { key: "points", title: "Points", numeric: true },
++    { key: "wins", title: "Wins", numeric: true },
++    { key: "podiums", title: "Podiums", numeric: true },
++  ];
++  const state: ViewState<readonly Row[]> = error
++    ? { status: "error", error: { message: error, retryable: true }, retry: () => void load() }
++    : loading
++      ? { status: "loading" }
++      : !champ
++        ? { status: "empty", reason: "first-use" }
++        : rows.length
++          ? { status: "populated", data: rows }
++          : { status: "empty", reason: "no-data" };
++  const podium = rows.slice(0, 3);
++  const topTen = rows.slice(0, 10).map((row) => `${String(row.rank ?? "—")} · ${String(row.driver_name ?? "—")} · ${String(row.points ?? 0)} PTS`);
++
+   return (
+     <>
+-      <PageHeader
+-        eyebrow="CHAMPIONSHIP / CLASSIFICATION"
+-        title="Standings"
+-        description="Persisted championship classification. Recalculate invokes the database standings routine."
+-      />
+-      <div className="toolbar select-toolbar">
++      <PageHeader eyebrow="CHAMPIONSHIP / CLASSIFICATION" title="Standings" description="Persisted championship classification. Recalculate invokes the database standings routine." />
++      <div className="toolbar select-toolbar standings-controls">
+         <label>
+           Championship
+-          <select value={champ} onChange={(e) => setChamp(e.target.value)}>
++          <NbSelect value={champ} onChange={(e) => setChamp(e.target.value)}>
+             <option value="">Select championship</option>
+-            {chs.map((c) => (
+-              <option key={String(c.id)} value={String(c.id)}>
+-                {String(c.name || c.id)} · {String(c.season || "")}
+-              </option>
+-            ))}
+-          </select>
++            {chs.map((c) => <option key={String(c.id)} value={String(c.id)}>{String(c.name || c.id)} · {String(c.season || "")}</option>)}
++          </NbSelect>
+         </label>
+-        {canRecalculate && (
+-          <Button data-primary="true" onClick={() => void recalc()} disabled={!champ || busy}>
+-            {busy ? "Recalculating…" : "Recalculate standings"}
+-          </Button>
+-        )}
++        {canRecalculate && <Button data-primary="true" onClick={() => void recalc()} disabled={!champ || busy}>{busy ? "Recalculating…" : "Recalculate standings"}</Button>}
+       </div>
+-      <StateMessage error={error} loading={loading} retry={() => void load()} />
+       {message && <div className="notice">{message}</div>}
+       {rows.some((row) => row.provisional === true) && (
+-        <div className="notice">
+-          Provisional standings: historical time and grid penalties are recorded but not applied to official order or points. Review the penalties before treating standings as final.
+-        </div>
++        <div className="notice">Provisional standings: historical time and grid penalties are recorded but not applied to official order or points. Review the penalties before treating standings as final.</div>
+       )}
+-      {!loading && !error && (
+-        <DataTable
+-          rows={rows}
+-          columns={
+-            rows[0]
+-              ? Object.keys(rows[0]).filter(
+-                  (k) => typeof rows[0][k] !== "object",
+-                )
+-              : [
+-                  "rank",
+-                  "driver_name",
+-                  "team_name",
+-                  "points",
+-                  "wins",
+-                  "podiums",
+-                ]
+-          }
+-        />
++      {topTen.length > 0 && <section className="standings-ticker" aria-label="Top ten points"><h2>Top ten · points</h2><NbMarquee items={topTen} tone="red" /></section>}
++      {podium.length > 0 && (
++        <section className="standings-podium" aria-label="Top three standings">
++          {[[2, podium[1]], [1, podium[0]], [3, podium[2]]].filter((entry): entry is [number, Row] => Boolean(entry[1])).map(([place, row]) => (
++            <article className={`podium-card podium-place-${place}`} key={String(row.driver_id ?? row.id ?? row.rank)}>
++              <span className="podium-position">{String(row.rank ?? place)}</span>
++              <h2>{String(row.driver_name ?? "—")}</h2>
++              <p>{String(row.team_name ?? "—")}</p>
++              <strong>{String(row.points ?? 0)} <span>points</span></strong>
++            </article>
++          ))}
++        </section>
+       )}
++      <section className="standings-data" aria-label="Full standings">
++        {state.status === "empty" && champ && <div className="standings-empty-accent" aria-hidden="true" />}
++        <NbTable state={state} columns={columns} rowKey={(row, index) => String(row.driver_id ?? row.id ?? row.rank ?? index)} caption="Championship standings" bodyRef={bodyRef} empty={champ ? "No standings have been recorded for this championship." : "Select a championship to view standings."} />
++      </section>
+     </>
+   );
+ }
+diff --git a/frontend/app/styles/components.css b/frontend/app/styles/components.css
+index 41891d9..ae31487 100644
+--- a/frontend/app/styles/components.css
++++ b/frontend/app/styles/components.css
+@@ -81,6 +81,36 @@
+     min-height: 12px;
+   }
+ 
++  .standings-controls { align-items: end; flex-wrap: wrap; }
++  .standings-controls > label { display: grid; gap: 8px; min-width: min(100%, 288px); }
++  .standings-ticker,
++  .standings-podium,
++  .standings-data { min-width: 0; margin-block: 24px; }
++  .standings-ticker h2 { margin-bottom: 12px; font-size: var(--fs-heading); }
++  .standings-empty-accent { height: 32px; margin-top: 24px; background: var(--nb-red); }
++  .standings-podium {
++    display: grid;
++    grid-template-columns: repeat(3, minmax(0, 1fr));
++    align-items: end;
++    gap: 16px;
++  }
++  .podium-card { min-width: 0; min-height: 144px; padding: 16px; border: 4px solid var(--nb-ink); background: var(--nb-paper); animation: podium-rise 250ms ease-out both; }
++  .podium-place-2 { animation-delay: 60ms; }
++  .podium-place-1 { min-height: 192px; background: var(--nb-yellow); animation-delay: 0ms; }
++  .podium-place-3 { animation-delay: 120ms; }
++  .podium-position { display: block; color: transparent; font-family: var(--font-sans); font-size: var(--fs-display); font-weight: 700; line-height: 1; -webkit-text-stroke: 2px var(--nb-ink); }
++  .podium-card h2, .podium-card p { overflow-wrap: anywhere; }
++  .podium-card h2 { margin-block: 8px; font-size: var(--fs-heading); }
++  .podium-card p { margin-block: 8px; }
++  .podium-card > strong { font-family: var(--font-mono); font-size: var(--fs-data); }
++  .podium-card > strong span { font-family: var(--font-sans); font-size: 0.75em; }
++  @keyframes podium-rise { from { transform: translateY(16px); } to { transform: translateY(0); } }
++  @media (max-width: 619px) {
++    .standings-podium { gap: 8px; }
++    .podium-card { min-height: 128px; padding: 8px; }
++    .podium-place-1 { min-height: 160px; }
++  }
++
+   .nb-focus:focus-visible {
+     min-width: 44px;
+     min-height: 44px;
+@@ -102,8 +132,11 @@
+   @media (prefers-reduced-motion: reduce) {
+     .nb-plinth > .nb-face,
+     .nb-marquee > *,
+-    .nb-skeleton {
++    .nb-skeleton,
++    .podium-card {
+       transition: none;
++      animation: none;
++      transform: none;
+     }
+   }
+ }

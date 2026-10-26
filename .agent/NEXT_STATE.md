@@ -6,13 +6,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 ### T-389 W1 — OPEN
 - target_files: frontend/app/standings/page.tsx, frontend/app/styles/components.css
 - contract: Implement the Phase 7 standings presentation from docs/overhaul-plan.md T-389. Keep all existing fetch/API behavior, role checks, championship selection, recalculation, provisional explanation and actual persisted values. Use the stepped P2/P1/P3 podium, championship NbSelect, one data-primary recalculation button with its busy state, a full standings table using fields the current API actually returns, the existing NbMarquee for the static top-ten points ticker, NbTable/ViewState for the data region, and useFlip for row reorder after recalculation. Add the M14 podium-rise treatment in components.css: transform only, 250ms, staggered, instant under reduced motion. Do not add dependencies, endpoints, filters, or fabricate historical rank deltas; the current schema/API has no prior-rank value.
-- verify: python3 .agent/check-frontend-browser.py T-389.route e2e/routes.spec.ts e2e/states-matrix.spec.ts e2e/responsive.spec.ts e2e/touch-targets.spec.ts e2e/accessibility.spec.ts e2e/data-primary.spec.ts e2e/palette.spec.ts e2e/provisional-results.spec.ts --grep 'E2E-R11|E2E-S|F-DOM-02' --workers=2 && npm --prefix frontend run typecheck && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
-
-### T-44565 W2 — OPEN
-- target_files: backend/app/main.py, backend/app/database.py
-- contract: Resolve the 41 strict-mypy errors in main.py after T-44564; annotate the existing pool generics in database.py to fix the final pool assignment error. Type-only; preserve runtime behavior and every route/API contract.
-- verify: .venv/bin/mypy --strict backend/app && env APP_ENV=local PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py && .venv/bin/ruff check backend/app/main.py && .venv/bin/ruff format --check backend/app/main.py
-
+- verify: npm --prefix frontend run typecheck && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh; root browser gate: python3 .agent/check-frontend-browser.py T-389.route e2e/routes.spec.ts e2e/states-matrix.spec.ts e2e/responsive.spec.ts e2e/touch-targets.spec.ts e2e/accessibility.spec.ts e2e/data-primary.spec.ts e2e/palette.spec.ts e2e/provisional-results.spec.ts --grep 'E2E-R11|E2E-S|F-DOM-02' --workers=2
 
 ## Blocked
 - T379 parent final gate: exact split complete, build/static0 and1020/1100mockedPASS; remaining15desktopA3layouts requirePhase7. Body/reducedmotion repaired; never mark fullsuitepassed. Proceed Phase7layouttasks as parentgate repairs, retain fullgate for finalrerun.
@@ -24,6 +18,7 @@ phase: 3 T331 + 7 route redesign; Phases0–2,5–6 COMPLETE; no current score
 - P-3 DBMS: full-route initial-asset measurement is fixed; Live now passes at 161.29 KiB, DBMS remains 260.10 KiB (170 KiB limit). Reduce DBMS initial bundle after Phase 4 and T-393 dependencies; never change the threshold.
 
 ## Done
+- T-44565 accepted669f39e; verify0.
 - T-44564 accepted8b064db; verify0.
 - T-44563 accepted917fe55; verify0.
 - T-44562 accepted19cbe5e; verify0.

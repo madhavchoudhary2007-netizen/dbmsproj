@@ -1,0 +1,17 @@
+{
+  "task_id": "T-389",
+  "status": "FAILED",
+  "files_modified": [
+    {"path": "frontend/app/standings/page.tsx", "lines_added": 58, "lines_removed": 48},
+    {"path": "frontend/app/styles/components.css", "lines_added": 33, "lines_removed": 1}
+  ],
+  "diff_summary": "Added championship selection, top-ten points ticker, stepped P2/P1/P3 podium, provisional notice, and a five-state standings table with FLIP row reordering. Added staggered 250ms podium rise with reduced-motion handling. No historical rank deltas were added.",
+  "verification": {
+    "command": "python3 .agent/check-frontend-browser.py T-389.route e2e/routes.spec.ts e2e/states-matrix.spec.ts e2e/responsive.spec.ts e2e/touch-targets.spec.ts e2e/accessibility.spec.ts e2e/data-primary.spec.ts e2e/palette.spec.ts e2e/provisional-results.spec.ts --grep 'E2E-R11|E2E-S|F-DOM-02' --workers=2 && npm --prefix frontend run typecheck && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh",
+    "exit_code": 1,
+    "tests_passed": 0,
+    "tests_failed": 0,
+    "duration_ms": 115000
+  },
+  "unresolved_blockers": ["In the isolated clone, Turbopack could not resolve Next because its node_modules symlink points outside the workspace; the temporary server therefore never became ready. Typecheck and eval lint commands passed separately."]
+}
