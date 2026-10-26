@@ -5,17 +5,17 @@ execution: RUNNING
 phase: 3 backend / 7 routes; no current score
 
 ## Queue (root must prepare exact packets before dispatch)
-### T-44594 — RootLayout document-title accessibility fix
-- worker: W1 | priority: P1 | origin: E2E-R01 accessibility audit defect
-- target_files: frontend/app/layout.tsx, frontend/next-env.d.ts
-- contract: Add static <head><title>ApexGrid | Race Operations</title></head> to RootLayout so every route has document-title present at domcontentloaded, passing accessibility.spec.ts 85/85.
-- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts frontend/e2e/accessibility.spec.ts && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+### T-44595 — Simulator loop off event loop
+- worker: W2 | priority: P1 | origin: Phase 3 T-334 simulator loop performance
+- target_files: backend/app/simulation_persist.py, backend/app/simulation_runner.py
+- contract: Replace per-packet insert_one with insert_many(ordered=False) in simulation_persist.py; offload blocking MongoDB/SQL writes to asyncio.to_thread in simulation_runner.py, preserving publish order and error handling.
+- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_simulation_replay.py backend/tests/test_telemetry_ordering.py backend/tests/test_telemetry_ingest_contract.py backend/tests/test_api.py -k "test_app_lifespan or test_restarting_simulator or test_websocket_bus or f_dom_05" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
 
-### T-44593 — Typed Pydantic v2 schemas for CRUD endpoints
-- worker: W2 | priority: P1 | origin: Phase 3 T-333 typed CRUD
-- target_files: backend/app/schemas_competition.py, backend/app/api/crud.py
-- contract: Add Pydantic v2 models for Championship, Circuit, Team, Driver, Event, Session in schemas_competition.py and use response_model with ConfigDict(extra="allow") and typed payloads in crud.py, keeping openapi snapshot assert_compatible green.
-- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_api.py -k "test_runtime_route_registrations or test_current_openapi or test_websocket_bus or f_dom_05" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
+### T-44597 — Harmonize race control feed 40px height with A3 desktop palette share
+- worker: W1 | priority: P1 | origin: E2E race-control-feed height & palette.spec.ts
+- target_files: frontend/app/styles/shell.css
+- contract: Keep .race-control-feed height at 40px across all viewports to pass race-control-feed.spec.ts 15/15; supply required 5-15% red palette share on desktop via red footer styling to pass palette.spec.ts 80/80.
+- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts frontend/e2e/race-control-feed.spec.ts frontend/e2e/palette.spec.ts && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Documentation checkpoint
 ### T-44587 — Active document authority audit
