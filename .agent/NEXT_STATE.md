@@ -5,11 +5,11 @@ execution: RUNNING
 phase: 3 backend / 7 routes; no current score
 
 ## Queue (root must prepare exact packets before dispatch)
-### T-44592 — Modularize frontend/components/ui.tsx under 300 lines
-- worker: W1 | priority: P1 | origin: ARCHITECT.md hard rule (< 300 lines per component)
-- target_files: frontend/components/ui.tsx, frontend/components/modal.tsx, frontend/components/resource-editor.tsx
-- contract: Extract Modal into frontend/components/modal.tsx and ResourceEditor into frontend/components/resource-editor.tsx, re-exporting both from ui.tsx so all three files are strictly < 300 lines and backwards compatible.
-- verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
+### T-44594 — RootLayout document-title accessibility fix
+- worker: W1 | priority: P1 | origin: E2E-R01 accessibility audit defect
+- target_files: frontend/app/layout.tsx
+- contract: Add static <head><title>ApexGrid | Race Operations</title></head> to RootLayout so every route has document-title present at domcontentloaded, passing accessibility.spec.ts 85/85.
+- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts frontend/e2e/accessibility.spec.ts && npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ### T-44593 — Typed Pydantic v2 schemas for CRUD endpoints
 - worker: W2 | priority: P1 | origin: Phase 3 T-333 typed CRUD
