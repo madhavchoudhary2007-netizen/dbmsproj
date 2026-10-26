@@ -11,10 +11,10 @@ phase: 3 backend / 7 routes; no current score
 - contract: Extract simulation lifecycle helpers from main.py into core/simulation_service.py, <=250 lines; retain main.py entrypoint cleanliness (target <= 120 lines).
 - verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py backend/tests/test_api.py -k "test_runtime_route_registrations or test_current_openapi or test_websocket_bus or f_dom_05 or test_simulation_stop_clears_pending_pit_reservations" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
 
-### T-44589 — Dashboard 4-accent repair
-- worker: W1 | priority: P1 | origin: TASTE-381-1
-- target_files: frontend/components/pages/dashboard.tsx
-- contract: Fix stat card accent tones to stay within the approved <= 3 distinct accent colors (e.g. use red, yellow, mint; avoid violet). Preserve all text, props, structure, data-test attributes, and accessibility attributes verbatim.
+### T-44590 — Resource-page component modularization
+- worker: W1 | priority: P1 | origin: TASTE-382-BLOAT
+- target_files: frontend/components/resource-page.tsx, frontend/components/resource-table.tsx, frontend/components/resource-modals.tsx
+- contract: Split 594-line resource-page.tsx into modular subcomponents so every component is strictly < 300 lines. Preserve all existing exports, props, accessibility tags, data attributes, and test hooks verbatim.
 - verify: npm --prefix frontend run typecheck && npm --prefix frontend run lint -- --max-warnings 0 && bash scripts/eval/lint-spacing.sh && bash scripts/eval/lint-motion.sh && bash scripts/eval/lint-banned.sh && bash scripts/eval/lint-neobrutal.sh
 
 ## Documentation checkpoint

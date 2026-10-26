@@ -280,7 +280,7 @@ from .core.auth_dependencies import (
     create_role_check,
     token_is_revoked,
 )
-from .core.events import EventBus
+from .core.events import EventBus as EventBus
 from .core.http_auth import authenticate_http_user
 from .core.lifespan import lifespan
 from .core.lock_demo import create_lock_demo_helpers
@@ -288,10 +288,73 @@ from .core.runtime import RuntimeState as RuntimeState
 from .core.security import websocket_bearer as websocket_bearer
 from .core.serialization import jsonable
 from .core.serialization import telemetry_ws_payload as telemetry_ws_payload
-from .core.simulation_tick import advance_simulation_tick as advance_simulation_tick
-from .core.validation import (
-    _require_crud_record,
+from .core.simulation_service import (
+    _default_demo_race_row as _default_demo_race_row,
 )
+from .core.simulation_service import (
+    _finalize_simulation_results as _finalize_simulation_results,
+)
+from .core.simulation_service import (
+    _make_demo_race as _make_demo_race,
+)
+from .core.simulation_service import (
+    _persist_simulation_tick as _persist_simulation_tick,
+)
+from .core.simulation_service import (
+    _reset_session_simulation as _reset_session_simulation,
+)
+from .core.simulation_service import (
+    _simulation_lease_is_valid as _simulation_lease_is_valid,
+)
+from .core.simulation_service import (
+    _start_session_simulation as _start_session_simulation,
+)
+from .core.simulation_service import (
+    cancel_automatic_pit_reservations as cancel_automatic_pit_reservations,
+)
+from .core.simulation_service import (
+    clear_session_measurements as clear_session_measurements,
+)
+from .core.simulation_service import (
+    demo_race_row as demo_race_row,
+)
+from .core.simulation_service import (
+    ensure_session_reset_allowed as ensure_session_reset_allowed,
+)
+from .core.simulation_service import (
+    launch_demo_simulation as launch_demo_simulation,
+)
+from .core.simulation_service import (
+    record_simulated_incidents as record_simulated_incidents,
+)
+from .core.simulation_service import (
+    refresh_simulation_pit_state as refresh_simulation_pit_state,
+)
+from .core.simulation_service import (
+    restore_simulated_incidents as restore_simulated_incidents,
+)
+from .core.simulation_service import (
+    restore_simulation_from_telemetry as restore_simulation_from_telemetry,
+)
+from .core.simulation_service import (
+    resume_or_create_auto_demo_race as resume_or_create_auto_demo_race,
+)
+from .core.simulation_service import (
+    schedule_simulation_pit_stops as schedule_simulation_pit_stops,
+)
+from .core.simulation_service import (
+    simulation_loop as simulation_loop,
+)
+from .core.simulation_service import (
+    simulation_tick_work as simulation_tick_work,
+)
+from .core.simulation_service import (
+    simulations as simulations,
+)
+from .core.simulation_service import (
+    sync_simulation_lifecycle as sync_simulation_lifecycle,
+)
+from .core.simulation_tick import advance_simulation_tick as advance_simulation_tick
 from .core.validation import (
     validate_session_laps as validate_session_laps,
 )
@@ -300,22 +363,18 @@ from .core.websocket_runtime import wait_for_ws_event as _wait_for_ws_event_impl
 from .core.websocket_runtime import (
     websocket_authenticated_user as _websocket_authenticated_user_impl,
 )
-from .database import connection, fetch_all, fetch_one, get_pool
+from .database import connection, fetch_one, get_pool
+from .database import fetch_all as fetch_all
 from .demo_names import generate_demo_names as generate_demo_names
 from .demo_race_repository import DemoRaceDeleteConflict as DemoRaceDeleteConflict
 from .demo_race_repository import DemoRaceSetupError as DemoRaceSetupError
 from .demo_race_repository import choose_demo_car_numbers as choose_demo_car_numbers
-from .demo_race_repository import (
-    create_demo_race_records,
-    get_demo_race_row,
-)
 from .demo_race_router import (
     create_demo_race_router as create_demo_race_router,
 )
 from .demo_race_router import (
     router as demo_race_router,
 )
-from .demo_runtime import build_demo_race
 from .membership_router import router as membership_router
 from .pit_repository import (
     create_automatic_reservation as create_automatic_reservation,
@@ -331,9 +390,6 @@ from .pit_strategy_router import (
     router as pit_strategy_router,
 )
 from .pit_strategy_service import PIT_TIRE_STINT_LAPS as PIT_TIRE_STINT_LAPS
-from .pit_strategy_service import (
-    tire_stint_target,
-)
 from .runtime_lease import check_runtime_lease
 from .schemas_competition import ResultIn as ResultIn
 from .schemas_health import HealthReport as HealthReport
@@ -345,28 +401,9 @@ from .schemas_operations import Decision as Decision
 from .schemas_operations import IncidentIn as IncidentIn
 from .schemas_operations import ReservationIn as ReservationIn
 from .schemas_operations import ReservationStatus as ReservationStatus
-from .schemas_simulation import SimulationControl
-from .session_measurements import clear_measurements, ensure_reset_allowed
-from .simulation_core import MAX_SESSION_LAPS
+from .schemas_simulation import SimulationControl as SimulationControl
 from .simulation_core import Simulation as Simulation
 from .simulation_core import calculate_sector_performance as calculate_sector_performance
-from .simulation_finish import finalize_results
-from .simulation_incidents import record_generated_incidents
-from .simulation_lifecycle import sync_lifecycle
-from .simulation_persist import persist_tick
-from .simulation_pit import (
-    cancel_automatic_reservations,
-    refresh_pit_state,
-    schedule_pit_stops,
-)
-from .simulation_reset import reset_simulation
-from .simulation_restore import (
-    restore_incident_state,
-    restore_or_create_demo,
-    restore_telemetry_state,
-)
-from .simulation_runner import run_simulation_loop
-from .simulation_start import start_simulation
 from .telemetry_router import (
     create_telemetry_router as create_telemetry_router,
 )
@@ -560,207 +597,10 @@ app.include_router(pit_strategy_router)
 pit_strategy = pit_strategy
 
 
-def demo_race_row(session_id: UUID | str) -> dict[str, Any] | None:
-    row = get_demo_race_row(session_id)
-    if not row:
-        return None
-    result: dict[str, Any] = jsonable(row)
-    sim = simulations.get(str(session_id))
-    result["simulation_state"] = sim.status if sim else "stopped"
-    return result
-
-
-_default_demo_race_row = demo_race_row
-
-
-def _make_demo_race(cars: int | None = None, auto_repeat: bool = False) -> dict[str, Any] | None:
-    result: dict[str, Any] | None = build_demo_race(
-        cars,
-        auto_repeat,
-        mongo_ready,
-        create_demo_race_records,
-        simulations,
-        demo_race_row,
-    )
-    return result
-
-
-def launch_demo_simulation(session_id: UUID | str) -> None:
-    sim = simulations[str(session_id)]
-    sim.status = "running"
-    sim.task = asyncio.create_task(simulation_loop(sim))
-
-
-app.include_router(demo_race_router)
-
-
-def restore_simulation_from_telemetry(sim: Simulation) -> None:
-    return restore_telemetry_state(sim, lambda: mongo_ready())
-
-
-def restore_simulated_incidents(sim: Simulation) -> None:
-    return restore_incident_state(sim, lambda *a, **kw: fetch_all(*a, **kw))
-
-
-async def resume_or_create_auto_demo_race(create_if_missing: bool = True) -> None:
-    await restore_or_create_demo(
-        create_if_missing,
-        lambda *args, **kwargs: fetch_all(*args, **kwargs),
-        log,
-        lambda sim: restore_simulation_from_telemetry(sim),
-        lambda sim: restore_simulated_incidents(sim),
-        lambda *args, **kwargs: launch_demo_simulation(*args, **kwargs),
-        lambda *args, **kwargs: _make_demo_race(*args, **kwargs),
-        simulations,
-    )
-
-
 bus = EventBus()
-
-
-simulations: dict[str, Simulation] = {}
 app.state.runtime = RuntimeState(bus=bus, simulations=simulations)
 
-
-def sync_simulation_lifecycle(session_id: UUID, action: str) -> None:
-    sync_lifecycle(session_id, action, simulations)
-
-
-def ensure_session_reset_allowed(session_id: UUID | str) -> None:
-    return ensure_reset_allowed(session_id, fetch_one)
-
-
-def clear_session_measurements(session_id: UUID | str) -> None:
-    return clear_measurements(session_id, mongo_ready, connection, publish)
-
-
-def refresh_simulation_pit_state(sim: Simulation, timestamp: datetime) -> None:
-    refresh_pit_state(sim, timestamp, connection, publish, tire_stint_target)
-
-
-def schedule_simulation_pit_stops(sim: Simulation, packets: list[dict[str, Any]]) -> None:
-    return schedule_pit_stops(
-        sim, packets, tire_stint_target, create_automatic_reservation, publish, log
-    )
-
-
-def record_simulated_incidents(sim: Simulation, packets: list[dict[str, Any]]) -> None:
-    return record_generated_incidents(sim, packets, connection, publish)
-
-
-def cancel_automatic_pit_reservations(session_id: UUID | str) -> None:
-    return cancel_automatic_reservations(session_id, connection, publish)
-
-
-def _simulation_lease_is_valid(sim: Simulation) -> bool:
-    runtime_lease = getattr(app.state, "runtime_lease", None)
-    if runtime_lease is None:
-        return True
-    try:
-        check_runtime_lease(runtime_lease)
-    except RuntimeError as error:
-        sim.status = "error"
-        log.error("Simulation stopped after PostgreSQL runtime ownership loss: %s", error)
-        return False
-    return True
-
-
-async def _finalize_simulation_results(
-    sim: Simulation,
-    ordered: list[dict[str, Any]],
-    best_laps: dict[str, int],
-    pole_driver_id: str | None,
-    fastest_driver_id: str | None,
-    championship_id: UUID,
-) -> None:
-    await finalize_results(
-        sim,
-        ordered,
-        best_laps,
-        pole_driver_id,
-        fastest_driver_id,
-        championship_id,
-        connection,
-        publish,
-        cancel_automatic_pit_reservations,
-        _make_demo_race,
-        launch_demo_simulation,
-        simulations,
-    )
-
-
-def _persist_simulation_tick(
-    col: Collection[dict[str, Any]],
-    sim: Simulation,
-    packets: list[dict[str, Any]],
-    timing: dict[str, Any],
-) -> None:
-    persist_tick(
-        col,
-        sim,
-        packets,
-        timing,
-        publish,
-        schedule_simulation_pit_stops,
-        record_simulated_incidents,
-    )
-
-
-async def simulation_loop(sim: Simulation) -> None:
-    await run_simulation_loop(
-        sim,
-        _simulation_lease_is_valid=lambda *args, **kwargs: _simulation_lease_is_valid(
-            *args, **kwargs
-        ),
-        mongo_ready=lambda *args, **kwargs: mongo_ready(*args, **kwargs),
-        fetch_one=lambda *args, **kwargs: fetch_one(*args, **kwargs),
-        refresh_simulation_pit_state=lambda *args, **kwargs: refresh_simulation_pit_state(
-            *args, **kwargs
-        ),
-        advance_simulation_tick=lambda *args, **kwargs: advance_simulation_tick(*args, **kwargs),
-        _persist_simulation_tick=lambda *args, **kwargs: _persist_simulation_tick(*args, **kwargs),
-        _finalize_simulation_results=lambda *args, **kwargs: _finalize_simulation_results(
-            *args, **kwargs
-        ),
-        log=log,
-        MAX_SESSION_LAPS=MAX_SESSION_LAPS,
-        datetime=datetime,
-        UTC=UTC,
-    )
-
-
-async def _start_session_simulation(
-    session_id: UUID, body: SimulationControl, sim: Simulation | None
-) -> Simulation:
-    return await start_simulation(
-        session_id,
-        body,
-        sim,
-        _require_crud_record,
-        fetch_one,
-        clear_session_measurements,
-        fetch_all,
-        restore_simulated_incidents,
-        simulations,
-        simulation_loop,
-    )
-
-
-async def _reset_session_simulation(
-    session_id: UUID, body: SimulationControl, sim: Simulation | None
-) -> Simulation:
-    return await reset_simulation(
-        session_id,
-        body,
-        sim,
-        fetch_one,
-        ensure_session_reset_allowed,
-        sync_simulation_lifecycle,
-        clear_session_measurements,
-        simulations,
-    )
-
-
+app.include_router(demo_race_router)
 app.include_router(simulation_router)
 
 
