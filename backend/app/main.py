@@ -221,9 +221,28 @@ from .api.stewards import (
     stewards_router as stewards_router,
 )
 from .auth_cookie import verify_csrf_token
-from .auth_router import create_auth_router
+from .auth_router import (
+    auth_router as auth_router,
+)
+from .auth_router import (
+    create_auth_router as create_auth_router,
+)
+from .auth_router import (
+    login as login,
+)
+from .auth_router import (
+    logout as logout,
+)
+from .auth_router import (
+    me as me,
+)
+from .auth_router import (
+    refresh as refresh,
+)
 from .config import (
-    APP_ENV,
+    APP_ENV as APP_ENV,
+)
+from .config import (
     CORS_ORIGINS,
     JWT_ALGORITHM,
     JWT_SECRET,
@@ -326,7 +345,27 @@ from .simulation_restore import (
 from .simulation_runner import run_simulation_loop
 from .simulation_start import start_simulation
 from .telemetry_router import create_telemetry_router
-from .user_router import create_user_router
+from .user_router import (
+    create_user as create_user,
+)
+from .user_router import (
+    create_user_router as create_user_router,
+)
+from .user_router import (
+    delete_user as delete_user,
+)
+from .user_router import (
+    get_user as get_user,
+)
+from .user_router import (
+    update_user as update_user,
+)
+from .user_router import (
+    user_router as user_router,
+)
+from .user_router import (
+    users as users,
+)
 
 FutureTimeout = _FutureTimeout
 
@@ -436,18 +475,17 @@ app.include_router(membership_router)
 app.include_router(stewarding_reads_router)
 
 
-app.include_router(
-    create_auth_router(
-        require_allowed_origin,
-        lambda: fetch_one,
-        jsonable,
-        lambda: APP_ENV != "local",
-        current_user,
-    )
-)
-
-
-app.include_router(create_user_router(roles, jsonable))
+app.include_router(auth_router)
+app.include_router(user_router)
+login = login
+logout = logout
+me = me
+refresh = refresh
+users = users
+get_user = get_user
+create_user = create_user
+update_user = update_user
+delete_user = delete_user
 
 
 app.include_router(session_action_router)
