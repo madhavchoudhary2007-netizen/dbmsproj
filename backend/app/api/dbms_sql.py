@@ -319,7 +319,7 @@ def dbms_races(
             """c.id=e.circuit_id LEFT JOIN demo_races d ON d.session_id=s.id
   WHERE s.session_type='RACE' ORDER BY CASE WHEN s.state='ACTIVE' THEN 0 WHEN """
             """s.state='PAUSED' THEN 1 ELSE 2 END,COALESCE(d.auto_repeat,false) """
-            """DESC,s.scheduled_at DESC"""
+            """DESC,s.scheduled_at DESC LIMIT 200"""
         )
     )
 
@@ -598,7 +598,7 @@ def create_dbms_sql_router(
                 """c.id=e.circuit_id LEFT JOIN demo_races d ON d.session_id=s.id
       WHERE s.session_type='RACE' ORDER BY CASE WHEN s.state='ACTIVE' THEN 0 WHEN """
                 """s.state='PAUSED' THEN 1 ELSE 2 END,COALESCE(d.auto_repeat,false) """
-                """DESC,s.scheduled_at DESC"""
+                """DESC,s.scheduled_at DESC LIMIT 200"""
             )
         )
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from contextlib import suppress
 from datetime import UTC, datetime
 from typing import Annotated, Any
 from uuid import UUID
@@ -23,6 +24,34 @@ router = APIRouter()
 race_archive_router = router
 
 
+def latest_driver_telemetry(col: Any, match: dict[str, Any]) -> list[dict[str, Any]]:
+    latest_rows: list[dict[str, Any]] = []
+    if hasattr(col, "aggregate"):
+        with suppress(Exception):
+            cursor = col.aggregate(
+                [
+                    {"$match": match},
+                    {"$sort": {"ts": -1}},
+                    {"$group": {"_id": "$driver_id", "latest_doc": {"$first": "$$ROOT"}}},
+                    {"$replaceRoot": {"newRoot": "$latest_doc"}},
+                ]
+            )
+            latest_rows = [row for row in cursor if row]
+            return sorted(
+                latest_rows, key=lambda r: (r.get("position") is None, r.get("position") or 0)
+            )
+
+    driver_ids: list[Any] = []
+    with suppress(Exception):
+        driver_ids = col.distinct("driver_id", match)
+    for driver_id in driver_ids:
+        with suppress(Exception):
+            row = col.find_one({**match, "driver_id": driver_id}, sort=[("ts", DESCENDING)])
+            if row:
+                latest_rows.append(row)
+    return sorted(latest_rows, key=lambda r: (r.get("position") is None, r.get("position") or 0))
+
+
 @router.get("/api/dbms/races/{session_id}")
 def dbms_race(
     session_id: UUID,
@@ -33,11 +62,9 @@ def dbms_race(
 ) -> Any:
     session = database.fetch_one(
         (
-            "SELECT s.*,e.name AS event_name,c.name AS circuit_"
-            "name FROM race_sessions s\n      J"
-            "OIN race_events e ON e.id=s.event_id JOIN circuits c ON c.id=e.circuit_id WHERE s."
-            "id"
-            "=%s AND s.session_type='RACE'"
+            "SELECT s.*,e.name AS event_name,c.name AS circuit_name FROM race_sessions s "
+            "JOIN race_events e ON e.id=s.event_id JOIN circuits c ON c.id=e.circuit_id "
+            "WHERE s.id=%s AND s.session_type='RACE'"
         ),
         (session_id,),
     )
@@ -79,19 +106,7 @@ def dbms_race(
     match = {"session_id": str(session_id)}
     # Full lap history is optional for the 1s live poll; it grows with every race lap.
     laps = race_lap_measurements(col, match) if include_laps else []
-    driver_ids = col.distinct("driver_id", match)
-    latest_rows: list[dict[str, Any]] = []
-    latest = [
-        col.find_one({**match, "driver_id": driver_id}, sort=[("ts", DESCENDING)])
-        for driver_id in driver_ids
-    ]
-    for row in latest:
-        if row is not None and row:
-            latest_rows.append(row)
-    latest_rows = sorted(
-        latest_rows,
-        key=lambda row: (row.get("position") is None, row.get("position") or 0),
-    )
+    latest_rows = latest_driver_telemetry(col, match)
     ids = {row["driver_id"] for row in latest_rows} | {str(row["driver_id"]) for row in results}
     drivers = (
         database.fetch_all(
@@ -210,19 +225,7 @@ def create_race_archive_router(
         col = mongo_ready()
         match = {"session_id": str(session_id)}
         laps = race_lap_measurements(col, match) if include_laps else []
-        driver_ids = col.distinct("driver_id", match)
-        latest_rows: list[dict[str, Any]] = []
-        latest = [
-            col.find_one({**match, "driver_id": driver_id}, sort=[("ts", DESCENDING)])
-            for driver_id in driver_ids
-        ]
-        for row in latest:
-            if row is not None and row:
-                latest_rows.append(row)
-        latest_rows = sorted(
-            latest_rows,
-            key=lambda row: (row.get("position") is None, row.get("position") or 0),
-        )
+        latest_rows = latest_driver_telemetry(col, match)
         ids = {row["driver_id"] for row in latest_rows} | {str(row["driver_id"]) for row in results}
         drivers = (
             fetch_all(

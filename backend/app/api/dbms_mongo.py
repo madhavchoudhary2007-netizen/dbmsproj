@@ -117,6 +117,13 @@ def _resolve_db(database: DatabaseSession | None = None) -> DatabaseSession:
     return _MonkeypatchedDatabaseSession(cur_fetch_one, cur_fetch_all)
 
 
+def _estimated_telemetry_count(telemetry: Any) -> int:
+    if hasattr(telemetry, "estimated_document_count"):
+        with suppress(Exception):
+            return int(telemetry.estimated_document_count())
+    return int(telemetry.count_documents({}))
+
+
 @router.get("/api/dbms/overview")
 def dbms_overview(
     request: Request,
@@ -136,7 +143,7 @@ def dbms_overview(
     )
     try:
         telemetry = _resolve_telemetry(request=request)
-        telemetry_samples: int | None = telemetry.count_documents({})
+        telemetry_samples: int | None = _estimated_telemetry_count(telemetry)
         mongo_status = "up"
     except (HTTPException, PyMongoError, Exception):
         telemetry_samples = None
@@ -506,7 +513,7 @@ def create_dbms_mongo_router(
       (SELECT count(*) FROM pit_reservations WHERE status='COMPLETED') AS completed_pit_stops,
       (SELECT count(*) FROM session_results) AS official_results""")
         try:
-            telemetry_samples: int | None = mongo_ready().count_documents({})
+            telemetry_samples: int | None = _estimated_telemetry_count(mongo_ready())
             mongo_status = "up"
         except (HTTPException, PyMongoError):
             telemetry_samples = None

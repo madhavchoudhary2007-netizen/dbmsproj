@@ -38,6 +38,9 @@ async def lifespan(application: FastAPI) -> AsyncIterator[None]:
         main.telemetry_collection.create_index([("session_id", 1), ("ts", -1)])
         main.telemetry_collection.create_index([("driver_id", 1), ("ts", -1)])
         main.telemetry_collection.create_index([("session_id", 1), ("driver_id", 1), ("ts", -1)])
+        main.telemetry_collection.create_index(
+            [("session_id", 1), ("driver_id", 1), ("recorded_at", -1)]
+        )
     except Exception:
         log.warning("MongoDB is not available at startup", exc_info=True)
     runtime.mongo_client = main.mongo_client
