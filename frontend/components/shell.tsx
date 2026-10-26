@@ -165,7 +165,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </aside>
-      <div ref={backgroundRef} className="main-shell">
+      <div
+        ref={backgroundRef}
+        className="main-shell"
+        aria-hidden={isMobile && open ? true : undefined}
+        inert={isMobile && open ? true : undefined}
+      >
         <header className="topbar">
           <button ref={menuButtonRef} className="mobile-menu" aria-label="Open navigation" aria-expanded={open} aria-controls="primary-navigation" onClick={() => setOpen(true)}>
             <Menu />
@@ -194,6 +199,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           className="mobile-scrim"
           onClick={close}
           aria-label="Close navigation"
+          style={{ left: "min(264px, calc(100vw - 32px))" }}
         />
       )}
     </div>

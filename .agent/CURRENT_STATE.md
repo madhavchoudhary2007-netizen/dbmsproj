@@ -2,8 +2,8 @@
 updated_at: 2026-10-26
 branch: overhaul/neo-brutal
 execution: RUNNING — implementation resumed on owner instruction 2026-10-26
-verified_product_head: 59bbf84
-last_product_task: T-44595
+verified_product_head: e99c07d
+last_product_task: T-44596
 metadata_task: T-44587 active-document audit; see matching acceptance result/commit
 architect_sha256: 0f2b5366fee89ec70d8340ab2e148ad676f0c64bf324f00af559c242cd4cc46c
 target_harness: Antigravity; requested Gemini 3.8 Flash HIGH orchestrator / LOW workers; cap 2
@@ -40,6 +40,7 @@ Phase requirements are in docs/overhaul-plan.md; the table below is the current 
 - T-44594 (128693b): added static head title to RootLayout in layout.tsx; accessibility.spec.ts passed 85/85 green across all viewports. Core E2E suites (states-matrix, data-primary, responsive, touch-targets) verified 660/660 passed.
 - T-44597 (ba7f19d): harmonized race control feed to 40px everywhere (15/15 passed in race-control-feed.spec.ts) and added desktop red footer styling to maintain 5-15% red palette share (80/80 passed in palette.spec.ts).
 - T-44595 (59bbf84): replaced per-packet insert_one with batched col.insert_many(ordered=False) in simulation_persist.py and offloaded blocking writes in simulation_runner.py to asyncio.to_thread with legacy lifespan pool and cross-module resolution compatibility.
+- T-44596 (e99c07d): implemented schema_migrations ledger in migrations.py (152 lines) with transaction-wrapped version-ordered execution, SHA-256 checksum verification, and existing-DB backfill; delegated bootstrap.py (36 lines).
 
 ## Current risks and open work
 - Complete only remaining T-331/T-332 domains and required integration; do not repeat accepted T-44575..80 or create line-count wrappers. T-44573 remains superseded. Historical assembly counts are not the current module map.
