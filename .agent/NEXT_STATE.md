@@ -5,17 +5,17 @@ execution: RUNNING
 phase: 3 backend / 7 routes; no current score
 
 ## Queue (root must prepare exact packets before dispatch)
-### T-44599 — Query fixes & aggregation
-- worker: W2 | priority: P1 | origin: Phase 3 T-336 query fixes and MongoDB aggregation
-- target_files: backend/app/api/race_archive.py, backend/app/api/dbms_mongo.py, backend/app/api/dbms_sql.py, backend/app/core/lifespan.py
-- contract: Replace N+1 find_one per driver in race_archive with MongoDB aggregation ($match, $sort, $group by driver_id with latest packet $first) and test-mock fallback; use estimated_document_count in dbms_mongo overview; add LIMIT 200 to /api/dbms/races SQL; ensure compound index in lifespan; strict mypy clean.
+### T-44601 — Points system as data
+- worker: W2 | priority: P1 | origin: Phase 3 T-337 points system migration 005
+- target_files: backend/migrations/005_points_systems.sql, backend/app/schemas_competition.py
+- contract: Create migration 005 with points_systems and points_system_positions tables, default F1 2025 seed, championships.points_system_id column, and recalculate_standings joined through points system; add Pydantic schemas in schemas_competition.py; strict mypy clean.
 - verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_contract_snapshot.py backend/tests/test_route_registration.py backend/tests/test_simulation_replay.py backend/tests/test_api.py -k "test_runtime_route_registrations or test_current_openapi or test_websocket_bus or f_dom_05 or test_app_lifespan or test_restarting_simulator" && APP_ENV=local .venv/bin/mypy --strict backend/app && APP_ENV=local .venv/bin/ruff check backend/app && APP_ENV=local .venv/bin/ruff format --check backend/app
 
-### T-44600 — Edge resilience in-flight navigation abort test fix
-- worker: W3 | priority: P1 | origin: Playwright edge-resilience E-2 Lens 5 test
-- target_files: frontend/e2e/edge-resilience.spec.ts
-- contract: Attach .catch(() => {}) to void page.goto("/dashboard") so in-flight net::ERR_ABORTED rejection is handled when /sessions is immediately loaded; all heading assertions and failures array pass across all 5 viewports; never touch product source.
-- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts frontend/e2e/edge-resilience.spec.ts
+### T-44602 — Points system test suite
+- worker: W3 | priority: P1 | origin: Phase 3 T-337 QA unit test coverage
+- target_files: backend/tests/test_points_system.py
+- contract: Add unit tests in test_points_system.py asserting migration 005 structure, F1 points distribution, recalculate_standings query joins, and Pydantic schema validation; never touch product source.
+- verify: PYTHONPATH=backend:. APP_ENV=local .venv/bin/pytest -q backend/tests/test_points_system.py && APP_ENV=local .venv/bin/mypy --strict backend/tests/test_points_system.py
 
 ## Documentation checkpoint
 ### T-44587 — Active document authority audit

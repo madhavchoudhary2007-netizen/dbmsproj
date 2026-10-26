@@ -47,6 +47,7 @@ class ChampionshipIn(BaseModel):
 
     name: str | None = None
     season: int | None = None
+    points_system_id: UUID | None = None
 
 
 class ChampionshipOut(BaseModel):
@@ -55,6 +56,25 @@ class ChampionshipOut(BaseModel):
     id: UUID
     name: str
     season: int
+    points_system_id: UUID | None = None
+
+
+class PointsSystemPositionOut(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    id: UUID | None = None
+    system_id: UUID | None = None
+    position: int
+    points: int
+
+
+class PointsSystemOut(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    id: UUID | None = None
+    name: str
+    is_default: bool = False
+    positions: list[PointsSystemPositionOut] | None = Field(default_factory=list)
 
 
 class CircuitIn(BaseModel):
@@ -173,6 +193,8 @@ __all__ = [
     "MembershipIn",
     "MembershipOut",
     "MembershipPatch",
+    "PointsSystemOut",
+    "PointsSystemPositionOut",
     "ResultIn",
     "SessionIn",
     "SessionOut",
