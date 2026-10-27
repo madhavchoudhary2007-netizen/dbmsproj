@@ -74,7 +74,18 @@ for (const [snapshot, routePath] of routes) {
       if (pathname.endsWith("/dbms/overview")) {
         await route.fulfill({
           status: 200,
-          json: { postgres: { status: "connected" }, mongodb: { status: "connected" } },
+          json: {
+            active_sessions: 1,
+            completed_sessions: 12,
+            open_incidents: 2,
+            reserved_pit_stops: 3,
+            completed_pit_stops: 8,
+            official_results: 12,
+            telemetry_samples: 480,
+            postgres: "up",
+            mongodb: "up",
+            updated_at: "2026-10-27T12:00:00Z",
+          },
         });
         return;
       }
@@ -84,6 +95,12 @@ for (const [snapshot, routePath] of routes) {
     await page.goto(routePath, { waitUntil: "domcontentloaded" });
     const expectedPath = routePath === "/" ? "/dashboard" : routePath;
     await expect(page).toHaveURL((url) => new URL(url).pathname === expectedPath);
+    if (routePath === "/dbms") {
+      const statusPanel = page.locator(".dbms-status-panel");
+      await expect(statusPanel).toContainText("PostgreSQL · up");
+      await expect(statusPanel).toContainText("MongoDB · up");
+      await expect(statusPanel).not.toContainText("Connecting…");
+    }
     const primaryScreen = page.locator("[data-primary='true']");
     await expect(primaryScreen).toHaveCount(1);
     await expect(primaryScreen).toBeVisible();
