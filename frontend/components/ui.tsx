@@ -1,9 +1,7 @@
 "use client";
 
 import {
-  Plus,
   RefreshCw,
-  Search,
   AlertCircle,
   LoaderCircle,
 } from "lucide-react";
@@ -105,32 +103,6 @@ export function StateMessage({
   return null;
 }
 
-export function PartialStateNotice({
-  shownCount,
-  totalCount,
-  filterLabel,
-  onClear,
-}: {
-  shownCount: number;
-  totalCount: number;
-  filterLabel: string;
-  onClear: () => void;
-}) {
-  return (
-    <div className="state" role="status" aria-live="polite">
-      <span>Showing {shownCount} of {totalCount} records</span>
-      <button
-        className="text-button"
-        onClick={onClear}
-        aria-label={`Clear filter: ${filterLabel}`}
-        style={{ minHeight: 44, paddingInline: 12 }}
-      >
-        Clear filter
-      </button>
-    </div>
-  );
-}
-
 export function DataTable({
   rows,
   columns,
@@ -177,47 +149,10 @@ export function DataTable({
   );
 }
 
-export function SearchBox({
-  value,
-  onChange,
-  placeholder = "Filter records",
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  placeholder?: string;
-}) {
-  return (
-    <label className="search">
-      <Search size={15} aria-hidden="true" />
-      <input
-        aria-label={placeholder || "Filter records"}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-      />
-    </label>
-  );
-}
-
 export function ReloadButton({ onClick, "data-primary": dataPrimary }: { onClick: () => void; "data-primary"?: string | boolean }) {
   return (
     <button className="icon-button" onClick={onClick} aria-label="Refresh" data-primary={dataPrimary}>
       <RefreshCw size={15} />
     </button>
-  );
-}
-
-export function AddButton({
-  onClick,
-  children = "New record",
-}: {
-  onClick: () => void;
-  children?: string;
-}) {
-  return (
-    <Button onClick={onClick} data-primary="true">
-      <Plus size={15} />
-      {children}
-    </Button>
   );
 }
