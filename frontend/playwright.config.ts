@@ -2,7 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 const port = process.env.PLAYWRIGHT_PORT ?? "3100";
 const mode = process.env.PLAYWRIGHT_MODE ?? "production";
-if (mode !== "production" && mode !== "guide" && mode !== "real-stack") {
+if (mode !== "production" && mode !== "guide" && mode !== "visual" && mode !== "real-stack") {
   throw new Error(`Unsupported PLAYWRIGHT_MODE: ${mode}`);
 }
 const isGuideMode = mode === "guide";
@@ -41,17 +41,31 @@ const standardViewports = [
 ];
 
 const guideSpecs = ["**/nb-primitives.spec.ts", "**/motion-hooks.spec.ts"];
+const visualSpecs = ["**/visual-regression.spec.ts"];
 const projects = isGuideMode
   ? standardViewports.map(({ name, use }) => ({
       name: `guide-${name}`,
       testMatch: guideSpecs,
       use,
     }))
+  : mode === "visual"
+    ? [
+      {
+        name: "mobile-375",
+        testMatch: visualSpecs,
+        use: { ...devices["iPhone 13"], browserName: "chromium" as const, viewport: { width: 375, height: 812 } },
+      },
+      {
+        name: "desktop-1440",
+        testMatch: visualSpecs,
+        use: { viewport: { width: 1440, height: 900 } },
+      },
+    ]
   : mode === "production"
     ? [
       ...standardViewports.map(({ name, use }) => ({
         name,
-        testIgnore: ["**/real-stack.spec.ts", ...guideSpecs],
+        testIgnore: ["**/real-stack.spec.ts", ...guideSpecs, ...visualSpecs],
         use,
       })),
     ]

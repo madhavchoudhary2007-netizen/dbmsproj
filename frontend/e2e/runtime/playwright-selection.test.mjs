@@ -89,7 +89,11 @@ test("production selection assigns every app spec to its viewport projects once"
   const files = specFiles();
   const guide = new Set(guideFiles);
   const realStackFiles = files.filter((file) => file === "real-stack.spec.ts");
-  const appFiles = files.filter((file) => !guide.has(path.posix.basename(file)) && !realStackFiles.includes(file));
+  const visualFiles = files.filter((file) => file === "visual-regression.spec.ts");
+  const appFiles = files.filter((file) =>
+    !guide.has(path.posix.basename(file)) &&
+    !realStackFiles.includes(file) &&
+    !visualFiles.includes(file));
   const standardNames = Object.keys(expectedViewports);
 
   assert.deepEqual(Array.from(config.projects, ({ name }) => name), standardNames);
@@ -105,6 +109,7 @@ test("production selection assigns every app spec to its viewport projects once"
 
   for (const file of appFiles) assert.deepEqual(projectsForFile(config, file), standardNames, file);
   for (const file of realStackFiles) assert.deepEqual(projectsForFile(config, file), [], file);
+  for (const file of visualFiles) assert.deepEqual(projectsForFile(config, file), [], file);
   for (const file of files.filter((entry) => guide.has(path.posix.basename(entry)))) {
     assert.deepEqual(projectsForFile(config, file), [], file);
   }
@@ -127,6 +132,31 @@ test("guide mode selects only development guide specs across matching viewports"
   }
   for (const file of expectedGuideFiles) assert.deepEqual(projectsForFile(config, file), expectedNames, file);
   for (const file of files.filter((entry) => !expectedGuideFiles.includes(entry))) {
+    assert.deepEqual(projectsForFile(config, file), [], file);
+  }
+});
+
+test("visual mode selects only the 375px and 1440px visual regression projects", () => {
+  const config = loadConfig({ PLAYWRIGHT_MODE: "visual", PLAYWRIGHT_PORT: "3127" });
+  const files = specFiles();
+  const visualFiles = files.filter((file) => file === "visual-regression.spec.ts");
+  const expectedNames = ["mobile-375", "desktop-1440"];
+
+  assert.deepEqual(Array.from(config.projects, ({ name }) => name), expectedNames);
+  assert.equal(config.projects.length, expectedNames.length);
+  assert.equal(config.use.baseURL, "http://localhost:3127");
+  assert.match(config.webServer.command, /npm run start/);
+  assert.doesNotMatch(config.webServer.command, /npm run dev/);
+  assert.deepEqual(visualFiles, ["visual-regression.spec.ts"]);
+  assert.deepEqual(
+    plain(config.projects.map(({ use }) => use.viewport)),
+    [expectedViewports["mobile-375"], expectedViewports["desktop-1440"]],
+  );
+  assert.equal(config.projects[0].use.browserName, "chromium");
+  assert.equal(config.projects[0].use.isMobile, true);
+  assert.equal(config.projects[0].use.hasTouch, true);
+  for (const file of visualFiles) assert.deepEqual(projectsForFile(config, file), expectedNames, file);
+  for (const file of files.filter((entry) => !visualFiles.includes(entry))) {
     assert.deepEqual(projectsForFile(config, file), [], file);
   }
 });
