@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
-from datetime import datetime, timezone
 import os
-from pathlib import Path
 import sys
+from collections.abc import Iterator
+from datetime import UTC, datetime
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -75,7 +75,7 @@ class _ShowcaseTelemetry:
                 "elapsed_ms": 84250,
                 "lap_time_ms": 84250,
                 "sector": 3,
-                "ts": datetime(2026, 10, 26, 12, 0, tzinfo=timezone.utc),
+                "ts": datetime(2026, 10, 26, 12, 0, tzinfo=UTC),
             }
         ]
 
@@ -179,7 +179,8 @@ class _ShowcaseConnection:
     def transaction(self) -> _ShowcaseTransaction:
         return _ShowcaseTransaction(self)
 
-    def execute(self, sql: str, params: object = None) -> _ShowcaseConnection:
+    # C901: this in-memory dispatcher intentionally handles each tested SQL contract.
+    def execute(self, sql: str, params: object = None) -> _ShowcaseConnection:  # noqa: C901
         normalized = " ".join(sql.lower().split())
         self.statements.append(normalized)
         values = params if isinstance(params, tuple) else ()
@@ -192,7 +193,11 @@ class _ShowcaseConnection:
             row_id = str(values[0])
             if self.snapshot is None:
                 self.snapshot = self.database.rows.copy()
-            rows = self.snapshot if self.isolation in {"repeatable read", "serializable"} else self.database.rows
+            rows = (
+                self.snapshot
+                if self.isolation in {"repeatable read", "serializable"}
+                else self.database.rows
+            )
             value = self.pending.get(row_id, rows.get(row_id))
             self._result = (int(float(value) * 1000),)
             if normalized.endswith("for update"):

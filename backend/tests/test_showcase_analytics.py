@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
-from copy import deepcopy
-from datetime import datetime, timezone
 import json
 import os
-from pathlib import Path
 import sys
+from collections.abc import Iterator
+from copy import deepcopy
+from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -64,7 +64,7 @@ def _measurement(
         "position": position,
         "lap_time_ms": lap_time_ms,
         "sector": 3,
-        "ts": datetime.fromtimestamp(ts, tz=timezone.utc),
+        "ts": datetime.fromtimestamp(ts, tz=UTC),
     }
     if elapsed_ms is not None:
         record["elapsed_ms"] = elapsed_ms
@@ -110,7 +110,9 @@ class _AnalyticsCursor:
 
     def execute(self, sql: str, params: Any = None) -> None:
         # Simulate PostgreSQL's failure for the nonexistent legacy table.
-        assert "lap_telemetry" not in sql.lower(), "analytics query uses absent lap_telemetry relation"
+        assert "lap_telemetry" not in sql.lower(), (
+            "analytics query uses absent lap_telemetry relation"
+        )
         self.executed.append((sql, params))
 
     def fetchall(self) -> list[dict[str, Any]]:
@@ -203,7 +205,9 @@ def test_analytics_gaps_use_scoped_recorded_elapsed_windows(
     assert body["gaps"] == expected
     assert len(mongo.pipelines) == 1
     assert mongo.pipelines[0][0]["$match"]["session_id"] == SESSION_A
-    assert cursor.executed, "the recorded analytics query must execute through the injected SQL layer"
+    assert cursor.executed, (
+        "the recorded analytics query must execute through the injected SQL layer"
+    )
     sql, params = cursor.executed[0]
     assert "lap_telemetry" not in sql.lower()
     assert SESSION_A not in sql

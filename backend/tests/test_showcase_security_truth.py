@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
 import os
-from pathlib import Path
 import sys
+from collections.abc import Iterator
+from pathlib import Path
 from typing import Any
 
 import jwt
@@ -11,7 +11,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 SESSION_ID = "synthetic-showcase-session"
-TEST_SECRET = "synthetic-test-secret-for-showcase"
+TEST_SECRET = "synthetic-test-secret-for-showcase"  # noqa: S105 - synthetic signing value for test token generation
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 _prior_app_env = os.environ.get("APP_ENV")
 os.environ.setdefault("APP_ENV", "local")

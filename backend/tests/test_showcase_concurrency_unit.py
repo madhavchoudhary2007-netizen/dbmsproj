@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import os
+import sys
 from collections.abc import Iterator
 from contextlib import AbstractContextManager
 from pathlib import Path
-import os
-import sys
 from typing import Any
 
 import pytest

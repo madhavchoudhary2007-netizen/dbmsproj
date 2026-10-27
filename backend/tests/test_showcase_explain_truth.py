@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
 import os
-from pathlib import Path
 import sys
+from collections.abc import Iterator
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -144,7 +144,9 @@ def test_explain_returns_database_plan_and_binds_inputs(
     assert body["analyze"] is analyze
     assert len(cursor.executions) == 1
     sql, bound_params = cursor.executions[0]
-    assert sql.startswith(f"EXPLAIN (ANALYZE {'TRUE' if analyze else 'FALSE'}, BUFFERS TRUE, FORMAT JSON)")
+    assert sql.startswith(
+        f"EXPLAIN (ANALYZE {'TRUE' if analyze else 'FALSE'}, BUFFERS TRUE, FORMAT JSON)"
+    )
     assert bound_params == expected_params
 
 

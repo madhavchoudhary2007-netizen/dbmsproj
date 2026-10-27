@@ -12,7 +12,9 @@ import pytest
 def _guarded_fixture_url() -> str:
     url = os.environ.get("SHOWCASE_TEST_DATABASE_URL")
     if not url:
-        pytest.fail("SHOWCASE_TEST_DATABASE_URL must explicitly name the disposable apexgrid database")
+        pytest.fail(
+            "SHOWCASE_TEST_DATABASE_URL must explicitly name the disposable apexgrid database"
+        )
 
     try:
         parsed = urlparse(url)
@@ -79,7 +81,11 @@ def test_restricted_role_rls_exposes_only_owned_penalty_audit_row() -> None:
     conn = psycopg.connect(url, connect_timeout=3)
     try:
         conn.execute("BEGIN")
-        migration_path = Path(__file__).resolve().parents[1] / "migrations" / "009_audit_rls_scope.sql"
+        migration_path = (
+            Path(__file__).resolve().parents[1]
+            / "migrations"
+            / "009_audit_rls_scope.sql"
+        )
         migration_sql = migration_path.read_text(encoding="utf-8")
         for _ in range(2):
             for statement in migration_sql.split(";"):

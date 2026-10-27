@@ -1,23 +1,24 @@
 from __future__ import annotations
 
-from concurrent.futures import ThreadPoolExecutor
-from contextlib import contextmanager
-from pathlib import Path
 import os
 import threading
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 from urllib.parse import urlparse
 from uuid import uuid4
 
 import psycopg
-from psycopg import sql
 import pytest
 from fastapi.testclient import TestClient
+from psycopg import sql
 
 
 def _fixture_url() -> str:
     url = os.environ.get("SHOWCASE_TEST_DATABASE_URL")
     if not url:
-        pytest.fail("SHOWCASE_TEST_DATABASE_URL must explicitly name the disposable apexgrid database")
+        pytest.fail(
+            "SHOWCASE_TEST_DATABASE_URL must explicitly name the disposable apexgrid database"
+        )
     parsed = urlparse(url)
     if (
         parsed.scheme not in {"postgres", "postgresql"}
@@ -68,8 +69,14 @@ def owned_table() -> str:
     table = f"showcase_concurrency_{uuid4().hex}"
     ident = sql.Identifier(table)
     with psycopg.connect(url, connect_timeout=3) as conn:
-        conn.execute(sql.SQL("CREATE TABLE {} (id integer PRIMARY KEY, balance integer NOT NULL)").format(ident))
-        conn.execute(sql.SQL("INSERT INTO {} (id, balance) VALUES (1, 314), (2, 271)").format(ident))
+        conn.execute(
+            sql.SQL("CREATE TABLE {} (id integer PRIMARY KEY, balance integer NOT NULL)").format(
+                ident
+            )
+        )
+        conn.execute(
+            sql.SQL("INSERT INTO {} (id, balance) VALUES (1, 314), (2, 271)").format(ident)
+        )
     try:
         yield table
     finally:
@@ -92,14 +99,18 @@ def test_real_sessions_observe_requested_isolation(
         assert first.info.backend_pid != second.info.backend_pid
         first.execute(sql.SQL("SET TRANSACTION ISOLATION LEVEL " + level.upper()))
         first.execute("SET LOCAL statement_timeout = '8s'")
-        initial = first.execute(sql.SQL("SELECT balance FROM {} WHERE id = 1").format(table)).fetchone()
+        initial = first.execute(
+            sql.SQL("SELECT balance FROM {} WHERE id = 1").format(table)
+        ).fetchone()
         assert initial == (314,)
 
         second.execute("SET LOCAL statement_timeout = '8s'")
         second.execute(sql.SQL("UPDATE {} SET balance = 271 WHERE id = 1").format(table))
         second.commit()
 
-        observed = first.execute(sql.SQL("SELECT balance FROM {} WHERE id = 1").format(table)).fetchone()
+        observed = first.execute(
+            sql.SQL("SELECT balance FROM {} WHERE id = 1").format(table)
+        ).fetchone()
         assert observed == (expected_second_read,)
         first.rollback()
     finally:
@@ -116,9 +127,15 @@ def test_real_postgres_deadlock_reports_40p01_and_cleans_up(owned_table: str) ->
         with psycopg.connect(url, connect_timeout=3) as conn:
             conn.execute("SET LOCAL lock_timeout = '7s'")
             conn.execute("SET LOCAL statement_timeout = '9s'")
-            conn.execute(sql.SQL("UPDATE {} SET balance = balance + 1 WHERE id = %s").format(table), (own_id,))
+            conn.execute(
+                sql.SQL("UPDATE {} SET balance = balance + 1 WHERE id = %s").format(table),
+                (own_id,),
+            )
             rendezvous.wait(timeout=3)
-            conn.execute(sql.SQL("UPDATE {} SET balance = balance + 1 WHERE id = %s").format(table), (other_id,))
+            conn.execute(
+                sql.SQL("UPDATE {} SET balance = balance + 1 WHERE id = %s").format(table),
+                (other_id,),
+            )
         return "committed"
 
     outcomes: list[str] = []
@@ -133,7 +150,9 @@ def test_real_postgres_deadlock_reports_40p01_and_cleans_up(owned_table: str) ->
     assert outcomes.count("40P01") == 1, outcomes
     assert outcomes.count("committed") == 1, outcomes
     with psycopg.connect(url, connect_timeout=3) as verify:
-        rows = verify.execute(sql.SQL("SELECT id, balance FROM {} ORDER BY id").format(table)).fetchall()
+        rows = verify.execute(
+            sql.SQL("SELECT id, balance FROM {} ORDER BY id").format(table)
+        ).fetchall()
     assert len(rows) == 2
 
 
