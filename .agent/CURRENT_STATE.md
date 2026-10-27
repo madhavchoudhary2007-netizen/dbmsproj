@@ -2,9 +2,9 @@
 updated_at: 2026-10-27
 branch: overhaul/neo-brutal
 execution: RUNNING; implementing docs/completion-plan.md with Codex Luna workers
-verified_product_head: c7dae0a (last accepted product task T-410)
+verified_product_head: c71203f (T-44620 refresh; real DB integration pending)
 reviewed_repository_head: b22bec8
-metadata_task: T-44614 completion plan; not accepted/committed while unrelated T-411 work is dirty
+metadata_task: T-44614 completion plan and evidence accepted 00e50a2; unrelated T-411 work remains untouched
 architect_sha256: 0f2b5366fee89ec70d8340ab2e148ad676f0c64bf324f00af559c242cd4cc46c
 target_harness: Antigravity Gemini3.8Flash HIGH orchestrator / LOW workers; max2
 observed_antigravity_binding: prior state claimed active Flash workers; not observable in this Codex planning session
@@ -17,6 +17,8 @@ last_eval_score: no current overhaul score; old51.2974 is obsolete
 - Reproduced without real DB: unauthenticated isolation HTTP200; forced DB failure still returns audit sample1, gaps samples2 and refresh success. Core completion blockers recorded in .agent/audit/completion-review-2026-10-27.md.
 - Accepted implementation history through T-44613 and T-410 remains in Git/results. Do not restart router/DI/font/shell tasks. Historical route1475/1475, palette80/80 and bundle max161.53KiB/DBMS154.74KiB are scoped prior claims, not current release proof.
 - Last full disposable backend evidence predates recent changes; required zero-skip/full coverage and live acceptance remain pending. Boot/lock pass.
+
+- T-44618 accepted a100c9c: 25 authorization/CSRF cases pass with offline fixtures; T-44619 accepted dd11de9: audit/views/gaps empty and error cases pass; T-44620 accepted c71203f: refresh error/success checks pass; T-44617 accepted 15a21dd (31 passed); T-44635 accepted dded0ba (60 passed, original assertions retained); OpenAPI snapshot9 passed, strict showcase mypy passed.
 
 ## Phase truth after audit
 | Phase | Status | Needed proof/work |

@@ -175,3 +175,6 @@ After a failure, use one concrete hypothesis and the same owner role. At most fi
 Read AGENTS.md -> CURRENT_STATE/NEXT_STATE -> DOC_AUTHORITY -> this plan's next wave/rows -> the triggering protocols and relevant original plan sections. Verify branch/lock, record model settings and inspect in-flight ownership once. Do not reread every result/archived plan or repeat setup. Select only a ready packet with exact targets and literal Verify. State records TASK_VERIFIED/PARTIALLY_VERIFIED/DOMAIN_VERIFIED accurately; a completed implementation is not automatically verified.
 
 At each milestone report closed finding/task IDs, actual command exits/counts, integration debt, elapsed worker/root-check time if observable and the next two ready tasks. Measure speed with fewer redundant invocations/idle handoffs and accepted outcomes; do not lower tests/thresholds to improve a timing metric.
+
+
+**T-44635 (W3):** Preserve existing showcase assertions with authenticated, deterministic offline database fixtures after T-44618; the legacy tests assumed anonymous access and fallback data. No assertion may be deleted or weakened. Verify: `.venv/bin/pytest -q -p no:cacheprovider backend/tests/test_dbms_showcase.py`.

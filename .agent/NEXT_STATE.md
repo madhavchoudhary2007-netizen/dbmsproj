@@ -6,45 +6,13 @@ phase: reopen audited security/DBMS gaps, then complete9–11
 plan: docs/completion-plan.md (all tasks, exact acceptance outcomes and verification families)
 
 ## First actions
+Accepted: T-44614/15/16/17/18/19/20/21/22/35; see Git and CURRENT_STATE.
 Reconcile live T-411 owner and preserve its dirty config/spec/packet; hashes in audit. Scoped acceptance is fixed; preserve the unrelated browser draft. Every implementation packet needs literal offline Verify, exact paths/types and root-owned integration. Family names below are planning references, not executable packet commands.
 
-### T-44614 — Completion plan / audit truth
-- worker: O | priority: P1 | state: CHECKPOINT_IN_PROGRESS
-- target_files: docs/completion-plan.md, docs/overhaul-plan.md, .agent/CURRENT_STATE.md, .agent/NEXT_STATE.md, .agent/DOC_AUTHORITY.md, .agent/START_HERE.md, .agent/audit/completion-review-2026-10-27.md, .agent/packets/T-44614.md, .agent/results/T-44614.json, .agent/packets/T-44615.md, .agent/results/T-44615.json, .agent/packets/T-44616.md, .agent/results/T-44616.json, .agent/packets/T-44621.md, .agent/results/T-44621.json, .agent/packets/T-44622.md, .agent/results/T-44622.json
-- contract: Planning only; preserve pending product bytes/lock/rubric/scope. Safe commit blocked by unrelated T-411 work until scoped acceptance or owner handoff.
-- verify: bash scripts/agent/verify-lock.sh && bash scripts/agent/budget.sh && git diff --check -- .agent/CURRENT_STATE.md .agent/NEXT_STATE.md .agent/DOC_AUTHORITY.md .agent/START_HERE.md docs/overhaul-plan.md
-### T-44615 — Acceptance-scope regressions
-- worker: W3 | priority: P0 | state: ACCEPTED c9adf20
-- target_files: scripts/eval/test_accept_scope.py
-- verify: .venv/bin/pytest -q -p no:cacheprovider scripts/eval/test_accept_scope.py
-### T-44616 — Safe task-only acceptance
-- worker: W2 | priority: P0 | state: ACCEPTED c3d03aa | after:44615
-- target_files: scripts/agent/accept.sh
-- verify: .venv/bin/pytest -q -p no:cacheprovider scripts/eval/test_accept_scope.py
-### T-44617 — Showcase auth/truth regression
-- worker: W3 | priority: P0 | after:44616
-- target_files: backend/tests/test_showcase_security_truth.py
-- verify: .venv/bin/pytest -q -p no:cacheprovider backend/tests/test_showcase_security_truth.py
-### T-44618 — Showcase admin access
-- worker: W2 | priority: P0 | after:44617
-- target_files: backend/app/api/dbms_showcase.py
-- verify: SHOWCASE-AUTH + root relevant disposable auth integration.
-### T-44619 — Honest database reads
-- worker: W2 | priority: P0 | after:44618
-- target_files: backend/app/api/dbms_showcase.py
-- verify: SHOWCASE-TRUTH + root empty/error/real-row integration.
-### T-44620 — Honest refresh outcome
-- worker: W2 | priority: P0 | after:44619
-- target_files: backend/app/api/dbms_showcase.py
-- verify: SHOWCASE-REFRESH + root real refresh/failure proof.
-### T-44621 — Seed-policy regression
-- worker: W3 | priority: P1 | state: ACCEPTED 4567fa5 | after:44616
-- target_files: backend/tests/test_seed_policy.py
-- verify: .venv/bin/pytest -q -p no:cacheprovider backend/tests/test_seed_policy.py
-### T-44622 — Safe nonlocal seeding
-- worker: W2 | priority: P1 | state: ACCEPTED d61e1f3 | after:44621
-- target_files: backend/app/config.py, backend/app/bootstrap.py
-- verify: .venv/bin/pytest -q -p no:cacheprovider backend/tests/test_seed_policy.py && .venv/bin/ruff check backend/app/config.py
+### T-44636 — Showcase decision and evidence checkpoint
+- worker: O | priority: P1
+- target_files: .agent/adr/ADR-010-dbms-showcase-routes.md, .agent/CURRENT_STATE.md, .agent/NEXT_STATE.md, docs/completion-plan.md, .agent/packets/T-44636.md, .agent/results/T-44636.json, .agent/packets/T-44617.md, .agent/results/T-44617.json, .agent/packets/T-44618.md, .agent/results/T-44618.json, .agent/packets/T-44619.md, .agent/results/T-44619.json, .agent/packets/T-44620.md, .agent/results/T-44620.json, .agent/packets/T-44635.md, .agent/results/T-44635.json
+- verify: bash scripts/agent/verify-lock.sh && bash scripts/agent/budget.sh && git diff --check -- .agent/CURRENT_STATE.md .agent/NEXT_STATE.md docs/completion-plan.md
 ### T-44623 — Real concurrency regressions
 - worker: W3 | priority: P1 | after:ADR-010
 - target_files: backend/tests/test_showcase_concurrency_unit.py, backend/tests/test_showcase_db.py
