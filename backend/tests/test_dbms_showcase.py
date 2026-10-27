@@ -39,6 +39,8 @@ finally:
 
 @pytest.fixture
 def client(monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
+    global _showcase_database
+    _showcase_database = _ShowcaseDatabase()
     missing = object()
     previous = app.dependency_overrides.get(current_user, missing)
     previous_telemetry = app.dependency_overrides.get(get_race_telemetry, missing)
@@ -155,7 +157,15 @@ class _ShowcaseCursor:
 
 
 class _ShowcaseConnection:
-    autocommit = False
+    def __init__(self, database: _ShowcaseDatabase, identity: int) -> None:
+        self.database = database
+        self.identity = identity
+        self.autocommit = False
+        self.isolation = "read committed"
+        self.snapshot: dict[str, float] | None = None
+        self.locked_rows: set[str] = set()
+        self.pending: dict[str, float | None] = {}
+        self.statements: list[str] = []
 
     def __enter__(self) -> _ShowcaseConnection:
         return self
@@ -166,12 +176,83 @@ class _ShowcaseConnection:
     def cursor(self, *args: object, **kwargs: object) -> _ShowcaseCursor:
         return _ShowcaseCursor()
 
-    def transaction(self) -> _ShowcaseConnection:
+    def transaction(self) -> _ShowcaseTransaction:
+        return _ShowcaseTransaction(self)
+
+    def execute(self, sql: str, params: object = None) -> _ShowcaseConnection:
+        normalized = " ".join(sql.lower().split())
+        self.statements.append(normalized)
+        values = params if isinstance(params, tuple) else ()
+        if normalized.startswith("set transaction isolation level"):
+            self.isolation = normalized.removeprefix("set transaction isolation level ")
+        elif normalized.startswith("insert into circuits"):
+            row_id, _name, length = values
+            self.pending[str(row_id)] = float(length)
+        elif "select (length_km * 1000)" in normalized:
+            row_id = str(values[0])
+            if self.snapshot is None:
+                self.snapshot = self.database.rows.copy()
+            rows = self.snapshot if self.isolation in {"repeatable read", "serializable"} else self.database.rows
+            value = self.pending.get(row_id, rows.get(row_id))
+            self._result = (int(float(value) * 1000),)
+            if normalized.endswith("for update"):
+                self.locked_rows.add(row_id)
+        elif normalized.startswith("select id from circuits"):
+            row_id = str(values[0])
+            self.locked_rows.add(row_id)
+            self._result = (row_id,)
+        elif normalized.startswith("update circuits"):
+            row_id = str(values[-1])
+            if self.identity == 1 and self.locked_rows:
+                raise _ShowcaseDeadlock()
+            self.pending[row_id] = 1.5 if "1.500" in normalized else 0.999
+        elif normalized.startswith("delete from circuits"):
+            for row_id in values[0]:
+                self.pending[str(row_id)] = None
         return self
+
+    def fetchone(self) -> tuple[object, ...] | None:
+        return getattr(self, "_result", None)
+
+
+class _ShowcaseDatabase:
+    def __init__(self) -> None:
+        self.rows: dict[str, float] = {}
+        self.connections = 0
+
+
+class _ShowcaseDeadlock(Exception):
+    sqlstate = "40P01"
+
+
+class _ShowcaseTransaction:
+    def __init__(self, connection: _ShowcaseConnection) -> None:
+        self.connection = connection
+
+    def __enter__(self) -> _ShowcaseTransaction:
+        self.connection.snapshot = None
+        self.connection.isolation = "read committed"
+        self.connection.pending = {}
+        return self
+
+    def __exit__(self, exc_type: object, *_: object) -> None:
+        if exc_type is None:
+            for row_id, value in self.connection.pending.items():
+                if value is None:
+                    self.connection.database.rows.pop(row_id, None)
+                else:
+                    self.connection.database.rows[row_id] = value
+        self.connection.pending = {}
+        return None
+
+
+_showcase_database = _ShowcaseDatabase()
 
 
 def _showcase_connection() -> _ShowcaseConnection:
-    return _ShowcaseConnection()
+    identity = _showcase_database.connections
+    _showcase_database.connections += 1
+    return _ShowcaseConnection(_showcase_database, identity)
 
 
 # ---------------------------------------------------------------------------

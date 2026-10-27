@@ -132,7 +132,34 @@ def test_admin_can_reach_showcase_handlers(
     client: TestClient, monkeypatch: pytest.MonkeyPatch, method: str, path: str
 ) -> None:
     _as_role("ADMIN")
-    _install_connection(monkeypatch, _Cursor())
+    if path == "/api/dbms/isolation-demo":
+        monkeypatch.setattr(
+            dbms_showcase,
+            "run_isolation_demo",
+            lambda _connection, level: {
+                "level": level,
+                "observed_reads": [
+                    {"step": "T1: Initial read", "balance": 1000},
+                    {"step": "T1: Read after T2 commit", "balance": 1500},
+                ],
+                "anomaly_detected": True,
+                "anomaly_type": "Non-repeatable Read (Fuzzy Read)",
+                "timeline": [],
+            },
+        )
+    elif path == "/api/dbms/deadlock-demo":
+        monkeypatch.setattr(
+            dbms_showcase,
+            "run_deadlock_demo",
+            lambda _connection: {
+                "aborted_transaction": "T2",
+                "sqlstate": "40P01",
+                "error_message": "synthetic controlled deadlock",
+                "details": {},
+            },
+        )
+    else:
+        _install_connection(monkeypatch, _Cursor())
     response = _request(client, method, path)
     assert response.status_code == 200
 
