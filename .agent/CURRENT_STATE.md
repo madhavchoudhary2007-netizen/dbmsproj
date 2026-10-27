@@ -1,9 +1,9 @@
 # CURRENT_STATE
-updated_at: 2026-10-26
+updated_at: 2026-10-27
 branch: overhaul/neo-brutal
 execution: RUNNING — implementation resumed on owner instruction 2026-10-26
-verified_product_head: b7afc1b
-last_product_task: T-44611
+verified_product_head: d88bef8
+last_product_task: T-44613
 metadata_task: T-44587 active-document audit; see matching acceptance result/commit
 architect_sha256: 0f2b5366fee89ec70d8340ab2e148ad676f0c64bf324f00af559c242cd4cc46c
 target_harness: Antigravity; requested Gemini 3.8 Flash HIGH orchestrator / LOW workers; cap 2
@@ -48,6 +48,7 @@ Phase requirements are in docs/overhaul-plan.md; the table below is the current 
 - T-44611 (d866b4d): created DbmsShowcase component (286 lines, <300) and integrated dynamically into dbms-workspace.tsx (280 lines, <300); route initial JS 154.74 KB (<= 170 KB limit).
 - T-44612 (6a15c0c): authored dbms-showcase.test.mjs unit tests verifying all 8 client fetchers (77/77 runtime tests green).
 - T-358 (b7afc1b): authored normalisation analysis, BCNF justifications, index rationale table, and backup/restore runbook in docs/database.md.
+- T-44613 (d88bef8): unified dual-namespace module loading across app.* and backend.app.*, implemented dynamic symbol resolution for jwt/fetch_one/token_revocation/JWT_SECRET, added runtime state fallbacks, and fixed WebSocket auth token decoding (49/49 passed across 6 suites).
 
 ## Current risks and open work
 - Complete only remaining T-331/T-332 domains and required integration; do not repeat accepted T-44575..80 or create line-count wrappers. T-44573 remains superseded. Historical assembly counts are not the current module map.
