@@ -24,6 +24,25 @@ admin_steward_dependency = Depends(require_roles("ADMIN", "STEWARD"))
 authenticated_user_dependency = Depends(current_user)
 
 
+def _set_penalty_audit_context(cur: Any, user: Any) -> None:
+    if not isinstance(user, dict):
+        return
+    user_id = user.get("id")
+    if user_id is not None:
+        cur.execute(
+            "SELECT set_config('apexgrid.actor', %s, true)",
+            (str(user_id),),
+        )
+    role = user.get("role")
+    if isinstance(role, str):
+        normalized_role = role.strip().lower()
+        if normalized_role in {"admin", "steward"}:
+            cur.execute(
+                "SELECT set_config('apexgrid.role', %s, true)",
+                (normalized_role,),
+            )
+
+
 def _resolve_db(database: DatabaseSession | None = None) -> DatabaseSession:
     if database is not None:
         return database
@@ -203,11 +222,7 @@ def decide_incident(
         updated = cur.fetchone()
         penalty = None
         if body.approve and (body.points or body.time_seconds or body.grid_places):
-            if user_id is not None:
-                cur.execute(
-                    "SELECT set_config('apexgrid.actor', %s, true)",
-                    (str(user_id),),
-                )
+            _set_penalty_audit_context(cur, user)
             cur.execute(
                 (
                     "INSERT INTO penalties(incident_id,driver_id,points,time_seconds,"
@@ -283,11 +298,7 @@ def _register_decide_incident(
             updated = cur.fetchone()
             penalty = None
             if body.approve and (body.points or body.time_seconds or body.grid_places):
-                if user_id is not None:
-                    cur.execute(
-                        "SELECT set_config('apexgrid.actor', %s, true)",
-                        (str(user_id),),
-                    )
+                _set_penalty_audit_context(cur, user)
                 cur.execute(
                     (
                         "INSERT INTO penalties(incident_id,driver_id,points,time_seconds,"
