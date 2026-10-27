@@ -183,23 +183,20 @@ def get_views() -> ViewsResponse:
 @router.post("/api/dbms/refresh-standings-mv", response_model=RefreshStandingsMVResponse)
 def post_refresh_standings_mv() -> RefreshStandingsMVResponse:
     start = time.perf_counter()
-    with contextlib.suppress(Exception), connection() as conn:
-        conn.autocommit = True
-        with conn.cursor() as cur:
-            cur.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY mv_championship_standings;")
-        duration = (time.perf_counter() - start) * 1000
-        return RefreshStandingsMVResponse(
-            refreshed=True,
-            view_name="mv_championship_standings",
-            message="Materialized view mv_championship_standings refreshed concurrently",
-            duration_ms=round(duration, 2),
-        )
+    try:
+        with connection() as conn:
+            conn.autocommit = True
+            with conn.cursor() as cur:
+                cur.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY mv_championship_standings;")
+    except Exception as err:
+        raise HTTPException(status_code=500, detail="Database refresh failed") from err
 
+    duration = (time.perf_counter() - start) * 1000
     return RefreshStandingsMVResponse(
         refreshed=True,
         view_name="mv_championship_standings",
-        message="Materialized view mv_championship_standings refreshed (showcase fallback)",
-        duration_ms=12.5,
+        message="Materialized view mv_championship_standings refreshed concurrently",
+        duration_ms=round(duration, 2),
     )
 
 
