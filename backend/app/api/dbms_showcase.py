@@ -273,25 +273,6 @@ def get_audit_log(
 
 @router.get("/api/dbms/security", response_model=DBMSSecurityResponse)
 def get_security() -> DBMSSecurityResponse:
-    roles: list[str] = ["apexgrid_app", "apexgrid_readonly"]
-    grants: list[RoleGrant] = [
-        RoleGrant(grantee="apexgrid_app", table_name="championships", privilege_type="SELECT"),
-        RoleGrant(grantee="apexgrid_app", table_name="championships", privilege_type="INSERT"),
-        RoleGrant(
-            grantee="apexgrid_readonly",
-            table_name="championships",
-            privilege_type="SELECT",
-        ),
-    ]
-    policies: list[SecurityPolicy] = [
-        SecurityPolicy(
-            policyname="audit_stewards_penalties",
-            tablename="audit_log",
-            roles=["stewards"],
-            cmd="SELECT",
-        )
-    ]
-
     roles_sql = (
         "SELECT rolname FROM pg_roles WHERE rolname IN ('apexgrid_app', 'apexgrid_readonly')"
     )
@@ -304,27 +285,22 @@ def get_security() -> DBMSSecurityResponse:
         "SELECT policyname, tablename, roles, cmd FROM pg_policies WHERE schemaname = 'public'"
     )
 
-    with contextlib.suppress(Exception), connection() as conn, conn.cursor() as cur:
-        cur.execute(roles_sql)
-        r_rows = cur.fetchall()
-        if r_rows:
-            roles = [str(r["rolname"]) for r in r_rows]
+    try:
+        with connection() as conn, conn.cursor() as cur:
+            cur.execute(roles_sql)
+            roles = [str(r["rolname"]) for r in cur.fetchall()]
 
-        cur.execute(grants_sql)
-        g_rows = cur.fetchall()
-        if g_rows:
+            cur.execute(grants_sql)
             grants = [
                 RoleGrant(
                     grantee=str(r["grantee"]),
                     table_name=str(r["table_name"]),
                     privilege_type=str(r["privilege_type"]),
                 )
-                for r in g_rows
+                for r in cur.fetchall()
             ]
 
-        cur.execute(policies_sql)
-        p_rows = cur.fetchall()
-        if p_rows:
+            cur.execute(policies_sql)
             policies = [
                 SecurityPolicy(
                     policyname=str(r["policyname"]),
@@ -332,8 +308,10 @@ def get_security() -> DBMSSecurityResponse:
                     roles=r["roles"],
                     cmd=str(r["cmd"]),
                 )
-                for r in p_rows
+                for r in cur.fetchall()
             ]
+    except Exception as err:
+        raise HTTPException(status_code=500, detail="Security metadata query failed") from err
 
     return DBMSSecurityResponse(roles=roles, grants=grants, policies=policies)
 
