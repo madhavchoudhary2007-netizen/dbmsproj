@@ -1196,10 +1196,10 @@ tbody tr:hover {
 .dbms-workspace { display:grid; gap:12px; }
 .dbms-status-panel { margin:0; }
 .dbms-status-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(135px,1fr)); gap:8px; margin:12px 0; }
-.dbms-stat { display:flex; flex-direction:column; gap:8px; min-height:74px; padding:12px; background:#10171d; border:1px solid #303b43; }
-.dbms-stat small { color:var(--muted); text-transform:uppercase; font-size:10px; letter-spacing:.08em; }
-.dbms-stat strong { color:#e7ff6b; font-size:23px; font-variant-numeric:tabular-nums; }
-.dbms-connection { display:flex; flex-wrap:wrap; gap:16px; color:#96cdbd; font-size:11px; text-transform:uppercase; letter-spacing:.07em; }
+.dbms-stat { display:flex; flex-direction:column; gap:8px; min-height:74px; padding:12px; background:var(--nb-paper); border:1px solid var(--nb-ink); }
+.dbms-stat small { color:var(--nb-ink); text-transform:uppercase; font-size:10px; letter-spacing:.08em; }
+.dbms-stat strong { color:var(--nb-ink); font-size:23px; font-variant-numeric:tabular-nums; }
+.dbms-connection { display:flex; flex-wrap:wrap; gap:16px; color:var(--nb-ink); font-size:11px; text-transform:uppercase; letter-spacing:.07em; }
 .dbms-workspace-nav { display:grid; grid-template-columns:auto 1fr 1fr auto; gap:8px; padding:8px; background:#10161c; border:1px solid #35414a; }
 .dbms-view-group { min-width:0; display:grid; align-content:start; gap:8px; padding:4px 8px; border-inline-start:1px solid #303b43; }
 .dbms-view-group:first-child { border-inline-start:0; padding-left:0; }
