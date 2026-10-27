@@ -1,19 +1,17 @@
-"""End-to-end ApexGrid smoke flow against running Compose services.
-
-Run with backend dependencies plus websockets installed:
-  DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:5432/apexgrid \
-  MONGODB_URL=mongodb://localhost:27017 python scripts/acceptance.py
-
-The script creates and removes a temporary session and its telemetry. It restores
-the tested driver's pre-run penalty state and recalculates standings on cleanup.
-"""
+"""End-to-end ApexGrid smoke flow against explicitly owned disposable databases."""
 
 import json
 import os
+import socket
+import subprocess
+import sys
+import time
 import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
+from ipaddress import ip_address
+from urllib.parse import unquote, urlparse
 from uuid import UUID
 
 import psycopg
@@ -21,9 +19,9 @@ from pymongo import MongoClient
 from websockets.sync.client import connect
 
 
-API = os.getenv("API_URL", "http://localhost:8000/api")
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://apexgrid:apexgrid@localhost:5432/apexgrid")
-MONGO_URL = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
+API = ""
+DATABASE_URL = os.getenv("DATABASE_URL", "")
+MONGO_URL = os.getenv("MONGODB_URL", "")
 
 
 def request(path, token=None, body=None, method=None):
@@ -46,6 +44,180 @@ def expect(path, token=None, body=None, method=None, status=200):
     return value
 
 
+def _is_loopback_host(host):
+    if not host:
+        return False
+    if host.lower() == "localhost":
+        return True
+    try:
+        return ip_address(host).is_loopback
+    except ValueError:
+        return False
+
+
+def ensure_disposable_target(database_url, mongo_database):
+    raw = database_url or ""
+    parsed = urlparse(raw)
+    if ("?" in raw or "#" in raw or parsed.query or parsed.fragment or parsed.params
+            or raw.count("@") > 1 or "," in parsed.netloc.rsplit("@", 1)[-1]):
+        raise ValueError("DATABASE_URL cannot contain query, fragment, multi-host, or ambiguous options")
+    if parsed.scheme not in {"postgres", "postgresql"}:
+        raise ValueError("DATABASE_URL must use PostgreSQL")
+    if not parsed.netloc or not parsed.path.startswith("/") or parsed.path.count("/") != 1:
+        raise ValueError("DATABASE_URL must contain exactly one database path segment")
+    database = unquote(parsed.path[1:])
+    try:
+        hostname, port = parsed.hostname, parsed.port
+    except ValueError as exc:
+        raise ValueError("DATABASE_URL has an ambiguous authority") from exc
+    if not _is_loopback_host(hostname) or port != 15432:
+        raise ValueError("DATABASE_URL must target loopback PostgreSQL on port 15432")
+    prefix = "apexgrid_acceptance_"
+    suffix = database[len(prefix):] if database.startswith(prefix) else ""
+    if not suffix or not all(char.isalnum() or char in "-_" for char in suffix):
+        raise ValueError("PostgreSQL database must be uniquely named apexgrid_acceptance_<run-id>")
+    if mongo_database != database:
+        raise ValueError("MongoDB database must match the owned PostgreSQL database name")
+    return database
+
+
+def ensure_mongo_target(mongo_url, database):
+    raw = mongo_url or ""
+    parsed = urlparse(raw)
+    if ("?" in raw or "#" in raw or parsed.query or parsed.fragment or parsed.params
+            or raw.count("@") > 1 or "," in parsed.netloc.rsplit("@", 1)[-1]):
+        raise ValueError("MONGODB_URL cannot contain query, fragment, multi-host, or ambiguous options")
+    if parsed.scheme not in {"mongodb", "mongodb+srv"}:
+        raise ValueError("MONGODB_URL must be a MongoDB URL")
+    if not parsed.netloc or not parsed.path.startswith("/") or parsed.path.count("/") != 1:
+        raise ValueError("MONGODB_URL must contain exactly one database path segment")
+    try:
+        hostname, port = parsed.hostname, parsed.port
+    except ValueError as exc:
+        raise ValueError("MONGODB_URL has an ambiguous authority") from exc
+    if not _is_loopback_host(hostname) or port != 27018:
+        raise ValueError("MONGODB_URL must target loopback MongoDB on port 27018")
+    if unquote(parsed.path[1:]) != database:
+        raise ValueError("MONGODB_URL must select the matching run-owned database")
+
+
+def verify_run_ownership(database_url, mongo_url, database, run_id, owner_token):
+    prefix = "apexgrid_acceptance_"
+    if not run_id or database != f"{prefix}{run_id}" or not owner_token:
+        raise RuntimeError("Acceptance requires a matching run id and ownership token")
+    with psycopg.connect(database_url) as db:
+        with db.cursor() as cur:
+            cur.execute("SELECT shobj_description(oid, 'pg_database') FROM pg_database WHERE datname=current_database()")
+            row = cur.fetchone()
+    expected = f"apexgrid-acceptance:{run_id}:{owner_token}"
+    if not row or row[0] != expected:
+        raise RuntimeError("Acceptance database ownership marker is missing or mismatched")
+    with MongoClient(mongo_url, serverSelectionTimeoutMS=5000) as client:
+        marker = client[database]["acceptance_metadata"].find_one({"_id": "run_owner"})
+        if not marker or marker.get("run_id") != run_id or marker.get("owner_token") != owner_token:
+            raise RuntimeError("Acceptance MongoDB ownership marker is missing or mismatched")
+
+
+def start_owned_api(database_url, mongo_url):
+    global API
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    process = None
+    try:
+        sock.bind(("127.0.0.1", 0))
+        sock.listen(socket.SOMAXCONN)
+        port = sock.getsockname()[1]
+        API = f"http://127.0.0.1:{port}/api"
+        child_env = os.environ.copy()
+        child_env["DATABASE_URL"] = database_url
+        child_env["MONGODB_URL"] = mongo_url
+        child_env["MONGODB_DATABASE"] = unquote(urlparse(mongo_url).path.lstrip("/"))
+        child_env["AUTO_DEMO_RACE"] = "0"
+        child_env.pop("API_URL", None)
+        process = subprocess.Popen(
+            [sys.executable, "-m", "uvicorn", "backend.app.main:app", "--fd",
+             str(sock.fileno()), "--log-level", "warning"],
+            cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            env=child_env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            pass_fds=(sock.fileno(),),
+        )
+    except Exception:
+        sock.close()
+        if process is not None:
+            stop_owned_api(process)
+        raise
+    sock.close()
+    try:
+        deadline = time.monotonic() + 30
+        while time.monotonic() < deadline:
+            if process.poll() is not None:
+                raise RuntimeError("Owned acceptance API exited before becoming healthy")
+            try:
+                health = expect("/health")
+                if health.get("services") == {"postgres": "up", "mongodb": "up"} and process.poll() is None:
+                    return process
+            except (OSError, urllib.error.URLError, AssertionError, ValueError):
+                pass
+            time.sleep(0.25)
+        raise RuntimeError("Owned acceptance API did not become healthy within 30 seconds")
+    except Exception:
+        stop_owned_api(process)
+        raise
+
+
+def stop_owned_api(process):
+    if process.poll() is None:
+        process.terminate()
+        try:
+            process.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            process.wait(timeout=5)
+
+
+def create_owned_fixture(token, circuit_id, unique_suffix):
+    championships = expect("/championships?limit=200&offset=0", token)
+    used_seasons = {row["season"] for row in championships}
+    season = datetime.now(timezone.utc).year + 100
+    while season in used_seasons:
+        season += 1
+    championship = None
+    event = None
+    try:
+        championship = expect("/championships", token, {
+            "name": f"Acceptance Test {unique_suffix}", "season": season,
+        }, method="POST", status=201)
+        event = expect("/events", token, {
+            "championship_id": championship["id"], "circuit_id": circuit_id,
+            "round_number": 3, "name": f"Acceptance Test Round 3 {unique_suffix}",
+            "start_date": datetime.now(timezone.utc).date().isoformat(),
+        }, method="POST", status=201)
+    except Exception:
+        if championship and championship.get("id"):
+            try:
+                expect(f"/championships/{championship['id']}", token, method="DELETE", status=204)
+            except Exception:
+                pass
+        raise
+    return {
+        "championship_id": championship["id"], "season": season,
+        "event_id": event["id"], "unique_suffix": unique_suffix,
+    }
+
+
+def cleanup_owned_fixture(token, fixture):
+    event_id = fixture.get("event_id")
+    championship_id = fixture.get("championship_id")
+    if event_id:
+        for path, id_key in (("/sessions?limit=200&offset=0", "event_id"),
+                             ("/results?limit=200&offset=0", "event_id")):
+            for row in expect(path, token):
+                if row.get(id_key) == event_id and row.get("id"):
+                    expect(f"{path.split('?')[0]}/{row['id']}", token, method="DELETE", status=204)
+        expect(f"/events/{event_id}", token, method="DELETE", status=204)
+    if championship_id:
+        expect(f"/championships/{championship_id}", token, method="DELETE", status=204)
+
+
 def assert_penalty_guard_enabled(cur):
     cur.execute("""SELECT tgenabled FROM pg_trigger
         WHERE tgrelid='penalties'::regclass AND tgname='trg_penalties_immutable' AND NOT tgisinternal""")
@@ -54,22 +226,17 @@ def assert_penalty_guard_enabled(cur):
         raise RuntimeError("Apply the penalty immutability migration before running acceptance")
 
 
-def main():
+def _run_acceptance(database):
+    mongo_database = unquote(urlparse(MONGO_URL or "").path.lstrip("/"))
     health = expect("/health")
     assert health["services"] == {"postgres": "up", "mongodb": "up"}
     token = expect("/auth/login", body={"email": "admin@apexgrid.test", "password": "ApexGrid2026!"})["access_token"]
-    championship = next(row for row in expect("/championships", token) if row["name"] == "ApexGrid World Series")
-    offset = 0
-    event = None
-    while event is None:
-        events = expect(f"/events?limit=200&offset={offset}", token)
-        event = next((row for row in events
-                      if row["round_number"] == 3 and row["championship_id"] == championship["id"]), None)
-        if event is not None or len(events) < 200:
-            break
-        offset += 200
-    if event is None:
-        raise RuntimeError("Seeded ApexGrid World Series round 3 event was not found in /events")
+    circuit = next(iter(expect("/circuits", token)))
+    fixture = create_owned_fixture(token, circuit["id"], UUID(int=0).hex[:12] + "-" + os.urandom(4).hex())
+    championship = next(row for row in expect("/championships", token)
+                        if row["id"] == fixture["championship_id"])
+    event = next(row for row in expect("/events?limit=200&offset=0", token)
+                 if row["id"] == fixture["event_id"])
     driver_rows = []
     offset = 0
     while True:
@@ -101,10 +268,7 @@ def main():
     with psycopg.connect(DATABASE_URL) as db:
         with db.cursor() as cur:
             assert_penalty_guard_enabled(cur)
-            cur.execute("SELECT points FROM penalty_points WHERE driver_id=%s AND season=%s", (driver["id"], championship["season"]))
-            original_points = cur.fetchone()
-            original_eligibility = driver["eligibility"]
-    mongo = MongoClient(MONGO_URL)["apexgrid"]["telemetry"]
+    mongo = MongoClient(MONGO_URL)[database]["telemetry"]
     demo_session_id = None
     incident_id = None
     try:
@@ -196,35 +360,31 @@ def main():
         assert expect(f"/sessions/{demo_session_id}/live", token)["session"]["state"] == "ACTIVE"
         print("PASS: login, session, simulator, MongoDB, WebSocket, pit conflict, trigger/ban, results, standings, DBMS, generated demo races")
     finally:
-        if demo_session_id:
-            request(f"/demo-races/{demo_session_id}", token, method="DELETE")
-        if session_id:
-            request(f"/sessions/{session_id}/simulate", token, {"action": "stop"})
-            mongo.delete_many({"session_id": session_id})
-            with psycopg.connect(DATABASE_URL) as db:
-                with db.cursor() as cur:
-                    cur.execute("DELETE FROM pit_reservations WHERE session_id=%s", (session_id,))
-                    if incident_id:
-                        cur.execute("SELECT 1 FROM penalties WHERE incident_id=%s", (incident_id,))
-                        if cur.fetchone():
-                            # This is an acceptance-owned penalty in a disposable session.
-                            # Keep the production trigger immutable and bypass it only
-                            # around this exact cleanup delete inside this transaction.
-                            cur.execute("ALTER TABLE penalties DISABLE TRIGGER trg_penalties_immutable")
-                            try:
-                                cur.execute("DELETE FROM penalties WHERE incident_id=%s", (incident_id,))
-                            finally:
-                                cur.execute("ALTER TABLE penalties ENABLE TRIGGER trg_penalties_immutable")
-                    cur.execute("DELETE FROM incident_reports WHERE session_id=%s", (session_id,))
-                    cur.execute("DELETE FROM session_results WHERE session_id=%s", (session_id,))
-                    cur.execute("DELETE FROM race_sessions WHERE id=%s", (session_id,))
-                    if original_points is None:
-                        cur.execute("DELETE FROM penalty_points WHERE driver_id=%s AND season=%s", (driver["id"], championship["season"]))
-                    else:
-                        cur.execute("UPDATE penalty_points SET points=%s WHERE driver_id=%s AND season=%s", (original_points[0], driver["id"], championship["season"]))
-                    cur.execute("UPDATE drivers SET eligibility=%s WHERE id=%s", (original_eligibility, driver["id"]))
-                    cur.execute("SELECT recalculate_standings(%s)", (championship["id"],))
-                    assert_penalty_guard_enabled(cur)
+        try:
+            if demo_session_id:
+                request(f"/demo-races/{demo_session_id}", token, method="DELETE")
+            if session_id:
+                request(f"/sessions/{session_id}/simulate", token, {"action": "stop"})
+                mongo.delete_many({"session_id": session_id})
+        finally:
+            mongo.database.client.close()
+        # Official penalties are immutable. The operator-owned lifecycle must stop
+        # this API and drop this exact run-owned database after the process exits.
+
+
+def main():
+    global MONGO_URL
+    mongo_database = unquote(urlparse(MONGO_URL or "").path.lstrip("/"))
+    database = ensure_disposable_target(DATABASE_URL, mongo_database)
+    ensure_mongo_target(MONGO_URL, database)
+    run_id = os.getenv("ACCEPTANCE_RUN_ID", "")
+    owner_token = os.getenv("ACCEPTANCE_OWNERSHIP_TOKEN", "")
+    verify_run_ownership(DATABASE_URL, MONGO_URL, database, run_id, owner_token)
+    process = start_owned_api(DATABASE_URL, MONGO_URL)
+    try:
+        _run_acceptance(database)
+    finally:
+        stop_owned_api(process)
 
 
 if __name__ == "__main__":
