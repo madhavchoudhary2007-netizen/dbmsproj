@@ -5,7 +5,7 @@ DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://apexgrid:apexgrid@localho
 MONGODB_URL = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
 MONGODB_DATABASE = os.getenv("MONGODB_DATABASE", "apexgrid")
 AUTO_DEMO_RACE = os.getenv("AUTO_DEMO_RACE", "0").strip() == "1" and APP_ENV == "local"
-SEED_DEMO_DATA = os.getenv("SEED_DEMO_DATA", "1").strip() == "1"
+SEED_DEMO_DATA = os.getenv("SEED_DEMO_DATA", "1" if APP_ENV == "local" else "0").strip() == "1"
 _LOCAL_DEMO_SECRET = "local-development-secret-change-me"  # noqa: S105 -- public local-only fallback rejected outside local mode
 _WEAK_SECRETS = {
     "dev-change-me",
