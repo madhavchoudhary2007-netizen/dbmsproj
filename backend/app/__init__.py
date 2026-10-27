@@ -6,11 +6,18 @@ import sys
 
 
 _PACKAGE = sys.modules[__name__]
-_BACKEND = importlib.import_module("backend")
-setattr(_BACKEND, "app", _PACKAGE)
+try:
+    _BACKEND = importlib.import_module("backend")
+except ModuleNotFoundError as error:
+    if error.name != "backend":
+        raise
+    _BACKEND = None
+else:
+    setattr(_BACKEND, "app", _PACKAGE)
 
 
 if __name__ == "app":
-    sys.modules["backend.app"] = _PACKAGE
+    if _BACKEND is not None:
+        sys.modules["backend.app"] = _PACKAGE
 elif __name__ == "backend.app":
     sys.modules["app"] = _PACKAGE
