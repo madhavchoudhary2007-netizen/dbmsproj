@@ -146,28 +146,6 @@ def post_deadlock_demo() -> DeadlockDemoResponse:
 
 @router.get("/api/dbms/views", response_model=ViewsResponse)
 def get_views() -> ViewsResponse:
-    fallback_views = [
-        ViewDefinition(
-            name="v_driver_season_summary",
-            view_type="view",
-            definition=(
-                "SELECT ds.driver_id, d.number AS driver_number, c.id AS championship_id, "
-                "c.name AS championship_name, c.season, ds.points, ds.wins, ds.podiums, ds.rank "
-                "FROM driver_standings ds JOIN championships c ON c.id = ds.championship_id "
-                "LEFT JOIN drivers d ON d.id = ds.driver_id;"
-            ),
-        ),
-        ViewDefinition(
-            name="mv_championship_standings",
-            view_type="materialized_view",
-            definition=(
-                "SELECT ds.championship_id, ds.driver_id, ds.points, ds.wins, ds.podiums, "
-                "ds.rank, c.name AS championship_name, c.season FROM driver_standings ds "
-                "JOIN championships c ON c.id = ds.championship_id;"
-            ),
-        ),
-    ]
-
     views_sql = """
         SELECT viewname AS name, 'view' AS view_type, pg_get_viewdef(c.oid, true) AS def
         FROM pg_views v
@@ -180,22 +158,26 @@ def get_views() -> ViewsResponse:
         WHERE schemaname = 'public' AND matviewname LIKE 'mv_%'
     """
 
-    with contextlib.suppress(Exception), connection() as conn, conn.cursor() as cur:
-        cur.execute(views_sql)
-        rows = cur.fetchall()
-        if rows:
-            return ViewsResponse(
-                views=[
-                    ViewDefinition(
-                        name=str(r["name"]),
-                        view_type=str(r["view_type"]),
-                        definition=str(r["def"]),
-                    )
-                    for r in rows
-                ]
-            )
+    try:
+        with connection() as conn, conn.cursor() as cur:
+            cur.execute(views_sql)
+            rows = cur.fetchall()
+    except Exception as err:
+        raise HTTPException(status_code=500, detail="Database query failed") from err
 
-    return ViewsResponse(views=fallback_views)
+    try:
+        return ViewsResponse(
+            views=[
+                ViewDefinition(
+                    name=str(r["name"]),
+                    view_type=str(r["view_type"]),
+                    definition=str(r["def"]),
+                )
+                for r in rows
+            ]
+        )
+    except Exception as err:
+        raise HTTPException(status_code=500, detail="Database query failed") from err
 
 
 @router.post("/api/dbms/refresh-standings-mv", response_model=RefreshStandingsMVResponse)
@@ -240,42 +222,23 @@ def get_analytics_gaps(session_id: str = Query(...)) -> AnalyticsGapsResponse:
         "FROM lap_telemetry WHERE session_id = %s ORDER BY lap, position;"
     )
 
-    gaps: list[LapGapRecord] = [
-        LapGapRecord(
-            driver_id="d1",
-            driver_name="Max Verstappen",
-            lap=1,
-            position=1,
-            gap_to_leader_ms=0,
-            interval_ms=0,
-            rolling_avg_ms=84250,
-        ),
-        LapGapRecord(
-            driver_id="d2",
-            driver_name="Lewis Hamilton",
-            lap=1,
-            position=2,
-            gap_to_leader_ms=1250,
-            interval_ms=1250,
-            rolling_avg_ms=85500,
-        ),
-    ]
-
-    with contextlib.suppress(Exception), connection() as conn, conn.cursor() as cur:
-        cur.execute(raw_sql, (valid_session_id,))
-        rows = cur.fetchall()
-        if rows:
-            gaps = [
-                LapGapRecord(
-                    driver_id=str(r["driver_id"]),
-                    lap=int(r["lap"]),
-                    position=int(r["position"]),
-                    gap_to_leader_ms=r.get("gap_to_leader_ms"),
-                    interval_ms=r.get("interval_ms"),
-                    rolling_avg_ms=r.get("rolling_avg_ms"),
-                )
-                for r in rows
-            ]
+    try:
+        with connection() as conn, conn.cursor() as cur:
+            cur.execute(raw_sql, (valid_session_id,))
+            rows = cur.fetchall()
+        gaps = [
+            LapGapRecord(
+                driver_id=str(r["driver_id"]),
+                lap=int(r["lap"]),
+                position=int(r["position"]),
+                gap_to_leader_ms=r.get("gap_to_leader_ms"),
+                interval_ms=r.get("interval_ms"),
+                rolling_avg_ms=r.get("rolling_avg_ms"),
+            )
+            for r in rows
+        ]
+    except Exception as err:
+        raise HTTPException(status_code=500, detail="Database query failed") from err
 
     return AnalyticsGapsResponse(session_id=valid_session_id, gaps=gaps, sql=raw_sql)
 
@@ -360,51 +323,38 @@ def get_audit_log(
     tbl = params["table"]
     lim = params["limit"]
 
-    audit_logs: list[AuditLogRow] = [
-        AuditLogRow(
-            id=1,
-            table_name=tbl or "penalties",
-            op="INSERT",
-            row_pk={"id": 10},
-            old=None,
-            new={"severity": "5s", "reason": "Causing a collision"},
-            actor="steward_1",
-            at="2026-10-26T12:00:00Z",
-        )
-    ]
-    total = len(audit_logs)
-
-    with contextlib.suppress(Exception), connection() as conn, conn.cursor() as cur:
-        if tbl:
-            cur.execute(
-                "SELECT id, table_name, op, row_pk, old, new, actor, at "
-                "FROM audit_log WHERE table_name = %s ORDER BY at DESC LIMIT %s",
-                (tbl, lim),
-            )
-        else:
-            cur.execute(
-                "SELECT id, table_name, op, row_pk, old, new, actor, at "
-                "FROM audit_log ORDER BY at DESC LIMIT %s",
-                (lim,),
-            )
-        rows = cur.fetchall()
-        if rows:
-            audit_logs = [
-                AuditLogRow(
-                    id=int(r["id"]),
-                    table_name=str(r["table_name"]),
-                    op=str(r["op"]),
-                    row_pk=r["row_pk"],
-                    old=r["old"],
-                    new=r["new"],
-                    actor=r["actor"],
-                    at=(r["at"].isoformat() if hasattr(r["at"], "isoformat") else str(r["at"])),
+    try:
+        with connection() as conn, conn.cursor() as cur:
+            if tbl:
+                cur.execute(
+                    "SELECT id, table_name, op, row_pk, old, new, actor, at "
+                    "FROM audit_log WHERE table_name = %s ORDER BY at DESC LIMIT %s",
+                    (tbl, lim),
                 )
-                for r in rows
-            ]
-            total = len(audit_logs)
+            else:
+                cur.execute(
+                    "SELECT id, table_name, op, row_pk, old, new, actor, at "
+                    "FROM audit_log ORDER BY at DESC LIMIT %s",
+                    (lim,),
+                )
+            rows = cur.fetchall()
+        audit_logs = [
+            AuditLogRow(
+                id=int(r["id"]),
+                table_name=str(r["table_name"]),
+                op=str(r["op"]),
+                row_pk=r["row_pk"],
+                old=r["old"],
+                new=r["new"],
+                actor=r["actor"],
+                at=(r["at"].isoformat() if hasattr(r["at"], "isoformat") else str(r["at"])),
+            )
+            for r in rows
+        ]
+    except Exception as err:
+        raise HTTPException(status_code=500, detail="Database query failed") from err
 
-    return AuditLogResponse(audit_logs=audit_logs, total=total)
+    return AuditLogResponse(audit_logs=audit_logs, total=len(audit_logs))
 
 
 @router.get("/api/dbms/security", response_model=DBMSSecurityResponse)
