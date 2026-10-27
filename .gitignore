@@ -20,3 +20,4 @@ frontend/test-results/
 frontend/playwright-report/
 
 .agent/loop-runs.log
+test-results/
