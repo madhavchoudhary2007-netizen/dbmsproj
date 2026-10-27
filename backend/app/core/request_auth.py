@@ -1,3 +1,4 @@
+import sys
 from collections.abc import Callable
 from typing import Annotated, Any, cast
 
@@ -14,8 +15,28 @@ from .runtime import RuntimeState, get_pool, get_runtime
 from .serialization import jsonable
 
 
+_REQUEST_AUTH_MODULE = sys.modules[__name__]
+if __name__ == "app.core.request_auth":
+    sys.modules.setdefault("backend.app.core", sys.modules[__package__])
+    sys.modules.setdefault("backend.app.core.request_auth", _REQUEST_AUTH_MODULE)
+elif __name__ == "backend.app.core.request_auth":
+    sys.modules.setdefault("app.core", sys.modules[__package__])
+    sys.modules.setdefault("app.core.request_auth", _REQUEST_AUTH_MODULE)
+for _package_name, _module_name in (
+    ("app.core", "app.core.request_auth"),
+    ("backend.app.core", "backend.app.core.request_auth"),
+):
+    _package = sys.modules.get(_package_name)
+    _module = sys.modules.get(_module_name)
+    if _package is not None and _module is not None:
+        setattr(_package, "request_auth", _module)
+
+_INITIAL_JWT_SECRET = JWT_SECRET
+
+
 def _resolve_jwt_secret() -> str:
-    import sys
+    if JWT_SECRET != _INITIAL_JWT_SECRET:
+        return JWT_SECRET
 
     for mod_name in ("backend.app.main", "app.main"):
         mod = sys.modules.get(mod_name)
