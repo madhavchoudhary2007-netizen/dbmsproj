@@ -11,7 +11,11 @@ import { startLiveStream } from "@/lib/live-stream";
 import { NbBadge } from "@/components/nb/badge";
 import { NbCard } from "@/components/nb/card";
 import { NbSkeleton } from "@/components/nb/skeleton";
+import { NbButton } from "@/components/nb/button";
+import { NbModal } from "@/components/nb/modal";
+import { pretty, type Row } from "@/lib/api";
 import { useLiveTimingState } from "@/lib/use-live-timing-state";
+import { useAuth } from "@/components/auth";
 const TelemetryCharts = dynamic(
   () => import("./telemetry-charts").then((module) => module.TelemetryCharts),
   { ssr: false, loading: () => <NbSkeleton variant="chart" /> },
@@ -19,9 +23,7 @@ const TelemetryCharts = dynamic(
 import { RaceRecords } from "./race-records";
 import { TimingTower } from "./timing-tower";
 import { LatestTelemetry } from "./latest-telemetry";
-import { SnapshotStrip } from "./snapshot-strip";
 import { DemoControls } from "./demo-controls";
-import { DeleteDemoModal } from "./delete-demo-modal";
 import { LiveSelectors } from "./live-selectors";
 
 export function LiveTiming() {
@@ -43,12 +45,16 @@ export function LiveTiming() {
       setListError(error);
     });
   }, [clearError, listRequest, setDemoRaces, setListError, setListLoading, setSessions]);
+  // Live polling, the stream and the chart bundle wait for the session check so they do not compete with it.
+  const authed = Boolean(useAuth().user);
   useEffect(() => {
+    if (!authed) return;
     return startInitialLiveSelection(refreshLists, autoFollow, setSession, reportError);
-  }, [refreshLists, reportError, autoFollow, setSession]);
+  }, [authed, refreshLists, reportError, autoFollow, setSession]);
   useEffect(() => {
+    if (!authed) return;
     return startLiveListPolling(refreshLists, session, autoFollow, listRequest, setSession, setDriver);
-  }, [refreshLists, session, autoFollow, listRequest, setSession, setDriver]);
+  }, [authed, refreshLists, session, autoFollow, listRequest, setSession, setDriver]);
   useEffect(() => {
     return startLiveRecordPolling(session, clearError, setCompletedLaps, setLiveIncidents, setLivePitStops, setRecordsError, { setLoading: setRecordsLoading, retryRef: recordsRetry });
   }, [clearError, session, setCompletedLaps, setLiveIncidents, setLivePitStops, setRecordsError, setRecordsLoading, recordsRetry]);
@@ -184,6 +190,58 @@ export function LiveTiming() {
         setDeleteRace={setDeleteRace}
         removeDemoRace={removeDemoRace}
       />
+    </>
+  );
+}
+
+function SnapshotStrip({
+  snapshot,
+}: {
+  snapshot: Record<string, unknown> | null;
+}) {
+  return (
+    <div className="snapshot-strip">
+      {Object.entries(snapshot || {})
+        .filter(
+          ([k, v]) =>
+            !["participants", "drivers", "timing", "safety_car"].includes(
+              k,
+            ) && typeof v !== "object",
+        )
+        .map(([k, v]) => (
+          <div key={k}>
+            <small>{k.replaceAll("_", " ")}</small>
+            <b>{pretty(v)}</b>
+          </div>
+        ))}
+    </div>
+  );
+}
+
+function DeleteDemoModal({
+  deleteRace,
+  demoBusy,
+  setDeleteRace,
+  removeDemoRace,
+}: {
+  deleteRace: Row | null;
+  demoBusy: boolean;
+  setDeleteRace: (race: Row | null) => void;
+  removeDemoRace: () => Promise<void>;
+}) {
+  return (
+    <>
+      {deleteRace && (
+        <NbModal title="Delete generated race?" open={Boolean(deleteRace)} onClose={() => !demoBusy && setDeleteRace(null)}>
+          <div className="decision-form">
+            <p>Delete <strong>{String(deleteRace.event_name || "this generated race")}</strong> and its generated drivers and telemetry? This action cannot be undone.</p>
+            <div className="form-actions">
+              <NbButton variant="secondary" disabled={demoBusy} onClick={() => setDeleteRace(null)}>Keep race</NbButton>
+              <NbButton variant="danger" disabled={demoBusy} data-primary="true" onClick={() => void removeDemoRace()}>{demoBusy ? "Deleting…" : "Delete race"}</NbButton>
+            </div>
+          </div>
+        </NbModal>
+      )}
     </>
   );
 }
