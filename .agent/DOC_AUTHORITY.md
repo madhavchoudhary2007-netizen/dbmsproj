@@ -10,6 +10,7 @@ Status: ACTIVE. Owner chat > AGENTS.md > routed protocols > repository evidence.
 | Requested/observed Antigravity model settings | protocol/antigravity.md (Gemini 3.8 Flash HIGH root / LOW workers, cap 2) |
 | Task size, scheduling, evidence reuse | protocol/delivery-workflow.md; ADR-014 as clarified by ADR-015/ADR-016 |
 | Roles / packets / state / context | protocol/roles.md, packets.md, state-files.md, compaction.md on their triggers |
+| Remaining-work order after 2026-10-27 audit | docs/completion-plan.md and current NEXT_STATE; this schedules existing requirements, not new product scope |
 | Product scope and visual identity | docs/overhaul-plan.md; approved ADR-007; locked ARCHITECT.md |
 | Design / UX | protocol/design-visual.md and design-ux.md; existing tokens/types, approved plan section 2 |
 | Architecture amendment | protocol/architect.md then lenses.md; archetypes.md records the already approved choice |

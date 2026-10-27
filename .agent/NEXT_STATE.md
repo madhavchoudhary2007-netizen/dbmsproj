@@ -1,35 +1,62 @@
 # NEXT_STATE
 updated_at: 2026-10-27
 branch: overhaul/neo-brutal
-execution: RUNNING
-phase: 9 tests & visual regression; Phase 8 complete
+execution: RUNNING; implementing completion plan
+phase: reopen audited security/DBMS gaps, then complete9–11
+plan: docs/completion-plan.md (all tasks, exact acceptance outcomes and verification families)
 
-## Queue (root must prepare exact packets before dispatch)
-### T-410 — Playwright webServer production/CI mode
-- worker: W3 | priority: P1 | origin: Phase 9 T-410 Playwright CI webServer
-- target_files: frontend/playwright.config.ts
-- contract: Update webServer in frontend/playwright.config.ts to use next build && next start -p 3100 (or npm run start) when CI or PLAYWRIGHT_USE_PROD is set, while preserving next dev locally.
-- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts e2e/routes.spec.ts
+## First actions
+Reconcile live T-411 owner and preserve its dirty config/spec/packet; hashes in audit. Scoped acceptance is fixed; preserve the unrelated browser draft. Every implementation packet needs literal offline Verify, exact paths/types and root-owned integration. Family names below are planning references, not executable packet commands.
 
-### T-411 — Real-stack project and end-to-end happy paths (Hard Gate F-4)
-- worker: W3 | priority: P1 | origin: Phase 9 T-411 Real-stack Playwright Project
-- target_files: frontend/playwright.config.ts, frontend/e2e/real-stack.spec.ts
-- contract: Add real-stack project in playwright.config.ts (desktop-1440, mobile-375) without page.route mocks against backend on 18000 (SEED_DEMO=1); cover login, dashboard, live timing updates, steward actions, standings recalculation.
-- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts --project=real-stack
+### T-44614 — Completion plan / audit truth
+- worker: O | priority: P1 | state: CHECKPOINT_IN_PROGRESS
+- target_files: docs/completion-plan.md, docs/overhaul-plan.md, .agent/CURRENT_STATE.md, .agent/NEXT_STATE.md, .agent/DOC_AUTHORITY.md, .agent/START_HERE.md, .agent/audit/completion-review-2026-10-27.md, .agent/packets/T-44614.md, .agent/results/T-44614.json, .agent/packets/T-44615.md, .agent/results/T-44615.json, .agent/packets/T-44616.md, .agent/results/T-44616.json, .agent/packets/T-44621.md, .agent/results/T-44621.json, .agent/packets/T-44622.md, .agent/results/T-44622.json
+- contract: Planning only; preserve pending product bytes/lock/rubric/scope. Safe commit blocked by unrelated T-411 work until scoped acceptance or owner handoff.
+- verify: bash scripts/agent/verify-lock.sh && bash scripts/agent/budget.sh && git diff --check -- .agent/CURRENT_STATE.md .agent/NEXT_STATE.md .agent/DOC_AUTHORITY.md .agent/START_HERE.md docs/overhaul-plan.md
+### T-44615 — Acceptance-scope regressions
+- worker: W3 | priority: P0 | state: ACCEPTED c9adf20
+- target_files: scripts/eval/test_accept_scope.py
+- verify: .venv/bin/pytest -q -p no:cacheprovider scripts/eval/test_accept_scope.py
+### T-44616 — Safe task-only acceptance
+- worker: W2 | priority: P0 | state: ACCEPTED c3d03aa | after:44615
+- target_files: scripts/agent/accept.sh
+- verify: .venv/bin/pytest -q -p no:cacheprovider scripts/eval/test_accept_scope.py
+### T-44617 — Showcase auth/truth regression
+- worker: W3 | priority: P0 | after:44616
+- target_files: backend/tests/test_showcase_security_truth.py
+- verify: .venv/bin/pytest -q -p no:cacheprovider backend/tests/test_showcase_security_truth.py
+### T-44618 — Showcase admin access
+- worker: W2 | priority: P0 | after:44617
+- target_files: backend/app/api/dbms_showcase.py
+- verify: SHOWCASE-AUTH + root relevant disposable auth integration.
+### T-44619 — Honest database reads
+- worker: W2 | priority: P0 | after:44618
+- target_files: backend/app/api/dbms_showcase.py
+- verify: SHOWCASE-TRUTH + root empty/error/real-row integration.
+### T-44620 — Honest refresh outcome
+- worker: W2 | priority: P0 | after:44619
+- target_files: backend/app/api/dbms_showcase.py
+- verify: SHOWCASE-REFRESH + root real refresh/failure proof.
+### T-44621 — Seed-policy regression
+- worker: W3 | priority: P1 | state: ACCEPTED 4567fa5 | after:44616
+- target_files: backend/tests/test_seed_policy.py
+- verify: .venv/bin/pytest -q -p no:cacheprovider backend/tests/test_seed_policy.py
+### T-44622 — Safe nonlocal seeding
+- worker: W2 | priority: P1 | state: ACCEPTED d61e1f3 | after:44621
+- target_files: backend/app/config.py, backend/app/bootstrap.py
+- verify: .venv/bin/pytest -q -p no:cacheprovider backend/tests/test_seed_policy.py && .venv/bin/ruff check backend/app/config.py
+### T-44623 — Real concurrency regressions
+- worker: W3 | priority: P1 | after:ADR-010
+- target_files: backend/tests/test_showcase_concurrency_unit.py, backend/tests/test_showcase_db.py
+- verify: CONCURRENCY-UNIT; DB-SHOWCASE is root-only.
+### T-44624 — Real isolation/deadlock demos
+- worker: W2 | priority: P1 | after:44623
+- target_files: backend/app/api/dbms_showcase.py, backend/app/core/showcase_transactions.py
+- verify: CONCURRENCY-UNIT + root DB-SHOWCASE with cleanup/timeouts.
+### T-44630 — Browser project/environment repair
+- worker: W3 | priority: P1 | after:44616 and T-411 ownership handoff
+- target_files: frontend/playwright.config.ts, frontend/e2e/runtime/playwright-selection.test.mjs
+- verify: BROWSER-SELECTION; root runs guide/browser evidence, no dropped tests.
 
-### T-413 — Motion specifications and P-5 perf-fps threshold
-- worker: W3 | priority: P1 | origin: Phase 9 T-413 Motion specs & P-5
-- target_files: frontend/e2e/motion-hooks.spec.ts, frontend/e2e/perf-fps.spec.ts
-- contract: Assert reduced motion gives 0 running animations across routes; marquee animates only transform; FLIP <= 350ms; perf-fps asserts p95 <= 16.7ms and heap growth < 1MB.
-- verify: npm --prefix frontend exec -- playwright test --config frontend/playwright.config.ts e2e/motion-hooks.spec.ts e2e/perf-fps.spec.ts
-
-### T-415 — Backend coverage hardening and tie-break specs
-- worker: W3 | priority: P1 | origin: Phase 9 T-415 Backend coverage & tie-breaks
-- target_files: backend/tests/test_points_system.py, backend/tests/test_standings_tiebreak.py
-- contract: Add standings tie-break unit tests and verify backend coverage meets >= 80% threshold across backend/app.
-- verify: APEXGRID_TEST_STACK=1 DATABASE_URL='postgresql://apexgrid:apexgrid@localhost:15432/apexgrid' MONGODB_URL='mongodb://localhost:27018' MONGODB_DATABASE=apexgrid APP_ENV=local PYTHONPATH=backend:. .venv/bin/pytest -q backend/tests/test_points_system.py backend/tests/test_standings_tiebreak.py
-
-## Integration debt / deferred
-- Real-stack test runs against apexgrid-test on 18000 / 15432 / 27018.
-- CI workflows (T-420) and docs (T-421) queued for Phase 10.
-- Final scoring (T-430) and cleanup (T-431) queued for Phase 11.
+## Remaining/deferred, retained in the full plan
+T-44625..29 real analytics/audit/RLS + backend domain close;44631 redirect/axe; T-021 fixtures; T-411 full real journeys;412visual/413motion/414matrix/415coverage;44632 runner dedup;44633 locked images;420CI/421docs/431cleanup/430score/432PR. No accepted domain restart. Standings delta remains unfabricated; no test, threshold or real-data waiver.

@@ -1,5 +1,7 @@
 # ApexGrid Neo-Brutal Overhaul — Implementation Plan
 
+Remaining-work schedule after the 2026-10-27 audit: [completion-plan.md](completion-plan.md). It repairs measured gaps and schedules the remaining original requirements; design, task inventory and final gates below remain authoritative.
+
 Status: IN PROGRESS. Current evidence and permission are in .agent/CURRENT_STATE.md and the latest owner instruction; this historical baseline does not reset them.
 Audience: the orchestrator model (GPT-6.1 Sol medium in Codex CLI, Sonnet 5.5 medium in Claude Code, or Gemini 3.8 Flash high thinking in Gemini CLI / Antigravity) and the W1/W2/W3 workers it dispatches.
 Base branch: `perfection-loop` (HEAD `1acf8e1`). Work branch: `overhaul/neo-brutal`.

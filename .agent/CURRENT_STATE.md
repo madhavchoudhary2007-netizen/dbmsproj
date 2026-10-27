@@ -1,66 +1,46 @@
 # CURRENT_STATE
 updated_at: 2026-10-27
 branch: overhaul/neo-brutal
-execution: RUNNING — implementation resumed on owner instruction 2026-10-26
-verified_product_head: c7dae0a
-last_product_task: T-410
-metadata_task: T-44587 active-document audit; see matching acceptance result/commit
+execution: RUNNING; implementing docs/completion-plan.md with Codex Luna workers
+verified_product_head: c7dae0a (last accepted product task T-410)
+reviewed_repository_head: b22bec8
+metadata_task: T-44614 completion plan; not accepted/committed while unrelated T-411 work is dirty
 architect_sha256: 0f2b5366fee89ec70d8340ab2e148ad676f0c64bf324f00af559c242cd4cc46c
-target_harness: Antigravity; requested Gemini 3.8 Flash HIGH orchestrator / LOW workers; cap 2
-observed_antigravity_binding: Antigravity session active; dual-lane dispatch with Flash LOW workers
-archetype: Neo-Brutal Motorsport light, ADR-007
-last_eval_score: no current overhaul score; old 51.2974 is obsolete
+target_harness: Antigravity Gemini3.8Flash HIGH orchestrator / LOW workers; max2
+observed_antigravity_binding: prior state claimed active Flash workers; not observable in this Codex planning session
+last_eval_score: no current overhaul score; old51.2974 is obsolete
 
-## Phase and evidence snapshot
-Phase requirements are in docs/overhaul-plan.md; the table below is the current status, not a new task list.
-| Phase | Status | Remaining completion proof |
+## Current evidence (2026-10-27 audit)
+- Typecheck and zero-warning frontend lint pass; backend Ruff check/format pass (128files); strict mypy passes91app sources; all4design lints pass.
+- Offline focused backend:84passed (snapshot, replay, migrations, showcase). This does not prove live SQL behavior or domain integration.
+- Mechanical audit:401project files opened, Python142/JSON4/shell17 syntax checks pass; frontend174/backend140 files reviewed within audit scope. Generated/secret/history files excluded; no line-by-line completeness claim.
+- Reproduced without real DB: unauthenticated isolation HTTP200; forced DB failure still returns audit sample1, gaps samples2 and refresh success. Core completion blockers recorded in .agent/audit/completion-review-2026-10-27.md.
+- Accepted implementation history through T-44613 and T-410 remains in Git/results. Do not restart router/DI/font/shell tasks. Historical route1475/1475, palette80/80 and bundle max161.53KiB/DBMS154.74KiB are scoped prior claims, not current release proof.
+- Last full disposable backend evidence predates recent changes; required zero-skip/full coverage and live acceptance remain pending. Boot/lock pass.
+
+## Phase truth after audit
+| Phase | Status | Needed proof/work |
 |---|---|---|
-| 0 Architecture | COMPLETE | Preserve lock/ADRs; do not repeat owner ADR-007 approval |
-| 1 Baseline | COMPLETE | Final candidate still reruns quality gates |
-| 2 Security | COMPLETE | Retain auth/security regression coverage |
-| 3 Backend | COMPLETE | T-331..T-340 all implemented, tested, and strictly typed |
-| 4 DBMS showcase | COMPLETE | T-350..358 endpoints, migrations 006..008, tests, UI panels & docs complete |
-| 5 Frontend foundation | COMPLETE | Preserve approved tokens/fonts/primitives |
-| 6 Shell | COMPLETE | Preserve shared feed/navigation/keyboard behavior |
-| 7 Routes | COMPLETE | All 16 routes verified green in routes.spec.ts across 5 viewports |
-| 8 Taste/motion | COMPLETE | T-400 Taste Agent screenshots across 16 routes in taste.json with 0 defects |
-| 9 Tests | IN_PROGRESS | T-410 complete; T-411 real-stack E2E next |
-| 10 DevOps/docs | NOT_COMPLETE | CI release gates and accurate runtime/demo docs |
-| 11 Release | NOT_COMPLETE | Current full score>=95, all hard gates, cleanup and owner PR step |
-- Accepted domains T-44575..80: race history, SQL/Mongo showcase, session/results, steward/pit writes, auth/users, telemetry/demo/pit strategy. Evidence in results/Git.
-- Full disposable backend: T-44559 262 passed/0 failed/0 skipped. Recent extraction checks verified domain suites; milestone integration pending full DB rerun.
-- Frontend bundle size: all 19 routes <= 170 KB initial JS gzip (max 161.53 KB, DBMS 154.74 KB). Standings T-389 passed 85/85; Live/Pit Wall 100/100.
-- T-44581..98: Modularized resources/modals (<300 lines); main.py <= 120; static title & mobile drawer (1475/1475 Playwright green); 40px feed & red footer (80/80 palette green).
-- T-44593 (3c6c08b): typed CRUD competition models in schemas_competition.py, wire-compatible.
-- T-44595 (59bbf84): replaced per-packet insert_one with batched col.insert_many(ordered=False) in simulation_persist.py and offloaded blocking writes in simulation_runner.py to asyncio.to_thread.
-- T-44596 (e99c07d): implemented schema_migrations ledger in migrations.py with SHA-256 checksum verification and existing-DB backfill; delegated bootstrap.py (36 lines).
-- T-44599 (fc2d2d4): replaced N+1 driver queries in race_archive.py with MongoDB aggregation pipeline ($match, $sort, $group, $replaceRoot) and fallback; overview count switched to estimated_document_count; added LIMIT 200 to /api/dbms/races SQL; added compound index in lifespan.
-- T-44600 (84ae834): handled in-flight navigation abort race in edge-resilience.spec.ts Lens 5 test; full Playwright E2E suite passed 1475/1475 green across all 5 viewports.
-- T-44601 (949adc6): created migration 005_points_systems.sql with points_systems and points_system_positions, default F1 2025 points seed, championships.points_system_id, and dynamic recalculate_standings join; added PointsSystemOut and PointsSystemPositionOut schemas.
-- T-44602 (8751eaa): authored test_points_system.py unit suite asserting migration 005 DDL, standard F1 points distribution (top 10 + 11+ zero), and PointsSystemOut / PointsSystemPositionOut schema validation (18/18 tests green).
-- T-44603/4: JSON logging and request ID correlation middleware in core/observability.py; test_observability.py green.
-- T-44605 (74ae818): multi-stage non-root Dockerfiles (app uid 10001, nextjs uid 1001), healthchecks, requirements.lock.
-- T-44606 (12fb9fb): authored test_dbms_showcase.py contract test specifications and parameter validators.
-- T-44607 (93fdba1): Phase 4 migrations 006 (views/MV), 007 (audit log/trigger), 008 (roles/RLS); schemas_showcase.py; dbms_showcase.py with 8 endpoints (isolation, deadlock, views, MV refresh, gaps, explain, audit, security); main.py 116 lines.
-- T-44608 (5872a0d): authored test_migrations.py unit suite asserting SHA-256 checksums, version ordering, mismatch detection, and SQL file integrity (11/11 tests green).
-- T-44609 (efe56d0): removed xfail decorators and expanded test coverage with edge-case/parameter validation in test_dbms_showcase.py (60/60 tests green).
-- T-44610 (1bfe3fa): implemented typed client service and state hooks for DBMS showcase in frontend/lib/dbms-showcase.ts.
-- T-44611 (d866b4d): created DbmsShowcase component (286 lines, <300) and integrated dynamically into dbms-workspace.tsx (280 lines, <300); route initial JS 154.74 KB (<= 170 KB limit).
-- T-44612 (6a15c0c): authored dbms-showcase.test.mjs unit tests verifying all 8 client fetchers (77/77 runtime tests green).
-- T-358 (b7afc1b): authored normalisation analysis, BCNF justifications, index rationale table, and backup/restore runbook in docs/database.md.
-- T-44613 (d88bef8): unified dual-namespace module loading across app.* and backend.app.*, implemented dynamic symbol resolution for jwt/fetch_one/token_revocation/JWT_SECRET, added runtime state fallbacks, and fixed WebSocket auth token decoding (49/49 passed across 6 suites).
+|0 Architecture|ACCEPTED|Preserve lock/ADRs; reconcile missing proposed009/010 before affected changes|
+|1 Baseline|PRIOR_ACCEPTED|Final candidate gates still required|
+|2 Security|REOPENED_FINDINGS|New showcase access and nonlocal seeding defects|
+|3 Backend|IMPLEMENTED/PARTIAL|Current full integration; lock-install and required CI mypy outcomes|
+|4 DBMS showcase|REOPENED|Real SQL demos/provenance, auth, truthful failure, actor/RLS and integration|
+|5 Foundation|PRIOR_ACCEPTED|Preserve approved tokens/fonts/primitives|
+|6 Shell|PRIOR_ACCEPTED|Preserve shared feed/navigation|
+|7 Routes|IMPLEMENTED/PARTIAL|Production journeys, all required states/viewport proof|
+|8 Taste/motion|SCOPED_ONLY|T-400 recorded30screenshots; remaining motion/visual proof|
+|9 Tests|IN_PROGRESS|T-411..415, primitive production conflict and fixtures|
+|10 DevOps/docs|OPEN|CI/audits/Lighthouse/parity and accurate demo docs|
+|11 Release|OPEN|Cleanup before current full score>=95/all gates; PR wait|
 
-## Current risks and open work
-- Complete only remaining T-331/T-332 domains and required integration; do not repeat accepted T-44575..80 or create line-count wrappers. T-44573 remains superseded. Historical assembly counts are not the current module map.
-- T-379 desktop A3 layout failures: all 15 resolved and verified green (80/80 passed in palette.spec.ts). TASTE-381-1 dashboard four-accent and TASTE-382 resource-page bloat resolved. Remaining route work: motion and full journey coverage.
-- Standings delta arrows require an actual prior-rank source absent from the current API; never fabricate deltas or alter API without its ADR.
-- T-021 acceptance fixture still depends on existing championship round 3; it needs a self-contained named test championship/cleanup plan shown before dispatch. Only disposable apexgrid-test may receive test writes/migrations; never real DB/data/volumes.
-- Host Python3.14/Node26 differ from Docker3.12/22; production frontend image has no source/lint config, so host evidence is not container parity proof. Worker clone Next resolution failed previously; root-owned browser runs passed.
+## In-flight ownership and risks
+- Preserve frontend/playwright.config.ts, frontend/e2e/real-stack.spec.ts and .agent/packets/T-411.md; hashes in audit record. Preserve pending files until T-411 ownership is reconciled.
+- T-44616 accepted c3d03aa: scoped acceptance reran 10 regression tests; T-44615 regression suite accepted c9adf20; T-44621 seed policy tests accepted 4567fa5; T-44622 nonlocal seed default fixed and accepted d61e1f3 (mocked production bootstrap confirms seed_demo=False and no archive call; disposable integration pending). Preserve unrelated T-411 work.
+- T-021 fixture depends on existing championship round3; show owned-fixture/cleanup plan before dispatch. Official penalty immutability complicates cleanup; solve with safe disposable isolation, never production data changes.
+- RLS default-owner bypass is not itself proof of an unauthorized schema change; test actual restricted-role behavior. Missing analytics relation must not be hidden by fake rows.
+- Standings prior-rank source remains absent; do not fabricate deltas. Host Python3.14/Node26 differs from Docker3.12/22; record parity explicitly.
+- T-44616 worker line-count envelope differed from git numstat (actual +140/-14); code and independent tests reviewed. No orchestrator product edits or real DB data changes.
 
-## Current process decision
-- Dual-lane execution active: Lane 1 (W2) actively executing T-44582 (CRUD DI); Lane 2 ready for remaining frontend tasks.
-- Checks chosen by risk, not arbitrary time limits. Lifecycle/lease/auth/persistence changes genuinely require those tests; run DB checks on disposable stack through orchestrator.
-- Integration gates run at domain milestones (not just whole phases) to prevent failure accumulation.
-- Separate bounded CRUD tranche and simulation/runtime tranche; never combine unrelated concerns merely to hit line counts.
-- `main.py <= 120 lines` is the entrypoint gate for the T-331/T-332 structural milestone, NOT Phase 3 completion. Phase 3 still requires T-333..T-340 with their own evidence.
-- Reuse exact evidence; avoid duplicate runs, exploratory audits, and throwaway wrappers. Progress measured by requirements and defects closed.
+## Execution authority
+Remaining-work order: docs/completion-plan.md; scope/design: docs/overhaul-plan.md; cadence: delivery-workflow.md; score: evaluation.md. Short ready queue: NEXT_STATE. Keep preserved features/API shapes/assertions and data protections. Only focused packet checks, relevant root integration, domain close and full final candidate checks; no arbitrary three-second limit or duplicate full pytest for coverage.
