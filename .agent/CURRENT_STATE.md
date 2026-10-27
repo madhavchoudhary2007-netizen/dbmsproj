@@ -2,8 +2,8 @@
 updated_at: 2026-10-27
 branch: overhaul/neo-brutal
 execution: RUNNING — implementation resumed on owner instruction 2026-10-26
-verified_product_head: d88bef8
-last_product_task: T-44613
+verified_product_head: c7dae0a
+last_product_task: T-410
 metadata_task: T-44587 active-document audit; see matching acceptance result/commit
 architect_sha256: 0f2b5366fee89ec70d8340ab2e148ad676f0c64bf324f00af559c242cd4cc46c
 target_harness: Antigravity; requested Gemini 3.8 Flash HIGH orchestrator / LOW workers; cap 2
@@ -22,9 +22,9 @@ Phase requirements are in docs/overhaul-plan.md; the table below is the current 
 | 4 DBMS showcase | COMPLETE | T-350..358 endpoints, migrations 006..008, tests, UI panels & docs complete |
 | 5 Frontend foundation | COMPLETE | Preserve approved tokens/fonts/primitives |
 | 6 Shell | COMPLETE | Preserve shared feed/navigation/keyboard behavior |
-| 7 Routes | IN_PROGRESS | T-390..393 dependencies, T-379 failures and remaining route proof |
-| 8 Taste/motion | NOT_COMPLETE | T-400 audit and resulting fixes; keep known Taste backlog |
-| 9 Tests | NOT_COMPLETE | Production/real-stack E2E, visual/motion/resilience, coverage |
+| 7 Routes | COMPLETE | All 16 routes verified green in routes.spec.ts across 5 viewports |
+| 8 Taste/motion | COMPLETE | T-400 Taste Agent screenshots across 16 routes in taste.json with 0 defects |
+| 9 Tests | IN_PROGRESS | T-410 complete; T-411 real-stack E2E next |
 | 10 DevOps/docs | NOT_COMPLETE | CI release gates and accurate runtime/demo docs |
 | 11 Release | NOT_COMPLETE | Current full score>=95, all hard gates, cleanup and owner PR step |
 - Accepted domains T-44575..80: race history, SQL/Mongo showcase, session/results, steward/pit writes, auth/users, telemetry/demo/pit strategy. Evidence in results/Git.
