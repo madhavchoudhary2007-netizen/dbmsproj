@@ -49,8 +49,14 @@ from .user_router import user_router
 _MAIN_MODULE = sys.modules[__name__]
 if __name__ == "app.main":
     if sys.modules.get("backend.app") is sys.modules.get("app"):
+        _existing_main = sys.modules.get("backend.app.main")
+        if _existing_main is not None and _existing_main is not _MAIN_MODULE:
+            raise ImportError("backend.app.main is already loaded as a distinct module")
         sys.modules["backend.app.main"] = _MAIN_MODULE
 elif __name__ == "backend.app.main":
+    _existing_main = sys.modules.get("app.main")
+    if _existing_main is not None and _existing_main is not _MAIN_MODULE:
+        raise ImportError("app.main is already loaded as a distinct module")
     sys.modules["app.main"] = _MAIN_MODULE
 
 _APP_PACKAGE = sys.modules.get("app")
@@ -59,6 +65,24 @@ if _APP_PACKAGE is not None:
 _BACKEND_APP_PACKAGE = sys.modules.get("backend.app")
 if _BACKEND_APP_PACKAGE is _APP_PACKAGE and _BACKEND_APP_PACKAGE is not None:
     _BACKEND_APP_PACKAGE.main = _MAIN_MODULE
+
+_SOURCE_ROOT = "backend.app" if __name__ == "backend.app.main" else "app"
+_ALIAS_ROOT = "app" if _SOURCE_ROOT == "backend.app" else "backend.app"
+if sys.modules.get(_ALIAS_ROOT) is _APP_PACKAGE:
+    for _module_name, _module in tuple(sys.modules.items()):
+        if not _module_name.startswith(f"{_SOURCE_ROOT}."):
+            continue
+        _alias_name = f"{_ALIAS_ROOT}{_module_name[len(_SOURCE_ROOT):]}"
+        _existing_alias = sys.modules.get(_alias_name)
+        if _existing_alias is not None and _existing_alias is not _module:
+            continue
+        sys.modules[_alias_name] = _module
+        _parent_name, _, _child_name = _alias_name.rpartition(".")
+        _parent = sys.modules.get(_parent_name)
+        if _parent is not None:
+            _existing_child = vars(_parent).get(_child_name)
+            if _existing_child is None or _existing_child is _module:
+                vars(_parent)[_child_name] = _module
 
 __all__ = ("app", "resume_or_create_auto_demo_race", "simulations")
 
