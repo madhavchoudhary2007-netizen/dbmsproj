@@ -20,7 +20,7 @@ try:
     import backend.app.core.request_auth as request_auth
     import backend.app.main as main_module
     from backend.app.api import dbms_showcase
-    from backend.app.api.laps import current_user
+    from backend.app.api.laps import current_user, get_race_telemetry
     from backend.app.main import app
 finally:
     if _prior_app_env is None:
@@ -43,9 +43,19 @@ SENSITIVE_ROUTES = (
 
 @pytest.fixture
 def client() -> Iterator[TestClient]:
+    previous_overrides = app.dependency_overrides.copy()
     app.dependency_overrides.clear()
-    yield TestClient(app)
-    app.dependency_overrides.clear()
+    app.dependency_overrides[get_race_telemetry] = lambda: _EmptyTelemetry()
+    try:
+        yield TestClient(app)
+    finally:
+        app.dependency_overrides.clear()
+        app.dependency_overrides.update(previous_overrides)
+
+
+class _EmptyTelemetry:
+    def aggregate(self, _pipeline: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        return []
 
 
 def _as_role(role: str) -> None:

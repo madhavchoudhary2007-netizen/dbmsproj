@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
+from datetime import datetime, timezone
 import os
 from pathlib import Path
 import sys
@@ -13,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 _prior_app_env = os.environ.get("APP_ENV")
 os.environ.setdefault("APP_ENV", "local")
 try:
-    from backend.app.api.laps import current_user
+    from backend.app.api.laps import current_user, get_race_telemetry
     from backend.app.main import app
     from backend.app.schemas_showcase import (
         AnalyticsGapsResponse,
@@ -40,11 +41,13 @@ finally:
 def client(monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
     missing = object()
     previous = app.dependency_overrides.get(current_user, missing)
+    previous_telemetry = app.dependency_overrides.get(get_race_telemetry, missing)
     app.dependency_overrides[current_user] = lambda: {
         "id": "synthetic-admin-user",
         "email": "admin@example.invalid",
         "role": "ADMIN",
     }
+    app.dependency_overrides[get_race_telemetry] = lambda: _ShowcaseTelemetry()
     monkeypatch.setattr("backend.app.api.dbms_showcase.connection", _showcase_connection)
     try:
         yield TestClient(app)
@@ -53,6 +56,26 @@ def client(monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
             app.dependency_overrides.pop(current_user, None)
         else:
             app.dependency_overrides[current_user] = previous
+        if previous_telemetry is missing:
+            app.dependency_overrides.pop(get_race_telemetry, None)
+        else:
+            app.dependency_overrides[get_race_telemetry] = previous_telemetry
+
+
+class _ShowcaseTelemetry:
+    def aggregate(self, _pipeline: list[dict[str, object]]) -> list[dict[str, object]]:
+        return [
+            {
+                "session_id": "00000000-0000-0000-0000-000000000001",
+                "driver_id": "driver-1",
+                "lap": 1,
+                "position": 1,
+                "elapsed_ms": 84250,
+                "lap_time_ms": 84250,
+                "sector": 3,
+                "ts": datetime(2026, 10, 26, 12, 0, tzinfo=timezone.utc),
+            }
+        ]
 
 
 class _ShowcaseCursor:
@@ -82,7 +105,7 @@ class _ShowcaseCursor:
                     "def": "SELECT championship_id, driver_id FROM standings",
                 },
             ]
-        if "lap_telemetry" in self.sql:
+        if "lap_telemetry" in self.sql or "jsonb_to_recordset" in self.sql:
             return [
                 {
                     "driver_id": "driver-1",
