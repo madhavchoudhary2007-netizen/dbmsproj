@@ -13,6 +13,7 @@ from ..core.showcase_analytics import (
     recorded_elapsed_rows,
     serialize_recorded_rows,
 )
+from ..core.showcase_transactions import run_deadlock_demo, run_isolation_demo
 from ..database import connection
 from ..schemas_showcase import (
     AnalyticsGapsResponse,
@@ -45,109 +46,18 @@ def get_isolation_demo(level: str = Query(default="read_committed")) -> Isolatio
     except ValueError as err:
         raise HTTPException(status_code=400, detail=str(err)) from err
 
-    # Showcase simulation with scripted interleaving
-    if norm_level == "read_committed":
-        return IsolationDemoResponse(
-            level="read_committed",
-            observed_reads=[
-                {"step": "T1: Initial read", "balance": 1000},
-                {"step": "T1: Read after T2 commit", "balance": 1500},
-            ],
-            anomaly_detected=True,
-            anomaly_type="Non-repeatable Read (Fuzzy Read)",
-            timeline=[
-                {"time": 1, "tx": "T1", "action": "BEGIN ISOLATION LEVEL READ COMMITTED"},
-                {"time": 2, "tx": "T1", "action": "SELECT balance FROM account WHERE id=1 -> 1000"},
-                {
-                    "time": 3,
-                    "tx": "T2",
-                    "action": "BEGIN; UPDATE account SET balance=1500 WHERE id=1; COMMIT;",
-                },
-                {
-                    "time": 4,
-                    "tx": "T1",
-                    "action": "SELECT balance FROM account WHERE id=1 -> 1500 (value changed!)",
-                },
-                {"time": 5, "tx": "T1", "action": "ROLLBACK"},
-            ],
-        )
-
-    if norm_level == "repeatable_read":
-        return IsolationDemoResponse(
-            level="repeatable_read",
-            observed_reads=[
-                {"step": "T1: Initial read", "balance": 1000},
-                {"step": "T1: Read after T2 commit", "balance": 1000},
-            ],
-            anomaly_detected=False,
-            anomaly_type=None,
-            timeline=[
-                {"time": 1, "tx": "T1", "action": "BEGIN ISOLATION LEVEL REPEATABLE READ"},
-                {"time": 2, "tx": "T1", "action": "SELECT balance FROM account WHERE id=1 -> 1000"},
-                {
-                    "time": 3,
-                    "tx": "T2",
-                    "action": "BEGIN; UPDATE account SET balance=1500 WHERE id=1; COMMIT;",
-                },
-                {
-                    "time": 4,
-                    "tx": "T1",
-                    "action": "SELECT balance FROM account WHERE id=1 -> 1000 (snapshot preserved)",
-                },
-                {"time": 5, "tx": "T1", "action": "ROLLBACK"},
-            ],
-        )
-
-    # serializable
-    return IsolationDemoResponse(
-        level="serializable",
-        observed_reads=[
-            {"step": "T1: Initial read", "balance": 1000},
-            {"step": "T1: Read after T2 commit", "balance": 1000},
-        ],
-        anomaly_detected=False,
-        anomaly_type=None,
-        timeline=[
-            {"time": 1, "tx": "T1", "action": "BEGIN ISOLATION LEVEL SERIALIZABLE"},
-            {"time": 2, "tx": "T1", "action": "SELECT balance FROM account WHERE id=1 -> 1000"},
-            {
-                "time": 3,
-                "tx": "T2",
-                "action": "BEGIN; UPDATE account SET balance=1500 WHERE id=1; COMMIT;",
-            },
-            {
-                "time": 4,
-                "tx": "T1",
-                "action": "SELECT balance FROM account WHERE id=1 -> 1000 (strict serialization)",
-            },
-            {"time": 5, "tx": "T1", "action": "ROLLBACK"},
-        ],
-    )
+    try:
+        return IsolationDemoResponse(**run_isolation_demo(connection, norm_level))
+    except Exception as err:
+        raise HTTPException(status_code=500, detail="Isolation demonstration failed") from err
 
 
 @router.post("/api/dbms/deadlock-demo", response_model=DeadlockDemoResponse)
 def post_deadlock_demo() -> DeadlockDemoResponse:
-    return DeadlockDemoResponse(
-        aborted_transaction="T2",
-        sqlstate="40P01",
-        error_message=(
-            "deadlock detected: Process 12345 waits for ShareLock on transaction 67890; "
-            "Process 67890 waits for ExclusiveLock on tuple (0, 1) of relation 'pit_reservations'"
-        ),
-        details={
-            "transaction_1": {
-                "query": "UPDATE pit_reservations SET reserved_window='10:00' WHERE id=1",
-                "holding": "RowShareLock on id=1",
-                "waiting_for": "RowExclusiveLock on id=2",
-            },
-            "transaction_2": {
-                "query": "UPDATE pit_reservations SET reserved_window='10:05' WHERE id=2",
-                "holding": "RowShareLock on id=2",
-                "waiting_for": "RowExclusiveLock on id=1",
-            },
-            "resolution": "PostgreSQL deadlock detector aborted Transaction T2 with error 40P01",
-        },
-    )
+    try:
+        return DeadlockDemoResponse(**run_deadlock_demo(connection))
+    except Exception as err:
+        raise HTTPException(status_code=500, detail="Deadlock demonstration failed") from err
 
 
 @router.get("/api/dbms/views", response_model=ViewsResponse)
