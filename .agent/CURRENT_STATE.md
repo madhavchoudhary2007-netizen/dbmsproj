@@ -2,9 +2,9 @@
 updated_at: 2026-10-27
 branch: overhaul/neo-brutal
 execution: RUNNING; implementing docs/completion-plan.md with Codex Luna workers
-verified_product_head: c71203f (T-44620 refresh; real DB integration pending)
+verified_product_head: 81d7819 (T-44641 EXPLAIN truth; integration pending)
 reviewed_repository_head: b22bec8
-metadata_task: T-44614 completion plan and evidence accepted 00e50a2; unrelated T-411 work remains untouched
+metadata_task: T-44636 ADR-010 and evidence checkpoint accepted a80bfd2; unrelated T-411 work remains untouched
 architect_sha256: 0f2b5366fee89ec70d8340ab2e148ad676f0c64bf324f00af559c242cd4cc46c
 target_harness: Antigravity Gemini3.8Flash HIGH orchestrator / LOW workers; max2
 observed_antigravity_binding: prior state claimed active Flash workers; not observable in this Codex planning session
@@ -20,10 +20,20 @@ last_eval_score: no current overhaul score; old51.2974 is obsolete
 
 - T-44618 accepted a100c9c: 25 authorization/CSRF cases pass with offline fixtures; T-44619 accepted dd11de9: audit/views/gaps empty and error cases pass; T-44620 accepted c71203f: refresh error/success checks pass; T-44617 accepted 15a21dd (31 passed); T-44635 accepted dded0ba (60 passed, original assertions retained); OpenAPI snapshot9 passed, strict showcase mypy passed.
 
+- T-44626 accepted a001d83; a read-only query on verified disposable PostgreSQL returned correct tie, gap and rolling-lap values. Combined isolated suite 94 passed and strict mypy passed; T-44625 tests accepted 0acf6b2; T-44637 fixture updates accepted 65f8069; isolated suite 94 passed.
+
+- T-44624 accepted 23f6a9c: offline 9 passed; guarded disposable PostgreSQL integration 8 passed, including independent PIDs and real SQLSTATE 40P01. Demo circuit rows remaining: 0. First integration attempt lacked PYTHONPATH (4 errors); corrected run passed. T-44623 accepted 013c3ef; legacy fixtures accepted 47fd11c, combined suite 94 passed.
+
+- T-44639 accepted ebee956: authenticated actor set with transaction-local parameterized SQL for both steward handlers; real trigger proof pending. T-44628 accepted 2f3294c: security metadata returns actual rows or errors; T-44627 regression accepted 78d4c9b. A rollback-only disposable trigger probe produced exactly one audit row with the synthetic actor.
+
+- Confirmed P0 RLS gap: on disposable apexgrid-test with restricted apexgrid_app and steward context, own probe rows for both championships and penalties were visible; plan requires penalties only. Probe rolled back. ADR-017 drafted; candidate 009 replayed twice in one rollback-only disposable transaction, with steward/admin/unknown read and steward write checks passing; migration not accepted or deployed.
+
+- T-44641 accepted 81d7819: offline EXPLAIN error/empty/success tests9 passed; no fabricated plan on error. T-44640 regression accepted 2bfcbb1; real EXPLAIN proof pending.
+
 ## Phase truth after audit
 | Phase | Status | Needed proof/work |
 |---|---|---|
-|0 Architecture|ACCEPTED|Preserve lock/ADRs; reconcile missing proposed009/010 before affected changes|
+|0 Architecture|ACCEPTED|ADR-010 recorded; reconcile missing proposed009 before points changes|
 |1 Baseline|PRIOR_ACCEPTED|Final candidate gates still required|
 |2 Security|REOPENED_FINDINGS|New showcase access and nonlocal seeding defects|
 |3 Backend|IMPLEMENTED/PARTIAL|Current full integration; lock-install and required CI mypy outcomes|

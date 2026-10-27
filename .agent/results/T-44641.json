@@ -1,0 +1,20 @@
+{
+  "task_id": "T-44641",
+  "status": "PASSED",
+  "files_modified": [
+    {
+      "path": "backend/app/api/dbms_showcase.py",
+      "lines_added": 16,
+      "lines_removed": 29
+    }
+  ],
+  "diff_summary": "Removed the fabricated EXPLAIN plan. Database errors and missing or empty results now return a generic 500; successful plans are returned from the database.",
+  "verification": {
+    "command": ".venv/bin/pytest -q -p no:cacheprovider backend/tests/test_showcase_explain_truth.py && .venv/bin/ruff check backend/app/api/dbms_showcase.py",
+    "exit_code": 0,
+    "tests_passed": 9,
+    "tests_failed": 0,
+    "duration_ms": 616
+  },
+  "unresolved_blockers": []
+}

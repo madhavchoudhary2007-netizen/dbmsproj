@@ -1,0 +1,20 @@
+{
+  "task_id": "T-44640",
+  "status": "PASSED",
+  "files_modified": [
+    {
+      "path": "backend/tests/test_showcase_explain_truth.py",
+      "lines_added": 161,
+      "lines_removed": 0
+    }
+  ],
+  "diff_summary": "Added offline EXPLAIN regressions covering failure and empty-result responses, plan passthrough, safe parameter binding, analyze behavior, and query-name validation.",
+  "verification": {
+    "command": ".venv/bin/pytest -q -p no:cacheprovider backend/tests/test_showcase_explain_truth.py",
+    "exit_code": 0,
+    "tests_passed": 9,
+    "tests_failed": 0,
+    "duration_ms": 564
+  },
+  "unresolved_blockers": []
+}

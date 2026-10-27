@@ -1,0 +1,21 @@
+{
+  "task_id": "T-44639",
+  "status": "PASSED",
+  "files_modified": [
+    {
+      "path": "backend/app/api/stewards.py",
+      "lines_added": 12,
+      "lines_removed": 1
+    }
+  ],
+  "diff_summary": "Set parameterized transaction-local audit actor context before penalty inserts in both decision handlers when an authenticated user id is available. Calls without a user leave actor context unset.",
+  "verification": {
+    "command": ".venv/bin/pytest -q -p no:cacheprovider backend/tests/test_showcase_audit.py -k steward_penalty && .venv/bin/ruff check backend/app/api/stewards.py",
+    "exit_code": 0,
+    "tests_passed": 1,
+    "tests_failed": 0,
+    "duration_ms": 200,
+    "lint_warnings": 0
+  },
+  "unresolved_blockers": []
+}

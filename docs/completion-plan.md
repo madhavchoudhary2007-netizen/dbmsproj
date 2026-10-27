@@ -178,3 +178,9 @@ At each milestone report closed finding/task IDs, actual command exits/counts, i
 
 
 **T-44635 (W3):** Preserve existing showcase assertions with authenticated, deterministic offline database fixtures after T-44618; the legacy tests assumed anonymous access and fallback data. No assertion may be deleted or weakened. Verify: `.venv/bin/pytest -q -p no:cacheprovider backend/tests/test_dbms_showcase.py`.
+
+
+**T-44639 (W2):** Set authenticated steward actor in the transaction-local audit context for incident decisions; audit evidence located the write in `backend/app/api/stewards.py`, outside the originally listed showcase files. Verify the focused actor regression and scoped Ruff; root verifies the trigger on disposable PostgreSQL.
+
+
+**T-44640/41 (W3/W2):** Test and remove the EXPLAIN fallback that fabricates a plan when PostgreSQL fails or returns no result; preserve the allow-list, API shape and query safety. Root verifies a real disposable query.
