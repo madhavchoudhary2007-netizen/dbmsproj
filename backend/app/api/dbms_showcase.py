@@ -4,7 +4,7 @@ import contextlib
 import time
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from psycopg.rows import tuple_row
 
 from ..database import connection
@@ -27,8 +27,9 @@ from ..schemas_showcase import (
     validate_gaps_query_params,
     validate_isolation_level_param,
 )
+from .laps import admin
 
-router = APIRouter(tags=["dbms_showcase"])
+router = APIRouter(tags=["dbms_showcase"], dependencies=[Depends(admin)])
 
 
 @router.get("/api/dbms/isolation-demo", response_model=IsolationDemoResponse)
