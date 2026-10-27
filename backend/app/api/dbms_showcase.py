@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 import time
 from typing import Annotated, Any
 
@@ -183,37 +182,25 @@ def get_explain_plan(
     }
     sql = queries[qname]
 
-    plan: list[dict[str, Any]] | dict[str, Any] = [
-        {
-            "Plan": {
-                "Node Type": "Aggregate",
-                "Strategy": "Sorted",
-                "Startup Cost": 15.0,
-                "Total Cost": 25.5,
-                "Plan Rows": 10,
-                "Plan Width": 32,
-                "Actual Startup Time": 0.05,
-                "Actual Total Time": 0.12,
-                "Actual Rows": 10,
-                "Actual Loops": 1,
-            }
-        }
-    ]
-
     bool_analyze = "TRUE" if analyze else "FALSE"
     explain_cmd = f"EXPLAIN (ANALYZE {bool_analyze}, BUFFERS TRUE, FORMAT JSON) {sql}"
 
-    with (
-        contextlib.suppress(Exception),
-        connection() as conn,
-        conn.transaction(),
-        conn.cursor(row_factory=tuple_row) as cur,
-    ):
-        explain_params = ("[]", "00000000-0000-0000-0000-000000000000")
-        cur.execute(explain_cmd, explain_params if qname == "lap_telemetry_window" else ())
-        row = cur.fetchone()
-        if row and row[0]:
-            plan = row[0]
+    try:
+        with (
+            connection() as conn,
+            conn.transaction(),
+            conn.cursor(row_factory=tuple_row) as cur,
+        ):
+            explain_params = ("[]", "00000000-0000-0000-0000-000000000000")
+            cur.execute(explain_cmd, explain_params if qname == "lap_telemetry_window" else ())
+            row = cur.fetchone()
+    except Exception as err:
+        raise HTTPException(status_code=500, detail="Database EXPLAIN failed") from err
+
+    if not row or not row[0]:
+        raise HTTPException(status_code=500, detail="Database EXPLAIN failed")
+
+    plan = row[0]
 
     return ExplainPlanResponse(
         query_name=qname,
