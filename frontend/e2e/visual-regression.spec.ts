@@ -44,7 +44,7 @@ for (const [snapshot, routePath] of routes) {
               id: "visual-admin",
               email: "visual@example.test",
               full_name: "Visual Fixture",
-              role: "admin",
+              role: "ADMIN",
             },
           });
         }
@@ -87,7 +87,7 @@ for (const [snapshot, routePath] of routes) {
     const primaryScreen = page.locator("[data-primary='true']");
     await expect(primaryScreen).toHaveCount(1);
     await expect(primaryScreen).toBeVisible();
-    await expect.poll(() => primaryScreen.innerText()).toMatch(/\S/);
+    await expect(primaryScreen).toHaveAccessibleName(/\S/);
     expect(unexpectedWrites).toEqual([]);
     await page.evaluate(async () => {
       await document.fonts.ready;
