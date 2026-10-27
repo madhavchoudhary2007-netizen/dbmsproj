@@ -14,7 +14,6 @@ from .request_database import DatabaseSession
 from .runtime import RuntimeState, get_pool, get_runtime
 from .serialization import jsonable
 
-
 _REQUEST_AUTH_MODULE = sys.modules[__name__]
 _RUNTIME_MODULE = sys.modules[f"{__package__}.runtime"]
 if __name__ == "app.core.request_auth":
@@ -32,11 +31,11 @@ for _package_name, _module_name in (
     _package = sys.modules.get(_package_name)
     _module = sys.modules.get(_module_name)
     if _package is not None and _module is not None:
-        setattr(_package, "request_auth", _module)
+        vars(_package)["request_auth"] = _module
 for _package_name in ("app.core", "backend.app.core"):
     _package = sys.modules.get(_package_name)
     if _package is not None:
-        setattr(_package, "runtime", _RUNTIME_MODULE)
+        vars(_package)["runtime"] = _RUNTIME_MODULE
 
 _INITIAL_JWT_SECRET = JWT_SECRET
 

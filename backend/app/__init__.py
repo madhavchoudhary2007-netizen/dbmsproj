@@ -3,8 +3,10 @@
 
 import importlib
 import sys
+from types import ModuleType
 
 _PACKAGE = sys.modules[__name__]
+_BACKEND: ModuleType | None
 try:
     _BACKEND = importlib.import_module("backend")
 except ModuleNotFoundError as error:
@@ -19,7 +21,7 @@ else:
     if _existing_attribute is not None and _existing_attribute is not _PACKAGE:
         raise ImportError("backend.app already refers to a distinct application package")
     sys.modules["backend.app"] = _PACKAGE
-    _BACKEND.app = _PACKAGE
+    vars(_BACKEND)["app"] = _PACKAGE
 
 
 if __name__ == "backend.app":

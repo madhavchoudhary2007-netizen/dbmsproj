@@ -61,10 +61,10 @@ elif __name__ == "backend.app.main":
 
 _APP_PACKAGE = sys.modules.get("app")
 if _APP_PACKAGE is not None:
-    _APP_PACKAGE.main = _MAIN_MODULE
+    vars(_APP_PACKAGE)["main"] = _MAIN_MODULE
 _BACKEND_APP_PACKAGE = sys.modules.get("backend.app")
 if _BACKEND_APP_PACKAGE is _APP_PACKAGE and _BACKEND_APP_PACKAGE is not None:
-    _BACKEND_APP_PACKAGE.main = _MAIN_MODULE
+    vars(_BACKEND_APP_PACKAGE)["main"] = _MAIN_MODULE
 
 _SOURCE_ROOT = "backend.app" if __name__ == "backend.app.main" else "app"
 _ALIAS_ROOT = "app" if _SOURCE_ROOT == "backend.app" else "backend.app"
