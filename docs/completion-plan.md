@@ -184,3 +184,6 @@ At each milestone report closed finding/task IDs, actual command exits/counts, i
 
 
 **T-44640/41 (W3/W2):** Test and remove the EXPLAIN fallback that fabricates a plan when PostgreSQL fails or returns no result; preserve the allow-list, API shape and query safety. Root verifies a real disposable query.
+
+
+**T-44645/46 (W3/W2):** Test and bind validated steward role as transaction-local audit context. ADR-017 policy requires this for restricted database roles; do not trust body-supplied context. Root verifies on disposable PostgreSQL.
