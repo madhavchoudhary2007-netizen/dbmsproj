@@ -1,28 +1,154 @@
 from __future__ import annotations
 
+from collections.abc import Iterator
+import os
+from pathlib import Path
+import sys
+
 import pytest
 from fastapi.testclient import TestClient
 
-from backend.app.main import app
-from backend.app.schemas_showcase import (
-    AnalyticsGapsResponse,
-    AuditLogResponse,
-    DBMSSecurityResponse,
-    DeadlockDemoResponse,
-    ExplainPlanResponse,
-    IsolationDemoResponse,
-    RefreshStandingsMVResponse,
-    ViewsResponse,
-    validate_audit_query_params,
-    validate_explain_query_params,
-    validate_gaps_query_params,
-    validate_isolation_level_param,
-)
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+_prior_app_env = os.environ.get("APP_ENV")
+os.environ.setdefault("APP_ENV", "local")
+try:
+    from backend.app.api.laps import current_user
+    from backend.app.main import app
+    from backend.app.schemas_showcase import (
+        AnalyticsGapsResponse,
+        AuditLogResponse,
+        DBMSSecurityResponse,
+        DeadlockDemoResponse,
+        ExplainPlanResponse,
+        IsolationDemoResponse,
+        RefreshStandingsMVResponse,
+        ViewsResponse,
+        validate_audit_query_params,
+        validate_explain_query_params,
+        validate_gaps_query_params,
+        validate_isolation_level_param,
+    )
+finally:
+    if _prior_app_env is None:
+        os.environ.pop("APP_ENV", None)
+    else:
+        os.environ["APP_ENV"] = _prior_app_env
 
 
 @pytest.fixture
-def client() -> TestClient:
-    return TestClient(app)
+def client(monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
+    missing = object()
+    previous = app.dependency_overrides.get(current_user, missing)
+    app.dependency_overrides[current_user] = lambda: {
+        "id": "synthetic-admin-user",
+        "email": "admin@example.invalid",
+        "role": "ADMIN",
+    }
+    monkeypatch.setattr("backend.app.api.dbms_showcase.connection", _showcase_connection)
+    try:
+        yield TestClient(app)
+    finally:
+        if previous is missing:
+            app.dependency_overrides.pop(current_user, None)
+        else:
+            app.dependency_overrides[current_user] = previous
+
+
+class _ShowcaseCursor:
+    def __init__(self) -> None:
+        self.sql = ""
+
+    def __enter__(self) -> _ShowcaseCursor:
+        return self
+
+    def __exit__(self, *_: object) -> None:
+        return None
+
+    def execute(self, sql: str, params: object = None) -> None:
+        self.sql = sql
+
+    def fetchall(self) -> list[dict[str, object]]:
+        if "pg_views" in self.sql:
+            return [
+                {
+                    "name": "v_driver_season_summary",
+                    "view_type": "view",
+                    "def": "SELECT driver_id, season_id FROM driver_standings",
+                },
+                {
+                    "name": "mv_championship_standings",
+                    "view_type": "materialized_view",
+                    "def": "SELECT championship_id, driver_id FROM standings",
+                },
+            ]
+        if "lap_telemetry" in self.sql:
+            return [
+                {
+                    "driver_id": "driver-1",
+                    "lap": 1,
+                    "position": 1,
+                    "gap_to_leader_ms": 0,
+                    "interval_ms": 0,
+                    "rolling_avg_ms": 84250,
+                }
+            ]
+        if "audit_log" in self.sql:
+            return [
+                {
+                    "id": 1,
+                    "table_name": "penalties",
+                    "op": "INSERT",
+                    "row_pk": {"id": 10},
+                    "old": None,
+                    "new": {"severity": "5s"},
+                    "actor": "steward_1",
+                    "at": "2026-10-26T12:00:00Z",
+                }
+            ]
+        if "pg_roles" in self.sql:
+            return [{"rolname": "apexgrid_app"}, {"rolname": "apexgrid_readonly"}]
+        if "role_table_grants" in self.sql:
+            return [
+                {
+                    "grantee": "apexgrid_app",
+                    "table_name": "championships",
+                    "privilege_type": "SELECT",
+                }
+            ]
+        if "pg_policies" in self.sql:
+            return [
+                {
+                    "policyname": "audit_stewards_penalties",
+                    "tablename": "audit_log",
+                    "roles": ["stewards"],
+                    "cmd": "SELECT",
+                }
+            ]
+        return []
+
+    def fetchone(self) -> tuple[list[dict[str, object]]]:
+        return ([{"Plan": {"Node Type": "Aggregate", "Total Cost": 25.5}}],)
+
+
+class _ShowcaseConnection:
+    autocommit = False
+
+    def __enter__(self) -> _ShowcaseConnection:
+        return self
+
+    def __exit__(self, *_: object) -> None:
+        return None
+
+    def cursor(self, *args: object, **kwargs: object) -> _ShowcaseCursor:
+        return _ShowcaseCursor()
+
+    def transaction(self) -> _ShowcaseConnection:
+        return self
+
+
+def _showcase_connection() -> _ShowcaseConnection:
+    return _ShowcaseConnection()
 
 
 # ---------------------------------------------------------------------------
