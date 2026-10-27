@@ -17,7 +17,64 @@ async function signIn(page: Page): Promise<void> {
   await expect(page.getByRole("heading", { name: "Race operations" })).toBeVisible();
 }
 
+type TimingUpdate = {
+  type?: string;
+  session_id?: string;
+  data?: { cars?: Array<Record<string, unknown>> };
+};
+
+function watchTimingUpdates(page: Page): TimingUpdate[] {
+  const updates: TimingUpdate[] = [];
+  page.on("websocket", (socket) => {
+    if (!new URL(socket.url()).pathname.includes("/api/ws/sessions/")) return;
+    socket.on("framereceived", ({ payload }) => {
+      try {
+        const message = JSON.parse(String(payload)) as TimingUpdate;
+        if (message.type === "timing.update") updates.push(message);
+      } catch {
+        // Ignore non-JSON WebSocket frames.
+      }
+    });
+  });
+  return updates;
+}
+
+async function waitForTimingUpdate(
+  updates: TimingUpdate[],
+  sessionId: string,
+): Promise<TimingUpdate> {
+  await expect.poll(() => updates.some(
+    (update) => update.session_id === sessionId && Boolean(update.data?.cars?.length),
+  )).toBe(true);
+  const update = updates.find(
+    (message) => message.session_id === sessionId && Boolean(message.data?.cars?.length),
+  );
+  if (!update) throw new Error(`No timing update received for generated session ${sessionId}`);
+  return update;
+}
+
+async function createGeneratedRace(page: Page): Promise<string> {
+  const responsePromise = page.waitForResponse((response) =>
+    response.request().method() === "POST" &&
+    new URL(response.url()).pathname.endsWith("/api/demo-races"),
+  );
+  await page.getByRole("button", { name: "Create live race" }).click();
+  const response = await responsePromise;
+  expect(response.status()).toBe(201);
+  const created = await response.json() as { session_id?: unknown };
+  expect(typeof created.session_id).toBe("string");
+  const sessionId = created.session_id as string;
+  await expect(page.getByRole("combobox", { name: "Session" })).toHaveValue(sessionId);
+  return sessionId;
+}
+
 test.describe("Real-stack Journey Tests (Unmocked)", () => {
+  test.beforeEach(async ({ page }) => {
+    expect(process.env.APEXGRID_E2E_OWNED_DISPOSABLE).toBe("1");
+    await page.goto("/");
+    expect(["localhost", "127.0.0.1"]).toContain(new URL(page.url()).hostname);
+  });
+
   test("Test 1: Sign in through UI at /login navigates to /dashboard and displays operational context", async ({
     page,
   }) => {
@@ -47,6 +104,7 @@ test.describe("Real-stack Journey Tests (Unmocked)", () => {
   test("Test 2: Live session & timing tower on /live with connected WebSocket status", async ({
     page,
   }) => {
+    const timingUpdates = watchTimingUpdates(page);
     const failures: string[] = [];
     page.on("pageerror", (err) => failures.push(`pageerror: ${err.message}`));
     page.on("response", (res) => {
@@ -63,6 +121,16 @@ test.describe("Real-stack Journey Tests (Unmocked)", () => {
     ).toBeVisible();
 
     await expect(page.getByText("Connected · live stream", { exact: true }).first()).toBeVisible();
+
+    const sessionId = await createGeneratedRace(page);
+    const update = await waitForTimingUpdate(timingUpdates, sessionId);
+    const carCount = update.data?.cars?.length ?? 0;
+    expect(carCount).toBeGreaterThan(0);
+    await expect(page.getByText("Connected · live stream", { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: `${carCount} cars on timing` })).toBeVisible();
+    await expect(
+      page.getByRole("table", { name: "LIVE TIMING / RUNNING ORDER" }).getByRole("row"),
+    ).toHaveCount(carCount + 1);
 
     expect(failures).toEqual([]);
   });
@@ -148,8 +216,16 @@ test.describe("Real-stack Journey Tests (Unmocked)", () => {
     ).toBeVisible();
   });
 
-  test("Test 7: Steward desk exposes incident cases and report control", async ({ page }) => {
+  test("Test 7: Steward approval is followed by standings recalculation", async ({ page }) => {
     await signIn(page);
+    const timingUpdates = watchTimingUpdates(page);
+    await page.goto("/live");
+    const sessionId = await createGeneratedRace(page);
+    const update = await waitForTimingUpdate(timingUpdates, sessionId);
+    const firstCar = update.data?.cars?.[0];
+    expect(firstCar?.driver_id).toBeTruthy();
+    const driverId = String(firstCar?.driver_id);
+
     await page.goto("/stewards");
     await expect(page.getByRole("heading", { name: "Steward desk" })).toBeVisible();
     await expect(page.getByRole("table", { name: "Incident case files" })).toBeVisible();
@@ -157,6 +233,37 @@ test.describe("Real-stack Journey Tests (Unmocked)", () => {
     await expect(report).toBeVisible();
     await report.click();
     await expect(page.getByRole("heading", { name: "Report incident" })).toBeVisible();
+
+    const sessionField = page.getByLabel("session id", { exact: true });
+    const driverField = page.getByLabel("driver id", { exact: true });
+    await expect.poll(() => sessionField.locator(`option[value="${sessionId}"]`).count()).toBe(1);
+    await expect.poll(() => driverField.locator(`option[value="${driverId}"]`).count()).toBe(1);
+    await sessionField.selectOption(sessionId);
+    await driverField.selectOption(driverId);
+    await page.getByLabel("lap", { exact: true }).fill("1");
+    const description = `Owned disposable steward case ${Date.now()}`;
+    await page.getByLabel("description", { exact: true }).fill(description);
+    await page.getByRole("button", { name: "Save record" }).click();
+
+    const incident = page.getByRole("row", { name: new RegExp(description) });
+    await expect(incident).toBeVisible();
+    await incident.click();
+    await expect(page.getByRole("heading", { name: "Incident review" })).toBeVisible();
+    await page.getByLabel("Decision notes").fill("Approved in disposable E2E fixture");
+    await page.getByLabel("Penalty points").fill("1");
+    await page.getByRole("button", { name: "Approve penalty" }).click();
+    await expect(page.getByRole("status").filter({ hasText: "Decision recorded." })).toBeVisible();
+
+    await page.goto("/standings");
+    await expect(page.getByRole("heading", { name: "Standings" })).toBeVisible();
+    const championship = page.getByLabel("Championship");
+    const demoChampionship = championship.locator("option").filter({ hasText: "ApexGrid Live Demo" }).first();
+    await expect(demoChampionship).toBeAttached();
+    const championshipId = await demoChampionship.getAttribute("value");
+    if (!championshipId) throw new Error("Generated demo championship is unavailable");
+    await championship.selectOption(championshipId);
+    await page.getByRole("button", { name: "Recalculate standings" }).click();
+    await expect(page.getByText(/^Standings recalculated\..*"recalculated":true/)).toBeVisible();
   });
 
   test("Test 8: Pit wall loads race control state and can refresh", async ({ page }) => {
