@@ -46,13 +46,17 @@ for (const [id, path] of routes) {
     });
 
     await page.goto(path, { waitUntil: "domcontentloaded" });
+    const expectedPath = path === "/" ? "/dashboard" : path;
+    if (path === "/") {
+      await expect(page).toHaveURL((url) => new URL(url).pathname === "/dashboard");
+    }
     if (path === "/login") {
       await expect(page.getByRole("heading", { name: "Sign in to ApexGrid" })).toBeVisible();
       await expect(page.locator("form.login-form")).toBeVisible();
       await expect(page.getByLabel("Email address")).toBeVisible();
       await expect(page.getByLabel("Email address")).toBeEnabled();
     }
-    await expect(page).toHaveURL((url) => new URL(url).pathname === path);
+    await expect(page).toHaveURL((url) => new URL(url).pathname === expectedPath);
     await expect.poll(() => page.locator("body").innerText()).toMatch(/\S{8}/);
     expect(attemptedWrites).toEqual([]);
 
