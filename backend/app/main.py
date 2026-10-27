@@ -72,7 +72,7 @@ if sys.modules.get(_ALIAS_ROOT) is _APP_PACKAGE:
     for _module_name, _module in tuple(sys.modules.items()):
         if not _module_name.startswith(f"{_SOURCE_ROOT}."):
             continue
-        _alias_name = f"{_ALIAS_ROOT}{_module_name[len(_SOURCE_ROOT):]}"
+        _alias_name = f"{_ALIAS_ROOT}{_module_name[len(_SOURCE_ROOT) :]}"
         _existing_alias = sys.modules.get(_alias_name)
         if _existing_alias is not None and _existing_alias is not _module:
             continue

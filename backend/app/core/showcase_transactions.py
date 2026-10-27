@@ -102,7 +102,7 @@ def run_isolation_demo(
 
 
 def run_deadlock_demo(
-    connection: Callable[[], AbstractContextManager[Connection[DatabaseRow]]]
+    connection: Callable[[], AbstractContextManager[Connection[DatabaseRow]]],
 ) -> dict[str, Any]:
     ids = (uuid4(), uuid4())
     barrier = threading.Barrier(2)

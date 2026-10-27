@@ -1,4 +1,3 @@
-
 """Application package aliases for both supported import roots."""
 
 import importlib

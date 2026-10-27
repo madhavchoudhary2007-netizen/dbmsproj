@@ -172,9 +172,7 @@ def get_explain_plan(
             "SELECT championship_id, count(*), sum(points) "
             "FROM driver_standings GROUP BY championship_id;"
         ),
-        "lap_telemetry_window": (
-            RECORDED_ELAPSED_QUERY
-        ),
+        "lap_telemetry_window": (RECORDED_ELAPSED_QUERY),
         "driver_history": (
             "SELECT d.id, d.number, count(r.id) FROM drivers d "
             "LEFT JOIN session_results r ON r.driver_id = d.id GROUP BY d.id, d.number;"
