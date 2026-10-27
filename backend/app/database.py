@@ -1,6 +1,12 @@
+import sys
 from collections.abc import Iterator, Sequence
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from typing import Any
+
+if __name__ == "app.database":
+    sys.modules.setdefault("backend.app.database", sys.modules[__name__])
+elif __name__ == "backend.app.database":
+    sys.modules.setdefault("app.database", sys.modules[__name__])
 
 from psycopg import Connection
 from psycopg.rows import dict_row
@@ -33,10 +39,25 @@ def open_pool() -> None:
     if pool.closed:
         pool = _new_pool()
     pool.open(wait=True)
+    import sys
+
+    for mod_name in ("app.database", "backend.app.database"):
+        mod = sys.modules.get(mod_name)
+        if mod is not None and mod is not sys.modules.get(__name__):
+            setattr(mod, "pool", pool)  # noqa: B010
 
 
 def close_pool() -> None:
     pool.close()
+    import sys
+
+    for mod_name in ("app.database", "backend.app.database"):
+        mod = sys.modules.get(mod_name)
+        if mod is not None and mod is not sys.modules.get(__name__):
+            with suppress(Exception):
+                other_pool = getattr(mod, "pool", None)
+                if other_pool is not None:
+                    other_pool.close()
 
 
 @contextmanager

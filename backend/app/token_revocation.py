@@ -1,5 +1,11 @@
+import sys
 from datetime import datetime
 from uuid import NAMESPACE_URL, UUID, uuid5
+
+if __name__ == "app.token_revocation":
+    sys.modules.setdefault("backend.app.token_revocation", sys.modules[__name__])
+elif __name__ == "backend.app.token_revocation":
+    sys.modules.setdefault("app.token_revocation", sys.modules[__name__])
 
 from .database import connection, fetch_one
 

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Annotated, Any
+from typing import Annotated, Any, cast
 
 from fastapi import Depends, HTTPException
 from psycopg import Connection
@@ -27,6 +27,17 @@ class RuntimeState:
 def get_runtime(connection: HTTPConnection) -> RuntimeState:
     runtime = getattr(connection.app.state, "runtime", None)
     if not isinstance(runtime, RuntimeState):
+        if getattr(connection.app, "title", None) == "ApexGrid API":
+            import sys
+
+            for mod_name in ("backend.app.main", "app.main"):
+                main_mod = sys.modules.get(mod_name)
+                if main_mod is not None:
+                    bus = getattr(main_mod, "bus", None) or EventBus()
+                    sims = getattr(main_mod, "simulations", None) or {}
+                    restored = RuntimeState(bus=bus, simulations=sims)
+                    connection.app.state.runtime = restored
+                    return restored
         raise HTTPException(status_code=503, detail="Application runtime is unavailable")
     return runtime
 
@@ -34,25 +45,44 @@ def get_runtime(connection: HTTPConnection) -> RuntimeState:
 def get_pool(
     runtime: Annotated[RuntimeState, Depends(get_runtime)],
 ) -> ConnectionPool[Connection[dict[str, Any]]]:
-    if runtime.pool is None or runtime.pool.closed:
-        raise HTTPException(status_code=503, detail="PostgreSQL is unavailable")
-    return runtime.pool
+    if runtime.pool is not None and not runtime.pool.closed:
+        return runtime.pool
+    import sys
+
+    for mod_name in ("app.database", "backend.app.database"):
+        mod = sys.modules.get(mod_name)
+        candidate = getattr(mod, "pool", None) if mod is not None else None
+        if candidate is not None and not getattr(candidate, "closed", False):
+            return cast(ConnectionPool[Connection[dict[str, Any]]], candidate)
+    raise HTTPException(status_code=503, detail="PostgreSQL is unavailable")
 
 
 def get_mongo(
     runtime: Annotated[RuntimeState, Depends(get_runtime)],
 ) -> Database[dict[str, Any]]:
-    if runtime.mongo_client is None:
-        raise HTTPException(status_code=503, detail="MongoDB document store is unavailable")
-    return runtime.mongo_client[MONGODB_DATABASE]
+    if runtime.mongo_client is not None:
+        return runtime.mongo_client[MONGODB_DATABASE]
+    import sys
+
+    for mod_name in ("backend.app.main", "app.main"):
+        mod = sys.modules.get(mod_name)
+        if mod is not None and getattr(mod, "mongo_client", None) is not None:
+            return cast(Database[dict[str, Any]], mod.mongo_client[MONGODB_DATABASE])
+    raise HTTPException(status_code=503, detail="MongoDB document store is unavailable")
 
 
 def get_telemetry(
     runtime: Annotated[RuntimeState, Depends(get_runtime)],
 ) -> Collection[dict[str, Any]]:
-    if runtime.telemetry_collection is None:
-        raise HTTPException(status_code=503, detail="MongoDB telemetry store is unavailable")
-    return runtime.telemetry_collection
+    if runtime.telemetry_collection is not None:
+        return runtime.telemetry_collection
+    import sys
+
+    for mod_name in ("backend.app.main", "app.main"):
+        mod = sys.modules.get(mod_name)
+        if mod is not None and getattr(mod, "telemetry_collection", None) is not None:
+            return cast(Collection[dict[str, Any]], mod.telemetry_collection)
+    raise HTTPException(status_code=503, detail="MongoDB telemetry store is unavailable")
 
 
 def get_bus(runtime: Annotated[RuntimeState, Depends(get_runtime)]) -> EventBus:

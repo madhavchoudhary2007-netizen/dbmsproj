@@ -5,6 +5,12 @@ execution: RUNNING
 phase: 3 backend / 7 routes; no current score
 
 ## Queue (root must prepare exact packets before dispatch)
+### T-44613 — Live WebSocket Auth, Dual-Namespace Unification, and Runtime State Fallbacks
+- worker: W2 | priority: P1 | origin: Phase 3 / Phase 9 Backend Test Hardening & Dual-Namespace Compatibility
+- target_files: backend/app/auth_router.py, backend/app/core/legacy_compat.py, backend/app/core/request_auth.py, backend/app/core/runtime.py, backend/app/core/websocket_runtime.py, backend/app/database.py, backend/app/token_revocation.py
+- contract: Dynamic delegation in legacy_compat/request_auth/auth_router/websocket_runtime; module namespace aliasing in database/token_revocation/auth_router; module-level fallbacks in runtime.py; passes test_runtime_lease, test_contract_goldens, test_token_revocation_db, test_logout_revocation, test_auth_revocation_edges, test_runtime_dependencies.
+- verify: APEXGRID_TEST_STACK=1 DATABASE_URL='postgresql://apexgrid:apexgrid@localhost:15432/apexgrid' MONGODB_URL='mongodb://localhost:27018' MONGODB_DATABASE=apexgrid APP_ENV=local PYTHONPATH=backend:. .venv/bin/pytest -q backend/tests/test_runtime_lease.py backend/tests/test_contract_goldens.py backend/tests/test_token_revocation_db.py backend/tests/test_logout_revocation.py backend/tests/test_auth_revocation_edges.py backend/tests/test_runtime_dependencies.py && .venv/bin/mypy --strict backend/app && .venv/bin/ruff format --check backend/app backend/tests && .venv/bin/ruff check backend/app backend/tests
+
 ### T-44611 — DBMS Showcase UI tab and workspace integration
 - worker: W1 | priority: P1 | origin: Phase 4 T-393 / T-351..T-357 Showcase UI workspace integration
 - target_files: frontend/components/dbms-showcase.tsx, frontend/components/dbms-workspace.tsx

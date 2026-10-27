@@ -34,6 +34,16 @@ async def wait_for_ws_event(
                 return None
 
 
+def _get_jwt_decode() -> Callable[..., Any]:
+    import sys
+
+    for mod_name in ("app.main", "backend.app.main"):
+        mod = sys.modules.get(mod_name)
+        if mod is not None and hasattr(mod, "jwt"):
+            return getattr(mod.jwt, "decode", jwt.decode)
+    return jwt.decode
+
+
 def websocket_authenticated_user(
     token: str,
     JWT_SECRET: str,
@@ -41,7 +51,8 @@ def websocket_authenticated_user(
     _token_is_revoked: Callable[..., Any],
     fetch_one: Callable[..., Any],
 ) -> Any:
-    claims = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    decode_fn = _get_jwt_decode()
+    claims = decode_fn(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
     if _token_is_revoked(claims):
         return None
     return (

@@ -53,8 +53,30 @@ def require_allowed_origin(request: Request) -> None:
     return check_allowed_origin(request, CORS_ORIGINS)
 
 
+def _get_fetch_one() -> Callable[..., Any]:
+    for mod in _iter_main_modules():
+        if (fn := getattr(mod, "fetch_one", None)) is not None:
+            return cast(Callable[..., Any], fn)
+    return fetch_one
+
+
+def _resolve_jwt_secret() -> str:
+    for mod in _iter_main_modules():
+        if (sec := getattr(mod, "JWT_SECRET", None)) is not None:
+            return str(sec)
+    return JWT_SECRET
+
+
+def _get_token_revocation() -> Any:
+    for mod in _iter_main_modules():
+        if (rev := getattr(mod, "token_revocation", None)) is not None:
+            return rev
+    return token_revocation
+
+
 def _token_is_revoked(claims: dict[str, Any], *, fail_closed: bool = False) -> bool:
-    return token_is_revoked(claims, fail_closed=fail_closed, is_revoked=token_revocation.is_revoked)
+    rev = _get_token_revocation()
+    return token_is_revoked(claims, fail_closed=fail_closed, is_revoked=rev.is_revoked)
 
 
 def current_user(
@@ -66,12 +88,12 @@ def current_user(
         authenticate_http_user(
             request,
             credentials,
-            JWT_SECRET=JWT_SECRET,
+            JWT_SECRET=_resolve_jwt_secret(),
             JWT_ALGORITHM=JWT_ALGORITHM,
             _token_is_revoked=_token_is_revoked,
             require_allowed_origin=require_allowed_origin,
             verify_csrf_token=verify_csrf_token,
-            fetch_one=fetch_one,
+            fetch_one=_get_fetch_one(),
             jsonable=jsonable,
         ),
     )
@@ -155,7 +177,7 @@ async def _wait_for_ws_event(ws: WebSocket, queue: asyncio.Queue[Any]) -> dict[s
 
 def _websocket_authenticated_user(token: str) -> Any:
     return _websocket_authenticated_user_impl(
-        token, JWT_SECRET, JWT_ALGORITHM, _token_is_revoked, fetch_one
+        token, _resolve_jwt_secret(), JWT_ALGORITHM, _token_is_revoked, _get_fetch_one()
     )
 
 

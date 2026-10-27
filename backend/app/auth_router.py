@@ -3,9 +3,15 @@
 from __future__ import annotations
 
 import secrets
+import sys
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from typing import Annotated, Any, cast
+
+if __name__ == "app.auth_router":
+    sys.modules.setdefault("backend.app.auth_router", sys.modules[__name__])
+elif __name__ == "backend.app.auth_router":
+    sys.modules.setdefault("app.auth_router", sys.modules[__name__])
 
 import bcrypt
 import jwt
@@ -61,11 +67,21 @@ def _is_secure_cookie() -> bool:
     return env != "local"
 
 
+def _get_token_revocation() -> Any:
+    import sys
+
+    for mod_name in ("backend.app.main", "app.main"):
+        mod = sys.modules.get(mod_name)
+        if mod is not None and hasattr(mod, "token_revocation"):
+            return mod.token_revocation
+    return token_revocation
+
+
 def _purge_revocations(
     limiter: LoginLimiter, account: str, source: str, token: object | None
 ) -> None:
     try:
-        token_revocation.purge_expired_revocations()
+        _get_token_revocation().purge_expired_revocations()
     except Exception:
         limiter.release(account, source, token)
         raise HTTPException(503, "PostgreSQL is unavailable") from None
@@ -76,7 +92,7 @@ def _revoke_claims(claims: dict[str, Any]) -> None:
         return
     try:
         expiry = datetime.fromtimestamp(claims["exp"], UTC)
-        token_revocation.revoke_token(claims["jti"], expiry)
+        _get_token_revocation().revoke_token(claims["jti"], expiry)
     except Exception:
         raise HTTPException(503, "PostgreSQL is unavailable") from None
 
@@ -95,10 +111,11 @@ def current_user(
         return cast(dict[str, Any], main_module.current_user(request, credentials))
 
     def _tok_revoked(claims: dict[str, Any], *, fail_closed: bool = False) -> bool:
+        rev = _get_token_revocation()
         return token_is_revoked(
             claims,
             fail_closed=fail_closed,
-            is_revoked=token_revocation.is_revoked,
+            is_revoked=rev.is_revoked,
         )
 
     def _query(sql: str, params: tuple[Any, ...]) -> dict[str, Any] | None:

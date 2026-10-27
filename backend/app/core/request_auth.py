@@ -14,6 +14,16 @@ from .runtime import RuntimeState, get_pool, get_runtime
 from .serialization import jsonable
 
 
+def _resolve_jwt_secret() -> str:
+    import sys
+
+    for mod_name in ("backend.app.main", "app.main"):
+        mod = sys.modules.get(mod_name)
+        if mod is not None and hasattr(mod, "JWT_SECRET"):
+            return str(mod.JWT_SECRET)
+    return JWT_SECRET
+
+
 def current_user(
     request: Request,
     credentials: Annotated[
@@ -40,7 +50,7 @@ def current_user(
         authenticate_http_user(
             request,
             credentials,
-            JWT_SECRET=JWT_SECRET,
+            JWT_SECRET=_resolve_jwt_secret(),
             JWT_ALGORITHM=JWT_ALGORITHM,
             _token_is_revoked=revoked,
             require_allowed_origin=lambda req: check_allowed_origin(req, CORS_ORIGINS),
