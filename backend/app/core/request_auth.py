@@ -16,12 +16,15 @@ from .serialization import jsonable
 
 
 _REQUEST_AUTH_MODULE = sys.modules[__name__]
+_RUNTIME_MODULE = sys.modules[f"{__package__}.runtime"]
 if __name__ == "app.core.request_auth":
-    sys.modules.setdefault("backend.app.core", sys.modules[__package__])
-    sys.modules.setdefault("backend.app.core.request_auth", _REQUEST_AUTH_MODULE)
+    sys.modules["backend.app.core"] = sys.modules[__package__]
+    sys.modules["backend.app.core.request_auth"] = _REQUEST_AUTH_MODULE
+    sys.modules["backend.app.core.runtime"] = _RUNTIME_MODULE
 elif __name__ == "backend.app.core.request_auth":
-    sys.modules.setdefault("app.core", sys.modules[__package__])
-    sys.modules.setdefault("app.core.request_auth", _REQUEST_AUTH_MODULE)
+    sys.modules["app.core"] = sys.modules[__package__]
+    sys.modules["app.core.request_auth"] = _REQUEST_AUTH_MODULE
+    sys.modules["app.core.runtime"] = _RUNTIME_MODULE
 for _package_name, _module_name in (
     ("app.core", "app.core.request_auth"),
     ("backend.app.core", "backend.app.core.request_auth"),
@@ -30,6 +33,10 @@ for _package_name, _module_name in (
     _module = sys.modules.get(_module_name)
     if _package is not None and _module is not None:
         setattr(_package, "request_auth", _module)
+for _package_name in ("app.core", "backend.app.core"):
+    _package = sys.modules.get(_package_name)
+    if _package is not None:
+        setattr(_package, "runtime", _RUNTIME_MODULE)
 
 _INITIAL_JWT_SECRET = JWT_SECRET
 
