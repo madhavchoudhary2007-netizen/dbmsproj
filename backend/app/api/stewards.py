@@ -203,6 +203,11 @@ def decide_incident(
         updated = cur.fetchone()
         penalty = None
         if body.approve and (body.points or body.time_seconds or body.grid_places):
+            if user_id is not None:
+                cur.execute(
+                    "SELECT set_config('apexgrid.actor', %s, true)",
+                    (str(user_id),),
+                )
             cur.execute(
                 (
                     "INSERT INTO penalties(incident_id,driver_id,points,time_seconds,"
@@ -259,6 +264,7 @@ def _register_decide_incident(
         body: Decision,
         user: dict[str, object] = legacy_admin_steward_dependency,
     ) -> dict[str, object]:
+        user_id = user.get("id") if isinstance(user, dict) else None
         with connection() as conn, conn.cursor(row_factory=dict_row) as cur:
             cur.execute("SELECT * FROM incident_reports WHERE id=%s FOR UPDATE", (incident_id,))
             incident = cur.fetchone()
@@ -272,11 +278,16 @@ def _register_decide_incident(
                     "UPDATE incident_reports SET state=%s,decided_by=%s,decision_notes=%s "
                     "WHERE id=%s RETURNING *"
                 ),
-                (state, user["id"], body.notes, incident_id),
+                (state, user_id, body.notes, incident_id),
             )
             updated = cur.fetchone()
             penalty = None
             if body.approve and (body.points or body.time_seconds or body.grid_places):
+                if user_id is not None:
+                    cur.execute(
+                        "SELECT set_config('apexgrid.actor', %s, true)",
+                        (str(user_id),),
+                    )
                 cur.execute(
                     (
                         "INSERT INTO penalties(incident_id,driver_id,points,time_seconds,"
