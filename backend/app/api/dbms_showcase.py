@@ -2,11 +2,17 @@ from __future__ import annotations
 
 import contextlib
 import time
-from typing import Any
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from psycopg.rows import tuple_row
 
+from ..core.showcase_analytics import (
+    RECORDED_ELAPSED_QUERY,
+    completed_lap_measurements,
+    recorded_elapsed_rows,
+    serialize_recorded_rows,
+)
 from ..database import connection
 from ..schemas_showcase import (
     AnalyticsGapsResponse,
@@ -27,7 +33,7 @@ from ..schemas_showcase import (
     validate_gaps_query_params,
     validate_isolation_level_param,
 )
-from .laps import admin
+from .laps import admin, get_race_telemetry
 
 router = APIRouter(tags=["dbms_showcase"], dependencies=[Depends(admin)])
 
@@ -200,28 +206,27 @@ def post_refresh_standings_mv() -> RefreshStandingsMVResponse:
     )
 
 
-@router.get("/api/analytics/gaps", response_model=AnalyticsGapsResponse)
-def get_analytics_gaps(session_id: str = Query(...)) -> AnalyticsGapsResponse:
+def validate_analytics_session_id(session_id: str | None = Query(default=None)) -> str:
     try:
-        valid_session_id = validate_gaps_query_params(session_id)
+        return validate_gaps_query_params(session_id)
     except ValueError as err:
-        raise HTTPException(status_code=400, detail=str(err)) from err
+        status_code = 422 if session_id is None else 400
+        raise HTTPException(status_code=status_code, detail=str(err)) from err
 
-    raw_sql = (
-        "SELECT driver_id, lap, position, "
-        "RANK() OVER (PARTITION BY lap ORDER BY lap_time_ms ASC) AS lap_rank, "
-        "(lap_time_ms - FIRST_VALUE(lap_time_ms) OVER "
-        "(PARTITION BY lap ORDER BY position ASC)) AS gap_to_leader_ms, "
-        "(lap_time_ms - LAG(lap_time_ms, 1) OVER "
-        "(PARTITION BY lap ORDER BY position ASC)) AS interval_ms, "
-        "AVG(lap_time_ms) OVER (PARTITION BY driver_id ORDER BY lap "
-        "ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS rolling_avg_ms "
-        "FROM lap_telemetry WHERE session_id = %s ORDER BY lap, position;"
-    )
+
+@router.get("/api/analytics/gaps", response_model=AnalyticsGapsResponse)
+def get_analytics_gaps(
+    session_id: Annotated[str, Depends(validate_analytics_session_id)],
+    telemetry: Annotated[Any, Depends(get_race_telemetry)],
+) -> AnalyticsGapsResponse:
+    raw_sql = RECORDED_ELAPSED_QUERY
 
     try:
+        measurements = completed_lap_measurements(telemetry, session_id)
+        rows = recorded_elapsed_rows(measurements, session_id)
+        payload = serialize_recorded_rows(rows)
         with connection() as conn, conn.cursor() as cur:
-            cur.execute(raw_sql, (valid_session_id,))
+            cur.execute(raw_sql, (payload, session_id))
             rows = cur.fetchall()
         gaps = [
             LapGapRecord(
@@ -234,10 +239,12 @@ def get_analytics_gaps(session_id: str = Query(...)) -> AnalyticsGapsResponse:
             )
             for r in rows
         ]
+    except OverflowError as err:
+        raise HTTPException(status_code=413, detail=str(err)) from err
     except Exception as err:
         raise HTTPException(status_code=500, detail="Database query failed") from err
 
-    return AnalyticsGapsResponse(session_id=valid_session_id, gaps=gaps, sql=raw_sql)
+    return AnalyticsGapsResponse(session_id=session_id, gaps=gaps, sql=raw_sql)
 
 
 @router.get("/api/dbms/explain", response_model=ExplainPlanResponse)
@@ -257,8 +264,7 @@ def get_explain_plan(
             "FROM driver_standings GROUP BY championship_id;"
         ),
         "lap_telemetry_window": (
-            "SELECT driver_id, lap, AVG(lap_time_ms) OVER (PARTITION BY driver_id ORDER BY lap) "
-            "FROM session_results WHERE classified;"
+            RECORDED_ELAPSED_QUERY
         ),
         "driver_history": (
             "SELECT d.id, d.number, count(r.id) FROM drivers d "
@@ -293,7 +299,8 @@ def get_explain_plan(
         conn.transaction(),
         conn.cursor(row_factory=tuple_row) as cur,
     ):
-        cur.execute(explain_cmd)
+        explain_params = ("[]", "00000000-0000-0000-0000-000000000000")
+        cur.execute(explain_cmd, explain_params if qname == "lap_telemetry_window" else ())
         row = cur.fetchone()
         if row and row[0]:
             plan = row[0]
