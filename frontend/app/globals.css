@@ -857,9 +857,6 @@ tbody tr:hover {
   flex-wrap: wrap;
   gap: 8px;
 }
-.dbms-grid .panel {
-  margin: 0;
-}
 .inline-form {
   display: flex;
   gap: 8px;
