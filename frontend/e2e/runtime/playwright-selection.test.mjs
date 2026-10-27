@@ -14,10 +14,10 @@ function loadConfig(env = {}) {
   const output = typescript.transpileModule(configSource, {
     compilerOptions: { module: typescript.ModuleKind.CommonJS, target: typescript.ScriptTarget.ES2022 },
   }).outputText;
-  const module = { exports: {} };
+  const configModule = { exports: {} };
   const context = {
-    exports: module.exports,
-    module,
+    exports: configModule.exports,
+    module: configModule,
     process: { env },
     URL,
     require: (specifier) => {
@@ -29,7 +29,7 @@ function loadConfig(env = {}) {
     },
   };
   vm.runInNewContext(output, context, { filename: "playwright.config.ts" });
-  return module.exports.default;
+  return configModule.exports.default;
 }
 
 function specFiles(directory = e2eDirectory, parent = "") {
