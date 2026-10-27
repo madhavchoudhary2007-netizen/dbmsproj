@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import os
+import sys
 import threading
 from typing import Any
 
@@ -44,6 +45,20 @@ from .pit_strategy_router import router as pit_strategy_router
 from .runtime_lease import check_runtime_lease
 from .telemetry_router import router as telemetry_router
 from .user_router import user_router
+
+_MAIN_MODULE = sys.modules[__name__]
+if __name__ == "app.main":
+    if sys.modules.get("backend.app") is sys.modules.get("app"):
+        sys.modules["backend.app.main"] = _MAIN_MODULE
+elif __name__ == "backend.app.main":
+    sys.modules["app.main"] = _MAIN_MODULE
+
+_APP_PACKAGE = sys.modules.get("app")
+if _APP_PACKAGE is not None:
+    _APP_PACKAGE.main = _MAIN_MODULE
+_BACKEND_APP_PACKAGE = sys.modules.get("backend.app")
+if _BACKEND_APP_PACKAGE is _APP_PACKAGE and _BACKEND_APP_PACKAGE is not None:
+    _BACKEND_APP_PACKAGE.main = _MAIN_MODULE
 
 __all__ = ("app", "resume_or_create_auto_demo_race", "simulations")
 
