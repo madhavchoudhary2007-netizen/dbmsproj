@@ -1,4 +1,5 @@
-import { expect, test, type Locator, type Page } from "./mock-platform";
+import { expect, test, type Page } from "./mock-platform";
+import type { Locator } from "@playwright/test";
 
 type Reply = { status: number; json: unknown };
 type Endpoint = { reply: Reply; gate?: Promise<void>; served?: () => void };
