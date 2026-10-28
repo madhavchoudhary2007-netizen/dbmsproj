@@ -16,7 +16,7 @@ live_router = router
 
 
 def _main_module() -> Any:
-    # The app runs as "app.main" under uvicorn from backend/ and as "backend.app.main" from the repo root.
+    # "app.main" under uvicorn from backend/, "backend.app.main" from the repo root.
     import sys
 
     for name in ("app.main", "backend.app.main"):
