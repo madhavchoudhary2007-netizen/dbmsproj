@@ -4,3 +4,7 @@ node_modules
 npm-debug.log*
 .DS_Store
 .git
+e2e
+test-results
+playwright-report
+playwright.config.ts
