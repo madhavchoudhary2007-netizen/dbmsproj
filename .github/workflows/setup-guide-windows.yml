@@ -1,11 +1,11 @@
-# Runs docs/setup-without-docker.md (Windows section) on an x64 runner.
+# Runs README.md "Setup option B: without Docker" (Windows steps) on an x64 runner.
 name: setup-guide-windows
 
 on:
   workflow_dispatch:
   push:
     paths:
-      - docs/setup-without-docker.md
+      - README.md
       - .github/workflows/setup-guide-windows.yml
       - backend/requirements.lock
 

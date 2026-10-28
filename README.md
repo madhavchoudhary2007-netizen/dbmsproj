@@ -1,12 +1,21 @@
 # ApexGrid
 
-A motorsport league and race operations platform with a PostgreSQL authoritative core, MongoDB telemetry, FastAPI, Next.js and WebSocket live timing. The interface uses a light Neo-brutalist design system (cream, paper, ink, yellow and red tokens, hard shadows, motion limited to transform and opacity with reduced-motion support). Overhaul scope and acceptance are in `docs/overhaul-plan.md`, `docs/completion-plan.md` and the ADRs in `.agent/adr/`.
+ApexGrid is a motorsport league and race operations platform. It manages championships, teams, drivers, events and sessions; shows live timing and car telemetry during a race; and handles steward penalties, pit-lane bookings, results and championship standings. PostgreSQL holds the official record and enforces the rules with constraints, triggers and stored functions, MongoDB stores high-rate telemetry, a FastAPI backend runs the race simulator and streams updates over WebSockets, and a Next.js frontend presents it all. An admin-only DBMS workspace inspects both databases live.
 
-## Setup
+How it works, who uses it and why it is built this way: [ARCHITECTURE.md](ARCHITECTURE.md).
 
-The supported way to run ApexGrid is Docker Compose. It starts four services from `compose.yaml`: PostgreSQL 16, MongoDB 7, the FastAPI backend (Python 3.12) and the Next.js frontend (Node 22). You do not need Python, Node, PostgreSQL or MongoDB on your machine unless you want to run tests or develop outside containers.
+## Contents
 
-To run without Docker on macOS, Windows or Linux, follow [docs/setup-without-docker.md](docs/setup-without-docker.md).
+- [Setup option A: Docker (recommended)](#setup-option-a-docker-recommended)
+- [Setup option B: without Docker](#setup-option-b-without-docker)
+- [Development environment](#development-environment-all-platforms)
+- [Demo accounts](#demo-accounts)
+- [Routes](#routes)
+- [Quality gates](#quality-gates)
+
+## Setup option A: Docker (recommended)
+
+Docker Compose starts four services from `compose.yaml`: PostgreSQL 16, MongoDB 7, the FastAPI backend (Python 3.12) and the Next.js frontend (Node 22). You need only Git and Docker; Python, Node, PostgreSQL and MongoDB stay inside the containers.
 
 ### What you need
 
@@ -110,7 +119,202 @@ If a system PostgreSQL or MongoDB already holds the port, stop it (`sudo systemc
 
 The backend bootstrap reapplies the idempotent schema migration and seeds fictional data on startup. Set `SEED_DEMO_DATA=0` in `.env` to skip both SQL demo fixtures and historical lap telemetry while still applying migrations. PostgreSQL data and MongoDB telemetry persist in named Docker volumes.
 
-### Development environment (all platforms)
+### Troubleshooting (Docker)
+
+| Symptom | Fix |
+|---|---|
+| `docker: 'compose' is not a docker command` | Install the Compose v2 plugin (`docker-compose-plugin`) or update Docker Desktop. |
+| `port is already allocated` | Another service holds 3000, 8000, 5432 or 27017; stop it or change the host port in `compose.yaml`. |
+| Backend restarts with a runtime ownership error | A second backend is using the same database. Stop the other one (only one backend process per database is supported). |
+| Login succeeds but pages show signed-out | The browser and API must share a host name: open `http://localhost:3000` (not `127.0.0.1`) while `NEXT_PUBLIC_API_URL` is `http://localhost:8000`. |
+| `exec ... no such file or directory` in a container on Windows | The repository was checked out with CRLF line endings; set `core.autocrlf input` and re-clone. |
+| Frontend build fails after changing `.env` | Rebuild the image: `docker compose build --no-cache frontend`. |
+
+## Setup option B: without Docker
+
+This runs the same four parts that `compose.yaml` starts, directly on your machine: PostgreSQL, MongoDB, the FastAPI backend and the Next.js frontend. It takes about 10 minutes, mostly downloads.
+
+You install four programs, create one database, then start the backend and frontend in two terminals.
+
+| Program | Version |
+|---|---|
+| PostgreSQL | 16 (15 or newer works) |
+| MongoDB Community Server | 7.0, 8.0 or 9.0 |
+| Python | 3.12 or newer |
+| Node.js | 22 or newer |
+| Git | any |
+
+Ports 3000, 8000, 5432 and 27017 must be free. If the Docker stack from option A is running, stop it first with `docker compose down`.
+
+### Step 1: Install the programs
+
+#### macOS
+
+Install [Homebrew](https://brew.sh) if you do not have it, then:
+
+```bash
+brew install git postgresql@16 python@3.12 node@22
+brew tap mongodb/brew
+brew install mongodb-community@7.0
+brew services start postgresql@16
+brew services start mongodb/brew/mongodb-community@7.0
+```
+
+`postgresql@16` and `node@22` are keg-only, so put them on your `PATH` (Intel Macs use `/usr/local` instead of `/opt/homebrew`):
+
+```bash
+echo 'export PATH="/opt/homebrew/opt/postgresql@16/bin:/opt/homebrew/opt/node@22/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+#### Windows 10/11 (PowerShell)
+
+Open PowerShell and run:
+
+```powershell
+winget install --id Git.Git -e
+winget install --id MongoDB.Server -e
+winget install --id Python.Python.3.12 -e
+winget install --id OpenJS.NodeJS.LTS -e
+```
+
+Click **Yes** on each administrator prompt.
+
+PostgreSQL is not installed with winget: its download server rejects winget with `403 Forbidden`. Download the PostgreSQL 16 Windows installer from [enterprisedb.com/downloads/postgres-postgresql-downloads](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads) and run it with the defaults (Stack Builder and pgAdmin can be unticked). It asks you to choose a password for the `postgres` superuser; remember it for step 2.
+
+PostgreSQL and MongoDB are installed as Windows services and start automatically. Close and reopen PowerShell so the new programs are on `PATH`.
+
+If script execution is blocked when you activate anything later, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once.
+
+#### Linux (Ubuntu 24.04 / Debian 12)
+
+```bash
+sudo apt-get update
+sudo apt-get install -y git curl gnupg postgresql python3 python3-venv
+# Node.js 22
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt-get install -y nodejs
+# MongoDB 8.0 (official repository; use "jammy" on Ubuntu 22.04, "bookworm" on Debian 12)
+curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | sudo gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg --dearmor
+sudo chmod 644 /usr/share/keyrings/mongodb-server-8.0.gpg
+echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+sudo systemctl enable --now postgresql mongod
+```
+
+Ubuntu 24.04 ships PostgreSQL 16 and Python 3.12. On Debian 12, which ships Python 3.11, install Python 3.12 or newer first (for example with `uv python install 3.12`). For the Debian repository line use `https://repo.mongodb.org/apt/debian bookworm/mongodb-org/8.0 main` on x86-64. MongoDB publishes no ARM64 Debian packages, so on ARM64 Debian (for example a VM on an Apple silicon Mac) keep the Ubuntu `noble` line above; it installs and runs there.
+
+Fedora: `sudo dnf install git postgresql-server python3 nodejs`, then `sudo postgresql-setup --initdb && sudo systemctl enable --now postgresql`, and install MongoDB from its [RHEL repository](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-red-hat/).
+
+### Step 2: Create the database
+
+The backend expects a PostgreSQL login `apexgrid` with password `apexgrid` and a database `apexgrid`, exactly as in Docker. The login must be a superuser because the first start creates the `pgcrypto` and `btree_gist` extensions and two application roles. Use this only on your own machine.
+
+macOS:
+
+```bash
+psql postgres -c "CREATE ROLE apexgrid LOGIN SUPERUSER PASSWORD 'apexgrid';" -c "CREATE DATABASE apexgrid OWNER apexgrid;"
+```
+
+Linux:
+
+```bash
+sudo -u postgres psql -c "CREATE ROLE apexgrid LOGIN SUPERUSER PASSWORD 'apexgrid';" -c "CREATE DATABASE apexgrid OWNER apexgrid;"
+```
+
+Windows (enter the `postgres` password from step 1 when asked):
+
+```powershell
+& "C:\Program Files\PostgreSQL\16\bin\psql.exe" -U postgres -c "CREATE ROLE apexgrid LOGIN SUPERUSER PASSWORD 'apexgrid';" -c "CREATE DATABASE apexgrid OWNER apexgrid;"
+```
+
+MongoDB needs no setup; the backend creates its collections.
+
+### Step 3: Get the code
+
+```bash
+git clone -b overhaul/neo-brutal https://github.com/madhavchoudhary2007-netizen/dbmsproj.git
+cd dbmsproj
+```
+
+### Step 4: Start the backend (terminal 1)
+
+The backend reads its settings from environment variables. The defaults already point at `localhost:5432` and `localhost:27017`; `APP_ENV=local` enables the demo data, the local sign-in secret and the auto-started demo race.
+
+macOS and Linux:
+
+```bash
+cd backend
+python3.12 -m venv .venv          # on Linux "python3 -m venv .venv" if python3 is 3.12+
+.venv/bin/python -m pip install --require-hashes -r requirements.lock
+export APP_ENV=local AUTO_DEMO_RACE=1
+.venv/bin/python -m app.bootstrap
+.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+Windows (PowerShell):
+
+```powershell
+cd backend
+py -3.12 -m venv .venv
+.\.venv\Scripts\python -m pip install --require-hashes -r requirements.lock
+$env:APP_ENV = "local"; $env:AUTO_DEMO_RACE = "1"
+.\.venv\Scripts\python -m app.bootstrap
+.\.venv\Scripts\python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+`app.bootstrap` prints `Database migration complete and seed complete`. Leave uvicorn running; `http://localhost:8000/health/ready` should report every service `up`.
+
+Next time, only the last line is needed (after `cd backend` and setting the two variables). Bootstrap is safe to rerun.
+
+### Step 5: Start the frontend (terminal 2)
+
+Same on every system, from the repository root:
+
+```bash
+cd frontend
+npm ci
+npm run build
+npm start
+```
+
+Open **http://localhost:3000** (use `localhost`, not `127.0.0.1`, so the sign-in cookie reaches the API) and sign in with a demo account in the demo accounts table below, for example `admin@apexgrid.test` / `ApexGrid2026!`. The Live timing page should show `Connected · live stream`.
+
+On Windows, `npm ci` prints warnings in red; they are not errors as long as `npm run build` ends with the route list.
+
+For frontend development with hot reload, use `npm run dev` instead of `build` and `start`.
+
+### Stopping and resetting (without Docker)
+
+Stop the backend and frontend with `Ctrl+C`. The databases keep running as services.
+
+To start over with fresh demo data, drop and recreate the database, then run step 4 again:
+
+```bash
+psql postgres -c "DROP DATABASE apexgrid;" -c "CREATE DATABASE apexgrid OWNER apexgrid;"   # Linux: sudo -u postgres psql ...
+mongosh apexgrid --eval "db.dropDatabase()"
+```
+
+### Troubleshooting (without Docker)
+
+| Symptom | Fix |
+|---|---|
+| `connection refused` on 5432 or 27017 | The database service is not running: `brew services list` (macOS), `sudo systemctl status postgresql mongod` (Linux), or `Get-Service postgresql*, MongoDB` (Windows). |
+| `password authentication failed for user "apexgrid"` | Step 2 was skipped or used a different password. Rerun it. |
+| `permission denied to create extension` | The `apexgrid` login is not a superuser: `ALTER ROLE apexgrid SUPERUSER;` as the `postgres` user. |
+| Backend exits with a runtime ownership error | Another backend (for example the Docker one) is using the same database. Stop it; only one backend per database is supported. |
+| `Address already in use` / `EADDRINUSE` | Something else holds 8000 or 3000. Stop it, or stop the Docker stack with `docker compose down`. |
+| `python3.12: command not found` | Use the Python 3.12+ command your system has (`python3`, or `py -3.12` on Windows) and check it with `--version`. |
+| `template database "template1" has a collation version mismatch` (rolling distributions such as Kali or Arch) | As the `postgres` user run `ALTER DATABASE template1 REFRESH COLLATION VERSION;` and the same for `postgres`, then repeat step 2. |
+| `The repository ... mongodb-org ... is not signed` | The key file is not readable by apt: `sudo chmod 644 /usr/share/keyrings/mongodb-server-8.0.gpg`, then `sudo apt-get update`. |
+| `ERROR: In --require-hashes mode` on install | Your copy of `requirements.lock` is out of date; run `git pull`. |
+
+### Tested on
+
+On 2026-10-28 this guide was run end to end (install, database, backend, frontend, sign-in and live WebSocket telemetry) on Windows 11 x64 (GitHub Actions, every push that changes this README), Windows 11 ARM64 (Python 3.12, Node 24, PostgreSQL 16, MongoDB 9.0), Kali Linux 2025.2 ARM64 (Python 3.14, Node 22, PostgreSQL 17, MongoDB 8.0). On macOS (Apple silicon) the backend and frontend steps were run; the Homebrew install commands were not.
+
+## Development environment (all platforms)
 
 On macOS and Linux use the commands as written; on Windows run them in WSL.
 
@@ -122,21 +326,6 @@ cd frontend && npm ci && npx playwright install --with-deps chromium && cd ..
 
 Run backend tests as `.venv/bin/python -m pytest` (not the bare `pytest` script) so the package-identity guard in `backend/app/__init__.py` passes. Stop any local API that uses the same database first: the backend holds a single runtime-ownership lease per database.
 
-### Troubleshooting
-
-| Symptom | Fix |
-|---|---|
-| `docker: 'compose' is not a docker command` | Install the Compose v2 plugin (`docker-compose-plugin`) or update Docker Desktop. |
-| `port is already allocated` | Another service holds 3000, 8000, 5432 or 27017; stop it or change the host port in `compose.yaml`. |
-| Backend restarts with a runtime ownership error | A second backend is using the same database. Stop the other one (only one backend process per database is supported). |
-| Login succeeds but pages show signed-out | The browser and API must share a host name: open `http://localhost:3000` (not `127.0.0.1`) while `NEXT_PUBLIC_API_URL` is `http://localhost:8000`. |
-| `exec ... no such file or directory` in a container on Windows | The repository was checked out with CRLF line endings; set `core.autocrlf input` and re-clone. |
-| Frontend build fails after changing `.env` | Rebuild the image: `docker compose build --no-cache frontend`. |
-
-## Routes
-
-Sixteen routes: `/` (landing), `/login`, `/dashboard`, `/live`, `/sessions`, `/stewards`, `/pit-wall`, `/championships`, `/events`, `/circuits`, `/standings`, `/teams`, `/drivers`, `/users`, `/analytics` and `/dbms` (DBMS operations and the PostgreSQL/MongoDB showcase). `/%5F_nb` is the design-primitives guide used by guide-mode tests.
-
 ## Demo accounts
 
 | Role | Email | Password |
@@ -146,6 +335,10 @@ Sixteen routes: `/` (landing), `/login`, `/dashboard`, `/live`, `/sessions`, `/s
 | Team principal | `principal@apexgrid.test` | `ApexGrid2026!` |
 
 These are local demonstration credentials. Replace the seed and JWT secret before any shared deployment.
+
+## Routes
+
+Sixteen routes: `/` (landing), `/login`, `/dashboard`, `/live`, `/sessions`, `/stewards`, `/pit-wall`, `/championships`, `/events`, `/circuits`, `/standings`, `/teams`, `/drivers`, `/users`, `/analytics` and `/dbms` (DBMS operations and the PostgreSQL/MongoDB showcase). `/%5F_nb` is the design-primitives guide used by guide-mode tests.
 
 ## Quality gates
 
@@ -158,18 +351,6 @@ These are local demonstration credentials. Replace the seed and JWT secret befor
 | Visual baselines (375 and 1440) | `cd frontend && PLAYWRIGHT_MODE=visual CI=1 npx --no-install playwright test e2e/visual-regression.spec.ts` |
 | Real-stack journeys | `PLAYWRIGHT_MODE=real-stack PLAYWRIGHT_REAL_STACK_API_URL=http://localhost:18000 APEXGRID_E2E_OWNED_DISPOSABLE=1 npx --no-install playwright test` with the API on port 18000 (use `localhost`, not `127.0.0.1`, so the session cookie is same-site) |
 | Design lints | `scripts/eval/lint-*.sh` |
-
-## Architecture
-
-- `frontend/`: Next.js operational interface
-- `backend/app/`: FastAPI API, auth, simulation and database adapters
-- `backend/migrations/`: PostgreSQL schema and stored logic
-- `backend/db/`: demo seed
-- `docs/contracts.md`: shared wire and state contract
-
-PostgreSQL owns official entities and rules. MongoDB stores telemetry documents keyed by shared UUIDs. The WebSocket stream delivers normalized events to the live pit wall.
-
-Live simulation and WebSocket delivery run in one backend process per PostgreSQL database. The supplied Compose service starts one Uvicorn worker; a second backend process using the same database fails startup. If the runtime ownership connection is lost, HTTP returns 503, WebSockets close, and simulators stop. Restart the backend after PostgreSQL recovers. Do not increase the worker or replica count without shared simulation leadership and event delivery.
 
 ## Development checks
 
@@ -189,23 +370,6 @@ cd frontend && npm ci && npm run typecheck && npm run build
 ```
 
 The acceptance script exercises the API, WebSocket, PostgreSQL trigger and lock conflict, MongoDB telemetry, standings and DBMS operations. For cleanup of acceptance-owned test records, its isolated fixture transaction temporarily disables the production `trg_penalties_immutable` trigger, re-enables it before commit, and checks that it is enabled after cleanup.
-
-## Simulation and external telemetry
-
-Sign in as admin and select or create a live race. Generated races start their simulator immediately; for a manually created session, start the session and simulator from Sessions. Open Live Timing to see MongoDB samples and WebSocket timing. Pause, resume and stop controls for manually simulated sessions are on the session view. The same normalized packet can be posted by an external provider to `POST /api/telemetry/ingest` for an active session with an admin or steward Bearer token; see `docs/contracts.md` and `/docs` for the payload.
-
-## Instant live demo races
-
-With `AUTO_DEMO_RACE=1`, ApexGrid starts a generated live race when the backend boots. Admins and stewards can also click **Create live race** to start one immediately, with a random 8–16 car grid of fictional named drivers, unique licences and car numbers, varied pace, and a race capped at 72 laps. Select a generated race from the list to follow its positions, gaps, per-driver sectors, completed lap times, incidents, pit stops and telemetry. The list also has a **Delete** action that removes only that generated race and its telemetry. When automatic race creation is enabled, completed races remain archived and a new generated session starts. The ordinary seeded championship records remain separate.
-
-For generated races, Pit Wall shows each driver's tire age and wear, recommended stop lap and window, automatic box assignment, and completed stop history. The simulator schedules stops as tires age; operators do not need to request or close them. Allocations and pit states also appear in the Live Timing stream and DBMS race explorer. The manual reservation API remains available for non-generated sessions.
-
-The supplied `.env.example` enables an automatic repeating race. Set `AUTO_DEMO_RACE=0` to start races only when created from the UI. Creating a live race does not require changing the setting.
-
-### Race database explorer
-
-At `/dbms`, grouped one-click navigation opens live PostgreSQL status, running and completed race archives, all 17 actual public base tables, the EER diagram, schema, indexes, query plans, locks, database operations, MongoDB collections, and cross-store results. PostgreSQL table counts and rows come from the database; there are no public SQL `VIEW` objects. MongoDB shows the actual telemetry collection, document counts and index definitions, with filtered, paged documents and a raw JSON inspector. The selected view is encoded in the URL hash, so links open a view directly and browser Back/Forward restores navigation. Status and read-only views refresh automatically; the global Refresh control also refreshes the selected race database view. The SQL table browser hides password hashes. Race records refresh every second while active; completed races retain final classifications, telemetry, incidents, pit stops, a two-driver comparison and every-driver lap/sector history. The two original completed fixtures have explicitly labeled historical demo lap archives; generated completed races retain their actual simulator data across restarts.
-
 
 ## Engineering workflow
 
