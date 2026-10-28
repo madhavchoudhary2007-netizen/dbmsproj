@@ -45,6 +45,6 @@ Authority: owner instructions of 2026-10-26 and ADR-014/ADR-015/ADR-016. This is
 - Product scope and all twelve phase requirements: docs/overhaul-plan.md; phase numbering reports progress and does not multiply verification.
 - Roles/models: roles.md and .agent/models.env; packet schema/boundaries: packets.md and envelope.schema.json.
 - Commands: .agent/commands.env and existing test-stack/browser configuration. Do not copy setup templates over a configured project.
-- Runtime contracts: docs/contracts.md, docs/api.md and locked ARCHITECT.md; architecture changes follow architect.md/ADRs.
+- Runtime contracts: docs/contracts.md and locked ARCHITECT.md; architecture changes follow architect.md/ADRs.
 - Scores: evaluation.md and scripts/eval/score.sh. Reuse matching evidence across dimensions; no four duplicate suite runs for four scoring workers.
 - Stop after satisfying the final definition of done or an honest escalation. Do not invent extra polish cycles. Documentation completion never authorizes extra implementation. Progress means requirements/defects closed with evidence, not commit counts or lines moved. Antigravity-specific receipts and compliance limitations are in antigravity.md.

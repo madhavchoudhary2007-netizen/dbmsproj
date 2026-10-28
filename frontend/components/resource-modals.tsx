@@ -24,7 +24,7 @@ const MEMBER_FIELDS: Field[] = [
   { name: "end_date", type: "date" },
 ];
 
-export function buildMemberFormFields(entityRows: Record<string, Row[]>): Field[] {
+function buildMemberFormFields(entityRows: Record<string, Row[]>): Field[] {
   return MEMBER_FIELDS.map((field) => ({
     ...field,
     options: (entityRows[field.name] || []).map((row) => ({
@@ -63,7 +63,7 @@ export interface ResourceRecordModalProps {
   onClose: () => void;
 }
 
-export function ResourceRecordModal({
+function ResourceRecordModal({
   open, edit, canManage, columns, formFields, userField, userRole,
   userLoadError, userOptions, endpoint, busy, primary, actionError,
   supportsHistory, members, membersLoading, memberError, retryMembers,
@@ -140,7 +140,7 @@ export interface ResourceDeleteModalProps {
   onConfirm: () => void;
 }
 
-export function ResourceDeleteModal({
+function ResourceDeleteModal({
   open, edit, busy, onCancel, onConfirm,
 }: ResourceDeleteModalProps) {
   if (!open || !edit) return null;
@@ -181,7 +181,7 @@ export interface ResourceMembershipModalProps {
   onClose: () => void;
 }
 
-export function ResourceMembershipModal({
+function ResourceMembershipModal({
   open, edit, supportsHistory, currentMembers, membersLoading, memberError,
   retryMembers, busy, deleteConfirm, entityRows, onSave, onEndMembership, onClose,
 }: ResourceMembershipModalProps) {

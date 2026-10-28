@@ -16,9 +16,6 @@ import { Button } from "./ui";
 import {
   Field,
   ResourceModals,
-  ResourceRecordModal,
-  ResourceDeleteModal,
-  ResourceMembershipModal,
 } from "./resource-modals";
 
 export function ResourcePage({
@@ -287,5 +284,3 @@ export function ResourcePage({
     </>
   );
 }
-
-export { ResourceRecordModal, ResourceDeleteModal, ResourceMembershipModal };

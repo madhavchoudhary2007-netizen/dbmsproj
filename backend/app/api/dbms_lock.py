@@ -231,36 +231,3 @@ dbms_lock_handlers: dict[str, Callable[..., Any]] = {
     "dbms_lock_demo": dbms_lock_demo,
     "dbms_recalculate": dbms_recalculate,
 }
-
-
-def create_dbms_lock_router(
-    fetch_one: Callable[..., DatabaseRow | None],
-    connection: Callable[[], AbstractContextManager[Connection[DatabaseRow]]],
-    _competing_lock_demo_reservation: Callable[..., dict[str, Any]],
-    _cleanup_lock_demo: Callable[..., None],
-    lock_demo_guard: LockType,
-    recalculate: Callable[..., Any],
-    admin_dependency: Any,
-) -> tuple[APIRouter, dict[str, Callable[..., Any]]]:
-    legacy_router = APIRouter()
-
-    @legacy_router.post("/api/dbms/lock-demo")
-    def dbms_lock_demo(user: Any = admin_dependency) -> dict[str, Any]:
-        """Demonstrate two real transactions contending on a pit box row."""
-        return _run_lock_demo(
-            fetch_one,
-            connection,
-            _competing_lock_demo_reservation,
-            _cleanup_lock_demo,
-            lock_demo_guard,
-        )
-
-    @legacy_router.post("/api/dbms/recalculate")
-    def dbms_recalculate(championship_id: UUID, user: Any = admin_dependency) -> Any:
-        return recalculate(championship_id, user)
-
-    handlers: dict[str, Callable[..., Any]] = {
-        "dbms_lock_demo": dbms_lock_demo,
-        "dbms_recalculate": dbms_recalculate,
-    }
-    return legacy_router, handlers

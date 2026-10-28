@@ -35,7 +35,7 @@ Goal: rebuild the ApexGrid frontend in a light neo-brutal motorsport style, and 
 
 Non-negotiables (every packet repeats the ones that apply):
 
-1. **No API break.** Every route in `docs/contracts.md` and `docs/api.md` keeps its path, method, request and response shape. New fields and routes are additive only, with one ADR per contract change (ADR-001 rule).
+1. **No API break.** Every route in `docs/contracts.md` keeps its path, method, request and response shape. New fields and routes are additive only, with one ADR per contract change (ADR-001 rule).
 2. **No data loss.** Migrations are additive. Historical races, telemetry and penalties remain readable. Run migrations only on the disposable stack (`scripts/eval/test-stack.sh`) until accepted.
 3. **Preserve test contracts in the UI.** Keep:
    - every existing visible copy string that a spec asserts (search `frontend/e2e/*.spec.ts` before renaming any text);
@@ -426,7 +426,7 @@ Concurrency for Phase 7: W1 takes two routes at a time only if they share no fil
 | ID | Owner | Task | Verify |
 |---|---|---|---|
 | T-420 | W3 | CI adds the real-stack job (service containers), visual regression job (Linux baselines, generated in CI via an `update-snapshots` workflow_dispatch), `npm audit` + `pip-audit` jobs, Lighthouse CI on `next start` for 16 routes (P-1/P-2 assertions) and a bundle-size job (`verify-bundle-size.py`, 170KB). | workflow lint + a green run on the PR |
-| T-421 | O | `README.md` quick start (compose up, seed, login demo accounts from the seed file, URLs), `docs/architecture.md` updated diagram, and a `docs/demo-guide.md` script for the course demo (which `/dbms` showcase panels to click, in order). | links valid |
+| T-421 | O | `README.md` quick start (compose up, seed, login demo accounts from the seed file, URLs), `ARCHITECTURE.md` updated diagram, and a `docs/demo-guide.md` script for the course demo (which `/dbms` showcase panels to click, in order). | links valid |
 
 ### Phase 11 — Final evaluation
 

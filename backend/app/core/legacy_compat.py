@@ -27,7 +27,7 @@ from ..core.websocket_runtime import wait_for_ws_event as _wait_for_ws_event_imp
 from ..core.websocket_runtime import (
     websocket_authenticated_user as _websocket_authenticated_user_impl,
 )
-from ..database import fetch_one, get_pool
+from ..database import fetch_one
 from ..runtime_lease import check_runtime_lease
 
 log = logging.getLogger("apexgrid")
@@ -42,11 +42,6 @@ def _iter_main_modules() -> list[Any]:
         if mod is not None and mod not in mods:
             mods.append(mod)
     return mods
-
-
-def require_db() -> None:
-    if get_pool().closed:
-        raise HTTPException(503, "PostgreSQL is unavailable")
 
 
 def require_allowed_origin(request: Request) -> None:

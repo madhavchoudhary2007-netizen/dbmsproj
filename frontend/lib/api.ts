@@ -189,7 +189,7 @@ export const asArray = (v: unknown): Row[] => {
   }
   return [];
 };
-export const label = (x: unknown): string => {
+const label = (x: unknown): string => {
   if (typeof x === "string" || typeof x === "number") return String(x);
   if (typeof x === "object" && x !== null) {
     const r = x as Record<string, unknown>;

@@ -21,7 +21,7 @@ Expected branch: overhaul/neo-brutal; boot must exit0 and print boot OK. Boot in
 | Question | Authoritative source |
 |---|---|
 | What is verified, incomplete or blocked? | .agent/CURRENT_STATE.md; .agent/NEXT_STATE.md; named result/commit if needed |
-| Which product features/design must survive? | docs/overhaul-plan.md relevant task and section2; docs/contracts.md/docs/api.md |
+| Which product features/design must survive? | docs/overhaul-plan.md relevant task and section2; docs/contracts.md and the live OpenAPI at /docs |
 | Which architecture is permitted? | Locked .agent/ARCHITECT.md relevant section and its named ADR |
 | How big is a task and which checks run now? | .agent/protocol/delivery-workflow.md |
 | Antigravity setup and compliance? | .agent/protocol/antigravity.md; requested Gemini 3.8 Flash HIGH orchestrator / LOW workers; actual UI settings or UNVERIFIED |
