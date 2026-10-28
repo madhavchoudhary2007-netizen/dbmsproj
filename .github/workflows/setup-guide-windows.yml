@@ -59,27 +59,25 @@ jobs:
           $env:APP_ENV = "local"; $env:AUTO_DEMO_RACE = "1"
           .\.venv\Scripts\python -m app.bootstrap
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          Start-Process -FilePath .\.venv\Scripts\python.exe -ArgumentList "-m uvicorn app.main:app --host 127.0.0.1 --port 8000" -RedirectStandardOutput "$env:RUNNER_TEMP\be.out" -RedirectStandardError "$env:RUNNER_TEMP\be.log"
-          for ($i = 0; $i -lt 30; $i++) {
-            try { (Invoke-WebRequest -UseBasicParsing http://localhost:8000/health/ready).Content; exit 0 } catch { Start-Sleep 2 }
-          }
-          Get-Content "$env:RUNNER_TEMP\be.log"; exit 1
-
       - name: Step 5 - frontend
         working-directory: frontend
         run: |
           npm ci --no-audit --no-fund
           npm run build
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          Start-Process -FilePath cmd.exe -ArgumentList "/c npm start > $env:RUNNER_TEMP\fe.log 2>&1"
-          for ($i = 0; $i -lt 30; $i++) {
-            try { "login page: " + (Invoke-WebRequest -UseBasicParsing http://localhost:3000/login).StatusCode; exit 0 } catch { Start-Sleep 2 }
-          }
-          Get-Content "$env:RUNNER_TEMP\fe.log"; exit 1
 
-      - name: Sign in and receive live telemetry over WebSocket
+      # Windows runners stop background processes when a step ends, so both servers start here.
+      - name: Start servers, sign in and receive live telemetry over WebSocket
         working-directory: backend
         run: |
+          $env:APP_ENV = "local"; $env:AUTO_DEMO_RACE = "1"
+          Start-Process -FilePath .\.venv\Scripts\python.exe -ArgumentList "-m uvicorn app.main:app --host 127.0.0.1 --port 8000" -RedirectStandardOutput "$env:RUNNER_TEMP\be.out" -RedirectStandardError "$env:RUNNER_TEMP\be.log"
+          Start-Process -FilePath cmd.exe -WorkingDirectory ..\frontend -ArgumentList "/c npm start > $env:RUNNER_TEMP\fe.log 2>&1"
+          $up = $false
+          for ($i = 0; $i -lt 45; $i++) {
+            try { (Invoke-WebRequest -UseBasicParsing http://localhost:8000/health/ready).Content; "login page: " + (Invoke-WebRequest -UseBasicParsing http://localhost:3000/login).StatusCode; $up = $true; break } catch { Start-Sleep 2 }
+          }
+          if (-not $up) { Get-Content "$env:RUNNER_TEMP\be.log", "$env:RUNNER_TEMP\fe.log"; exit 1 }
           @'
           import asyncio, json, urllib.request, websockets
           API = "http://localhost:8000"
