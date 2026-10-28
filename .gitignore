@@ -21,3 +21,20 @@ frontend/playwright-report/
 
 .agent/loop-runs.log
 test-results/
+
+# Local agent workflow artefacts and historical notes (kept on disk, not published)
+/.agent/results/
+/.agent/packets/
+/.agent/screenshots/
+/.agent/archive/
+/.agent/audit/
+/.agent/check-*.py
+/.agent/orchestrate.py
+/.agent/playwright-offline.config.ts
+/.agent/LOOP.md
+/FINAL_REPORT.md
+/NEXT_STEPS.md
+/PROJECT_STATE.md
+/PROJECT_CONTEXT.md
+/DECISIONS.md
+/docs/flow-audit-2026-10-06.md

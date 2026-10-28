@@ -1,8 +1,0 @@
-diff --git a/frontend/app/live/page.tsx b/frontend/app/live/page.tsx
-index b4fd09d..e86f781 100644
---- a/frontend/app/live/page.tsx
-+++ b/frontend/app/live/page.tsx
-@@ -1,2 +1,2 @@
--import { LiveTiming } from "@/components/special-pages";
-+import { LiveTiming } from "@/components/pages/live";
- export default LiveTiming;

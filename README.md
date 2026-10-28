@@ -1,14 +1,139 @@
 # ApexGrid
 
-A motorsport league and race operations platform with a PostgreSQL authoritative core, MongoDB telemetry, FastAPI, Next.js and WebSocket live timing. The original presentations informed the product; docs/overhaul-plan.md and approved ADRs define active overhaul scope and acceptance.
+A motorsport league and race operations platform with a PostgreSQL authoritative core, MongoDB telemetry, FastAPI, Next.js and WebSocket live timing. The interface uses a light Neo-brutalist design system (cream, paper, ink, yellow and red tokens, hard shadows, motion limited to transform and opacity with reduced-motion support). Overhaul scope and acceptance are in `docs/overhaul-plan.md`, `docs/completion-plan.md` and the ADRs in `.agent/adr/`.
 
-## Start
+## Setup
 
-1. Copy `.env.example` to `.env`. The default `APP_ENV=local` is for the local demo; set a strong `JWT_SECRET` and a non-local `APP_ENV` for any shared environment. Set `CORS_ORIGINS` to the frontend origin if it differs from `http://localhost:3000`.
-2. Run `docker compose up --build`.
-3. Open [ApexGrid](http://localhost:3000) and [API docs](http://localhost:8000/docs).
+The supported way to run ApexGrid is Docker Compose. It starts four services from `compose.yaml`: PostgreSQL 16, MongoDB 7, the FastAPI backend (Python 3.12) and the Next.js frontend (Node 22). You do not need Python, Node, PostgreSQL or MongoDB on your machine unless you want to run tests or develop outside containers.
 
-The backend bootstrap reapplies the idempotent schema migration and seeds fictional data on startup. Set `SEED_DEMO_DATA=0` in `.env` to skip both SQL demo fixtures and historical lap telemetry while still applying migrations. PostgreSQL data and MongoDB telemetry persist in named Docker volumes. Their host ports bind to loopback for local development.
+### What you need
+
+| | Required to run | Required to develop and test |
+|---|---|---|
+| Git | yes | yes |
+| Docker with Compose v2 (`docker compose`, not `docker-compose`) | yes | yes |
+| Node.js 22 and npm | no | yes (frontend, Playwright) |
+| Python 3.12 | no | yes (backend tests, lint, type checks) |
+
+Docker needs about 4 GB of memory and 5 GB of free disk for the images and volumes. Ports `3000`, `8000`, `5432` and `27017` must be free (the database ports bind to `127.0.0.1` only).
+
+### macOS (Apple silicon or Intel)
+
+1. Install the Xcode command line tools, which provide Git:
+   ```bash
+   xcode-select --install
+   ```
+2. Install Docker Desktop from <https://www.docker.com/products/docker-desktop/>, or with Homebrew:
+   ```bash
+   brew install --cask docker
+   ```
+   Open Docker Desktop once and wait until it reports that the engine is running. In **Settings → Resources**, give it at least 4 GB of memory.
+3. Clone and start:
+   ```bash
+   git clone https://github.com/madhavchoudhary2007-netizen/dbmsproj.git
+   cd dbmsproj
+   cp .env.example .env
+   docker compose up --build
+   ```
+4. For development tools (optional):
+   ```bash
+   brew install node@22 python@3.12
+   ```
+
+If port 5432 or 27017 is taken by a Homebrew PostgreSQL or MongoDB, stop it with `brew services stop postgresql@16` / `brew services stop mongodb-community`, or change the left-hand port in `compose.yaml`.
+
+### Windows 10/11
+
+ApexGrid runs on Windows through Docker Desktop with the WSL 2 backend. Running the commands inside a WSL Ubuntu shell is recommended: it avoids line-ending problems in the shell scripts and gives much faster file access.
+
+1. In an **administrator PowerShell**, install WSL 2 with Ubuntu, then restart:
+   ```powershell
+   wsl --install -d Ubuntu
+   ```
+2. Install Docker Desktop from <https://www.docker.com/products/docker-desktop/> (or `winget install -e --id Docker.DockerDesktop`). In **Settings → General**, keep **Use the WSL 2 based engine** on; in **Settings → Resources → WSL integration**, enable your Ubuntu distribution.
+3. Open the **Ubuntu** terminal and clone into the Linux file system (for example your home directory, not `/mnt/c/...`):
+   ```bash
+   sudo apt update && sudo apt install -y git
+   git clone https://github.com/madhavchoudhary2007-netizen/dbmsproj.git
+   cd dbmsproj
+   cp .env.example .env
+   docker compose up --build
+   ```
+4. Open <http://localhost:3000> in your Windows browser; WSL forwards localhost automatically.
+
+If you prefer plain PowerShell instead of WSL, install Git for Windows (`winget install -e --id Git.Git`) and run, from the cloned folder:
+```powershell
+git config core.autocrlf input
+Copy-Item .env.example .env
+docker compose up --build
+```
+Set `core.autocrlf input` before cloning (or re-clone after setting it globally with `git config --global core.autocrlf input`); Windows line endings break the container start scripts. The `scripts/eval/*.sh` quality gates need bash, so run them from WSL or Git Bash.
+
+If a port is in use, find the process with `netstat -ano | findstr :5432` and stop it, or change the left-hand port in `compose.yaml`.
+
+### Linux (Ubuntu/Debian; Fedora notes below)
+
+1. Install Docker Engine and the Compose plugin from Docker's repository (the distribution's `docker.io` package often lacks Compose v2). Follow <https://docs.docker.com/engine/install/> for your distribution; on Ubuntu:
+   ```bash
+   sudo apt update && sudo apt install -y ca-certificates curl git
+   sudo install -m 0755 -d /etc/apt/keyrings
+   sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" | sudo tee /etc/apt/sources.list.d/docker.list
+   sudo apt update && sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+   ```
+   On Fedora: `sudo dnf install -y dnf-plugins-core git && sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo && sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && sudo systemctl enable --now docker`.
+2. Let your user run Docker without `sudo`, then log out and back in:
+   ```bash
+   sudo usermod -aG docker "$USER"
+   ```
+3. Clone and start:
+   ```bash
+   git clone https://github.com/madhavchoudhary2007-netizen/dbmsproj.git
+   cd dbmsproj
+   cp .env.example .env
+   docker compose up --build
+   ```
+4. For development tools (optional), install Node 22 (for example from <https://nodejs.org> or `nvm install 22`) and Python 3.12 (`sudo apt install python3.12 python3.12-venv`, or `pyenv`).
+
+If a system PostgreSQL or MongoDB already holds the port, stop it (`sudo systemctl stop postgresql mongod`) or change the left-hand port in `compose.yaml`.
+
+### After the containers start
+
+- App: <http://localhost:3000> · API docs: <http://localhost:8000/docs> · health: <http://localhost:8000/api/health>
+- Sign in with a demo account below.
+- Run detached with `docker compose up --build -d`; follow logs with `docker compose logs -f backend`.
+- Stop with `docker compose down`. Add `-v` to also delete the database volumes and start fresh.
+
+`.env` controls the stack. The default `APP_ENV=local` is for the local demo; set a strong `JWT_SECRET` and a non-local `APP_ENV` for any shared environment. Set `CORS_ORIGINS` to the frontend origin if it differs from `http://localhost:3000`, and `NEXT_PUBLIC_API_URL` if the API is not at `http://localhost:8000` (it is baked into the frontend image, so rebuild after changing it).
+
+The backend bootstrap reapplies the idempotent schema migration and seeds fictional data on startup. Set `SEED_DEMO_DATA=0` in `.env` to skip both SQL demo fixtures and historical lap telemetry while still applying migrations. PostgreSQL data and MongoDB telemetry persist in named Docker volumes.
+
+### Development environment (all platforms)
+
+On macOS and Linux use the commands as written; on Windows run them in WSL.
+
+```bash
+python3.12 -m venv .venv
+.venv/bin/pip install -r backend/requirements-dev.txt
+cd frontend && npm ci && npx playwright install --with-deps chromium && cd ..
+```
+
+Run backend tests as `.venv/bin/python -m pytest` (not the bare `pytest` script) so the package-identity guard in `backend/app/__init__.py` passes. Stop any local API that uses the same database first: the backend holds a single runtime-ownership lease per database.
+
+### Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| `docker: 'compose' is not a docker command` | Install the Compose v2 plugin (`docker-compose-plugin`) or update Docker Desktop. |
+| `port is already allocated` | Another service holds 3000, 8000, 5432 or 27017; stop it or change the host port in `compose.yaml`. |
+| Backend restarts with a runtime ownership error | A second backend is using the same database. Stop the other one (only one backend process per database is supported). |
+| Login succeeds but pages show signed-out | The browser and API must share a host name: open `http://localhost:3000` (not `127.0.0.1`) while `NEXT_PUBLIC_API_URL` is `http://localhost:8000`. |
+| `exec ... no such file or directory` in a container on Windows | The repository was checked out with CRLF line endings; set `core.autocrlf input` and re-clone. |
+| Frontend build fails after changing `.env` | Rebuild the image: `docker compose build --no-cache frontend`. |
+
+## Routes
+
+Sixteen routes: `/` (landing), `/login`, `/dashboard`, `/live`, `/sessions`, `/stewards`, `/pit-wall`, `/championships`, `/events`, `/circuits`, `/standings`, `/teams`, `/drivers`, `/users`, `/analytics` and `/dbms` (DBMS operations and the PostgreSQL/MongoDB showcase). `/%5F_nb` is the design-primitives guide used by guide-mode tests.
 
 ## Demo accounts
 
@@ -19,6 +144,18 @@ The backend bootstrap reapplies the idempotent schema migration and seeds fictio
 | Team principal | `principal@apexgrid.test` | `ApexGrid2026!` |
 
 These are local demonstration credentials. Replace the seed and JWT secret before any shared deployment.
+
+## Quality gates
+
+| Gate | Command |
+|---|---|
+| Disposable stack (Postgres 15432, Mongo 27018) | `bash scripts/eval/test-stack.sh up` / `down` |
+| Backend suite, coverage (80% minimum), owned live acceptance | `bash scripts/eval/db-baseline.sh` |
+| Frontend typecheck, lint, build | `cd frontend && npm run typecheck && npm run build` |
+| Browser matrix (5 viewports) | `cd frontend && npx --no-install playwright test` |
+| Visual baselines (375 and 1440) | `cd frontend && PLAYWRIGHT_MODE=visual CI=1 npx --no-install playwright test e2e/visual-regression.spec.ts` |
+| Real-stack journeys | `PLAYWRIGHT_MODE=real-stack PLAYWRIGHT_REAL_STACK_API_URL=http://localhost:18000 APEXGRID_E2E_OWNED_DISPOSABLE=1 npx --no-install playwright test` with the API on port 18000 (use `localhost`, not `127.0.0.1`, so the session cookie is same-site) |
+| Design lints | `scripts/eval/lint-*.sh` |
 
 ## Architecture
 
@@ -44,7 +181,7 @@ docker compose exec -T postgres psql -U apexgrid -d apexgrid -v ON_ERROR_STOP=1 
 To run the integration suite locally, create a Python virtual environment and install `backend/requirements-dev.txt`, then run:
 
 ```bash
-DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:5432/apexgrid MONGODB_URL=mongodb://localhost:27017 pytest -q backend/tests
+DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:5432/apexgrid MONGODB_URL=mongodb://localhost:27017 .venv/bin/python -m pytest -q backend/tests
 DATABASE_URL=postgresql://apexgrid:apexgrid@localhost:5432/apexgrid MONGODB_URL=mongodb://localhost:27017 python scripts/acceptance.py
 cd frontend && npm ci && npm run typecheck && npm run build
 ```
@@ -61,9 +198,7 @@ With `AUTO_DEMO_RACE=1`, ApexGrid starts a generated live race when the backend 
 
 For generated races, Pit Wall shows each driver's tire age and wear, recommended stop lap and window, automatic box assignment, and completed stop history. The simulator schedules stops as tires age; operators do not need to request or close them. Allocations and pit states also appear in the Live Timing stream and DBMS race explorer. The manual reservation API remains available for non-generated sessions.
 
-The supplied `.env.example` enables an automatic repeating race. Set `AUTO_DEMO_RACE=0` to start races only when created from the UI. The current local `.env` uses `AUTO_DEMO_RACE=0` and `SEED_DEMO_DATA=0`; it has two completed generated race archives and no live race. The newest archive (session `87049420-8e98-4fd6-95a0-cc8de6340d74`) has 8 drivers, exactly 60 laps per driver (480 total), 8 official results, 3 incidents, 19 completed automatic pit stops, and 2,784 MongoDB samples. The earlier archive has 9 drivers, 495 completed laps, 22 completed pit stops, 3 incidents, and 2,916 MongoDB samples. All four services are healthy. Creating a live race does not require changing the setting.
-
-See `PROJECT_STATE.md` for verified feature and test status.
+The supplied `.env.example` enables an automatic repeating race. Set `AUTO_DEMO_RACE=0` to start races only when created from the UI. Creating a live race does not require changing the setting.
 
 ### Race database explorer
 

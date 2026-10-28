@@ -1,6 +1,6 @@
 # Demo flow
 
-Operator guide, not an autonomous-agent task list. Do not execute these writes/deletes/seeds against real databases. Agent verification uses only guarded disposable apexgrid-test with explicit fixture/cleanup scope. Demo availability must be observed, not assumed.
+Operator guide for the local demo only (never point it at a shared database). Not an autonomous-agent task list. Do not execute these writes/deletes/seeds against real databases. Agent verification uses only guarded disposable apexgrid-test with explicit fixture/cleanup scope. Demo availability must be observed, not assumed.
 
 1. Run `docker compose up --build`, open `http://localhost:3000`, and sign in as `admin@apexgrid.test` with `ApexGrid2026!`.
 2. Open Live Timing. A generated race is already running in the local Compose setup. Inspect the fictional driver names, licences, car numbers, positions, lap pace and telemetry. Click **Create live race** to start another random 8–16 car race; select it from the generated-race list. Delete a generated race from that list when finished. The automatically started race repeats after its configured lap count. The seeded 2026 championship, 10 drivers, four teams, three circuits and three events remain available; you can also start the scheduled Alpine race manually from Sessions.
@@ -12,7 +12,7 @@ Operator guide, not an autonomous-agent task list. Do not execute these writes/d
 
 For a repeatable command-line acceptance run with automatic cleanup, execute `scripts/acceptance.py` as documented in the README. It exercises the trigger threshold, WebSocket, concurrency, standings and DBMS endpoints.
 
-Use `.agent/CURRENT_STATE.md` and named test evidence for current verification; PROJECT_STATE.md is historical.
+Use `.agent/CURRENT_STATE.md` and named test evidence for current verification.
 
 
 ### Live database and completed race archive
