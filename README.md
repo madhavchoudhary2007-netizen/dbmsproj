@@ -6,6 +6,8 @@ A motorsport league and race operations platform with a PostgreSQL authoritative
 
 The supported way to run ApexGrid is Docker Compose. It starts four services from `compose.yaml`: PostgreSQL 16, MongoDB 7, the FastAPI backend (Python 3.12) and the Next.js frontend (Node 22). You do not need Python, Node, PostgreSQL or MongoDB on your machine unless you want to run tests or develop outside containers.
 
+To run without Docker on macOS, Windows or Linux, follow [docs/setup-without-docker.md](docs/setup-without-docker.md).
+
 ### What you need
 
 | | Required to run | Required to develop and test |

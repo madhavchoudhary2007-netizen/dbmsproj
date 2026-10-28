@@ -15,21 +15,27 @@ router = APIRouter()
 live_router = router
 
 
+def _main_module() -> Any:
+    # The app runs as "app.main" under uvicorn from backend/ and as "backend.app.main" from the repo root.
+    import sys
+
+    for name in ("app.main", "backend.app.main"):
+        if (module := sys.modules.get(name)) is not None:
+            return module
+    return None
+
+
 def _resolve_bus(bus: EventBus | None = None) -> EventBus:
     if bus is not None:
         return bus
-    import sys
-
-    main_module = sys.modules.get("backend.app.main")
+    main_module = _main_module()
     if main_module is not None and hasattr(main_module, "bus"):
         return cast(EventBus, main_module.bus)
     return EventBus()
 
 
 def _resolve_check_ws_runtime_lease() -> Callable[[WebSocket], Any]:
-    import sys
-
-    main_module = sys.modules.get("backend.app.main")
+    main_module = _main_module()
     if main_module is not None and hasattr(main_module, "_check_ws_runtime_lease"):
         return cast(Callable[[WebSocket], Any], main_module._check_ws_runtime_lease)
     from ..core.websocket_runtime import check_ws_runtime_lease
@@ -38,18 +44,14 @@ def _resolve_check_ws_runtime_lease() -> Callable[[WebSocket], Any]:
 
 
 def _resolve_websocket_authenticated_user() -> Callable[[str], Any]:
-    import sys
-
-    main_module = sys.modules.get("backend.app.main")
+    main_module = _main_module()
     if main_module is not None and hasattr(main_module, "_websocket_authenticated_user"):
         return cast(Callable[[str], Any], main_module._websocket_authenticated_user)
     return lambda _token: None
 
 
 def _resolve_wait_for_ws_event() -> Callable[[WebSocket, asyncio.Queue[Any]], Any]:
-    import sys
-
-    main_module = sys.modules.get("backend.app.main")
+    main_module = _main_module()
     if main_module is not None and hasattr(main_module, "_wait_for_ws_event"):
         return cast(Callable[[WebSocket, asyncio.Queue[Any]], Any], main_module._wait_for_ws_event)
     from ..core.websocket_runtime import wait_for_ws_event
@@ -58,9 +60,7 @@ def _resolve_wait_for_ws_event() -> Callable[[WebSocket, asyncio.Queue[Any]], An
 
 
 def _resolve_cors_origins() -> list[str]:
-    import sys
-
-    main_module = sys.modules.get("backend.app.main")
+    main_module = _main_module()
     if main_module is not None and hasattr(main_module, "CORS_ORIGINS"):
         return cast(list[str], main_module.CORS_ORIGINS)
     from ..config import CORS_ORIGINS
