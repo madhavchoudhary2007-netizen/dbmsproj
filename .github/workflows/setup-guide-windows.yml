@@ -1,0 +1,104 @@
+# Runs docs/setup-without-docker.md (Windows section) on an x64 runner.
+name: setup-guide-windows
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - docs/setup-without-docker.md
+      - .github/workflows/setup-guide-windows.yml
+      - backend/requirements.lock
+
+jobs:
+  windows-x64:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      # Step 1: the guide installs Python 3.12 and Node LTS with winget; the runner equivalents are below.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install MongoDB (winget, as in the guide)
+        run: |
+          if (Get-Command winget -ErrorAction SilentlyContinue) {
+            winget install --id MongoDB.Server -e --silent --accept-package-agreements --accept-source-agreements --disable-interactivity
+          } else {
+            Write-Output "winget unavailable on this runner image; using Chocolatey"
+            choco install mongodb -y --no-progress
+          }
+          Get-Service MongoDB | Start-Service
+          Get-Service MongoDB
+
+      - name: Install PostgreSQL 16 (EDB installer, as in the guide)
+        run: |
+          curl.exe -sSL -o "$env:RUNNER_TEMP\pg16.exe" https://get.enterprisedb.com/postgresql/postgresql-16.15-5-windows-x64.exe
+          Start-Process "$env:RUNNER_TEMP\pg16.exe" -Wait -ArgumentList '--mode unattended --unattendedmodeui none --superpassword postgres --serverport 5432 --disable-components stackbuilder,pgAdmin'
+          Get-Service postgresql-x64-16
+
+      - name: Step 2 - create the database
+        env:
+          PGPASSWORD: postgres
+        run: |
+          & "C:\Program Files\PostgreSQL\16\bin\psql.exe" -U postgres -v ON_ERROR_STOP=1 -c "CREATE ROLE apexgrid LOGIN SUPERUSER PASSWORD 'apexgrid';" -c "CREATE DATABASE apexgrid OWNER apexgrid;"
+
+      - name: Step 4 - backend
+        working-directory: backend
+        run: |
+          py -3.12 -m venv .venv
+          .\.venv\Scripts\python -m pip install --require-hashes -r requirements.lock
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $env:APP_ENV = "local"; $env:AUTO_DEMO_RACE = "1"
+          .\.venv\Scripts\python -m app.bootstrap
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          Start-Process -FilePath .\.venv\Scripts\python.exe -ArgumentList "-m uvicorn app.main:app --host 127.0.0.1 --port 8000" -RedirectStandardOutput "$env:RUNNER_TEMP\be.out" -RedirectStandardError "$env:RUNNER_TEMP\be.log"
+          for ($i = 0; $i -lt 30; $i++) {
+            try { (Invoke-WebRequest -UseBasicParsing http://localhost:8000/health/ready).Content; exit 0 } catch { Start-Sleep 2 }
+          }
+          Get-Content "$env:RUNNER_TEMP\be.log"; exit 1
+
+      - name: Step 5 - frontend
+        working-directory: frontend
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          Start-Process -FilePath cmd.exe -ArgumentList "/c npm start > $env:RUNNER_TEMP\fe.log 2>&1"
+          for ($i = 0; $i -lt 30; $i++) {
+            try { "login page: " + (Invoke-WebRequest -UseBasicParsing http://localhost:3000/login).StatusCode; exit 0 } catch { Start-Sleep 2 }
+          }
+          Get-Content "$env:RUNNER_TEMP\fe.log"; exit 1
+
+      - name: Sign in and receive live telemetry over WebSocket
+        working-directory: backend
+        run: |
+          @'
+          import asyncio, json, urllib.request, websockets
+          API = "http://localhost:8000"
+          def call(path, data=None, token=None):
+              headers = {"content-type": "application/json"}
+              if token:
+                  headers["Authorization"] = "Bearer " + token
+              req = urllib.request.Request(API + path, data=json.dumps(data).encode() if data else None, headers=headers)
+              return json.load(urllib.request.urlopen(req, timeout=10))
+          tok = call("/api/auth/login", {"email": "admin@apexgrid.test", "password": "ApexGrid2026!"})["access_token"]
+          print("login ok")
+          sessions = call("/api/sessions", token=tok)
+          sessions = sessions.get("items", sessions) if isinstance(sessions, dict) else sessions
+          active = [s for s in sessions if s.get("state") == "ACTIVE"]
+          assert active, "no ACTIVE demo race"
+          async def main():
+              url = f"ws://localhost:8000/api/ws/sessions/{active[0]['id']}"
+              async with websockets.connect(url, subprotocols=["apexgrid.jwt", tok], origin="http://localhost:3000") as ws:
+                  print("ws event:", (await asyncio.wait_for(ws.recv(), 30))[:100])
+          asyncio.run(main())
+          '@ | Set-Content "$env:RUNNER_TEMP\e2e.py"
+          .\.venv\Scripts\python "$env:RUNNER_TEMP\e2e.py"
