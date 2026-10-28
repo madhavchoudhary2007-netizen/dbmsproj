@@ -32,7 +32,7 @@ Docker needs about 4 GB of memory and 5 GB of free disk for the images and volum
    Open Docker Desktop once and wait until it reports that the engine is running. In **Settings → Resources**, give it at least 4 GB of memory.
 3. Clone and start:
    ```bash
-   git clone https://github.com/madhavchoudhary2007-netizen/dbmsproj.git
+   git clone -b overhaul/neo-brutal https://github.com/madhavchoudhary2007-netizen/dbmsproj.git
    cd dbmsproj
    cp .env.example .env
    docker compose up --build
@@ -56,7 +56,7 @@ ApexGrid runs on Windows through Docker Desktop with the WSL 2 backend. Running 
 3. Open the **Ubuntu** terminal and clone into the Linux file system (for example your home directory, not `/mnt/c/...`):
    ```bash
    sudo apt update && sudo apt install -y git
-   git clone https://github.com/madhavchoudhary2007-netizen/dbmsproj.git
+   git clone -b overhaul/neo-brutal https://github.com/madhavchoudhary2007-netizen/dbmsproj.git
    cd dbmsproj
    cp .env.example .env
    docker compose up --build
@@ -90,7 +90,7 @@ If a port is in use, find the process with `netstat -ano | findstr :5432` and st
    ```
 3. Clone and start:
    ```bash
-   git clone https://github.com/madhavchoudhary2007-netizen/dbmsproj.git
+   git clone -b overhaul/neo-brutal https://github.com/madhavchoudhary2007-netizen/dbmsproj.git
    cd dbmsproj
    cp .env.example .env
    docker compose up --build

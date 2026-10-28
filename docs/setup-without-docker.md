@@ -7,7 +7,7 @@ You install four programs, create one database, then start the backend and front
 | Program | Version |
 |---|---|
 | PostgreSQL | 16 (15 or newer works) |
-| MongoDB Community Server | 7.0 or 8.0 |
+| MongoDB Community Server | 7.0, 8.0 or 9.0 |
 | Python | 3.12 or newer |
 | Node.js | 22 or newer |
 | Git | any |
@@ -41,13 +41,16 @@ Open PowerShell and run:
 
 ```powershell
 winget install --id Git.Git -e
-winget install --id PostgreSQL.PostgreSQL.16 -e
 winget install --id MongoDB.Server -e
 winget install --id Python.Python.3.12 -e
 winget install --id OpenJS.NodeJS.LTS -e
 ```
 
-The PostgreSQL installer asks you to choose a password for the `postgres` superuser; remember it for step 2. PostgreSQL and MongoDB are installed as Windows services and start automatically. Close and reopen PowerShell so the new programs are on `PATH`.
+Click **Yes** on each administrator prompt.
+
+PostgreSQL is not installed with winget: its download server rejects winget with `403 Forbidden`. Download the PostgreSQL 16 Windows installer from [enterprisedb.com/downloads/postgres-postgresql-downloads](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads) and run it with the defaults (Stack Builder and pgAdmin can be unticked). It asks you to choose a password for the `postgres` superuser; remember it for step 2.
+
+PostgreSQL and MongoDB are installed as Windows services and start automatically. Close and reopen PowerShell so the new programs are on `PATH`.
 
 If script execution is blocked when you activate anything later, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once.
 
@@ -61,13 +64,14 @@ curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 sudo apt-get install -y nodejs
 # MongoDB 8.0 (official repository; use "jammy" on Ubuntu 22.04, "bookworm" on Debian 12)
 curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | sudo gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg --dearmor
+sudo chmod 644 /usr/share/keyrings/mongodb-server-8.0.gpg
 echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
 sudo apt-get update
 sudo apt-get install -y mongodb-org
 sudo systemctl enable --now postgresql mongod
 ```
 
-Ubuntu 24.04 ships PostgreSQL 16 and Python 3.12. On Debian 12, which ships Python 3.11, install Python 3.12 or newer first (for example with `uv python install 3.12`). For the Debian repository line use `https://repo.mongodb.org/apt/debian bookworm/mongodb-org/8.0 main`.
+Ubuntu 24.04 ships PostgreSQL 16 and Python 3.12. On Debian 12, which ships Python 3.11, install Python 3.12 or newer first (for example with `uv python install 3.12`). For the Debian repository line use `https://repo.mongodb.org/apt/debian bookworm/mongodb-org/8.0 main` on x86-64. MongoDB publishes no ARM64 Debian packages, so on ARM64 Debian (for example a VM on an Apple silicon Mac) keep the Ubuntu `noble` line above; it installs and runs there.
 
 Fedora: `sudo dnf install git postgresql-server python3 nodejs`, then `sudo postgresql-setup --initdb && sudo systemctl enable --now postgresql`, and install MongoDB from its [RHEL repository](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-red-hat/).
 
@@ -98,7 +102,7 @@ MongoDB needs no setup; the backend creates its collections.
 ## 3. Get the code
 
 ```bash
-git clone https://github.com/madhavchoudhary2007-netizen/dbmsproj.git
+git clone -b overhaul/neo-brutal https://github.com/madhavchoudhary2007-netizen/dbmsproj.git
 cd dbmsproj
 ```
 
@@ -145,6 +149,8 @@ npm start
 
 Open **http://localhost:3000** (use `localhost`, not `127.0.0.1`, so the sign-in cookie reaches the API) and sign in with a demo account from the README, for example `admin@apexgrid.test` / `ApexGrid2026!`. The Live timing page should show `Connected · live stream`.
 
+On Windows, `npm ci` prints warnings in red; they are not errors as long as `npm run build` ends with the route list.
+
 For frontend development with hot reload, use `npm run dev` instead of `build` and `start`.
 
 ## Stopping and resetting
@@ -168,4 +174,10 @@ mongosh apexgrid --eval "db.dropDatabase()"
 | Backend exits with a runtime ownership error | Another backend (for example the Docker one) is using the same database. Stop it; only one backend per database is supported. |
 | `Address already in use` / `EADDRINUSE` | Something else holds 8000 or 3000. Stop it, or stop the Docker stack with `docker compose down`. |
 | `python3.12: command not found` | Use the Python 3.12+ command your system has (`python3`, or `py -3.12` on Windows) and check it with `--version`. |
+| `template database "template1" has a collation version mismatch` (rolling distributions such as Kali or Arch) | As the `postgres` user run `ALTER DATABASE template1 REFRESH COLLATION VERSION;` and the same for `postgres`, then repeat step 2. |
+| `The repository ... mongodb-org ... is not signed` | The key file is not readable by apt: `sudo chmod 644 /usr/share/keyrings/mongodb-server-8.0.gpg`, then `sudo apt-get update`. |
 | `ERROR: In --require-hashes mode` on install | Your copy of `requirements.lock` is out of date; run `git pull`. |
+
+## Tested on
+
+On 2026-10-28 this guide was run end to end (install, database, backend, frontend, sign-in and live WebSocket telemetry) on Windows 11 ARM64 (Python 3.12, Node 24, PostgreSQL 16, MongoDB 9.0), Kali Linux 2025.2 ARM64 (Python 3.14, Node 22, PostgreSQL 17, MongoDB 8.0). On macOS (Apple silicon) the backend and frontend steps were run; the Homebrew install commands were not.
